@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Social Dating</string>
+    <string name="back_button">Назад</string>
 </resources>
