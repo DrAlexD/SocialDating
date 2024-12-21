@@ -33,6 +33,7 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.ui.state.CategoriesUiState
+import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.CategoriesViewModel
 
@@ -50,8 +51,8 @@ fun CategoriesScreen(
         topBar = {
             AppTopBar(
                 title = stringResource(CategoriesDestination.titleRes),
-                currentStatus = categoriesUiState.getCurrentStatus(),
-                refreshAction = { categoriesViewModel.getCategories() }.takeIf { categoriesUiState.isAllowedRefresh() },
+                internetStatus = categoriesViewModel.internetStatus,
+                refreshAction = { categoriesViewModel.getCategories() },
                 scrollBehavior = scrollBehavior
             )
         },
@@ -59,6 +60,7 @@ fun CategoriesScreen(
     ) { innerPadding ->
         CategoriesBody(
             categoriesUiState = categoriesUiState,
+            internetStatus = categoriesViewModel.internetStatus,
             onCategoryClick = onCategoryClick,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding
@@ -69,6 +71,7 @@ fun CategoriesScreen(
 @Composable
 private fun CategoriesBody(
     categoriesUiState: CategoriesUiState,
+    internetStatus: InternetStatus,
     onCategoryClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -78,30 +81,25 @@ private fun CategoriesBody(
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
-        when (categoriesUiState) {
-            is CategoriesUiState.Success ->
-                CategoriesList(
-                    categories = categoriesUiState.categories,
-                    onCategoryClick = onCategoryClick,
-                    contentPadding = contentPadding,
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
-                )
-
-            is CategoriesUiState.Loading -> {
-                Text(
-                    text = stringResource(R.string.loading),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(contentPadding),
-                )
-            }
-
-            is CategoriesUiState.Error -> {
-                Text(
-                    text = stringResource(R.string.no_internet_connection),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(contentPadding),
-                )
-            }
+        if (categoriesUiState.categories.isNotEmpty()) {
+            CategoriesList(
+                categories = categoriesUiState.categories,
+                onCategoryClick = onCategoryClick,
+                contentPadding = contentPadding,
+                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+            )
+        } else {
+            Text(
+                text = stringResource(
+                    when (internetStatus) {
+                        InternetStatus.ONLINE -> R.string.no_data
+                        InternetStatus.LOADING -> R.string.loading
+                        InternetStatus.OFFLINE -> R.string.no_internet_connection
+                    }
+                ),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
+            )
         }
     }
 }
@@ -153,35 +151,11 @@ fun CategoryCard(
 
 @Preview(showBackground = true)
 @Composable
-fun CategoriesBodyLoadingPreview() {
-    AppTheme {
-        CategoriesBody(
-            categoriesUiState = CategoriesUiState.Loading,
-            onCategoryClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
 fun CategoriesBodyOfflineDataPreview() {
     AppTheme {
         CategoriesBody(
-            categoriesUiState = CategoriesUiState.Success(
-                categories = FakeDataSource.categories,
-                isRemoteData = false
-            ),
-            onCategoryClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CategoriesBodyErrorPreview() {
-    AppTheme {
-        CategoriesBody(
-            categoriesUiState = CategoriesUiState.Error,
+            categoriesUiState = CategoriesUiState(FakeDataSource.categories),
+            internetStatus = InternetStatus.OFFLINE,
             onCategoryClick = {}
         )
     }
