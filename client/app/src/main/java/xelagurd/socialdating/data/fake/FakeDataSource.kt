@@ -2,6 +2,7 @@ package xelagurd.socialdating.data.fake
 
 import xelagurd.socialdating.data.model.Category
 
+// FixMe: remove after implementing server
 object FakeDataSource {
     val categories = listOf(
         Category(1, "abc1"),

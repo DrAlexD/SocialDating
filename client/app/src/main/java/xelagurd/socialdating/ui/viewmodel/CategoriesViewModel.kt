@@ -2,10 +2,14 @@ package xelagurd.socialdating.ui.viewmodel
 
 import javax.inject.Inject
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,14 +17,23 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.LocalCategoriesRepository
 import xelagurd.socialdating.data.network.RemoteCategoriesRepository
 import xelagurd.socialdating.ui.state.CategoriesUiState
+import xelagurd.socialdating.ui.state.InternetStatus
 
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
     private val remoteRepository: RemoteCategoriesRepository,
     private val localRepository: LocalCategoriesRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow<CategoriesUiState>(CategoriesUiState.Loading)
-    val uiState: StateFlow<CategoriesUiState> = _uiState.asStateFlow()
+    var internetStatus by mutableStateOf(InternetStatus.LOADING)
+        private set
+
+    val uiState: StateFlow<CategoriesUiState> = localRepository.getCategories()
+        .map { CategoriesUiState(it) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = CategoriesUiState()
+        )
 
     init {
         getCategories()
@@ -28,35 +41,22 @@ class CategoriesViewModel @Inject constructor(
 
     fun getCategories() {
         viewModelScope.launch {
-            _uiState.value = CategoriesUiState.Loading
-            _uiState.value = try {
-                delay(3000L)
+            try {
+                internetStatus = InternetStatus.LOADING
+
+                delay(3000L) // FixMe: remove after implementing server
 
                 val remoteCategories = remoteRepository.getCategories()
-                remoteCategories.forEach { localRepository.insertCategory(it) }
-
-                CategoriesUiState.Success(
-                    categories = remoteCategories,
-                    isRemoteData = true
-                )
+                localRepository.insertCategories(remoteCategories)
+                internetStatus = InternetStatus.ONLINE
             } catch (_: Exception) {
-                try {
-                    val localCategories = localRepository.getCategories()
-
-                    if (localCategories.isNotEmpty()) {
-                        CategoriesUiState.Success(
-                            categories = localCategories,
-                            isRemoteData = false
-                        )
-                    } else {
-                        FakeDataSource.categories.forEach { localRepository.insertCategory(it) }
-                        CategoriesUiState.Error
-                    }
-                } catch (_: Exception) {
-                    FakeDataSource.categories.forEach { localRepository.insertCategory(it) }
-                    CategoriesUiState.Error
-                }
+                localRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
+                internetStatus = InternetStatus.OFFLINE
             }
         }
+    }
+
+    companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
     }
 }

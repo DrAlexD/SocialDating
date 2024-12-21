@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import xelagurd.socialdating.ui.navigation.AppNavHost
 import xelagurd.socialdating.ui.navigation.CategoriesDestination
-import xelagurd.socialdating.ui.state.Status
+import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 
 @Composable
@@ -39,10 +39,10 @@ fun SocialDatingApp() {
 @Composable
 fun AppTopBar(
     title: String,
-    currentStatus: Status,
+    internetStatus: InternetStatus,
+    refreshAction: () -> Unit,
     modifier: Modifier = Modifier,
     navigateUp: (() -> Unit)? = null,
-    refreshAction: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     CenterAlignedTopAppBar(
@@ -58,20 +58,22 @@ fun AppTopBar(
             }
         },
         actions = {
-            Card(onClick = refreshAction ?: {}) {
+            val onCardStatusClick =
+                refreshAction.takeIf { internetStatus.isAllowedRefresh() } ?: {}
+            Card(onClick = onCardStatusClick) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(
-                            when (currentStatus) {
-                                Status.ONLINE -> R.string.online
-                                Status.LOADING -> R.string.loading
-                                Status.OFFLINE -> R.string.offline
+                            when (internetStatus) {
+                                InternetStatus.ONLINE -> R.string.online
+                                InternetStatus.LOADING -> R.string.loading
+                                InternetStatus.OFFLINE -> R.string.offline
                             }
                         ),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
                     )
-                    refreshAction?.let {
+                    if (internetStatus.isAllowedRefresh()) {
                         Icon(
                             imageVector = Filled.Refresh,
                             contentDescription = stringResource(R.string.refresh),
@@ -96,9 +98,9 @@ fun AppTopBarOfflinePreview() {
     AppTheme {
         AppTopBar(
             title = stringResource(CategoriesDestination.titleRes),
-            currentStatus = Status.OFFLINE,
-            navigateUp = {},
-            refreshAction = {}
+            internetStatus = InternetStatus.OFFLINE,
+            refreshAction = {},
+            navigateUp = {}
         )
     }
 }
@@ -110,7 +112,8 @@ fun AppTopBarOnlinePreview() {
     AppTheme {
         AppTopBar(
             title = stringResource(CategoriesDestination.titleRes),
-            currentStatus = Status.ONLINE,
+            internetStatus = InternetStatus.ONLINE,
+            refreshAction = {},
             navigateUp = {}
         )
     }
