@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import xelagurd.socialdating.ui.screen.CategoriesScreen
+import xelagurd.socialdating.ui.screen.StatementsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,6 +29,20 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         composable(
             route = StatementsDestination.routeWithArgs,
             arguments = listOf(navArgument(StatementsDestination.categoryId) {
+                type = NavType.IntType
+            })
+        ) {
+            StatementsScreen(
+                onStatementClick = {
+                    navController.navigate("${StatementDetailsDestination.route}/${it}")
+                },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        composable(
+            route = StatementDetailsDestination.routeWithArgs,
+            arguments = listOf(navArgument(StatementDetailsDestination.statementId) {
                 type = NavType.IntType
             })
         ) {
