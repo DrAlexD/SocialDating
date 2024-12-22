@@ -11,7 +11,8 @@ abstract class NavigationDestination {
 
 enum class AppScreen {
     Categories,
-    Statements
+    Statements,
+    StatementDetails
 }
 
 object CategoriesDestination : NavigationDestination() {
@@ -22,4 +23,10 @@ object StatementsDestination : NavigationDestination() {
     override val route = AppScreen.Statements.name
     const val categoryId = "categoryId"
     val routeWithArgs = "$route/{$categoryId}"
+}
+
+object StatementDetailsDestination : NavigationDestination() {
+    override val route = AppScreen.StatementDetails.name
+    const val statementId = "statementId"
+    val routeWithArgs = "$route/{$statementId}"
 }

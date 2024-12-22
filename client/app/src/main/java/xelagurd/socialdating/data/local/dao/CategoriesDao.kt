@@ -1,4 +1,4 @@
-package xelagurd.socialdating.data.local
+package xelagurd.socialdating.data.local.dao
 
 import kotlinx.coroutines.flow.Flow
 import androidx.room.Dao
@@ -13,5 +13,5 @@ interface CategoriesDao {
     fun getCategories(): Flow<List<Category>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCategories(item: List<Category>)
+    suspend fun insertCategories(categories: List<Category>)
 }

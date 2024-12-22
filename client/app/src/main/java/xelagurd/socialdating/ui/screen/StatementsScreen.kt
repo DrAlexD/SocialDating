@@ -30,38 +30,40 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FakeDataSource
-import xelagurd.socialdating.data.model.Category
-import xelagurd.socialdating.ui.navigation.CategoriesDestination
-import xelagurd.socialdating.ui.state.CategoriesUiState
+import xelagurd.socialdating.data.model.Statement
+import xelagurd.socialdating.ui.navigation.StatementsDestination
+import xelagurd.socialdating.ui.state.StatementsUiState
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.theme.AppTheme
-import xelagurd.socialdating.ui.viewmodel.CategoriesViewModel
+import xelagurd.socialdating.ui.viewmodel.StatementsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoriesScreen(
-    onCategoryClick: (Int) -> Unit,
+fun StatementsScreen(
+    onStatementClick: (Int) -> Unit,
+    onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    categoriesViewModel: CategoriesViewModel = hiltViewModel()
+    statementsViewModel: StatementsViewModel = hiltViewModel()
 ) {
-    val categoriesUiState: CategoriesUiState by categoriesViewModel.uiState.collectAsState()
+    val statementsUiState: StatementsUiState by statementsViewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
         topBar = {
             AppTopBar(
-                title = stringResource(CategoriesDestination.titleRes),
-                internetStatus = categoriesViewModel.internetStatus,
-                refreshAction = { categoriesViewModel.getCategories() },
+                title = stringResource(StatementsDestination.titleRes),
+                internetStatus = statementsViewModel.internetStatus,
+                refreshAction = { statementsViewModel.getStatements() },
+                navigateUp = { onNavigateUp.invoke() },
                 scrollBehavior = scrollBehavior
             )
         },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
-        CategoriesBody(
-            categoriesUiState = categoriesUiState,
-            internetStatus = categoriesViewModel.internetStatus,
-            onCategoryClick = onCategoryClick,
+        StatementsBody(
+            statementsUiState = statementsUiState,
+            internetStatus = statementsViewModel.internetStatus,
+            onStatementClick = onStatementClick,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding
         )
@@ -69,10 +71,10 @@ fun CategoriesScreen(
 }
 
 @Composable
-private fun CategoriesBody(
-    categoriesUiState: CategoriesUiState,
+private fun StatementsBody(
+    statementsUiState: StatementsUiState,
     internetStatus: InternetStatus,
-    onCategoryClick: (Int) -> Unit,
+    onStatementClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -80,10 +82,10 @@ private fun CategoriesBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        if (categoriesUiState.categories.isNotEmpty()) {
-            CategoriesList(
-                categories = categoriesUiState.categories,
-                onCategoryClick = onCategoryClick,
+        if (statementsUiState.statements.isNotEmpty()) {
+            StatementsList(
+                statements = statementsUiState.statements,
+                onStatementClick = onStatementClick,
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
@@ -106,9 +108,9 @@ private fun CategoriesBody(
 }
 
 @Composable
-private fun CategoriesList(
-    categories: List<Category>,
-    onCategoryClick: (Int) -> Unit,
+private fun StatementsList(
+    statements: List<Statement>,
+    onStatementClick: (Int) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -116,10 +118,10 @@ private fun CategoriesList(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
-        items(items = categories, key = { it.id }) {
-            CategoryCard(
-                category = it,
-                onCategoryClick = onCategoryClick,
+        items(items = statements, key = { it.id }) {
+            StatementCard(
+                statement = it,
+                onStatementClick = onStatementClick,
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
             )
         }
@@ -127,13 +129,13 @@ private fun CategoriesList(
 }
 
 @Composable
-fun CategoryCard(
-    category: Category,
-    onCategoryClick: (Int) -> Unit,
+fun StatementCard(
+    statement: Statement,
+    onStatementClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        onClick = { onCategoryClick(category.id) },
+        onClick = { onStatementClick(statement.id) },
         elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
         modifier = modifier
     ) {
@@ -142,7 +144,7 @@ fun CategoryCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = category.name,
+                text = statement.text,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
             )
@@ -152,23 +154,23 @@ fun CategoryCard(
 
 @Preview(showBackground = true)
 @Composable
-fun CategoriesBodyOfflineDataPreview() {
+fun StatementsBodyOfflineDataPreview() {
     AppTheme {
-        CategoriesBody(
-            categoriesUiState = CategoriesUiState(FakeDataSource.categories),
+        StatementsBody(
+            statementsUiState = StatementsUiState(FakeDataSource.statements),
             internetStatus = InternetStatus.OFFLINE,
-            onCategoryClick = {}
+            onStatementClick = {}
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun CategoryCardPreview() {
+fun StatementCardPreview() {
     AppTheme {
-        CategoryCard(
-            category = FakeDataSource.categories[0],
-            onCategoryClick = {}
+        StatementCard(
+            statement = FakeDataSource.statements[0],
+            onStatementClick = {}
         )
     }
 }

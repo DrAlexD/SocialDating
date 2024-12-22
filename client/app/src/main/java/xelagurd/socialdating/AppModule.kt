@@ -38,5 +38,8 @@ object AppModule {
         .build()
 
     @Provides
-    fun provideAppDao(database: AppDatabase) = database.categoriesDao()
+    fun provideCategoriesDao(database: AppDatabase) = database.categoriesDao()
+
+    @Provides
+    fun provideStatementsDao(database: AppDatabase) = database.statementsDao()
 }
