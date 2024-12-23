@@ -94,7 +94,11 @@ private fun CategoriesBody(
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
         } else {
-            Column(verticalArrangement = Arrangement.Center) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = modifier
+            ) {
                 Text(
                     text = stringResource(
                         when (internetStatus) {
@@ -103,7 +107,7 @@ private fun CategoriesBody(
                             InternetStatus.OFFLINE -> R.string.no_internet_connection
                         }
                     ),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
                 )
             }
