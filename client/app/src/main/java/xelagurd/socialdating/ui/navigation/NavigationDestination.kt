@@ -12,12 +12,6 @@ abstract class NavigationDestination {
     val titleRes: Int = R.string.app_name
 }
 
-enum class AppScreen {
-    Categories,
-    Statements,
-    StatementDetails
-}
-
 data class TopLevelDestination(
     val navigationDestination: NavigationDestination,
     val navigateTo: () -> Unit,
@@ -28,6 +22,12 @@ data class TopLevelDestination(
 )
 
 val topLevelDestinations = arrayListOf<TopLevelDestination>()
+
+enum class AppScreen {
+    Categories,
+    Statements,
+    StatementDetails
+}
 
 object CategoriesDestination : NavigationDestination() {
     override val route = AppScreen.Categories.name
