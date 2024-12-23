@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import xelagurd.socialdating.AppBottomNavigationBar
 import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FakeDataSource
@@ -54,6 +55,11 @@ fun CategoriesScreen(
                 internetStatus = categoriesViewModel.internetStatus,
                 refreshAction = { categoriesViewModel.getCategories() },
                 scrollBehavior = scrollBehavior
+            )
+        },
+        bottomBar = {
+            AppBottomNavigationBar(
+                currentTopLevelRoute = CategoriesDestination.topLevelRoute
             )
         },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)

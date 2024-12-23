@@ -27,13 +27,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import xelagurd.socialdating.AppBottomNavigationBar
 import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.ui.navigation.StatementsDestination
-import xelagurd.socialdating.ui.state.StatementsUiState
 import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.StatementsUiState
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.StatementsViewModel
 
@@ -56,6 +57,11 @@ fun StatementsScreen(
                 refreshAction = { statementsViewModel.getStatements() },
                 navigateUp = { onNavigateUp.invoke() },
                 scrollBehavior = scrollBehavior
+            )
+        },
+        bottomBar = {
+            AppBottomNavigationBar(
+                currentTopLevelRoute = StatementsDestination.topLevelRoute
             )
         },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)

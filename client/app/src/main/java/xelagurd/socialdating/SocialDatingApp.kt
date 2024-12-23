@@ -3,8 +3,7 @@ package xelagurd.socialdating
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons.AutoMirrored
-import androidx.compose.material.icons.Icons.Filled
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
@@ -13,6 +12,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -25,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import xelagurd.socialdating.ui.navigation.AppNavHost
 import xelagurd.socialdating.ui.navigation.CategoriesDestination
+import xelagurd.socialdating.ui.navigation.topLevelDestinations
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 
@@ -51,7 +53,7 @@ fun AppTopBar(
             navigateUp?.let {
                 IconButton(onClick = it) {
                     Icon(
-                        imageVector = AutoMirrored.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back_button)
                     )
                 }
@@ -75,7 +77,7 @@ fun AppTopBar(
                     )
                     if (internetStatus.isAllowedRefresh()) {
                         Icon(
-                            imageVector = Filled.Refresh,
+                            imageVector = Icons.Default.Refresh,
                             contentDescription = stringResource(R.string.refresh),
                             modifier = Modifier.graphicsLayer {
                                 this.scaleX = 0.8f
@@ -89,6 +91,26 @@ fun AppTopBar(
         scrollBehavior = scrollBehavior,
         modifier = modifier
     )
+}
+
+@Composable
+fun AppBottomNavigationBar(currentTopLevelRoute: String) {
+    NavigationBar {
+        topLevelDestinations.forEach { item ->
+            val selectedRoute = currentTopLevelRoute == item.navigationDestination.route
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = if (selectedRoute) item.selectedIcon else item.unselectedIcon,
+                        contentDescription = stringResource(item.contentDescription)
+                    )
+                },
+                label = { Text(item.navigationDestination.route) },
+                selected = selectedRoute,
+                onClick = item.navigateTo
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
