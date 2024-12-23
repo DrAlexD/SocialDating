@@ -1,5 +1,6 @@
 package xelagurd.socialdating.ui.viewmodel
 
+import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,13 +15,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import okio.IOException
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.data.network.repository.RemoteStatementsRepository
 import xelagurd.socialdating.ui.navigation.StatementsDestination
-import xelagurd.socialdating.ui.state.StatementsUiState
 import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.StatementsUiState
 
 @HiltViewModel
 class StatementsViewModel @Inject constructor(
