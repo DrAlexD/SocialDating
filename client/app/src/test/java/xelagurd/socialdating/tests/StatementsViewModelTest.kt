@@ -1,4 +1,4 @@
-package xelagurd.socialdating
+package xelagurd.socialdating.tests
 
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,6 +14,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.data.model.Statement
@@ -38,7 +39,7 @@ class StatementsViewModelTest {
     private val remoteStatements = listOf(Statement(2, "Remote Statement", categoryId))
 
     @Before
-    fun setUp() {
+    fun setup() {
         state = MutableStateFlow(localStatements)
         every { localRepository.getStatements(categoryId) } returns state
         every { savedStateHandle.get<Int>("categoryId") } returns categoryId
@@ -49,12 +50,12 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_GetDataWithInternet_OnlineStatus() = runTest {
+    fun statementsViewModel_CheckDataWithInternet() = runTest {
         assertEquals(localStatements, localRepository.getStatements(categoryId).first())
 
         coEvery { remoteRepository.getStatements(categoryId) } returns remoteStatements
         coEvery { localRepository.insertStatements(remoteStatements) } answers {
-            state.value += remoteStatements
+            state.value = (state.value.toSet() + remoteStatements).toList()
         }
 
         advanceUntilIdle()
@@ -67,12 +68,12 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_GetDataWithoutInternet_OfflineStatus() = runTest {
+    fun statementsViewModel_CheckDataWithoutInternet() = runTest {
         assertEquals(localStatements, localRepository.getStatements(categoryId).first())
 
         coEvery { remoteRepository.getStatements(categoryId) } throws IOException()
         coEvery { localRepository.insertStatements(FakeDataSource.statements) } answers {
-            state.value += FakeDataSource.statements
+            state.value = (state.value.toSet() + FakeDataSource.statements).toList()
         }
 
         advanceUntilIdle()
@@ -85,12 +86,12 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_RefreshDataWithoutInternet_OfflineStatus() = runTest {
+    fun statementsViewModel_CheckRefreshedOnlineDataWithoutInternet() = runTest {
         assertEquals(localStatements, localRepository.getStatements(categoryId).first())
 
         coEvery { remoteRepository.getStatements(categoryId) } returns remoteStatements
         coEvery { localRepository.insertStatements(remoteStatements) } answers {
-            state.value += remoteStatements
+            state.value = (state.value.toSet() + remoteStatements).toList()
         }
 
         advanceUntilIdle()
@@ -103,7 +104,7 @@ class StatementsViewModelTest {
 
         coEvery { remoteRepository.getStatements(categoryId) } throws IOException()
         coEvery { localRepository.insertStatements(FakeDataSource.statements) } answers {
-            state.value += FakeDataSource.statements
+            state.value = (state.value.toSet() + FakeDataSource.statements).toList()
         }
 
         viewModel.getStatements()
@@ -118,12 +119,12 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_RefreshDataWithInternet_OnlineStatus() = runTest {
+    fun statementsViewModel_CheckRefreshedOfflineDataWithInternet() = runTest {
         assertEquals(localStatements, localRepository.getStatements(categoryId).first())
 
         coEvery { remoteRepository.getStatements(categoryId) } throws IOException()
         coEvery { localRepository.insertStatements(FakeDataSource.statements) } answers {
-            state.value += FakeDataSource.statements
+            state.value = (state.value.toSet() + FakeDataSource.statements).toList()
         }
 
         advanceUntilIdle()
@@ -136,7 +137,7 @@ class StatementsViewModelTest {
 
         coEvery { remoteRepository.getStatements(categoryId) } returns remoteStatements
         coEvery { localRepository.insertStatements(remoteStatements) } answers {
-            state.value += remoteStatements
+            state.value = (state.value.toSet() + remoteStatements).toList()
         }
 
         viewModel.getStatements()
@@ -146,6 +147,62 @@ class StatementsViewModelTest {
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
             localStatements + FakeDataSource.statements + remoteStatements,
+            localRepository.getStatements(categoryId).first()
+        )
+    }
+
+    @Test
+    fun statementsViewModel_CheckRefreshedOnlineDataWithInternet() = runTest {
+        assertEquals(localStatements, localRepository.getStatements(categoryId).first())
+
+        coEvery { remoteRepository.getStatements(categoryId) } returns remoteStatements
+        coEvery { localRepository.insertStatements(remoteStatements) } answers {
+            state.value = (state.value.toSet() + remoteStatements).toList()
+        }
+
+        advanceUntilIdle()
+
+        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(
+            localStatements + remoteStatements,
+            localRepository.getStatements(categoryId).first()
+        )
+
+        viewModel.getStatements()
+
+        advanceUntilIdle()
+
+        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(
+            localStatements + remoteStatements,
+            localRepository.getStatements(categoryId).first()
+        )
+    }
+
+    @Test
+    fun statementsViewModel_CheckRefreshedOfflineDataWithoutInternet() = runTest {
+        assertEquals(localStatements, localRepository.getStatements(categoryId).first())
+
+        coEvery { remoteRepository.getStatements(categoryId) } throws IOException()
+        coEvery { localRepository.insertStatements(FakeDataSource.statements) } answers {
+            state.value = (state.value.toSet() + FakeDataSource.statements).toList()
+        }
+
+        advanceUntilIdle()
+
+        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(
+            localStatements + FakeDataSource.statements,
+            localRepository.getStatements(categoryId).first()
+        )
+
+        viewModel.getStatements()
+
+        advanceUntilIdle()
+
+        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(
+            localStatements + FakeDataSource.statements,
             localRepository.getStatements(categoryId).first()
         )
     }

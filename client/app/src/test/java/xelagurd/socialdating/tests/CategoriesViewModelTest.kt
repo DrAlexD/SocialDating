@@ -1,4 +1,4 @@
-package xelagurd.socialdating
+package xelagurd.socialdating.tests
 
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,6 +13,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.data.model.Category
@@ -35,7 +36,7 @@ class CategoriesViewModelTest {
     private val remoteCategories = listOf(Category(2, "Remote Category"))
 
     @Before
-    fun setUp() {
+    fun setup() {
         state = MutableStateFlow(localCategories)
         every { localRepository.getCategories() } returns state
 
@@ -45,12 +46,12 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_GetDataWithInternet_OnlineStatus() = runTest {
+    fun categoriesViewModel_CheckDataWithInternet() = runTest {
         assertEquals(localCategories, localRepository.getCategories().first())
 
         coEvery { remoteRepository.getCategories() } returns remoteCategories
         coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            state.value += remoteCategories
+            state.value = (state.value.toSet() + remoteCategories).toList()
         }
 
         advanceUntilIdle()
@@ -63,12 +64,12 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_GetDataWithoutInternet_OfflineStatus() = runTest {
+    fun categoriesViewModel_CheckDataWithoutInternet() = runTest {
         assertEquals(localCategories, localRepository.getCategories().first())
 
         coEvery { remoteRepository.getCategories() } throws IOException()
         coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            state.value += FakeDataSource.categories
+            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
         }
 
         advanceUntilIdle()
@@ -81,12 +82,12 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_RefreshDataWithoutInternet_OfflineStatus() = runTest {
+    fun categoriesViewModel_CheckRefreshedOnlineDataWithoutInternet() = runTest {
         assertEquals(localCategories, localRepository.getCategories().first())
 
         coEvery { remoteRepository.getCategories() } returns remoteCategories
         coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            state.value += remoteCategories
+            state.value = (state.value.toSet() + remoteCategories).toList()
         }
 
         advanceUntilIdle()
@@ -96,7 +97,7 @@ class CategoriesViewModelTest {
 
         coEvery { remoteRepository.getCategories() } throws IOException()
         coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            state.value += FakeDataSource.categories
+            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
         }
 
         viewModel.getCategories()
@@ -111,12 +112,12 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_RefreshDataWithInternet_OnlineStatus() = runTest {
+    fun categoriesViewModel_CheckRefreshedOfflineDataWithInternet() = runTest {
         assertEquals(localCategories, localRepository.getCategories().first())
 
         coEvery { remoteRepository.getCategories() } throws IOException()
         coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            state.value += FakeDataSource.categories
+            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
         }
 
         advanceUntilIdle()
@@ -129,7 +130,7 @@ class CategoriesViewModelTest {
 
         coEvery { remoteRepository.getCategories() } returns remoteCategories
         coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            state.value += remoteCategories
+            state.value = (state.value.toSet() + remoteCategories).toList()
         }
 
         viewModel.getCategories()
@@ -139,6 +140,56 @@ class CategoriesViewModelTest {
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
             localCategories + FakeDataSource.categories + remoteCategories,
+            localRepository.getCategories().first()
+        )
+    }
+
+    @Test
+    fun categoriesViewModel_CheckRefreshedOnlineDataWithInternet() = runTest {
+        assertEquals(localCategories, localRepository.getCategories().first())
+
+        coEvery { remoteRepository.getCategories() } returns remoteCategories
+        coEvery { localRepository.insertCategories(remoteCategories) } answers {
+            state.value = (state.value.toSet() + remoteCategories).toList()
+        }
+
+        advanceUntilIdle()
+
+        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(localCategories + remoteCategories, localRepository.getCategories().first())
+
+        viewModel.getCategories()
+
+        advanceUntilIdle()
+
+        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(localCategories + remoteCategories, localRepository.getCategories().first())
+    }
+
+    @Test
+    fun categoriesViewModel_CheckRefreshedOfflineDataWithoutInternet() = runTest {
+        assertEquals(localCategories, localRepository.getCategories().first())
+
+        coEvery { remoteRepository.getCategories() } throws IOException()
+        coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
+            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
+        }
+
+        advanceUntilIdle()
+
+        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(
+            localCategories + FakeDataSource.categories,
+            localRepository.getCategories().first()
+        )
+
+        viewModel.getCategories()
+
+        advanceUntilIdle()
+
+        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(
+            localCategories + FakeDataSource.categories,
             localRepository.getCategories().first()
         )
     }
