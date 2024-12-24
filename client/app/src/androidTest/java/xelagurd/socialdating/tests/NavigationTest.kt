@@ -4,20 +4,23 @@ import androidx.activity.compose.setContent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
+import xelagurd.socialdating.assertBackStackDepth
 import xelagurd.socialdating.assertCurrentRouteName
 import xelagurd.socialdating.data.fake.FakeDataSource
+import xelagurd.socialdating.onNodeWithContentDescriptionId
+import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.ui.navigation.AppNavHost
 import xelagurd.socialdating.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.ui.navigation.StatementDetailsDestination
@@ -52,46 +55,122 @@ class NavigationTest {
     @Test
     fun appNavHost_verifyStartScreen() {
         navController.assertCurrentRouteName(CategoriesDestination.route)
-    }
-
-    @Test
-    fun appNavHost_verifyBackNavigationNotShownOnStartScreen() {
-        val backText = composeTestRule.activity.getString(R.string.back_button)
-        composeTestRule.onNodeWithContentDescription(backText).assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertDoesNotExist()
+        navController.assertBackStackDepth(2)
     }
 
     @Test
     fun appNavHost_clickCategory_navigatesToStatements() {
-        composeTestRule.waitUntil(TIMEOUT_MILLIS) {
-            composeTestRule.onNodeWithText(FakeDataSource.categories[0].name).isDisplayed()
-        }
-
-        composeTestRule.onNodeWithText(FakeDataSource.categories[0].name)
-            .performClick()
+        navigateFromCategoriesToStatements()
 
         navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertExists()
+        navController.assertBackStackDepth(3)
     }
 
     @Test
     fun appNavHost_clickStatement_navigatesToStatementDetails() {
+        navigateFromCategoriesToStatements()
+        navigateFromStatementsToStatementDetails()
+
+        navController.assertCurrentRouteName(StatementDetailsDestination.routeWithArgs)
+        //composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertExists()
+        navController.assertBackStackDepth(4)
+    }
+
+    @Test
+    fun appNavHost_clickBackOnStatementsScreen_navigatesToCategories() {
+        navigateFromCategoriesToStatements()
+        performNavigateUp()
+
+        navController.assertCurrentRouteName(CategoriesDestination.route)
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertDoesNotExist()
+        navController.assertBackStackDepth(2)
+    }
+
+/*    @Test
+    fun appNavHost_clickBackOnStatementDetailsScreen_navigatesToStatements() {
+        navigateFromCategoriesToStatements()
+        navigateFromStatementsToStatementDetails()
+        performNavigateUp()
+
+        navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertExists()
+        navController.assertBackStackDepth(3)
+    }*/
+
+    @Test
+    fun appNavHost_navigateToCategoriesScreenOnCategoriesScreen_stayOnCategoriesScreen() {
+        val previousRoute = navController.currentBackStackEntry?.destination?.route
+
+        navigateToCategoriesFromBottomNavBar()
+
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
+
+        assertEquals(previousRoute, currentRoute)
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertDoesNotExist()
+        navController.assertBackStackDepth(2)
+    }
+
+    @Test
+    fun appNavHost_navigateToCategoriesScreenOnStatementsScreen_stayOnStatementsScreen() {
+        navigateFromCategoriesToStatements()
+
+        val previousRoute = navController.currentBackStackEntry?.destination?.route
+
+        navigateToCategoriesFromBottomNavBar()
+
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
+
+        assertEquals(previousRoute, currentRoute)
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertExists()
+        navController.assertBackStackDepth(3)
+    }
+
+/*    @Test
+    fun appNavHost_navigateToCategoriesScreenOnStatementDetailsScreen_stayOnStatementDetailsScreen() {
+        navigateFromCategoriesToStatements()
+        navigateFromStatementsToStatementDetails()
+
+        val previousRoute = navController.currentBackStackEntry?.destination?.route
+
+        navigateToCategoriesFromBottomNavBar()
+
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
+
+        assertEquals(previousRoute, currentRoute)
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertExists()
+        navController.assertBackStackDepth(4)
+    }*/
+
+    private fun navigateFromCategoriesToStatements() {
         composeTestRule.waitUntil(TIMEOUT_MILLIS) {
             composeTestRule.onNodeWithText(FakeDataSource.categories[0].name).isDisplayed()
         }
 
         composeTestRule.onNodeWithText(FakeDataSource.categories[0].name)
             .performClick()
+    }
 
+    private fun navigateFromStatementsToStatementDetails() {
         composeTestRule.waitUntil(TIMEOUT_MILLIS) {
             composeTestRule.onNodeWithText(FakeDataSource.statements[0].text).isDisplayed()
         }
 
         composeTestRule.onNodeWithText(FakeDataSource.statements[0].text)
             .performClick()
+    }
 
-        navController.assertCurrentRouteName(StatementDetailsDestination.routeWithArgs)
+    private fun navigateToCategoriesFromBottomNavBar() {
+        composeTestRule.onNodeWithTagId(R.string.nav_categories)
+            .performClick()
+    }
+
+    private fun performNavigateUp() {
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).performClick()
     }
 
     companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+        private const val TIMEOUT_MILLIS = 5_000L // FixMe: remove after implementing server
     }
 }
