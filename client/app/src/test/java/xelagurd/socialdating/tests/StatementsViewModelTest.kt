@@ -1,4 +1,4 @@
-package xelagurd.socialdating
+package xelagurd.socialdating.tests
 
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,6 +14,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.data.model.Statement
