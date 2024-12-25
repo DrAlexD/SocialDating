@@ -63,7 +63,10 @@ fun AppTopBar(
         actions = {
             val onCardStatusClick =
                 refreshAction.takeIf { internetStatus.isAllowedRefresh() } ?: {}
-            Card(onClick = onCardStatusClick) {
+            Card(
+                onClick = onCardStatusClick,
+                modifier = Modifier.testTag(stringResource(R.string.refresh))
+            ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(

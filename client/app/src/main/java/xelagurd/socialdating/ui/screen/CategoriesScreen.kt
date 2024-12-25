@@ -75,7 +75,7 @@ fun CategoriesScreen(
 }
 
 @Composable
-private fun CategoriesBody(
+internal fun CategoriesBody(
     categoriesUiState: CategoriesUiState,
     internetStatus: InternetStatus,
     onCategoryClick: (Int) -> Unit,
