@@ -69,15 +69,13 @@ fun initializeTopLevelDestinations(navController: NavHostController) {
         }
     }
 
-    topLevelDestinations.addAll(
-        listOf(
-            TopLevelDestination(
-                navigationDestination = CategoriesDestination,
-                navigateTo = { navigateTo(CategoriesDestination.route) },
-                selectedIcon = Icons.Filled.Home,
-                unselectedIcon = Icons.Outlined.Home,
-                contentDescription = R.string.nav_categories
-            )
+    topLevelDestinations = listOf(
+        TopLevelDestination(
+            navigationDestination = CategoriesDestination,
+            navigateTo = { navigateTo(CategoriesDestination.route) },
+            selectedIcon = Icons.Filled.Home,
+            unselectedIcon = Icons.Outlined.Home,
+            contentDescription = R.string.nav_categories
         )
     )
 }
