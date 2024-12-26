@@ -18,6 +18,7 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.network.repository.RemoteCategoriesRepository
+import xelagurd.socialdating.mergeListsAsSets
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.viewmodel.CategoriesViewModel
 
@@ -30,15 +31,15 @@ class CategoriesViewModelTest {
     private val localRepository: LocalCategoriesRepository = mockk()
 
     private lateinit var viewModel: CategoriesViewModel
-    private lateinit var state: MutableStateFlow<List<Category>>
+    private lateinit var categoriesFlow: MutableStateFlow<List<Category>>
 
-    private val localCategories = listOf(Category(1, "Database Category"))
-    private val remoteCategories = listOf(Category(2, "Remote Category"))
+    private val localCategories = listOf(Category(1, ""))
+    private val remoteCategories = listOf(Category(1, ""), Category(2, ""))
 
     @Before
     fun setup() {
-        state = MutableStateFlow(localCategories)
-        every { localRepository.getCategories() } returns state
+        categoriesFlow = MutableStateFlow(localCategories)
+        every { localRepository.getCategories() } returns categoriesFlow
 
         viewModel = CategoriesViewModel(remoteRepository, localRepository)
 
@@ -51,14 +52,14 @@ class CategoriesViewModelTest {
 
         coEvery { remoteRepository.getCategories() } returns remoteCategories
         coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            state.value = (state.value.toSet() + remoteCategories).toList()
+            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, remoteCategories)
         }
 
         advanceUntilIdle()
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
-            localCategories + remoteCategories,
+            mergeListsAsSets(localCategories, remoteCategories),
             localRepository.getCategories().first()
         )
     }
@@ -69,14 +70,14 @@ class CategoriesViewModelTest {
 
         coEvery { remoteRepository.getCategories() } throws IOException()
         coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
+            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, FakeDataSource.categories)
         }
 
         advanceUntilIdle()
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
         assertEquals(
-            localCategories + FakeDataSource.categories,
+            mergeListsAsSets(localCategories, FakeDataSource.categories),
             localRepository.getCategories().first()
         )
     }
@@ -87,17 +88,20 @@ class CategoriesViewModelTest {
 
         coEvery { remoteRepository.getCategories() } returns remoteCategories
         coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            state.value = (state.value.toSet() + remoteCategories).toList()
+            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, remoteCategories)
         }
 
         advanceUntilIdle()
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
-        assertEquals(localCategories + remoteCategories, localRepository.getCategories().first())
+        assertEquals(
+            mergeListsAsSets(localCategories, remoteCategories),
+            localRepository.getCategories().first()
+        )
 
         coEvery { remoteRepository.getCategories() } throws IOException()
         coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
+            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, FakeDataSource.categories)
         }
 
         viewModel.getCategories()
@@ -106,7 +110,7 @@ class CategoriesViewModelTest {
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
         assertEquals(
-            localCategories + remoteCategories + FakeDataSource.categories,
+            mergeListsAsSets(localCategories, remoteCategories, FakeDataSource.categories),
             localRepository.getCategories().first()
         )
     }
@@ -117,20 +121,20 @@ class CategoriesViewModelTest {
 
         coEvery { remoteRepository.getCategories() } throws IOException()
         coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
+            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, FakeDataSource.categories)
         }
 
         advanceUntilIdle()
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
         assertEquals(
-            localCategories + FakeDataSource.categories,
+            mergeListsAsSets(localCategories, FakeDataSource.categories),
             localRepository.getCategories().first()
         )
 
         coEvery { remoteRepository.getCategories() } returns remoteCategories
         coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            state.value = (state.value.toSet() + remoteCategories).toList()
+            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, remoteCategories)
         }
 
         viewModel.getCategories()
@@ -139,7 +143,7 @@ class CategoriesViewModelTest {
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
-            localCategories + FakeDataSource.categories + remoteCategories,
+            mergeListsAsSets(localCategories, FakeDataSource.categories, remoteCategories),
             localRepository.getCategories().first()
         )
     }
@@ -150,20 +154,26 @@ class CategoriesViewModelTest {
 
         coEvery { remoteRepository.getCategories() } returns remoteCategories
         coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            state.value = (state.value.toSet() + remoteCategories).toList()
+            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, remoteCategories)
         }
 
         advanceUntilIdle()
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
-        assertEquals(localCategories + remoteCategories, localRepository.getCategories().first())
+        assertEquals(
+            mergeListsAsSets(localCategories, remoteCategories),
+            localRepository.getCategories().first()
+        )
 
         viewModel.getCategories()
 
         advanceUntilIdle()
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
-        assertEquals(localCategories + remoteCategories, localRepository.getCategories().first())
+        assertEquals(
+            mergeListsAsSets(localCategories, remoteCategories),
+            localRepository.getCategories().first()
+        )
     }
 
     @Test
@@ -172,14 +182,14 @@ class CategoriesViewModelTest {
 
         coEvery { remoteRepository.getCategories() } throws IOException()
         coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
+            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, FakeDataSource.categories)
         }
 
         advanceUntilIdle()
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
         assertEquals(
-            localCategories + FakeDataSource.categories,
+            mergeListsAsSets(localCategories, FakeDataSource.categories),
             localRepository.getCategories().first()
         )
 
@@ -189,7 +199,7 @@ class CategoriesViewModelTest {
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
         assertEquals(
-            localCategories + FakeDataSource.categories,
+            mergeListsAsSets(localCategories, FakeDataSource.categories),
             localRepository.getCategories().first()
         )
     }

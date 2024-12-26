@@ -10,8 +10,8 @@ import xelagurd.socialdating.data.model.Statement
 class LocalStatementsRepository @Inject constructor(
     private val statementsDao: StatementsDao
 ) {
-    fun getStatements(categoryId: Int): Flow<List<Statement>> =
-        statementsDao.getStatements(categoryId)
+    fun getStatements(definingThemeIds: List<Int>): Flow<List<Statement>> =
+        statementsDao.getStatements(definingThemeIds)
 
     suspend fun insertStatements(statements: List<Statement>) =
         statementsDao.insertStatements(statements)

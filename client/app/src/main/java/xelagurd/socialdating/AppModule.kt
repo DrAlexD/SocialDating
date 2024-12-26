@@ -41,5 +41,8 @@ object AppModule {
     fun provideCategoriesDao(database: AppDatabase) = database.categoriesDao()
 
     @Provides
+    fun provideDefiningThemesDao(database: AppDatabase) = database.definingThemesDao()
+
+    @Provides
     fun provideStatementsDao(database: AppDatabase) = database.statementsDao()
 }
