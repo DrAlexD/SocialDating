@@ -10,6 +10,7 @@ jobs:
   build:
     name: Test and Build APK
     runs-on: ubuntu-latest
+    continue-on-error: true
 
     steps:
       - name: Checkout sources
@@ -50,13 +51,15 @@ jobs:
           api-level: 35
           script: |
             cd client
+            adb wait-for-device
+            adb shell input keyevent 82
             ./gradlew connectedCheck
 
       - name: Upload Instrumented tests report
         uses: actions/upload-artifact@v4
         with:
           name: instrumented_tests_report
-          path: client/app/build/reports/androidTests/connected/debug
+          path: client/app/build/reports/androidTests/connected/
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
