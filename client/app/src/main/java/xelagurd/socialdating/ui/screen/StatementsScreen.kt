@@ -77,7 +77,7 @@ fun StatementsScreen(
 }
 
 @Composable
-private fun StatementsBody(
+internal fun StatementsBody(
     statementsUiState: StatementsUiState,
     internetStatus: InternetStatus,
     onStatementClick: (Int) -> Unit,

@@ -14,14 +14,14 @@ import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
-import xelagurd.socialdating.data.model.Category
+import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.onNodeWithTextId
-import xelagurd.socialdating.ui.screen.CategoriesBody
-import xelagurd.socialdating.ui.state.CategoriesUiState
+import xelagurd.socialdating.ui.screen.StatementsBody
 import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.StatementsUiState
 
 @HiltAndroidTest
-class CategoriesScreenTest {
+class StatementsScreenTest {
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -34,14 +34,14 @@ class CategoriesScreenTest {
     }
 
     @Test
-    fun categoriesScreen_loadingStatusAndEmptyData_loadingText() {
-        val categoriesUiState = CategoriesUiState(listOf())
+    fun statementsScreen_loadingStatusAndEmptyData_loadingText() {
+        val statementsUiState = StatementsUiState(listOf())
 
         composeTestRule.activity.setContent {
-            CategoriesBody(
-                categoriesUiState = categoriesUiState,
+            StatementsBody(
+                statementsUiState = statementsUiState,
                 internetStatus = InternetStatus.LOADING,
-                onCategoryClick = {}
+                onStatementClick = {}
             )
         }
 
@@ -49,14 +49,14 @@ class CategoriesScreenTest {
     }
 
     @Test
-    fun categoriesScreen_offlineStatusAndEmptyData_offlineText() {
-        val categoriesUiState = CategoriesUiState(listOf())
+    fun statementsScreen_offlineStatusAndEmptyData_offlineText() {
+        val statementsUiState = StatementsUiState(listOf())
 
         composeTestRule.activity.setContent {
-            CategoriesBody(
-                categoriesUiState = categoriesUiState,
+            StatementsBody(
+                statementsUiState = statementsUiState,
                 internetStatus = InternetStatus.OFFLINE,
-                onCategoryClick = {}
+                onStatementClick = {}
             )
         }
 
@@ -64,15 +64,15 @@ class CategoriesScreenTest {
     }
 
     @Test
-    fun categoriesScreen_onlineStatusAndEmptyData_onlineText() {
-        val categoriesUiState = CategoriesUiState(listOf())
+    fun statementsScreen_onlineStatusAndEmptyData_onlineText() {
+        val statementsUiState = StatementsUiState(listOf())
 
         composeTestRule.activity.setContent {
             Scaffold { innerPadding ->
-                CategoriesBody(
-                    categoriesUiState = categoriesUiState,
+                StatementsBody(
+                    statementsUiState = statementsUiState,
                     internetStatus = InternetStatus.ONLINE,
-                    onCategoryClick = {},
+                    onStatementClick = {},
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = innerPadding
                 )
@@ -83,47 +83,47 @@ class CategoriesScreenTest {
     }
 
     @Test
-    fun categoriesScreen_loadingStatusAndData_displayedData() {
-        val categoriesUiState = CategoriesUiState(listOf(Category(1, "MyCategory")))
+    fun statementsScreen_loadingStatusAndData_displayedData() {
+        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1)))
 
         composeTestRule.activity.setContent {
-            CategoriesBody(
-                categoriesUiState = categoriesUiState,
+            StatementsBody(
+                statementsUiState = statementsUiState,
                 internetStatus = InternetStatus.LOADING,
-                onCategoryClick = {}
+                onStatementClick = {}
             )
         }
 
-        composeTestRule.onNodeWithText("MyCategory").assertIsDisplayed()
+        composeTestRule.onNodeWithText("MyStatement").assertIsDisplayed()
     }
 
     @Test
-    fun categoriesScreen_offlineStatusAndData_displayedData() {
-        val categoriesUiState = CategoriesUiState(listOf(Category(1, "MyCategory")))
+    fun statementsScreen_offlineStatusAndData_displayedData() {
+        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1)))
 
         composeTestRule.activity.setContent {
-            CategoriesBody(
-                categoriesUiState = categoriesUiState,
+            StatementsBody(
+                statementsUiState = statementsUiState,
                 internetStatus = InternetStatus.OFFLINE,
-                onCategoryClick = {}
+                onStatementClick = {}
             )
         }
 
-        composeTestRule.onNodeWithText("MyCategory").assertIsDisplayed()
+        composeTestRule.onNodeWithText("MyStatement").assertIsDisplayed()
     }
 
     @Test
-    fun categoriesScreen_onlineStatusAndData_displayedData() {
-        val categoriesUiState = CategoriesUiState(listOf(Category(1, "MyCategory")))
+    fun statementsScreen_onlineStatusAndData_displayedData() {
+        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1)))
 
         composeTestRule.activity.setContent {
-            CategoriesBody(
-                categoriesUiState = categoriesUiState,
+            StatementsBody(
+                statementsUiState = statementsUiState,
                 internetStatus = InternetStatus.ONLINE,
-                onCategoryClick = {}
+                onStatementClick = {}
             )
         }
 
-        composeTestRule.onNodeWithText("MyCategory").assertIsDisplayed()
+        composeTestRule.onNodeWithText("MyStatement").assertIsDisplayed()
     }
 }
