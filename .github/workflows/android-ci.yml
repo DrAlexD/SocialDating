@@ -36,27 +36,24 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: unit_tests_report
-          working-directory: client
-          path: app/build/reports/tests/testDebugUnitTest/
+          path: client/app/build/reports/tests/testDebugUnitTest/
 
       - name: Run Instrumented tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          working-directory: client
           api-level: 35
           script: |
-            ./gradlew connectedAndroidTest
+            cd client
+            ./gradlew connectedCheck
 
       - name: Upload Instrumented tests report
         uses: actions/upload-artifact@v4
         with:
           name: instrumented_tests_report
-          working-directory: client
-          path: app/build/reports/androidTests/connected/debug
+          path: client/app/build/reports/androidTests/connected/debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: social-dating.apk
-          working-directory: client
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: client/app/build/outputs/apk/debug/app-debug.apk
