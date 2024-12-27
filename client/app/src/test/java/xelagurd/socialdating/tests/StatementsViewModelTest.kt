@@ -70,9 +70,7 @@ class StatementsViewModelTest {
         definingThemesFlow = MutableStateFlow(localDefiningThemes)
         statementsFlow = MutableStateFlow(localStatements)
 
-        every { savedStateHandle.get<Int>("categoryId") } returns categoryId
-        every { localDefiningThemesRepository.getDefiningThemes(categoryId) } returns definingThemesFlow
-        every { localStatementsRepository.getStatements(definingThemesFlow.toIds()) } returns statementsFlow
+        mockGeneralMethods()
 
         viewModel = StatementsViewModel(
             savedStateHandle,
@@ -81,31 +79,25 @@ class StatementsViewModelTest {
             remoteDefiningThemesRepository,
             localDefiningThemesRepository
         )
-
-        assertEquals(InternetStatus.LOADING, viewModel.internetStatus)
     }
 
     @Test
-    fun statementsViewModel_CheckDataWithInternet() = runTest {
+    fun statementsViewModel_checkInitialState() = runTest {
+        mockDataWithInternet()
+        mockLocalStatements()
+
+        assertEquals(InternetStatus.LOADING, viewModel.internetStatus)
         assertEquals(
             localStatements,
             localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
         )
+    }
 
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns remoteDefiningThemes
-        coEvery { remoteStatementsRepository.getStatements(remoteDefiningThemes.toIds()) } returns remoteStatements
-
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes) } answers {
-            definingThemesFlow.value =
-                mergeListsAsSets(definingThemesFlow.value, remoteDefiningThemes)
-        }
-        coEvery { localStatementsRepository.insertStatements(remoteStatements) } answers {
-            statementsFlow.value = mergeListsAsSets(statementsFlow.value, remoteStatements)
-        }
-
+    @Test
+    fun statementsViewModel_checkDataWithInternet() = runTest {
+        mockDataWithInternet()
         advanceUntilIdle()
-
-        every { localStatementsRepository.getStatements(definingThemesFlow.toIds()) } returns statementsFlow
+        mockLocalStatements()
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
@@ -115,25 +107,10 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_CheckDataWithoutInternet() = runTest {
-        assertEquals(
-            localStatements,
-            localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
-        )
-
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } throws IOException()
-
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) } answers {
-            definingThemesFlow.value =
-                mergeListsAsSets(definingThemesFlow.value, FakeDataSource.definingThemes)
-        }
-        coEvery { localStatementsRepository.insertStatements(FakeDataSource.statements) } answers {
-            statementsFlow.value = mergeListsAsSets(statementsFlow.value, FakeDataSource.statements)
-        }
-
+    fun statementsViewModel_checkDataWithoutInternet() = runTest {
+        mockDataWithoutInternet()
         advanceUntilIdle()
-
-        every { localStatementsRepository.getStatements(definingThemesFlow.toIds()) } returns statementsFlow
+        mockLocalStatements()
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
         assertEquals(
@@ -143,48 +120,14 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_CheckRefreshedOnlineDataWithoutInternet() = runTest {
-        assertEquals(
-            localStatements,
-            localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
-        )
-
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns remoteDefiningThemes
-        coEvery { remoteStatementsRepository.getStatements(remoteDefiningThemes.toIds()) } returns remoteStatements
-
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes) } answers {
-            definingThemesFlow.value =
-                mergeListsAsSets(definingThemesFlow.value, remoteDefiningThemes)
-        }
-        coEvery { localStatementsRepository.insertStatements(remoteStatements) } answers {
-            statementsFlow.value = mergeListsAsSets(statementsFlow.value, remoteStatements)
-        }
-
+    fun statementsViewModel_checkRefreshedOnlineDataWithoutInternet() = runTest {
+        mockDataWithInternet()
         advanceUntilIdle()
 
-        every { localStatementsRepository.getStatements(definingThemesFlow.toIds()) } returns statementsFlow
-
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
-        assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements),
-            localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
-        )
-
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } throws IOException()
-
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) } answers {
-            definingThemesFlow.value =
-                mergeListsAsSets(definingThemesFlow.value, FakeDataSource.definingThemes)
-        }
-        coEvery { localStatementsRepository.insertStatements(FakeDataSource.statements) } answers {
-            statementsFlow.value = mergeListsAsSets(statementsFlow.value, FakeDataSource.statements)
-        }
-
+        mockDataWithoutInternet()
         viewModel.getStatements()
-
         advanceUntilIdle()
-
-        every { localStatementsRepository.getStatements(definingThemesFlow.toIds()) } returns statementsFlow
+        mockLocalStatements()
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
         assertEquals(
@@ -194,48 +137,14 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_CheckRefreshedOfflineDataWithInternet() = runTest {
-        assertEquals(
-            localStatements,
-            localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
-        )
-
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } throws IOException()
-
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) } answers {
-            definingThemesFlow.value =
-                mergeListsAsSets(definingThemesFlow.value, FakeDataSource.definingThemes)
-        }
-        coEvery { localStatementsRepository.insertStatements(FakeDataSource.statements) } answers {
-            statementsFlow.value = mergeListsAsSets(statementsFlow.value, FakeDataSource.statements)
-        }
-
+    fun statementsViewModel_checkRefreshedOfflineDataWithInternet() = runTest {
+        mockDataWithoutInternet()
         advanceUntilIdle()
 
-        every { localStatementsRepository.getStatements(definingThemesFlow.toIds()) } returns statementsFlow
-
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
-        assertEquals(
-            mergeListsAsSets(localStatements, FakeDataSource.statements),
-            localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
-        )
-
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns remoteDefiningThemes
-        coEvery { remoteStatementsRepository.getStatements(remoteDefiningThemes.toIds()) } returns remoteStatements
-
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes) } answers {
-            definingThemesFlow.value =
-                mergeListsAsSets(definingThemesFlow.value, remoteDefiningThemes)
-        }
-        coEvery { localStatementsRepository.insertStatements(remoteStatements) } answers {
-            statementsFlow.value = mergeListsAsSets(statementsFlow.value, remoteStatements)
-        }
-
+        mockDataWithInternet()
         viewModel.getStatements()
-
         advanceUntilIdle()
-
-        every { localStatementsRepository.getStatements(definingThemesFlow.toIds()) } returns statementsFlow
+        mockLocalStatements()
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
@@ -245,12 +154,47 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_CheckRefreshedOnlineDataWithInternet() = runTest {
+    fun statementsViewModel_checkRefreshedOnlineDataWithInternet() = runTest {
+        mockDataWithInternet()
+        advanceUntilIdle()
+
+        viewModel.getStatements()
+        advanceUntilIdle()
+        mockLocalStatements()
+
+        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
-            localStatements,
+            mergeListsAsSets(localStatements, remoteStatements),
             localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
         )
+    }
 
+    @Test
+    fun statementsViewModel_checkRefreshedOfflineDataWithoutInternet() = runTest {
+        mockDataWithoutInternet()
+        advanceUntilIdle()
+
+        viewModel.getStatements()
+        advanceUntilIdle()
+        mockLocalStatements()
+
+        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(
+            mergeListsAsSets(localStatements, FakeDataSource.statements),
+            localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
+        )
+    }
+
+    private fun mockLocalStatements() {
+        every { localStatementsRepository.getStatements(definingThemesFlow.toIds()) } returns statementsFlow
+    }
+
+    private fun mockGeneralMethods() {
+        every { savedStateHandle.get<Int>("categoryId") } returns categoryId
+        every { localDefiningThemesRepository.getDefiningThemes(categoryId) } returns definingThemesFlow
+    }
+
+    private fun mockDataWithInternet() {
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns remoteDefiningThemes
         coEvery { remoteStatementsRepository.getStatements(remoteDefiningThemes.toIds()) } returns remoteStatements
 
@@ -261,35 +205,9 @@ class StatementsViewModelTest {
         coEvery { localStatementsRepository.insertStatements(remoteStatements) } answers {
             statementsFlow.value = mergeListsAsSets(statementsFlow.value, remoteStatements)
         }
-
-        advanceUntilIdle()
-
-        every { localStatementsRepository.getStatements(definingThemesFlow.toIds()) } returns statementsFlow
-
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
-        assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements),
-            localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
-        )
-
-        viewModel.getStatements()
-
-        advanceUntilIdle()
-
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
-        assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements),
-            localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
-        )
     }
 
-    @Test
-    fun statementsViewModel_CheckRefreshedOfflineDataWithoutInternet() = runTest {
-        assertEquals(
-            localStatements,
-            localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
-        )
-
+    private fun mockDataWithoutInternet() {
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } throws IOException()
 
         coEvery { localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) } answers {
@@ -299,25 +217,5 @@ class StatementsViewModelTest {
         coEvery { localStatementsRepository.insertStatements(FakeDataSource.statements) } answers {
             statementsFlow.value = mergeListsAsSets(statementsFlow.value, FakeDataSource.statements)
         }
-
-        advanceUntilIdle()
-
-        every { localStatementsRepository.getStatements(definingThemesFlow.toIds()) } returns statementsFlow
-
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
-        assertEquals(
-            mergeListsAsSets(localStatements, FakeDataSource.statements),
-            localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
-        )
-
-        viewModel.getStatements()
-
-        advanceUntilIdle()
-
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
-        assertEquals(
-            mergeListsAsSets(localStatements, FakeDataSource.statements),
-            localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
-        )
     }
 }
