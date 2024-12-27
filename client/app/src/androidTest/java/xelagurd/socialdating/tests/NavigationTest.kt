@@ -1,6 +1,8 @@
 package xelagurd.socialdating.tests
 
 import androidx.activity.compose.setContent
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -82,7 +84,7 @@ class NavigationTest {
         //navController.assertBackStackDepth(1)
     }
 
-/*    @Test
+    /*@Test
     fun appNavHost_clickBackOnStatementDetailsScreen_navigatesToStatements() {
         navigateFromCategoriesToStatements()
         navigateFromStatementsToStatementDetails()
@@ -94,9 +96,12 @@ class NavigationTest {
 
     @Test
     fun appNavHost_navigateToCategoriesScreenOnCategoriesScreen_stayOnCategoriesScreen() {
+        checkBottomNavToCategoriesWithCategoriesTopLevel()
+
         val previousRoute = navController.currentBackStackEntry?.destination?.route
 
         navigateToCategoriesFromBottomNavBar()
+        checkBottomNavToCategoriesWithCategoriesTopLevel()
 
         val currentRoute = navController.currentBackStackEntry?.destination?.route
 
@@ -107,10 +112,12 @@ class NavigationTest {
     @Test
     fun appNavHost_navigateToCategoriesScreenOnStatementsScreen_stayOnStatementsScreen() {
         navigateFromCategoriesToStatements()
+        checkBottomNavToCategoriesWithCategoriesTopLevel()
 
         val previousRoute = navController.currentBackStackEntry?.destination?.route
 
         navigateToCategoriesFromBottomNavBar()
+        checkBottomNavToCategoriesWithCategoriesTopLevel()
 
         val currentRoute = navController.currentBackStackEntry?.destination?.route
 
@@ -118,14 +125,16 @@ class NavigationTest {
         //navController.assertBackStackDepth(2)
     }
 
-/*    @Test
+    /*@Test
     fun appNavHost_navigateToCategoriesScreenOnStatementDetailsScreen_stayOnStatementDetailsScreen() {
         navigateFromCategoriesToStatements()
         navigateFromStatementsToStatementDetails()
+        checkBottomNavToCategoriesWithCategoriesTopLevel()
 
         val previousRoute = navController.currentBackStackEntry?.destination?.route
 
         navigateToCategoriesFromBottomNavBar()
+        checkBottomNavToCategoriesWithCategoriesTopLevel()
 
         val currentRoute = navController.currentBackStackEntry?.destination?.route
 
@@ -149,6 +158,11 @@ class NavigationTest {
 
         composeTestRule.onNodeWithText(FakeDataSource.statements[0].text)
             .performClick()
+    }
+
+    private fun checkBottomNavToCategoriesWithCategoriesTopLevel() {
+        composeTestRule.onNodeWithTagId(R.string.nav_categories).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.nav_categories).assertIsSelected()
     }
 
     private fun navigateToCategoriesFromBottomNavBar() {
