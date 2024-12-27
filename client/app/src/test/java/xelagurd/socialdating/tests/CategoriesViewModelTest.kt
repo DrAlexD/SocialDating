@@ -18,6 +18,7 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.network.repository.RemoteCategoriesRepository
+import xelagurd.socialdating.mergeListsAsSets
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.viewmodel.CategoriesViewModel
 
@@ -30,167 +31,129 @@ class CategoriesViewModelTest {
     private val localRepository: LocalCategoriesRepository = mockk()
 
     private lateinit var viewModel: CategoriesViewModel
-    private lateinit var state: MutableStateFlow<List<Category>>
+    private lateinit var categoriesFlow: MutableStateFlow<List<Category>>
 
-    private val localCategories = listOf(Category(1, "Database Category"))
-    private val remoteCategories = listOf(Category(2, "Remote Category"))
+    private val localCategories = listOf(Category(1, ""))
+    private val remoteCategories = listOf(Category(1, ""), Category(2, ""))
 
     @Before
     fun setup() {
-        state = MutableStateFlow(localCategories)
-        every { localRepository.getCategories() } returns state
+        categoriesFlow = MutableStateFlow(localCategories)
+
+        mockGeneralMethods()
 
         viewModel = CategoriesViewModel(remoteRepository, localRepository)
+    }
+
+    @Test
+    fun categoriesViewModel_checkInitialState() = runTest {
+        mockDataWithInternet()
 
         assertEquals(InternetStatus.LOADING, viewModel.internetStatus)
+        assertEquals(localCategories, localRepository.getCategories().first())
     }
 
     @Test
-    fun categoriesViewModel_CheckDataWithInternet() = runTest {
-        assertEquals(localCategories, localRepository.getCategories().first())
-
-        coEvery { remoteRepository.getCategories() } returns remoteCategories
-        coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            state.value = (state.value.toSet() + remoteCategories).toList()
-        }
-
+    fun categoriesViewModel_checkStateWithInternet() = runTest {
+        mockDataWithInternet()
         advanceUntilIdle()
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
-            localCategories + remoteCategories,
+            mergeListsAsSets(localCategories, remoteCategories),
             localRepository.getCategories().first()
         )
     }
 
     @Test
-    fun categoriesViewModel_CheckDataWithoutInternet() = runTest {
-        assertEquals(localCategories, localRepository.getCategories().first())
-
-        coEvery { remoteRepository.getCategories() } throws IOException()
-        coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
-        }
-
+    fun categoriesViewModel_checkStateWithoutInternet() = runTest {
+        mockDataWithoutInternet()
         advanceUntilIdle()
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
         assertEquals(
-            localCategories + FakeDataSource.categories,
+            mergeListsAsSets(localCategories, FakeDataSource.categories),
             localRepository.getCategories().first()
         )
     }
 
     @Test
-    fun categoriesViewModel_CheckRefreshedOnlineDataWithoutInternet() = runTest {
-        assertEquals(localCategories, localRepository.getCategories().first())
+    fun categoriesViewModel_checkRefreshedOnlineStateWithoutInternet() = runTest {
+        mockDataWithInternet()
+        advanceUntilIdle()
 
-        coEvery { remoteRepository.getCategories() } returns remoteCategories
-        coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            state.value = (state.value.toSet() + remoteCategories).toList()
-        }
+        mockDataWithoutInternet()
+        viewModel.getCategories()
+        advanceUntilIdle()
 
+        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(
+            mergeListsAsSets(localCategories, remoteCategories, FakeDataSource.categories),
+            localRepository.getCategories().first()
+        )
+    }
+
+    @Test
+    fun categoriesViewModel_checkRefreshedOfflineStateWithInternet() = runTest {
+        mockDataWithoutInternet()
+        advanceUntilIdle()
+
+        mockDataWithInternet()
+        viewModel.getCategories()
         advanceUntilIdle()
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
-        assertEquals(localCategories + remoteCategories, localRepository.getCategories().first())
+        assertEquals(
+            mergeListsAsSets(localCategories, FakeDataSource.categories, remoteCategories),
+            localRepository.getCategories().first()
+        )
+    }
 
-        coEvery { remoteRepository.getCategories() } throws IOException()
-        coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
-        }
+    @Test
+    fun categoriesViewModel_checkRefreshedOnlineStateWithInternet() = runTest {
+        mockDataWithInternet()
+        advanceUntilIdle()
 
         viewModel.getCategories()
-
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
-            localCategories + remoteCategories + FakeDataSource.categories,
+            mergeListsAsSets(localCategories, remoteCategories),
             localRepository.getCategories().first()
         )
     }
 
     @Test
-    fun categoriesViewModel_CheckRefreshedOfflineDataWithInternet() = runTest {
-        assertEquals(localCategories, localRepository.getCategories().first())
+    fun categoriesViewModel_checkRefreshedOfflineStateWithoutInternet() = runTest {
+        mockDataWithoutInternet()
+        advanceUntilIdle()
 
-        coEvery { remoteRepository.getCategories() } throws IOException()
-        coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
-        }
-
+        viewModel.getCategories()
         advanceUntilIdle()
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
         assertEquals(
-            localCategories + FakeDataSource.categories,
+            mergeListsAsSets(localCategories, FakeDataSource.categories),
             localRepository.getCategories().first()
         )
+    }
 
+    private fun mockGeneralMethods() {
+        every { localRepository.getCategories() } returns categoriesFlow
+    }
+
+    private fun mockDataWithInternet() {
         coEvery { remoteRepository.getCategories() } returns remoteCategories
         coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            state.value = (state.value.toSet() + remoteCategories).toList()
+            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, remoteCategories)
         }
-
-        viewModel.getCategories()
-
-        advanceUntilIdle()
-
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
-        assertEquals(
-            localCategories + FakeDataSource.categories + remoteCategories,
-            localRepository.getCategories().first()
-        )
     }
 
-    @Test
-    fun categoriesViewModel_CheckRefreshedOnlineDataWithInternet() = runTest {
-        assertEquals(localCategories, localRepository.getCategories().first())
-
-        coEvery { remoteRepository.getCategories() } returns remoteCategories
-        coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            state.value = (state.value.toSet() + remoteCategories).toList()
-        }
-
-        advanceUntilIdle()
-
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
-        assertEquals(localCategories + remoteCategories, localRepository.getCategories().first())
-
-        viewModel.getCategories()
-
-        advanceUntilIdle()
-
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
-        assertEquals(localCategories + remoteCategories, localRepository.getCategories().first())
-    }
-
-    @Test
-    fun categoriesViewModel_CheckRefreshedOfflineDataWithoutInternet() = runTest {
-        assertEquals(localCategories, localRepository.getCategories().first())
-
+    private fun mockDataWithoutInternet() {
         coEvery { remoteRepository.getCategories() } throws IOException()
         coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            state.value = (state.value.toSet() + FakeDataSource.categories).toList()
+            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, FakeDataSource.categories)
         }
-
-        advanceUntilIdle()
-
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
-        assertEquals(
-            localCategories + FakeDataSource.categories,
-            localRepository.getCategories().first()
-        )
-
-        viewModel.getCategories()
-
-        advanceUntilIdle()
-
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
-        assertEquals(
-            localCategories + FakeDataSource.categories,
-            localRepository.getCategories().first()
-        )
     }
 }

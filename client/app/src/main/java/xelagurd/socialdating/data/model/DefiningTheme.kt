@@ -8,19 +8,21 @@ import androidx.room.PrimaryKey
 
 @Serializable
 @Entity(
-    tableName = "statements",
+    tableName = "defining_themes",
     foreignKeys = [
         ForeignKey(
-            entity = DefiningTheme::class,
+            entity = Category::class,
             parentColumns = ["id"],
-            childColumns = ["definingThemeId"]
+            childColumns = ["categoryId"]
         )
     ],
-    indices = [Index(value = ["definingThemeId"])]
+    indices = [Index(value = ["categoryId"])]
 )
-data class Statement(
+data class DefiningTheme(
     @PrimaryKey
     val id: Int,
-    val text: String,
-    val definingThemeId: Int
+    val name: String,
+    val fromOpinion: String,
+    val toOpinion: String,
+    val categoryId: Int
 )
