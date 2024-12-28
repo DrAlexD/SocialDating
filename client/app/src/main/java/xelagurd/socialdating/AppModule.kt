@@ -13,7 +13,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import xelagurd.socialdating.data.local.AppDatabase
-import xelagurd.socialdating.data.network.ApiService
+import xelagurd.socialdating.data.remote.ApiService
 
 @Module
 @InstallIn(SingletonComponent::class)

@@ -17,7 +17,7 @@ import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.data.model.Category
-import xelagurd.socialdating.data.network.repository.RemoteCategoriesRepository
+import xelagurd.socialdating.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.mergeListsAsSets
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.viewmodel.CategoriesViewModel

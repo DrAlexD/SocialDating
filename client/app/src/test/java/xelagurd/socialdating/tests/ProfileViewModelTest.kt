@@ -18,7 +18,7 @@ import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.model.User
-import xelagurd.socialdating.data.network.repository.RemoteUsersRepository
+import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.viewmodel.ProfileViewModel
 

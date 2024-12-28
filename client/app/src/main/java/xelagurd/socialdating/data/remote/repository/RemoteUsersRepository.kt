@@ -1,9 +1,9 @@
-package xelagurd.socialdating.data.network.repository
+package xelagurd.socialdating.data.remote.repository
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import xelagurd.socialdating.data.model.User
-import xelagurd.socialdating.data.network.ApiService
+import xelagurd.socialdating.data.remote.ApiService
 
 @Singleton
 class RemoteUsersRepository @Inject constructor(

@@ -23,8 +23,8 @@ import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.Statement
-import xelagurd.socialdating.data.network.repository.RemoteDefiningThemesRepository
-import xelagurd.socialdating.data.network.repository.RemoteStatementsRepository
+import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
+import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.mergeListsAsSets
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.viewmodel.StatementsViewModel

@@ -22,8 +22,8 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
-import xelagurd.socialdating.data.network.repository.RemoteDefiningThemesRepository
-import xelagurd.socialdating.data.network.repository.RemoteStatementsRepository
+import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
+import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.ui.navigation.StatementsDestination
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.StatementsUiState

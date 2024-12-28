@@ -9,7 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import xelagurd.socialdating.data.local.AppDatabase
-import xelagurd.socialdating.data.network.ApiService
+import xelagurd.socialdating.data.remote.ApiService
 
 @Module
 @TestInstallIn(

@@ -17,7 +17,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
-import xelagurd.socialdating.data.network.repository.RemoteUsersRepository
+import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.ui.navigation.ProfileDestination
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileUiState

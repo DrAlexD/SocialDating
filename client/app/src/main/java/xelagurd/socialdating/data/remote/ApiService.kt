@@ -1,4 +1,4 @@
-package xelagurd.socialdating.data.network
+package xelagurd.socialdating.data.remote
 
 import retrofit2.http.GET
 import retrofit2.http.Query

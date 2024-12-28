@@ -5,7 +5,7 @@ import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.data.model.User
-import xelagurd.socialdating.data.network.ApiService
+import xelagurd.socialdating.data.remote.ApiService
 
 class FakeApiService : ApiService {
     override suspend fun getCategories(): List<Category> = FakeDataSource.categories
