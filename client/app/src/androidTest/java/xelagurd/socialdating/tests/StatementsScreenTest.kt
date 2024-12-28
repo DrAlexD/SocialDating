@@ -84,7 +84,7 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_loadingStatusAndData_displayedData() {
-        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1)))
+        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1, 1)))
 
         composeTestRule.activity.setContent {
             StatementsBody(
@@ -99,7 +99,7 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_offlineStatusAndData_displayedData() {
-        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1)))
+        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1, 1)))
 
         composeTestRule.activity.setContent {
             StatementsBody(
@@ -114,7 +114,7 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_onlineStatusAndData_displayedData() {
-        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1)))
+        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1, 1)))
 
         composeTestRule.activity.setContent {
             StatementsBody(

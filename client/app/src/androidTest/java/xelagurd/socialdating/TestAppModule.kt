@@ -37,4 +37,7 @@ object TestAppModule {
 
     @Provides
     fun provideStatementsDao(database: AppDatabase) = database.statementsDao()
+
+    @Provides
+    fun provideUsersDao(database: AppDatabase) = database.usersDao()
 }

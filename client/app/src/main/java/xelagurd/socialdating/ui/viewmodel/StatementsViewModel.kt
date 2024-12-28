@@ -21,6 +21,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
+import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.network.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.data.network.repository.RemoteStatementsRepository
 import xelagurd.socialdating.ui.navigation.StatementsDestination
@@ -35,6 +36,7 @@ class StatementsViewModel @Inject constructor(
     private val localStatementsRepository: LocalStatementsRepository,
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository,
     private val localDefiningThemesRepository: LocalDefiningThemesRepository,
+    private val localUsersRepository: LocalUsersRepository
 ) : ViewModel() {
     var internetStatus by mutableStateOf(InternetStatus.LOADING)
         private set
@@ -63,6 +65,8 @@ class StatementsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 internetStatus = InternetStatus.LOADING
+
+                localUsersRepository.insertUser(FakeDataSource.users[0]) // TODO: Remove after adding login screen
 
                 delay(3000L) // FixMe: remove after implementing server
 

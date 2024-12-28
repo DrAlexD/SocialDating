@@ -9,4 +9,5 @@
     <string name="online">В сети</string>
     <string name="offline">Не в сети</string>
     <string name="nav_categories">Перейти к Категориям</string>
+    <string name="nav_profile">Перейти к Профилю</string>
 </resources>

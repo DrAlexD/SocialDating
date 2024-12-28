@@ -26,7 +26,8 @@ lateinit var topLevelDestinations: List<TopLevelDestination>
 enum class AppScreen {
     Categories,
     Statements,
-    StatementDetails
+    StatementDetails,
+    Profile
 }
 
 object CategoriesDestination : NavigationDestination() {
@@ -46,4 +47,11 @@ object StatementDetailsDestination : NavigationDestination() {
     override val topLevelRoute = CategoriesDestination.route
     const val statementId = "statementId"
     val routeWithArgs = "$route/{$statementId}"
+}
+
+object ProfileDestination : NavigationDestination() {
+    override val route = AppScreen.Profile.name
+    override val topLevelRoute = "$route/1" // TODO: Replace after adding preferences
+    const val userId = "userId"
+    val routeWithArgs = "$route/{$userId}"
 }

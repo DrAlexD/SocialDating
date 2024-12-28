@@ -14,13 +14,19 @@ import androidx.room.PrimaryKey
             entity = DefiningTheme::class,
             parentColumns = ["id"],
             childColumns = ["definingThemeId"]
+        ),
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["id"],
+            childColumns = ["userId"]
         )
     ],
-    indices = [Index(value = ["definingThemeId"])]
+    indices = [Index(value = ["definingThemeId"]), Index(value = ["userId"])]
 )
 data class Statement(
     @PrimaryKey
     val id: Int,
     val text: String,
-    val definingThemeId: Int
+    val definingThemeId: Int,
+    val userId: Int
 )

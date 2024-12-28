@@ -1,7 +1,9 @@
 package xelagurd.socialdating.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -14,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import xelagurd.socialdating.R
 import xelagurd.socialdating.ui.screen.CategoriesScreen
+import xelagurd.socialdating.ui.screen.ProfileScreen
 import xelagurd.socialdating.ui.screen.StatementsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,7 +31,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         composable(route = CategoriesDestination.route) {
             CategoriesScreen(
                 onCategoryClick = {
-                    navController.navigate("${StatementsDestination.route}/${it}")
+                    navController.navigate("${StatementsDestination.route}/$it")
                 }
             )
         }
@@ -41,10 +44,19 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         ) {
             StatementsScreen(
                 onStatementClick = {
-                    navController.navigate("${StatementDetailsDestination.route}/${it}")
+                    navController.navigate("${StatementDetailsDestination.route}/$it")
                 },
                 onNavigateUp = { navController.navigateUp() }
             )
+        }
+
+        composable(
+            route = ProfileDestination.routeWithArgs,
+            arguments = listOf(navArgument(ProfileDestination.userId) {
+                type = NavType.IntType
+            })
+        ) {
+            ProfileScreen()
         }
 
         composable(
@@ -71,8 +83,15 @@ fun initializeTopLevelDestinations(navController: NavHostController) {
 
     topLevelDestinations = listOf(
         TopLevelDestination(
+            navigationDestination = ProfileDestination,
+            navigateTo = { navigateTo(ProfileDestination.topLevelRoute) },
+            selectedIcon = Icons.Filled.AccountCircle,
+            unselectedIcon = Icons.Outlined.AccountCircle,
+            contentDescription = R.string.nav_profile
+        ),
+        TopLevelDestination(
             navigationDestination = CategoriesDestination,
-            navigateTo = { navigateTo(CategoriesDestination.route) },
+            navigateTo = { navigateTo(CategoriesDestination.topLevelRoute) },
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
             contentDescription = R.string.nav_categories

@@ -7,8 +7,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import androidx.lifecycle.SavedStateHandle
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
@@ -18,6 +20,7 @@ import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
+import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.data.network.repository.RemoteDefiningThemesRepository
@@ -36,6 +39,7 @@ class StatementsViewModelTest {
     private val localStatementsRepository: LocalStatementsRepository = mockk()
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository = mockk()
     private val localDefiningThemesRepository: LocalDefiningThemesRepository = mockk()
+    private val localUsersRepository: LocalUsersRepository = mockk() // TODO: Remove after adding login screen
 
     private lateinit var viewModel: StatementsViewModel
     private lateinit var definingThemesFlow: MutableStateFlow<List<DefiningTheme>>
@@ -51,15 +55,15 @@ class StatementsViewModelTest {
         DefiningTheme(2, "", "", "", categoryId)
     )
     private val localStatements = listOf(
-        Statement(1, "", 1),
-        Statement(2, "", 1)
+        Statement(1, "", 1, 1),
+        Statement(2, "", 1, 1)
     )
     private val remoteStatements = listOf(
-        Statement(1, "", 1),
-        Statement(2, "", 1),
-        Statement(3, "", 1),
-        Statement(4, "", 2),
-        Statement(5, "", 2),
+        Statement(1, "", 1, 1),
+        Statement(2, "", 1, 1),
+        Statement(3, "", 1, 1),
+        Statement(4, "", 2, 1),
+        Statement(5, "", 2, 1),
     )
 
     private fun List<DefiningTheme>.toIds() = this.map { it.id }
@@ -77,7 +81,8 @@ class StatementsViewModelTest {
             remoteStatementsRepository,
             localStatementsRepository,
             remoteDefiningThemesRepository,
-            localDefiningThemesRepository
+            localDefiningThemesRepository,
+            localUsersRepository
         )
     }
 
@@ -192,6 +197,7 @@ class StatementsViewModelTest {
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>("categoryId") } returns categoryId
         every { localDefiningThemesRepository.getDefiningThemes(categoryId) } returns definingThemesFlow
+        coEvery { localUsersRepository.insertUser(FakeDataSource.users[0]) } just Runs
     }
 
     private fun mockDataWithInternet() {
