@@ -1,9 +1,6 @@
 package xelagurd.socialdating.tests
 
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -35,7 +32,7 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_loadingStatusAndEmptyData_loadingText() {
-        val statementsUiState = StatementsUiState(listOf())
+        val statementsUiState = StatementsUiState()
 
         composeTestRule.activity.setContent {
             StatementsBody(
@@ -50,7 +47,7 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_offlineStatusAndEmptyData_offlineText() {
-        val statementsUiState = StatementsUiState(listOf())
+        val statementsUiState = StatementsUiState()
 
         composeTestRule.activity.setContent {
             StatementsBody(
@@ -65,18 +62,14 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_onlineStatusAndEmptyData_onlineText() {
-        val statementsUiState = StatementsUiState(listOf())
+        val statementsUiState = StatementsUiState()
 
         composeTestRule.activity.setContent {
-            Scaffold { innerPadding ->
-                StatementsBody(
-                    statementsUiState = statementsUiState,
-                    internetStatus = InternetStatus.ONLINE,
-                    onStatementClick = {},
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = innerPadding
-                )
-            }
+            StatementsBody(
+                statementsUiState = statementsUiState,
+                internetStatus = InternetStatus.ONLINE,
+                onStatementClick = {}
+            )
         }
 
         composeTestRule.onNodeWithTextId(R.string.no_data).assertIsDisplayed()
