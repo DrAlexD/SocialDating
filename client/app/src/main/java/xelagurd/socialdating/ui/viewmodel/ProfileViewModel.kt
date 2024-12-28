@@ -11,47 +11,53 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import xelagurd.socialdating.data.fake.FakeDataSource
-import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
-import xelagurd.socialdating.data.remote.repository.RemoteCategoriesRepository
-import xelagurd.socialdating.ui.state.CategoriesUiState
+import xelagurd.socialdating.data.local.repository.LocalUsersRepository
+import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
+import xelagurd.socialdating.ui.navigation.ProfileDestination
 import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.ProfileUiState
 
 @HiltViewModel
-class CategoriesViewModel @Inject constructor(
-    private val remoteRepository: RemoteCategoriesRepository,
-    private val localRepository: LocalCategoriesRepository
+class ProfileViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val remoteRepository: RemoteUsersRepository,
+    private val localRepository: LocalUsersRepository
 ) : ViewModel() {
     var internetStatus by mutableStateOf(InternetStatus.LOADING)
         private set
 
-    val uiState: StateFlow<CategoriesUiState> = localRepository.getCategories()
-        .map { CategoriesUiState(it) }
+    private val userId: Int = checkNotNull(savedStateHandle[ProfileDestination.userId])
+
+    val uiState: StateFlow<ProfileUiState> = localRepository.getUser(userId)
+        .map { ProfileUiState(it) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = CategoriesUiState()
+            initialValue = ProfileUiState()
         )
 
     init {
-        getCategories()
+        getUser()
     }
 
-    fun getCategories() {
+    fun getUser() {
         viewModelScope.launch {
             try {
                 internetStatus = InternetStatus.LOADING
 
                 delay(3000L) // FixMe: remove after implementing server
 
-                val remoteCategories = remoteRepository.getCategories()
-                localRepository.insertCategories(remoteCategories)
+                val remoteUser = remoteRepository.getUser(userId)
+                localRepository.insertUser(remoteUser)
+
                 internetStatus = InternetStatus.ONLINE
             } catch (_: IOException) {
-                localRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
+                localRepository.insertUser(FakeDataSource.users[0]) // FixMe: remove after implementing server
                 internetStatus = InternetStatus.OFFLINE
             }
         }

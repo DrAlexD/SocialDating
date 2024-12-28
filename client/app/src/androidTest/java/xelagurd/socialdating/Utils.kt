@@ -11,8 +11,10 @@ import androidx.navigation.NavController
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.junit.Assert.assertEquals
 
+fun NavController.getCurrentRoute() = currentBackStackEntry?.destination?.route
+
 fun NavController.assertCurrentRouteName(expectedRouteName: String) {
-    assertEquals(expectedRouteName, currentBackStackEntry?.destination?.route)
+    assertEquals(expectedRouteName, getCurrentRoute())
 }
 
 fun NavController.assertBackStackDepth(expectedDepth: Int) {
