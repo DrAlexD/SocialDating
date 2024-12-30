@@ -22,6 +22,7 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
+import xelagurd.socialdating.data.model.StatementReactionType
 import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.ui.navigation.StatementsDestination
@@ -85,6 +86,20 @@ class StatementsViewModel @Inject constructor(
                 localStatementsRepository.insertStatements(FakeDataSource.statements) // FixMe: remove after implementing server
 
                 internetStatus = InternetStatus.OFFLINE
+            }
+        }
+    }
+
+    fun onStatementReactionClick(statementId: Int, reactionType: StatementReactionType) {
+        viewModelScope.launch {
+            try {
+                remoteStatementsRepository.postStatementReaction(
+                    1, // TODO: Remove after adding login screen
+                    statementId,
+                    reactionType
+                )
+            } catch (_: IOException) {
+                //
             }
         }
     }
