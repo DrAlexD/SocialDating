@@ -15,6 +15,9 @@ class FakeApiService : ApiService {
     override suspend fun getDefiningThemes(categoryId: Int): List<DefiningTheme> =
         FakeDataSource.definingThemes
 
+    override suspend fun getDefiningThemes(categoryIds: List<Int>): List<DefiningTheme> =
+        FakeDataSource.definingThemes
+
     override suspend fun getStatements(definingThemeIds: List<Int>): List<Statement> =
         FakeDataSource.statements
 
