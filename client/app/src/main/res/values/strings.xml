@@ -13,4 +13,9 @@
     <string name="nav_profile">Navigate to Profile</string>
     <string name="expand_list">Expand list</string>
     <string name="open_profile_statistics">Open profile statistics</string>
+    <string name="full_maintain">Fully maintain</string>
+    <string name="part_maintain">Partially maintain</string>
+    <string name="not_sure">Not sure</string>
+    <string name="part_no_maintain">Partially don\'t maintain</string>
+    <string name="full_no_maintain">Fully don\'t maintain</string>
 </resources>

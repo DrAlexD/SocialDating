@@ -1,26 +1,34 @@
 package xelagurd.socialdating.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -32,6 +40,7 @@ import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.Statement
+import xelagurd.socialdating.data.model.StatementReactionType
 import xelagurd.socialdating.ui.navigation.StatementsDestination
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.StatementsUiState
@@ -70,6 +79,9 @@ fun StatementsScreen(
             statementsUiState = statementsUiState,
             internetStatus = statementsViewModel.internetStatus,
             onStatementClick = onStatementClick,
+            onStatementReactionClick = { id, type ->
+                statementsViewModel.onStatementReactionClick(id, type)
+            },
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding
         )
@@ -81,6 +93,7 @@ internal fun StatementsBody(
     statementsUiState: StatementsUiState,
     internetStatus: InternetStatus,
     onStatementClick: (Int) -> Unit,
+    onStatementReactionClick: (Int, StatementReactionType) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -92,6 +105,7 @@ internal fun StatementsBody(
             StatementsList(
                 statements = statementsUiState.statements,
                 onStatementClick = onStatementClick,
+                onStatementReactionClick = onStatementReactionClick,
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
@@ -121,6 +135,7 @@ internal fun StatementsBody(
 private fun StatementsList(
     statements: List<Statement>,
     onStatementClick: (Int) -> Unit,
+    onStatementReactionClick: (Int, StatementReactionType) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -132,7 +147,10 @@ private fun StatementsList(
             StatementCard(
                 statement = it,
                 onStatementClick = onStatementClick,
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
+                onStatementReactionClick = onStatementReactionClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(id = R.dimen.padding_small))
             )
         }
     }
@@ -142,6 +160,7 @@ private fun StatementsList(
 fun StatementCard(
     statement: Statement,
     onStatementClick: (Int) -> Unit,
+    onStatementReactionClick: (Int, StatementReactionType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -149,14 +168,59 @@ fun StatementCard(
         elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
         modifier = modifier
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = statement.text,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+        Text(
+            text = statement.text,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+        )
+        HorizontalDivider(color = Color.Black)
+        ReactionsBody(
+            onStatementReactionClick = { onStatementReactionClick.invoke(statement.id, it) }
+        )
+    }
+}
+
+@Composable
+fun ReactionsBody(
+    onStatementReactionClick: (StatementReactionType) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        IconButton(onClick = { onStatementReactionClick.invoke(StatementReactionType.FULL_MAINTAIN) }) {
+            Icon(
+                imageVector = Icons.Filled.ThumbUp,
+                contentDescription = stringResource(R.string.full_maintain)
+            )
+        }
+        VerticalDivider()
+        IconButton(onClick = { onStatementReactionClick.invoke(StatementReactionType.PART_MAINTAIN) }) {
+            Icon(
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = stringResource(R.string.part_maintain)
+            )
+        }
+        VerticalDivider()
+        IconButton(onClick = { onStatementReactionClick.invoke(StatementReactionType.NOT_SURE) }) {
+            Icon(
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = stringResource(R.string.not_sure)
+            )
+        }
+        VerticalDivider()
+        IconButton(onClick = { onStatementReactionClick.invoke(StatementReactionType.PART_NO_MAINTAIN) }) {
+            Icon(
+                imageVector = Icons.Outlined.ThumbUp,
+                contentDescription = stringResource(R.string.part_no_maintain)
+            )
+        }
+        VerticalDivider()
+        IconButton(onClick = { onStatementReactionClick.invoke(StatementReactionType.FULL_NO_MAINTAIN) }) {
+            Icon(
+                imageVector = Icons.Filled.ThumbUp,
+                contentDescription = stringResource(R.string.full_no_maintain)
             )
         }
     }
@@ -169,7 +233,8 @@ fun StatementsBodyOfflineDataPreview() {
         StatementsBody(
             statementsUiState = StatementsUiState(FakeDataSource.statements),
             internetStatus = InternetStatus.OFFLINE,
-            onStatementClick = {}
+            onStatementClick = {},
+            onStatementReactionClick = { _, _ -> null }
         )
     }
 }
@@ -180,7 +245,8 @@ fun StatementCardPreview() {
     AppTheme {
         StatementCard(
             statement = FakeDataSource.statements[0],
-            onStatementClick = {}
+            onStatementClick = {},
+            onStatementReactionClick = { _, _ -> null }
         )
     }
 }

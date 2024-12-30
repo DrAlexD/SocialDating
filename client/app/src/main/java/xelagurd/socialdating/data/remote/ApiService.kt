@@ -1,10 +1,12 @@
 package xelagurd.socialdating.data.remote
 
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.Statement
+import xelagurd.socialdating.data.model.StatementReactionType
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.UserCategory
 import xelagurd.socialdating.data.model.UserDefiningTheme
@@ -21,6 +23,13 @@ interface ApiService {
 
     @GET("statements")
     suspend fun getStatements(@Query("definingThemeIds") definingThemeIds: List<Int>): List<Statement>
+
+    @POST("statements")
+    suspend fun postStatementReaction(
+        @Query("userId") userId: Int,
+        @Query("statementId") statementId: Int,
+        @Query("reactionType") reactionType: StatementReactionType
+    )
 
     @GET("users")
     suspend fun getUser(@Query("userId") userId: Int): User
