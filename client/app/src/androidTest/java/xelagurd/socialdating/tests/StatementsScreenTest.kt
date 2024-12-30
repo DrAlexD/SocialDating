@@ -12,6 +12,7 @@ import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.Statement
+import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.StatementsBody
 import xelagurd.socialdating.ui.state.InternetStatus
@@ -38,7 +39,8 @@ class StatementsScreenTest {
             StatementsBody(
                 statementsUiState = statementsUiState,
                 internetStatus = InternetStatus.LOADING,
-                onStatementClick = {}
+                onStatementClick = {},
+                onStatementReactionClick = { _, _ -> null }
             )
         }
 
@@ -53,7 +55,8 @@ class StatementsScreenTest {
             StatementsBody(
                 statementsUiState = statementsUiState,
                 internetStatus = InternetStatus.OFFLINE,
-                onStatementClick = {}
+                onStatementClick = {},
+                onStatementReactionClick = { _, _ -> null }
             )
         }
 
@@ -68,7 +71,8 @@ class StatementsScreenTest {
             StatementsBody(
                 statementsUiState = statementsUiState,
                 internetStatus = InternetStatus.ONLINE,
-                onStatementClick = {}
+                onStatementClick = {},
+                onStatementReactionClick = { _, _ -> null }
             )
         }
 
@@ -83,11 +87,19 @@ class StatementsScreenTest {
             StatementsBody(
                 statementsUiState = statementsUiState,
                 internetStatus = InternetStatus.LOADING,
-                onStatementClick = {}
+                onStatementClick = {},
+                onStatementReactionClick = { _, _ -> null }
             )
         }
 
         composeTestRule.onNodeWithText("MyStatement").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.part_maintain).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.not_sure).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.part_no_maintain)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.full_no_maintain)
+            .assertIsDisplayed()
     }
 
     @Test
@@ -98,11 +110,19 @@ class StatementsScreenTest {
             StatementsBody(
                 statementsUiState = statementsUiState,
                 internetStatus = InternetStatus.OFFLINE,
-                onStatementClick = {}
+                onStatementClick = {},
+                onStatementReactionClick = { _, _ -> null }
             )
         }
 
         composeTestRule.onNodeWithText("MyStatement").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.part_maintain).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.not_sure).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.part_no_maintain)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.full_no_maintain)
+            .assertIsDisplayed()
     }
 
     @Test
@@ -113,10 +133,18 @@ class StatementsScreenTest {
             StatementsBody(
                 statementsUiState = statementsUiState,
                 internetStatus = InternetStatus.ONLINE,
-                onStatementClick = {}
+                onStatementClick = {},
+                onStatementReactionClick = { _, _ -> null }
             )
         }
 
         composeTestRule.onNodeWithText("MyStatement").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.part_maintain).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.not_sure).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.part_no_maintain)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.full_no_maintain)
+            .assertIsDisplayed()
     }
 }
