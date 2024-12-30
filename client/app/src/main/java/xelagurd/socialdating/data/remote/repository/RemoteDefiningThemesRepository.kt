@@ -11,4 +11,7 @@ class RemoteDefiningThemesRepository @Inject constructor(
 ) {
     suspend fun getDefiningThemes(categoryId: Int): List<DefiningTheme> =
         apiService.getDefiningThemes(categoryId)
+
+    suspend fun getDefiningThemes(categoryIds: List<Int>): List<DefiningTheme> =
+        apiService.getDefiningThemes(categoryIds)
 }

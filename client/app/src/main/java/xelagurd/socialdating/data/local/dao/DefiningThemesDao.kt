@@ -12,6 +12,9 @@ interface DefiningThemesDao {
     @Query("SELECT * FROM defining_themes WHERE categoryId = :categoryId")
     fun getDefiningThemes(categoryId: Int): Flow<List<DefiningTheme>>
 
+    @Query("SELECT * FROM defining_themes WHERE categoryId IN (:categoryIds)")
+    fun getDefiningThemes(categoryIds: List<Int>): Flow<List<DefiningTheme>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDefiningThemes(categories: List<DefiningTheme>)
 }

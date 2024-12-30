@@ -16,6 +16,9 @@ interface ApiService {
     @GET("definingThemes")
     suspend fun getDefiningThemes(@Query("categoryId") categoryId: Int): List<DefiningTheme>
 
+    @GET("definingThemes")
+    suspend fun getDefiningThemes(@Query("categoryIds") categoryId: List<Int>): List<DefiningTheme>
+
     @GET("statements")
     suspend fun getStatements(@Query("definingThemeIds") definingThemeIds: List<Int>): List<Statement>
 

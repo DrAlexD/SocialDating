@@ -13,6 +13,9 @@ class LocalDefiningThemesRepository @Inject constructor(
     fun getDefiningThemes(categoryId: Int): Flow<List<DefiningTheme>> =
         definingThemesDao.getDefiningThemes(categoryId)
 
+    fun getDefiningThemes(categoryIds: List<Int>): Flow<List<DefiningTheme>> =
+        definingThemesDao.getDefiningThemes(categoryIds)
+
     suspend fun insertDefiningThemes(definingThemes: List<DefiningTheme>) =
         definingThemesDao.insertDefiningThemes(definingThemes)
 }
