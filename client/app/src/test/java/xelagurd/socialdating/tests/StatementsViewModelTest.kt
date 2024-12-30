@@ -39,7 +39,8 @@ class StatementsViewModelTest {
     private val localStatementsRepository: LocalStatementsRepository = mockk()
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository = mockk()
     private val localDefiningThemesRepository: LocalDefiningThemesRepository = mockk()
-    private val localUsersRepository: LocalUsersRepository = mockk() // TODO: Remove after adding login screen
+    private val localUsersRepository: LocalUsersRepository =
+        mockk() // TODO: Remove after adding login screen
 
     private lateinit var viewModel: StatementsViewModel
     private lateinit var definingThemesFlow: MutableStateFlow<List<DefiningTheme>>
@@ -93,6 +94,10 @@ class StatementsViewModelTest {
 
         assertEquals(InternetStatus.LOADING, viewModel.internetStatus)
         assertEquals(
+            localDefiningThemes,
+            localDefiningThemesRepository.getDefiningThemes(categoryId).first()
+        )
+        assertEquals(
             localStatements,
             localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
         )
@@ -106,6 +111,10 @@ class StatementsViewModelTest {
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
+            mergeListsAsSets(localDefiningThemes, remoteDefiningThemes),
+            localDefiningThemesRepository.getDefiningThemes(categoryId).first()
+        )
+        assertEquals(
             mergeListsAsSets(localStatements, remoteStatements),
             localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
         )
@@ -118,6 +127,10 @@ class StatementsViewModelTest {
         mockLocalStatements()
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(
+            mergeListsAsSets(localDefiningThemes, FakeDataSource.definingThemes),
+            localDefiningThemesRepository.getDefiningThemes(categoryId).first()
+        )
         assertEquals(
             mergeListsAsSets(localStatements, FakeDataSource.statements),
             localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
@@ -136,6 +149,14 @@ class StatementsViewModelTest {
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
         assertEquals(
+            mergeListsAsSets(
+                localDefiningThemes,
+                remoteDefiningThemes,
+                FakeDataSource.definingThemes
+            ),
+            localDefiningThemesRepository.getDefiningThemes(categoryId).first()
+        )
+        assertEquals(
             mergeListsAsSets(localStatements, remoteStatements, FakeDataSource.statements),
             localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
         )
@@ -153,6 +174,14 @@ class StatementsViewModelTest {
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
+            mergeListsAsSets(
+                localDefiningThemes,
+                FakeDataSource.definingThemes,
+                remoteDefiningThemes
+            ),
+            localDefiningThemesRepository.getDefiningThemes(categoryId).first()
+        )
+        assertEquals(
             mergeListsAsSets(localStatements, FakeDataSource.statements, remoteStatements),
             localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
         )
@@ -169,6 +198,10 @@ class StatementsViewModelTest {
 
         assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
         assertEquals(
+            mergeListsAsSets(localDefiningThemes, remoteDefiningThemes),
+            localDefiningThemesRepository.getDefiningThemes(categoryId).first()
+        )
+        assertEquals(
             mergeListsAsSets(localStatements, remoteStatements),
             localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()
         )
@@ -184,6 +217,10 @@ class StatementsViewModelTest {
         mockLocalStatements()
 
         assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(
+            mergeListsAsSets(localDefiningThemes, FakeDataSource.definingThemes),
+            localDefiningThemesRepository.getDefiningThemes(categoryId).first()
+        )
         assertEquals(
             mergeListsAsSets(localStatements, FakeDataSource.statements),
             localStatementsRepository.getStatements(definingThemesFlow.toIds()).first()

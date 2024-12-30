@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,8 +47,10 @@ import xelagurd.socialdating.AppBottomNavigationBar
 import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FakeDataSource
+import xelagurd.socialdating.data.fake.toUserCategoriesWithData
 import xelagurd.socialdating.data.fake.toUserCategoryWithData
 import xelagurd.socialdating.data.fake.toUserDefiningThemeWithData
+import xelagurd.socialdating.data.fake.toUserDefiningThemesWithData
 import xelagurd.socialdating.data.model.UserCategoryWithData
 import xelagurd.socialdating.data.model.UserDefiningThemeWithData
 import xelagurd.socialdating.ui.navigation.ProfileStatisticsDestination
@@ -267,11 +270,13 @@ fun UserDefiningThemeInfo(
             )
             LinearProgressIndicator(
                 progress = { userDefiningTheme.value.toFloat() / 100 },
-                modifier = Modifier.padding(
-                    start = dimensionResource(R.dimen.padding_small),
-                    end = dimensionResource(R.dimen.padding_small),
-                    bottom = dimensionResource(R.dimen.padding_small)
-                )
+                modifier = Modifier
+                    .padding(
+                        start = dimensionResource(R.dimen.padding_small),
+                        end = dimensionResource(R.dimen.padding_small),
+                        bottom = dimensionResource(R.dimen.padding_small)
+                    )
+                    .testTag(stringResource(R.string.progress_indicator))
             )
             Text(
                 text = userDefiningTheme.definingThemeToOpinion,
@@ -287,10 +292,8 @@ fun ProfileStatisticsBodyOfflineDataPreview() {
     AppTheme {
         ProfileStatisticsBody(
             profileStatisticsUiState = ProfileStatisticsUiState(
-                FakeDataSource.userCategories
-                    .map { it.toUserCategoryWithData() },
-                FakeDataSource.userDefiningThemes
-                    .map { it.toUserDefiningThemeWithData() }
+                FakeDataSource.userCategories.toUserCategoriesWithData(),
+                FakeDataSource.userDefiningThemes.toUserDefiningThemesWithData()
                     .groupBy { it.userCategoryId }
             ),
             internetStatus = InternetStatus.OFFLINE
@@ -304,8 +307,7 @@ fun UserCategoryCardPreview() {
     AppTheme {
         UserCategoryCard(
             userCategory = FakeDataSource.userCategories[0].toUserCategoryWithData(),
-            userDefiningThemes = FakeDataSource.userDefiningThemes
-                .map { it.toUserDefiningThemeWithData() }
+            userDefiningThemes = FakeDataSource.userDefiningThemes.toUserDefiningThemesWithData()
         )
     }
 }
@@ -315,8 +317,7 @@ fun UserCategoryCardPreview() {
 fun UserDefiningThemesListPreview() {
     AppTheme {
         UserDefiningThemesList(
-            userDefiningThemes = FakeDataSource.userDefiningThemes
-                .map { it.toUserDefiningThemeWithData() }
+            userDefiningThemes = FakeDataSource.userDefiningThemes.toUserDefiningThemesWithData()
         )
     }
 }

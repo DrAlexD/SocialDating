@@ -95,6 +95,8 @@ fun UserCategory.toUserCategoryWithData() =
         categoryName = "category"
     )
 
+fun List<UserCategory>.toUserCategoriesWithData() = this.map { it.toUserCategoryWithData() }
+
 fun UserDefiningTheme.toUserDefiningThemeWithData() =
     UserDefiningThemeWithData(
         id = id,
@@ -106,3 +108,5 @@ fun UserDefiningTheme.toUserDefiningThemeWithData() =
         definingThemeToOpinion = "Yes",
         definingThemeFromOpinion = "No"
     )
+
+fun List<UserDefiningTheme>.toUserDefiningThemesWithData() = this.map { it.toUserDefiningThemeWithData() }

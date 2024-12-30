@@ -23,9 +23,11 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.getCurrentRoute
 import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTagId
+import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.navigation.AppNavHost
 import xelagurd.socialdating.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.ui.navigation.ProfileDestination
+import xelagurd.socialdating.ui.navigation.ProfileStatisticsDestination
 import xelagurd.socialdating.ui.navigation.StatementDetailsDestination
 import xelagurd.socialdating.ui.navigation.StatementsDestination
 
@@ -117,7 +119,7 @@ class NavigationTest {
     }
 
     @Test
-    fun appNavHost_navigateToProfileOnCategoriesScreen_stayOnProfileScreen() {
+    fun appNavHost_navigateToProfileOnProfileScreen_stayOnProfileScreen() {
         navigateToProfileFromBottomNavBar()
         val previousRoute = navController.getCurrentRoute()
         navigateToProfileFromBottomNavBar()
@@ -128,21 +130,50 @@ class NavigationTest {
     }
 
     @Test
-    fun appNavHost_navigateToProfileOnCategoriesScreenAndBack_navigatesToCategories() {
-        navigateToProfileFromBottomNavBar()
-        navigateToCategoriesFromBottomNavBar()
-
-        navController.assertCurrentRouteName(CategoriesDestination.route)
-        //navController.assertBackStackDepth(?)
-    }
-
-    @Test
-    fun appNavHost_navigateToProfileOnStatementsScreenAndBack_navigatesToCategories() {
+    fun appNavHost_navigateToProfileOnStatementsScreenAndBack_navigatesToStatementsScreen() {
         navigateToStatements()
         navigateToProfileFromBottomNavBar()
         navigateToCategoriesFromBottomNavBar()
 
         navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_clickProfileStatistics_navigatesToProfileStatistics() {
+        navigateToProfileStatistics()
+
+        navController.assertCurrentRouteName(ProfileStatisticsDestination.routeWithArgs)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_clickBackOnProfileStatisticsScreen_navigatesToProfile() {
+        navigateToProfileStatistics()
+        performNavigateUp()
+
+        navController.assertCurrentRouteName(ProfileDestination.routeWithArgs)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_navigateToProfileStatisticsOnProfileStatisticsScreen_stayOnProfileStatisticsScreen() {
+        navigateToProfileStatistics()
+        val previousRoute = navController.getCurrentRoute()
+        navigateToProfileFromBottomNavBar()
+        val currentRoute = navController.getCurrentRoute()
+
+        assertEquals(previousRoute, currentRoute)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_navigateToCategoriesOnProfileStatisticsScreenAndBack_navigatesToProfileStatisticsScreen() {
+        navigateToProfileStatistics()
+        navigateToCategoriesFromBottomNavBar()
+        navigateToProfileFromBottomNavBar()
+
+        navController.assertCurrentRouteName(ProfileStatisticsDestination.routeWithArgs)
         //navController.assertBackStackDepth(?)
     }
 
@@ -176,6 +207,18 @@ class NavigationTest {
 
     private fun navigateToProfileFromBottomNavBar() {
         composeTestRule.onNodeWithTagId(R.string.nav_profile)
+            .performClick()
+        checkBottomNavBarWithProfileTopLevel()
+    }
+
+    private fun navigateToProfileStatistics() {
+        navigateToProfileFromBottomNavBar()
+
+        composeTestRule.waitUntil(TIMEOUT_MILLIS) {
+            composeTestRule.onNodeWithTextId(R.string.open_profile_statistics).isDisplayed()
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.open_profile_statistics)
             .performClick()
         checkBottomNavBarWithProfileTopLevel()
     }
