@@ -6,6 +6,8 @@ import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.data.model.User
+import xelagurd.socialdating.data.model.UserCategory
+import xelagurd.socialdating.data.model.UserDefiningTheme
 
 interface ApiService {
     @GET("categories")
@@ -19,4 +21,10 @@ interface ApiService {
 
     @GET("users")
     suspend fun getUser(@Query("userId") userId: Int): User
+
+    @GET("userCategories")
+    suspend fun getUserCategories(@Query("userId") userId: Int): List<UserCategory>
+
+    @GET("userDefiningThemes")
+    suspend fun getUserDefiningThemes(@Query("userCategoryIds") userCategoryIds: List<Int>): List<UserDefiningTheme>
 }

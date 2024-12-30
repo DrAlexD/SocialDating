@@ -10,4 +10,6 @@
     <string name="offline">Offline</string>
     <string name="nav_categories">Navigate to Categories</string>
     <string name="nav_profile">Navigate to Profile</string>
+    <string name="expand_list">Expand list</string>
+    <string name="open_profile_statistics">Open profile statistics</string>
 </resources>

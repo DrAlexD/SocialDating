@@ -10,4 +10,6 @@
     <string name="offline">Не в сети</string>
     <string name="nav_categories">Перейти к Категориям</string>
     <string name="nav_profile">Перейти к Профилю</string>
+    <string name="expand_list">Раскрыть список</string>
+    <string name="open_profile_statistics">Открыть статистику профиля</string>
 </resources>

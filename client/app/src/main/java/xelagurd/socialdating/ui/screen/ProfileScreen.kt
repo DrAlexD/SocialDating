@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -43,6 +44,7 @@ import xelagurd.socialdating.ui.viewmodel.ProfileViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    onProfileStatisticsClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -68,6 +70,7 @@ fun ProfileScreen(
         ProfileBody(
             profileUiState = profileUiState,
             internetStatus = profileViewModel.internetStatus,
+            onProfileStatisticsClick = onProfileStatisticsClick,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding
         )
@@ -78,6 +81,7 @@ fun ProfileScreen(
 internal fun ProfileBody(
     profileUiState: ProfileUiState,
     internetStatus: InternetStatus,
+    onProfileStatisticsClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -85,8 +89,8 @@ internal fun ProfileBody(
         if (profileUiState.user != null) {
             ProfileDetails(
                 user = profileUiState.user,
-                contentPadding = contentPadding,
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+                onProfileStatisticsClick = { onProfileStatisticsClick.invoke(profileUiState.user.id) },
+                modifier = modifier.padding(contentPadding)
             )
         } else {
             Column(
@@ -113,14 +117,16 @@ internal fun ProfileBody(
 @Composable
 private fun ProfileDetails(
     user: User,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    onProfileStatisticsClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(contentPadding)
+        modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
             modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
         ) {
             UserInfo(user)
@@ -128,9 +134,15 @@ private fun ProfileDetails(
 
         Column(
             modifier = Modifier.weight(1f),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.Top
         ) {
-
+            Card(onClick = onProfileStatisticsClick) {
+                Text(
+                    text = stringResource(R.string.open_profile_statistics),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
+                )
+            }
         }
     }
 }
@@ -203,7 +215,8 @@ fun AvatarIcon(gender: String) {
 fun ProfileCardPreview() {
     AppTheme {
         ProfileDetails(
-            user = FakeDataSource.users[0]
+            user = FakeDataSource.users[0],
+            onProfileStatisticsClick = {}
         )
     }
 }

@@ -48,4 +48,10 @@ object AppModule {
 
     @Provides
     fun provideUsersDao(database: AppDatabase) = database.usersDao()
+
+    @Provides
+    fun provideUserCategoriesDao(database: AppDatabase) = database.userCategoriesDao()
+
+    @Provides
+    fun provideUserDefiningThemesDao(database: AppDatabase) = database.userDefiningThemesDao()
 }
