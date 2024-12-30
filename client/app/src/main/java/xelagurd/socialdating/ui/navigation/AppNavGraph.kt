@@ -17,6 +17,7 @@ import androidx.navigation.navArgument
 import xelagurd.socialdating.R
 import xelagurd.socialdating.ui.screen.CategoriesScreen
 import xelagurd.socialdating.ui.screen.ProfileScreen
+import xelagurd.socialdating.ui.screen.ProfileStatisticsScreen
 import xelagurd.socialdating.ui.screen.StatementsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +57,22 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                 type = NavType.IntType
             })
         ) {
-            ProfileScreen()
+            ProfileScreen(
+                onProfileStatisticsClick = {
+                    navController.navigate("${ProfileStatisticsDestination.route}/$it")
+                }
+            )
+        }
+
+        composable(
+            route = ProfileStatisticsDestination.routeWithArgs,
+            arguments = listOf(navArgument(ProfileStatisticsDestination.userId) {
+                type = NavType.IntType
+            })
+        ) {
+            ProfileStatisticsScreen(
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
 
         composable(

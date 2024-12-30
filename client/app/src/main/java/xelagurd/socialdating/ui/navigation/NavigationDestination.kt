@@ -27,7 +27,8 @@ enum class AppScreen {
     Categories,
     Statements,
     StatementDetails,
-    Profile
+    Profile,
+    ProfileStatistics
 }
 
 object CategoriesDestination : NavigationDestination() {
@@ -52,6 +53,13 @@ object StatementDetailsDestination : NavigationDestination() {
 object ProfileDestination : NavigationDestination() {
     override val route = AppScreen.Profile.name
     override val topLevelRoute = "$route/1" // TODO: Replace after adding preferences
+    const val userId = "userId"
+    val routeWithArgs = "$route/{$userId}"
+}
+
+object ProfileStatisticsDestination : NavigationDestination() {
+    override val route = AppScreen.ProfileStatistics.name
+    override val topLevelRoute = "${ProfileDestination.route}/1" // TODO: Replace after adding preferences
     const val userId = "userId"
     val routeWithArgs = "$route/{$userId}"
 }

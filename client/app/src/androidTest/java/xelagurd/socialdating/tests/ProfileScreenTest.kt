@@ -37,7 +37,8 @@ class ProfileScreenTest {
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.LOADING
+                internetStatus = InternetStatus.LOADING,
+                onProfileStatisticsClick = {}
             )
         }
 
@@ -51,7 +52,8 @@ class ProfileScreenTest {
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.OFFLINE
+                internetStatus = InternetStatus.OFFLINE,
+                onProfileStatisticsClick = {}
             )
         }
 
@@ -65,7 +67,8 @@ class ProfileScreenTest {
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.ONLINE
+                internetStatus = InternetStatus.ONLINE,
+                onProfileStatisticsClick = {}
             )
         }
 
@@ -79,7 +82,8 @@ class ProfileScreenTest {
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.LOADING
+                internetStatus = InternetStatus.LOADING,
+                onProfileStatisticsClick = {}
             )
         }
 
@@ -93,7 +97,8 @@ class ProfileScreenTest {
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.OFFLINE
+                internetStatus = InternetStatus.OFFLINE,
+                onProfileStatisticsClick = {}
             )
         }
 
@@ -107,7 +112,8 @@ class ProfileScreenTest {
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.ONLINE
+                internetStatus = InternetStatus.ONLINE,
+                onProfileStatisticsClick = {}
             )
         }
 

@@ -4,6 +4,10 @@ import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.data.model.User
+import xelagurd.socialdating.data.model.UserCategory
+import xelagurd.socialdating.data.model.UserCategoryWithData
+import xelagurd.socialdating.data.model.UserDefiningTheme
+import xelagurd.socialdating.data.model.UserDefiningThemeWithData
 
 // FixMe: remove after implementing server
 object FakeDataSource {
@@ -66,4 +70,39 @@ object FakeDataSource {
         User(2, "Denis", "male", "abc2", "abc2", "adas2@gmail.com", 27, "St. Petersburg", "qwe", 50),
         User(3, "Andrey", "male", "abc3", "abc3", "adas3@gmail.com", 28, "Moscow", "qwe", 50),
     )
+
+    val userCategories = listOf(
+        UserCategory(1, 10, 1, 1),
+        UserCategory(2, 5, 1, 2),
+        UserCategory(3, 30, 1, 3),
+    )
+
+    val userDefiningThemes = listOf(
+        UserDefiningTheme(1, 17, 10, 1, 1),
+        UserDefiningTheme(2, 89, 5, 1, 2),
+        UserDefiningTheme(3, 12, 30, 1, 3),
+        UserDefiningTheme(4, 57, 15, 2, 4),
+        UserDefiningTheme(5, 15, 50, 3, 5),
+    )
 }
+
+fun UserCategory.toUserCategoryWithData() =
+    UserCategoryWithData(
+        id = id,
+        interest = interest,
+        userId = userId,
+        categoryId = categoryId,
+        categoryName = "category"
+    )
+
+fun UserDefiningTheme.toUserDefiningThemeWithData() =
+    UserDefiningThemeWithData(
+        id = id,
+        value = value,
+        interest = interest,
+        userCategoryId = userCategoryId,
+        definingThemeId = definingThemeId,
+        definingThemeName = "theme",
+        definingThemeToOpinion = "Yes",
+        definingThemeFromOpinion = "No"
+    )

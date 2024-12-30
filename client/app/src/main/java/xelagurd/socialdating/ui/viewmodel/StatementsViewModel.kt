@@ -72,18 +72,18 @@ class StatementsViewModel @Inject constructor(
 
                 val remoteDefiningThemes = remoteDefiningThemesRepository
                     .getDefiningThemes(categoryId)
-                val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
+                localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
 
+                val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
                 val remoteStatements = remoteStatementsRepository
                     .getStatements(remoteDefiningThemeIds)
-
-                localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
                 localStatementsRepository.insertStatements(remoteStatements)
 
                 internetStatus = InternetStatus.ONLINE
             } catch (_: IOException) {
                 localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
                 localStatementsRepository.insertStatements(FakeDataSource.statements) // FixMe: remove after implementing server
+
                 internetStatus = InternetStatus.OFFLINE
             }
         }
