@@ -66,14 +66,14 @@ fun ProfileStatisticsScreen(
     modifier: Modifier = Modifier,
     profileStatisticsViewModel: ProfileStatisticsViewModel = hiltViewModel()
 ) {
-    val profileStatisticsUiState: ProfileStatisticsUiState by profileStatisticsViewModel.uiState.collectAsState()
+    val profileStatisticsUiState by profileStatisticsViewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
         topBar = {
             AppTopBar(
                 title = stringResource(ProfileStatisticsDestination.titleRes),
-                internetStatus = profileStatisticsViewModel.internetStatus,
+                internetStatus = profileStatisticsUiState.internetStatus,
                 refreshAction = { profileStatisticsViewModel.getProfileStatistics() },
                 navigateUp = { onNavigateUp.invoke() },
                 scrollBehavior = scrollBehavior
@@ -88,7 +88,6 @@ fun ProfileStatisticsScreen(
     ) { innerPadding ->
         ProfileStatisticsBody(
             profileStatisticsUiState = profileStatisticsUiState,
-            internetStatus = profileStatisticsViewModel.internetStatus,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding
         )
@@ -98,7 +97,6 @@ fun ProfileStatisticsScreen(
 @Composable
 internal fun ProfileStatisticsBody(
     profileStatisticsUiState: ProfileStatisticsUiState,
-    internetStatus: InternetStatus,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -123,7 +121,7 @@ internal fun ProfileStatisticsBody(
             ) {
                 Text(
                     text = stringResource(
-                        when (internetStatus) {
+                        when (profileStatisticsUiState.internetStatus) {
                             InternetStatus.ONLINE -> R.string.no_data
                             InternetStatus.LOADING -> R.string.loading
                             InternetStatus.OFFLINE -> R.string.no_internet_connection
@@ -292,11 +290,12 @@ fun ProfileStatisticsBodyOfflineDataPreview() {
     AppTheme {
         ProfileStatisticsBody(
             profileStatisticsUiState = ProfileStatisticsUiState(
-                FakeDataSource.userCategories.toUserCategoriesWithData(),
-                FakeDataSource.userDefiningThemes.toUserDefiningThemesWithData()
-                    .groupBy { it.userCategoryId }
-            ),
-            internetStatus = InternetStatus.OFFLINE
+                userCategories = FakeDataSource.userCategories.toUserCategoriesWithData(),
+                userCategoryToDefiningThemes = FakeDataSource.userDefiningThemes
+                    .toUserDefiningThemesWithData()
+                    .groupBy { it.userCategoryId },
+                internetStatus = InternetStatus.OFFLINE
+            )
         )
     }
 }

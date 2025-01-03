@@ -38,7 +38,6 @@ class StatementsScreenTest {
         composeTestRule.activity.setContent {
             StatementsBody(
                 statementsUiState = statementsUiState,
-                internetStatus = InternetStatus.LOADING,
                 onStatementClick = {},
                 onStatementReactionClick = { _, _ -> null }
             )
@@ -49,12 +48,11 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_offlineStatusAndEmptyData_offlineText() {
-        val statementsUiState = StatementsUiState()
+        val statementsUiState = StatementsUiState(internetStatus = InternetStatus.OFFLINE)
 
         composeTestRule.activity.setContent {
             StatementsBody(
                 statementsUiState = statementsUiState,
-                internetStatus = InternetStatus.OFFLINE,
                 onStatementClick = {},
                 onStatementReactionClick = { _, _ -> null }
             )
@@ -65,12 +63,11 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_onlineStatusAndEmptyData_onlineText() {
-        val statementsUiState = StatementsUiState()
+        val statementsUiState = StatementsUiState(internetStatus = InternetStatus.ONLINE)
 
         composeTestRule.activity.setContent {
             StatementsBody(
                 statementsUiState = statementsUiState,
-                internetStatus = InternetStatus.ONLINE,
                 onStatementClick = {},
                 onStatementReactionClick = { _, _ -> null }
             )
@@ -81,12 +78,14 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_loadingStatusAndData_displayedData() {
-        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1, 1)))
+        val statementsUiState = StatementsUiState(
+            statements = listOf(Statement(1, "MyStatement", 1, 1)),
+            internetStatus = InternetStatus.LOADING
+        )
 
         composeTestRule.activity.setContent {
             StatementsBody(
                 statementsUiState = statementsUiState,
-                internetStatus = InternetStatus.LOADING,
                 onStatementClick = {},
                 onStatementReactionClick = { _, _ -> null }
             )
@@ -104,12 +103,14 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_offlineStatusAndData_displayedData() {
-        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1, 1)))
+        val statementsUiState = StatementsUiState(
+            statements = listOf(Statement(1, "MyStatement", 1, 1)),
+            internetStatus = InternetStatus.OFFLINE
+        )
 
         composeTestRule.activity.setContent {
             StatementsBody(
                 statementsUiState = statementsUiState,
-                internetStatus = InternetStatus.OFFLINE,
                 onStatementClick = {},
                 onStatementReactionClick = { _, _ -> null }
             )
@@ -127,12 +128,14 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_onlineStatusAndData_displayedData() {
-        val statementsUiState = StatementsUiState(listOf(Statement(1, "MyStatement", 1, 1)))
+        val statementsUiState = StatementsUiState(
+            statements = listOf(Statement(1, "MyStatement", 1, 1)),
+            internetStatus = InternetStatus.ONLINE
+        )
 
         composeTestRule.activity.setContent {
             StatementsBody(
                 statementsUiState = statementsUiState,
-                internetStatus = InternetStatus.ONLINE,
                 onStatementClick = {},
                 onStatementReactionClick = { _, _ -> null }
             )

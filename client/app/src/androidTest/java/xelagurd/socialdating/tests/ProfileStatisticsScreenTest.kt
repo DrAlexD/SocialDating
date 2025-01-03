@@ -40,8 +40,7 @@ class ProfileStatisticsScreenTest {
 
         composeTestRule.activity.setContent {
             ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState,
-                internetStatus = InternetStatus.LOADING
+                profileStatisticsUiState = profileStatisticsUiState
             )
         }
 
@@ -50,12 +49,11 @@ class ProfileStatisticsScreenTest {
 
     @Test
     fun profileStatisticsScreen_offlineStatusAndEmptyData_offlineText() {
-        val profileStatisticsUiState = ProfileStatisticsUiState()
+        val profileStatisticsUiState = ProfileStatisticsUiState(internetStatus = InternetStatus.OFFLINE)
 
         composeTestRule.activity.setContent {
             ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState,
-                internetStatus = InternetStatus.OFFLINE
+                profileStatisticsUiState = profileStatisticsUiState
             )
         }
 
@@ -64,12 +62,11 @@ class ProfileStatisticsScreenTest {
 
     @Test
     fun profileStatisticsScreen_onlineStatusAndEmptyData_onlineText() {
-        val profileStatisticsUiState = ProfileStatisticsUiState()
+        val profileStatisticsUiState = ProfileStatisticsUiState(internetStatus = InternetStatus.ONLINE)
 
         composeTestRule.activity.setContent {
             ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState,
-                internetStatus = InternetStatus.ONLINE
+                profileStatisticsUiState = profileStatisticsUiState
             )
         }
 
@@ -82,13 +79,13 @@ class ProfileStatisticsScreenTest {
             userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "MyCategory")),
             userCategoryToDefiningThemes = mapOf(
                 1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "MyTheme", "No", "Yes"))
-            )
+            ),
+            internetStatus = InternetStatus.LOADING
         )
 
         composeTestRule.activity.setContent {
             ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState,
-                internetStatus = InternetStatus.LOADING
+                profileStatisticsUiState = profileStatisticsUiState
             )
         }
 
@@ -108,13 +105,13 @@ class ProfileStatisticsScreenTest {
             userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "MyCategory")),
             userCategoryToDefiningThemes = mapOf(
                 1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "MyTheme", "No", "Yes"))
-            )
+            ),
+            internetStatus = InternetStatus.OFFLINE
         )
 
         composeTestRule.activity.setContent {
             ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState,
-                internetStatus = InternetStatus.OFFLINE
+                profileStatisticsUiState = profileStatisticsUiState
             )
         }
 
@@ -134,13 +131,13 @@ class ProfileStatisticsScreenTest {
             userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "MyCategory")),
             userCategoryToDefiningThemes = mapOf(
                 1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "MyTheme", "No", "Yes"))
-            )
+            ),
+            internetStatus = InternetStatus.ONLINE
         )
 
         composeTestRule.activity.setContent {
             ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState,
-                internetStatus = InternetStatus.ONLINE
+                profileStatisticsUiState = profileStatisticsUiState
             )
         }
 

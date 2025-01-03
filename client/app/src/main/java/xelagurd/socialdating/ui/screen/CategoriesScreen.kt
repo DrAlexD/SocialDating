@@ -45,14 +45,14 @@ fun CategoriesScreen(
     modifier: Modifier = Modifier,
     categoriesViewModel: CategoriesViewModel = hiltViewModel()
 ) {
-    val categoriesUiState: CategoriesUiState by categoriesViewModel.uiState.collectAsState()
+    val categoriesUiState by categoriesViewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
         topBar = {
             AppTopBar(
                 title = stringResource(CategoriesDestination.titleRes),
-                internetStatus = categoriesViewModel.internetStatus,
+                internetStatus = categoriesUiState.internetStatus,
                 refreshAction = { categoriesViewModel.getCategories() },
                 scrollBehavior = scrollBehavior
             )
@@ -66,7 +66,6 @@ fun CategoriesScreen(
     ) { innerPadding ->
         CategoriesBody(
             categoriesUiState = categoriesUiState,
-            internetStatus = categoriesViewModel.internetStatus,
             onCategoryClick = onCategoryClick,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding
@@ -77,7 +76,6 @@ fun CategoriesScreen(
 @Composable
 internal fun CategoriesBody(
     categoriesUiState: CategoriesUiState,
-    internetStatus: InternetStatus,
     onCategoryClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -101,7 +99,7 @@ internal fun CategoriesBody(
             ) {
                 Text(
                     text = stringResource(
-                        when (internetStatus) {
+                        when (categoriesUiState.internetStatus) {
                             InternetStatus.ONLINE -> R.string.no_data
                             InternetStatus.LOADING -> R.string.loading
                             InternetStatus.OFFLINE -> R.string.no_internet_connection
@@ -165,8 +163,10 @@ fun CategoryCard(
 fun CategoriesBodyOfflineDataPreview() {
     AppTheme {
         CategoriesBody(
-            categoriesUiState = CategoriesUiState(FakeDataSource.categories),
-            internetStatus = InternetStatus.OFFLINE,
+            categoriesUiState = CategoriesUiState(
+                categories = FakeDataSource.categories,
+                internetStatus = InternetStatus.OFFLINE
+            ),
             onCategoryClick = {}
         )
     }

@@ -37,7 +37,6 @@ class CategoriesScreenTest {
         composeTestRule.activity.setContent {
             CategoriesBody(
                 categoriesUiState = categoriesUiState,
-                internetStatus = InternetStatus.LOADING,
                 onCategoryClick = {}
             )
         }
@@ -47,12 +46,11 @@ class CategoriesScreenTest {
 
     @Test
     fun categoriesScreen_offlineStatusAndEmptyData_offlineText() {
-        val categoriesUiState = CategoriesUiState()
+        val categoriesUiState = CategoriesUiState(internetStatus = InternetStatus.OFFLINE)
 
         composeTestRule.activity.setContent {
             CategoriesBody(
                 categoriesUiState = categoriesUiState,
-                internetStatus = InternetStatus.OFFLINE,
                 onCategoryClick = {}
             )
         }
@@ -62,12 +60,11 @@ class CategoriesScreenTest {
 
     @Test
     fun categoriesScreen_onlineStatusAndEmptyData_onlineText() {
-        val categoriesUiState = CategoriesUiState()
+        val categoriesUiState = CategoriesUiState(internetStatus = InternetStatus.ONLINE)
 
         composeTestRule.activity.setContent {
             CategoriesBody(
                 categoriesUiState = categoriesUiState,
-                internetStatus = InternetStatus.ONLINE,
                 onCategoryClick = {}
             )
         }
@@ -77,12 +74,14 @@ class CategoriesScreenTest {
 
     @Test
     fun categoriesScreen_loadingStatusAndData_displayedData() {
-        val categoriesUiState = CategoriesUiState(listOf(Category(1, "MyCategory")))
+        val categoriesUiState = CategoriesUiState(
+            categories = listOf(Category(1, "MyCategory")),
+            internetStatus = InternetStatus.LOADING
+        )
 
         composeTestRule.activity.setContent {
             CategoriesBody(
                 categoriesUiState = categoriesUiState,
-                internetStatus = InternetStatus.LOADING,
                 onCategoryClick = {}
             )
         }
@@ -92,12 +91,14 @@ class CategoriesScreenTest {
 
     @Test
     fun categoriesScreen_offlineStatusAndData_displayedData() {
-        val categoriesUiState = CategoriesUiState(listOf(Category(1, "MyCategory")))
+        val categoriesUiState = CategoriesUiState(
+            categories = listOf(Category(1, "MyCategory")),
+            internetStatus = InternetStatus.OFFLINE
+        )
 
         composeTestRule.activity.setContent {
             CategoriesBody(
                 categoriesUiState = categoriesUiState,
-                internetStatus = InternetStatus.OFFLINE,
                 onCategoryClick = {}
             )
         }
@@ -107,12 +108,14 @@ class CategoriesScreenTest {
 
     @Test
     fun categoriesScreen_onlineStatusAndData_displayedData() {
-        val categoriesUiState = CategoriesUiState(listOf(Category(1, "MyCategory")))
+        val categoriesUiState = CategoriesUiState(
+            categories = listOf(Category(1, "MyCategory")),
+            internetStatus = InternetStatus.ONLINE
+        )
 
         composeTestRule.activity.setContent {
             CategoriesBody(
                 categoriesUiState = categoriesUiState,
-                internetStatus = InternetStatus.ONLINE,
                 onCategoryClick = {}
             )
         }

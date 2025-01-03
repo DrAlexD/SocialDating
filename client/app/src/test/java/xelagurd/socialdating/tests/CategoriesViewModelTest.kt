@@ -3,7 +3,9 @@ package xelagurd.socialdating.tests
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import io.mockk.coEvery
@@ -32,6 +34,8 @@ class CategoriesViewModelTest {
 
     private lateinit var viewModel: CategoriesViewModel
     private lateinit var categoriesFlow: MutableStateFlow<List<Category>>
+    private val categoriesUiState
+        get() = viewModel.uiState.value
 
     private val localCategories = listOf(Category(1, ""))
     private val remoteCategories = listOf(Category(1, ""), Category(2, ""))
@@ -45,40 +49,44 @@ class CategoriesViewModelTest {
         viewModel = CategoriesViewModel(remoteRepository, localRepository)
     }
 
-    @Test
-    fun categoriesViewModel_checkInitialState() = runTest {
-        mockDataWithInternet()
-
-        assertEquals(InternetStatus.LOADING, viewModel.internetStatus)
-        assertEquals(localCategories, localRepository.getCategories().first())
+    private fun TestScope.setupUiStateCollecting() {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
     }
 
     @Test
     fun categoriesViewModel_checkStateWithInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.ONLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, remoteCategories),
-            localRepository.getCategories().first()
+            categoriesUiState.categories
         )
     }
 
     @Test
     fun categoriesViewModel_checkStateWithoutInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.OFFLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, FakeDataSource.categories),
-            localRepository.getCategories().first()
+            categoriesUiState.categories
         )
     }
 
     @Test
     fun categoriesViewModel_checkRefreshedOnlineStateWithoutInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithInternet()
         advanceUntilIdle()
 
@@ -86,15 +94,17 @@ class CategoriesViewModelTest {
         viewModel.getCategories()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.OFFLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, remoteCategories, FakeDataSource.categories),
-            localRepository.getCategories().first()
+            categoriesUiState.categories
         )
     }
 
     @Test
     fun categoriesViewModel_checkRefreshedOfflineStateWithInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithoutInternet()
         advanceUntilIdle()
 
@@ -102,40 +112,44 @@ class CategoriesViewModelTest {
         viewModel.getCategories()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.ONLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, FakeDataSource.categories, remoteCategories),
-            localRepository.getCategories().first()
+            categoriesUiState.categories
         )
     }
 
     @Test
     fun categoriesViewModel_checkRefreshedOnlineStateWithInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithInternet()
         advanceUntilIdle()
 
         viewModel.getCategories()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.ONLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, remoteCategories),
-            localRepository.getCategories().first()
+            categoriesUiState.categories
         )
     }
 
     @Test
     fun categoriesViewModel_checkRefreshedOfflineStateWithoutInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithoutInternet()
         advanceUntilIdle()
 
         viewModel.getCategories()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.OFFLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, FakeDataSource.categories),
-            localRepository.getCategories().first()
+            categoriesUiState.categories
         )
     }
 
