@@ -48,14 +48,14 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val profileUiState: ProfileUiState by profileViewModel.uiState.collectAsState()
+    val profileUiState by profileViewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
         topBar = {
             AppTopBar(
                 title = stringResource(ProfileDestination.titleRes),
-                internetStatus = profileViewModel.internetStatus,
+                internetStatus = profileUiState.internetStatus,
                 refreshAction = { profileViewModel.getUser() },
                 scrollBehavior = scrollBehavior
             )
@@ -69,7 +69,6 @@ fun ProfileScreen(
     ) { innerPadding ->
         ProfileBody(
             profileUiState = profileUiState,
-            internetStatus = profileViewModel.internetStatus,
             onProfileStatisticsClick = onProfileStatisticsClick,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding
@@ -80,7 +79,6 @@ fun ProfileScreen(
 @Composable
 internal fun ProfileBody(
     profileUiState: ProfileUiState,
-    internetStatus: InternetStatus,
     onProfileStatisticsClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -100,7 +98,7 @@ internal fun ProfileBody(
             ) {
                 Text(
                     text = stringResource(
-                        when (internetStatus) {
+                        when (profileUiState.internetStatus) {
                             InternetStatus.ONLINE -> R.string.no_data
                             InternetStatus.LOADING -> R.string.loading
                             InternetStatus.OFFLINE -> R.string.no_internet_connection

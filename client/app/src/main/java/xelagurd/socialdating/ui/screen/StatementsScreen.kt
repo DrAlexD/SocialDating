@@ -55,14 +55,14 @@ fun StatementsScreen(
     modifier: Modifier = Modifier,
     statementsViewModel: StatementsViewModel = hiltViewModel()
 ) {
-    val statementsUiState: StatementsUiState by statementsViewModel.uiState.collectAsState()
+    val statementsUiState by statementsViewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
         topBar = {
             AppTopBar(
                 title = stringResource(StatementsDestination.titleRes),
-                internetStatus = statementsViewModel.internetStatus,
+                internetStatus = statementsUiState.internetStatus,
                 refreshAction = { statementsViewModel.getStatements() },
                 navigateUp = { onNavigateUp.invoke() },
                 scrollBehavior = scrollBehavior
@@ -77,7 +77,6 @@ fun StatementsScreen(
     ) { innerPadding ->
         StatementsBody(
             statementsUiState = statementsUiState,
-            internetStatus = statementsViewModel.internetStatus,
             onStatementClick = onStatementClick,
             onStatementReactionClick = { id, type ->
                 statementsViewModel.onStatementReactionClick(id, type)
@@ -91,7 +90,6 @@ fun StatementsScreen(
 @Composable
 internal fun StatementsBody(
     statementsUiState: StatementsUiState,
-    internetStatus: InternetStatus,
     onStatementClick: (Int) -> Unit,
     onStatementReactionClick: (Int, StatementReactionType) -> Unit,
     modifier: Modifier = Modifier,
@@ -117,7 +115,7 @@ internal fun StatementsBody(
             ) {
                 Text(
                     text = stringResource(
-                        when (internetStatus) {
+                        when (statementsUiState.internetStatus) {
                             InternetStatus.ONLINE -> R.string.no_data
                             InternetStatus.LOADING -> R.string.loading
                             InternetStatus.OFFLINE -> R.string.no_internet_connection
@@ -231,8 +229,10 @@ fun ReactionsBody(
 fun StatementsBodyOfflineDataPreview() {
     AppTheme {
         StatementsBody(
-            statementsUiState = StatementsUiState(FakeDataSource.statements),
-            internetStatus = InternetStatus.OFFLINE,
+            statementsUiState = StatementsUiState(
+                statements = FakeDataSource.statements,
+                internetStatus = InternetStatus.OFFLINE
+            ),
             onStatementClick = {},
             onStatementReactionClick = { _, _ -> null }
         )

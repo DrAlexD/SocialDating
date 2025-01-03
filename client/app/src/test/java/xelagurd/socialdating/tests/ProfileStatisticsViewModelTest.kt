@@ -3,7 +3,9 @@ package xelagurd.socialdating.tests
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import androidx.lifecycle.SavedStateHandle
@@ -56,6 +58,8 @@ class ProfileStatisticsViewModelTest {
     private lateinit var viewModel: ProfileStatisticsViewModel
     private lateinit var userCategoriesFlow: MutableStateFlow<List<UserCategoryWithData>>
     private lateinit var userDefiningThemesFlow: MutableStateFlow<List<UserDefiningThemeWithData>>
+    private val profileStatisticsUiState
+        get() = viewModel.uiState.value
 
     private val userId = 1
 
@@ -117,64 +121,59 @@ class ProfileStatisticsViewModelTest {
         )
     }
 
-    @Test
-    fun profileStatisticsViewModel_checkInitialState() = runTest {
-        mockDataWithInternet()
-        mockLocalProfileStatistics()
-
-        assertEquals(InternetStatus.LOADING, viewModel.internetStatus)
-        assertEquals(
-            localUserCategories.toUserCategoriesWithData(),
-            localUserCategoriesRepository.getUserCategories(userId).first()
-        )
-        assertEquals(
-            localUserDefiningThemes.toUserDefiningThemesWithData(),
-            localUserDefiningThemesRepository.getUserDefiningThemes(userCategoriesFlow.toIds())
-                .first()
-        )
+    private fun TestScope.setupUiStateCollecting() {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
     }
 
     @Test
     fun profileStatisticsViewModel_checkDataWithInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithInternet()
         advanceUntilIdle()
         mockLocalProfileStatistics()
 
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.ONLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, remoteUserCategories).toUserCategoriesWithData(),
-            localUserCategoriesRepository.getUserCategories(userId).first()
+            profileStatisticsUiState.userCategories
         )
         assertEquals(
             mergeListsAsSets(localUserDefiningThemes, remoteUserDefiningThemes)
-                .toUserDefiningThemesWithData(),
-            localUserDefiningThemesRepository.getUserDefiningThemes(userCategoriesFlow.toIds())
-                .first()
+                .toUserDefiningThemesWithData()
+                .groupBy { it.userCategoryId },
+            profileStatisticsUiState.userCategoryToDefiningThemes
         )
     }
 
     @Test
     fun profileStatisticsViewModel_checkDataWithoutInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithoutInternet()
         advanceUntilIdle()
         mockLocalProfileStatistics()
 
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.OFFLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, FakeDataSource.userCategories)
                 .toUserCategoriesWithData(),
-            localUserCategoriesRepository.getUserCategories(userId).first()
+            profileStatisticsUiState.userCategories
         )
         assertEquals(
             mergeListsAsSets(localUserDefiningThemes, FakeDataSource.userDefiningThemes)
-                .toUserDefiningThemesWithData(),
-            localUserDefiningThemesRepository.getUserDefiningThemes(userCategoriesFlow.toIds())
-                .first()
+                .toUserDefiningThemesWithData()
+                .groupBy { it.userCategoryId },
+            profileStatisticsUiState.userCategoryToDefiningThemes
         )
     }
 
     @Test
     fun profileStatisticsViewModel_checkRefreshedOnlineDataWithoutInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithInternet()
         advanceUntilIdle()
 
@@ -183,28 +182,31 @@ class ProfileStatisticsViewModelTest {
         advanceUntilIdle()
         mockLocalProfileStatistics()
 
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.OFFLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(
                 localUserCategories,
                 remoteUserCategories,
                 FakeDataSource.userCategories
             ).toUserCategoriesWithData(),
-            localUserCategoriesRepository.getUserCategories(userId).first()
+            profileStatisticsUiState.userCategories
         )
         assertEquals(
             mergeListsAsSets(
                 localUserDefiningThemes,
                 remoteUserDefiningThemes,
                 FakeDataSource.userDefiningThemes
-            ).toUserDefiningThemesWithData(),
-            localUserDefiningThemesRepository.getUserDefiningThemes(userCategoriesFlow.toIds())
-                .first()
+            )
+                .toUserDefiningThemesWithData()
+                .groupBy { it.userCategoryId },
+            profileStatisticsUiState.userCategoryToDefiningThemes
         )
     }
 
     @Test
     fun profileStatisticsViewModel_checkRefreshedOfflineDataWithInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithoutInternet()
         advanceUntilIdle()
 
@@ -213,28 +215,31 @@ class ProfileStatisticsViewModelTest {
         advanceUntilIdle()
         mockLocalProfileStatistics()
 
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.ONLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(
                 localUserCategories,
                 FakeDataSource.userCategories,
                 remoteUserCategories
             ).toUserCategoriesWithData(),
-            localUserCategoriesRepository.getUserCategories(userId).first()
+            profileStatisticsUiState.userCategories
         )
         assertEquals(
             mergeListsAsSets(
                 localUserDefiningThemes,
                 FakeDataSource.userDefiningThemes,
                 remoteUserDefiningThemes
-            ).toUserDefiningThemesWithData(),
-            localUserDefiningThemesRepository.getUserDefiningThemes(userCategoriesFlow.toIds())
-                .first()
+            )
+                .toUserDefiningThemesWithData()
+                .groupBy { it.userCategoryId },
+            profileStatisticsUiState.userCategoryToDefiningThemes
         )
     }
 
     @Test
     fun profileStatisticsViewModel_checkRefreshedOnlineDataWithInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithInternet()
         advanceUntilIdle()
 
@@ -242,21 +247,23 @@ class ProfileStatisticsViewModelTest {
         advanceUntilIdle()
         mockLocalProfileStatistics()
 
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.ONLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, remoteUserCategories).toUserCategoriesWithData(),
-            localUserCategoriesRepository.getUserCategories(userId).first()
+            profileStatisticsUiState.userCategories
         )
         assertEquals(
             mergeListsAsSets(localUserDefiningThemes, remoteUserDefiningThemes)
-                .toUserDefiningThemesWithData(),
-            localUserDefiningThemesRepository.getUserDefiningThemes(userCategoriesFlow.toIds())
-                .first()
+                .toUserDefiningThemesWithData()
+                .groupBy { it.userCategoryId },
+            profileStatisticsUiState.userCategoryToDefiningThemes
         )
     }
 
     @Test
     fun profileStatisticsViewModel_checkRefreshedOfflineDataWithoutInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithoutInternet()
         advanceUntilIdle()
 
@@ -264,17 +271,17 @@ class ProfileStatisticsViewModelTest {
         advanceUntilIdle()
         mockLocalProfileStatistics()
 
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.OFFLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, FakeDataSource.userCategories)
                 .toUserCategoriesWithData(),
-            localUserCategoriesRepository.getUserCategories(userId).first()
+            profileStatisticsUiState.userCategories
         )
         assertEquals(
             mergeListsAsSets(localUserDefiningThemes, FakeDataSource.userDefiningThemes)
-                .toUserDefiningThemesWithData(),
-            localUserDefiningThemesRepository.getUserDefiningThemes(userCategoriesFlow.toIds())
-                .first()
+                .toUserDefiningThemesWithData()
+                .groupBy { it.userCategoryId },
+            profileStatisticsUiState.userCategoryToDefiningThemes
         )
     }
 

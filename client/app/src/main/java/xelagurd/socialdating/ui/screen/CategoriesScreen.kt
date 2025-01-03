@@ -45,7 +45,7 @@ fun CategoriesScreen(
     modifier: Modifier = Modifier,
     categoriesViewModel: CategoriesViewModel = hiltViewModel()
 ) {
-    val categoriesUiState: CategoriesUiState by categoriesViewModel.uiState.collectAsState()
+    val categoriesUiState by categoriesViewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(

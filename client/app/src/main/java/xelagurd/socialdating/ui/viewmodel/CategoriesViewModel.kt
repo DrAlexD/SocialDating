@@ -5,7 +5,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -24,13 +23,10 @@ class CategoriesViewModel @Inject constructor(
     private val remoteRepository: RemoteCategoriesRepository,
     private val localRepository: LocalCategoriesRepository
 ) : ViewModel() {
-    private var internetStatus = MutableStateFlow(InternetStatus.LOADING)
+    private val internetStatusFlow = MutableStateFlow(InternetStatus.LOADING)
     private val categoriesFlow = localRepository.getCategories()
 
-    val uiState: StateFlow<CategoriesUiState> = combine(
-        categoriesFlow,
-        internetStatus
-    ) { categories, internetStatus ->
+    val uiState = combine(categoriesFlow, internetStatusFlow) { categories, internetStatus ->
         CategoriesUiState(
             categories = categories,
             internetStatus = internetStatus
@@ -48,16 +44,16 @@ class CategoriesViewModel @Inject constructor(
     fun getCategories() {
         viewModelScope.launch {
             try {
-                internetStatus.update { InternetStatus.LOADING }
+                internetStatusFlow.update { InternetStatus.LOADING }
 
                 delay(3000L) // FixMe: remove after implementing server
 
                 val remoteCategories = remoteRepository.getCategories()
                 localRepository.insertCategories(remoteCategories)
-                internetStatus.update { InternetStatus.ONLINE }
+                internetStatusFlow.update { InternetStatus.ONLINE }
             } catch (_: IOException) {
                 localRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
-                internetStatus.update { InternetStatus.OFFLINE }
+                internetStatusFlow.update { InternetStatus.OFFLINE }
             }
         }
     }
