@@ -6,6 +6,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,7 +25,7 @@ class CategoriesViewModel @Inject constructor(
     private val localRepository: LocalCategoriesRepository
 ) : ViewModel() {
     private val internetStatusFlow = MutableStateFlow(InternetStatus.LOADING)
-    private val categoriesFlow = localRepository.getCategories()
+    private val categoriesFlow = localRepository.getCategories().distinctUntilChanged()
 
     val uiState = combine(categoriesFlow, internetStatusFlow) { categories, internetStatus ->
         CategoriesUiState(

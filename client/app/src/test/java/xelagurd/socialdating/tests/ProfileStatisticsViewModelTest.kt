@@ -3,6 +3,7 @@ package xelagurd.socialdating.tests
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -133,7 +134,6 @@ class ProfileStatisticsViewModelTest {
 
         mockDataWithInternet()
         advanceUntilIdle()
-        mockLocalProfileStatistics()
 
         assertEquals(InternetStatus.ONLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
@@ -154,7 +154,6 @@ class ProfileStatisticsViewModelTest {
 
         mockDataWithoutInternet()
         advanceUntilIdle()
-        mockLocalProfileStatistics()
 
         assertEquals(InternetStatus.OFFLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
@@ -180,7 +179,6 @@ class ProfileStatisticsViewModelTest {
         mockDataWithoutInternet()
         viewModel.getProfileStatistics()
         advanceUntilIdle()
-        mockLocalProfileStatistics()
 
         assertEquals(InternetStatus.OFFLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
@@ -213,7 +211,6 @@ class ProfileStatisticsViewModelTest {
         mockDataWithInternet()
         viewModel.getProfileStatistics()
         advanceUntilIdle()
-        mockLocalProfileStatistics()
 
         assertEquals(InternetStatus.ONLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
@@ -245,7 +242,6 @@ class ProfileStatisticsViewModelTest {
 
         viewModel.getProfileStatistics()
         advanceUntilIdle()
-        mockLocalProfileStatistics()
 
         assertEquals(InternetStatus.ONLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
@@ -269,7 +265,6 @@ class ProfileStatisticsViewModelTest {
 
         viewModel.getProfileStatistics()
         advanceUntilIdle()
-        mockLocalProfileStatistics()
 
         assertEquals(InternetStatus.OFFLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
@@ -285,13 +280,16 @@ class ProfileStatisticsViewModelTest {
         )
     }
 
-    private fun mockLocalProfileStatistics() {
-        every { localUserDefiningThemesRepository.getUserDefiningThemes(userCategoriesFlow.toIds()) } returns userDefiningThemesFlow
+    private fun mockLocalUserDefiningThemes() {
+        every { localUserDefiningThemesRepository.getUserDefiningThemes(localUserCategories.toUserCategoryIds()) } returns userDefiningThemesFlow
+        every { localUserDefiningThemesRepository.getUserDefiningThemes(remoteUserCategories.toUserCategoryIds()) } returns userDefiningThemesFlow
+        every { localUserDefiningThemesRepository.getUserDefiningThemes(FakeDataSource.userCategories.toUserCategoryIds()) } returns userDefiningThemesFlow
     }
 
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>("userId") } returns userId
         every { localUserCategoriesRepository.getUserCategories(userId) } returns userCategoriesFlow
+        mockLocalUserDefiningThemes()
     }
 
     private fun mockDataWithInternet() {

@@ -44,8 +44,9 @@ class StatementsViewModel @Inject constructor(
     private val statementsFlow = localDefiningThemesRepository.getDefiningThemes(categoryId)
         .distinctUntilChanged()
         .flatMapLatest { definingThemes ->
-            val definingThemeIds = definingThemes.map { it.id }
+            val definingThemeIds = definingThemes.map { it.id }.distinct()
             localStatementsRepository.getStatements(definingThemeIds)
+                .distinctUntilChanged()
         }
 
     val uiState = combine(statementsFlow, internetStatusFlow) { statements, internetStatus ->

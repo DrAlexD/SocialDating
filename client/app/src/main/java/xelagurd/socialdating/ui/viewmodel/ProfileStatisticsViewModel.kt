@@ -51,8 +51,9 @@ class ProfileStatisticsViewModel @Inject constructor(
     private val userDefiningThemesFlow = userCategoriesFlow
         .distinctUntilChanged()
         .flatMapLatest { userCategories ->
-            val userCategoryIds = userCategories.map { it.id }
+            val userCategoryIds = userCategories.map { it.id }.distinct()
             localUserDefiningThemesRepository.getUserDefiningThemes(userCategoryIds)
+                .distinctUntilChanged()
         }
 
     val uiState = combine(userCategoriesFlow, userDefiningThemesFlow, internetStatusFlow)

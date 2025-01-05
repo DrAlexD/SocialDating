@@ -6,6 +6,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -29,7 +30,7 @@ class ProfileViewModel @Inject constructor(
     private val userId: Int = checkNotNull(savedStateHandle[ProfileDestination.userId])
 
     private val internetStatusFlow = MutableStateFlow(InternetStatus.LOADING)
-    private val userFlow = localRepository.getUser(userId)
+    private val userFlow = localRepository.getUser(userId).distinctUntilChanged()
 
     val uiState = combine(userFlow, internetStatusFlow) { user, internetStatus ->
         ProfileUiState(

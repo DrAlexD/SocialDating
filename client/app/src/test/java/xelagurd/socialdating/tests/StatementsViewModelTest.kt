@@ -103,7 +103,6 @@ class StatementsViewModelTest {
 
         mockDataWithInternet()
         advanceUntilIdle()
-        mockLocalStatements()
 
         assertEquals(InternetStatus.ONLINE, statementsUiState.internetStatus)
         assertEquals(
@@ -118,7 +117,6 @@ class StatementsViewModelTest {
 
         mockDataWithoutInternet()
         advanceUntilIdle()
-        mockLocalStatements()
 
         assertEquals(InternetStatus.OFFLINE, statementsUiState.internetStatus)
         assertEquals(
@@ -137,7 +135,6 @@ class StatementsViewModelTest {
         mockDataWithoutInternet()
         viewModel.getStatements()
         advanceUntilIdle()
-        mockLocalStatements()
 
         assertEquals(InternetStatus.OFFLINE, statementsUiState.internetStatus)
         assertEquals(
@@ -156,7 +153,6 @@ class StatementsViewModelTest {
         mockDataWithInternet()
         viewModel.getStatements()
         advanceUntilIdle()
-        mockLocalStatements()
 
         assertEquals(InternetStatus.ONLINE, statementsUiState.internetStatus)
         assertEquals(
@@ -174,7 +170,6 @@ class StatementsViewModelTest {
 
         viewModel.getStatements()
         advanceUntilIdle()
-        mockLocalStatements()
 
         assertEquals(InternetStatus.ONLINE, statementsUiState.internetStatus)
         assertEquals(
@@ -192,7 +187,6 @@ class StatementsViewModelTest {
 
         viewModel.getStatements()
         advanceUntilIdle()
-        mockLocalStatements()
 
         assertEquals(InternetStatus.OFFLINE, statementsUiState.internetStatus)
         assertEquals(
@@ -202,12 +196,15 @@ class StatementsViewModelTest {
     }
 
     private fun mockLocalStatements() {
-        every { localStatementsRepository.getStatements(definingThemesFlow.toIds()) } returns statementsFlow
+        every { localStatementsRepository.getStatements(localDefiningThemes.toIds()) } returns statementsFlow
+        every { localStatementsRepository.getStatements(remoteDefiningThemes.toIds()) } returns statementsFlow
+        every { localStatementsRepository.getStatements(FakeDataSource.definingThemes.toIds()) } returns statementsFlow
     }
 
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>("categoryId") } returns categoryId
         every { localDefiningThemesRepository.getDefiningThemes(categoryId) } returns definingThemesFlow
+        mockLocalStatements()
         coEvery { localUsersRepository.insertUser(FakeDataSource.users[0]) } just Runs
     }
 
