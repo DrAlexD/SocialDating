@@ -17,4 +17,5 @@
     <string name="not_sure">Не уверен</string>
     <string name="part_no_maintain">Скорее не поддерживаю</string>
     <string name="full_no_maintain">Полностью не поддерживаю</string>
+    <string name="login">Войти</string>
 </resources>

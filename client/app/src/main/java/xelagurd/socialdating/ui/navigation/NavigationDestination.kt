@@ -39,6 +39,7 @@ object CategoriesDestination : NavigationDestination() {
 object StatementsDestination : NavigationDestination() {
     override val route = AppScreen.Statements.name
     override val topLevelRoute = CategoriesDestination.route
+
     const val categoryId = "categoryId"
     val routeWithArgs = "$route/{$categoryId}"
 }
@@ -46,20 +47,29 @@ object StatementsDestination : NavigationDestination() {
 object StatementDetailsDestination : NavigationDestination() {
     override val route = AppScreen.StatementDetails.name
     override val topLevelRoute = CategoriesDestination.route
+
     const val statementId = "statementId"
     val routeWithArgs = "$route/{$statementId}"
 }
 
 object ProfileDestination : NavigationDestination() {
     override val route = AppScreen.Profile.name
-    override val topLevelRoute = "$route/1" // TODO: Replace after adding preferences
+
+    var currentUserId = -1
+    override val topLevelRoute
+        get() = "$route/$currentUserId"
+
     const val userId = "userId"
     val routeWithArgs = "$route/{$userId}"
 }
 
 object ProfileStatisticsDestination : NavigationDestination() {
     override val route = AppScreen.ProfileStatistics.name
-    override val topLevelRoute = "${ProfileDestination.route}/1" // TODO: Replace after adding preferences
+
+    var currentUserId = -1
+    override val topLevelRoute
+        get() = "${ProfileDestination.route}/$currentUserId"
+
     const val userId = "userId"
     val routeWithArgs = "$route/{$userId}"
 }

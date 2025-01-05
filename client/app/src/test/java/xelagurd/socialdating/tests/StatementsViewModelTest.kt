@@ -9,10 +9,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import androidx.lifecycle.SavedStateHandle
-import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
@@ -22,7 +20,6 @@ import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
-import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
@@ -41,8 +38,6 @@ class StatementsViewModelTest {
     private val localStatementsRepository: LocalStatementsRepository = mockk()
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository = mockk()
     private val localDefiningThemesRepository: LocalDefiningThemesRepository = mockk()
-    private val localUsersRepository: LocalUsersRepository =
-        mockk() // TODO: Remove after adding login screen
 
     private lateinit var viewModel: StatementsViewModel
     private lateinit var definingThemesFlow: MutableStateFlow<List<DefiningTheme>>
@@ -86,8 +81,7 @@ class StatementsViewModelTest {
             remoteStatementsRepository,
             localStatementsRepository,
             remoteDefiningThemesRepository,
-            localDefiningThemesRepository,
-            localUsersRepository
+            localDefiningThemesRepository
         )
     }
 
@@ -205,7 +199,6 @@ class StatementsViewModelTest {
         every { savedStateHandle.get<Int>("categoryId") } returns categoryId
         every { localDefiningThemesRepository.getDefiningThemes(categoryId) } returns definingThemesFlow
         mockLocalStatements()
-        coEvery { localUsersRepository.insertUser(FakeDataSource.users[0]) } just Runs
     }
 
     private fun mockDataWithInternet() {

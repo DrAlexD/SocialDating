@@ -14,7 +14,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.ui.navigation.ProfileDestination
@@ -59,7 +58,6 @@ class ProfileViewModel @Inject constructor(
 
                 internetStatusFlow.update { InternetStatus.ONLINE }
             } catch (_: IOException) {
-                localRepository.insertUser(FakeDataSource.users[0]) // FixMe: remove after implementing server
                 internetStatusFlow.update { InternetStatus.OFFLINE }
             }
         }
