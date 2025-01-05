@@ -3,6 +3,8 @@ package xelagurd.socialdating
 import javax.inject.Singleton
 import kotlinx.serialization.json.Json
 import android.content.Context
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -18,6 +20,12 @@ import xelagurd.socialdating.data.remote.ApiService
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context) = PreferenceDataStoreFactory.create {
+        context.preferencesDataStoreFile("social-dating-app")
+    }
 
     @Provides
     @Singleton

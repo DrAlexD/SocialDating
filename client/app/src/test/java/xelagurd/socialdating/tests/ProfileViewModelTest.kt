@@ -17,7 +17,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainDispatcherRule
-import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
@@ -81,7 +80,7 @@ class ProfileViewModelTest {
 
         assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
         assertEquals(
-            FakeDataSource.users[0],
+            localUser,
             profileUiState.user
         )
     }
@@ -99,7 +98,7 @@ class ProfileViewModelTest {
 
         assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
         assertEquals(
-            FakeDataSource.users[0],
+            remoteUser,
             profileUiState.user
         )
     }
@@ -151,7 +150,7 @@ class ProfileViewModelTest {
 
         assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
         assertEquals(
-            FakeDataSource.users[0],
+            localUser,
             profileUiState.user
         )
     }
@@ -170,8 +169,5 @@ class ProfileViewModelTest {
 
     private fun mockDataWithoutInternet() {
         coEvery { remoteRepository.getUser(userId) } throws IOException()
-        coEvery { localRepository.insertUser(FakeDataSource.users[0]) } answers {
-            usersFlow.value = FakeDataSource.users[0]
-        }
     }
 }

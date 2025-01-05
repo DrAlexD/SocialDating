@@ -20,7 +20,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
-import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.model.StatementReactionType
 import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
@@ -35,8 +34,7 @@ class StatementsViewModel @Inject constructor(
     private val remoteStatementsRepository: RemoteStatementsRepository,
     private val localStatementsRepository: LocalStatementsRepository,
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository,
-    private val localDefiningThemesRepository: LocalDefiningThemesRepository,
-    private val localUsersRepository: LocalUsersRepository
+    private val localDefiningThemesRepository: LocalDefiningThemesRepository
 ) : ViewModel() {
     private val categoryId: Int = checkNotNull(savedStateHandle[StatementsDestination.categoryId])
 
@@ -68,8 +66,6 @@ class StatementsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 internetStatusFlow.update { InternetStatus.LOADING }
-
-                localUsersRepository.insertUser(FakeDataSource.users[0]) // TODO: Remove after adding login screen
 
                 delay(3000L) // FixMe: remove after implementing server
 

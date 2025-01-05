@@ -7,6 +7,9 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import xelagurd.socialdating.MainViewModel
 import xelagurd.socialdating.R
 import xelagurd.socialdating.ui.screen.CategoriesScreen
 import xelagurd.socialdating.ui.screen.ProfileScreen
@@ -22,7 +26,15 @@ import xelagurd.socialdating.ui.screen.StatementsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppNavHost(navController: NavHostController = rememberNavController()) {
+fun AppNavHost(
+    navController: NavHostController = rememberNavController(),
+    mainViewModel: MainViewModel = hiltViewModel()
+) {
+    val currentUserId by mainViewModel.currentUserid.collectAsState()
+
+    ProfileDestination.currentUserId = currentUserId
+    ProfileStatisticsDestination.currentUserId = currentUserId
+
     initializeTopLevelDestinations(navController)
 
     NavHost(
