@@ -3,14 +3,13 @@ package xelagurd.socialdating.ui.viewmodel
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,18 +27,21 @@ class ProfileViewModel @Inject constructor(
     private val remoteRepository: RemoteUsersRepository,
     private val localRepository: LocalUsersRepository
 ) : ViewModel() {
-    var internetStatus by mutableStateOf(InternetStatus.LOADING)
-        private set
-
     private val userId: Int = checkNotNull(savedStateHandle[ProfileDestination.userId])
 
-    val uiState: StateFlow<ProfileUiState> = localRepository.getUser(userId)
-        .map { ProfileUiState(it) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = ProfileUiState()
+    private val internetStatusFlow = MutableStateFlow(InternetStatus.LOADING)
+    private val userFlow = localRepository.getUser(userId).distinctUntilChanged()
+
+    val uiState = combine(userFlow, internetStatusFlow) { user, internetStatus ->
+        ProfileUiState(
+            user = user,
+            internetStatus = internetStatus
         )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+        initialValue = ProfileUiState()
+    )
 
     init {
         getUser()
@@ -48,17 +50,17 @@ class ProfileViewModel @Inject constructor(
     fun getUser() {
         viewModelScope.launch {
             try {
-                internetStatus = InternetStatus.LOADING
+                internetStatusFlow.update { InternetStatus.LOADING }
 
                 delay(3000L) // FixMe: remove after implementing server
 
                 val remoteUser = remoteRepository.getUser(userId)
                 localRepository.insertUser(remoteUser)
 
-                internetStatus = InternetStatus.ONLINE
+                internetStatusFlow.update { InternetStatus.ONLINE }
             } catch (_: IOException) {
                 localRepository.insertUser(FakeDataSource.users[0]) // FixMe: remove after implementing server
-                internetStatus = InternetStatus.OFFLINE
+                internetStatusFlow.update { InternetStatus.OFFLINE }
             }
         }
     }

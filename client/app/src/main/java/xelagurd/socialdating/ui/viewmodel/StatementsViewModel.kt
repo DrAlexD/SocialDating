@@ -5,15 +5,14 @@ import javax.inject.Inject
 import kotlin.collections.map
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -39,24 +38,27 @@ class StatementsViewModel @Inject constructor(
     private val localDefiningThemesRepository: LocalDefiningThemesRepository,
     private val localUsersRepository: LocalUsersRepository
 ) : ViewModel() {
-    var internetStatus by mutableStateOf(InternetStatus.LOADING)
-        private set
-
     private val categoryId: Int = checkNotNull(savedStateHandle[StatementsDestination.categoryId])
 
-    val uiState: StateFlow<StatementsUiState> = localDefiningThemesRepository
-        .getDefiningThemes(categoryId)
-        .map { definingThemes ->
-            val definingThemeIds = definingThemes.map { it.id }
+    private val internetStatusFlow = MutableStateFlow(InternetStatus.LOADING)
+    private val statementsFlow = localDefiningThemesRepository.getDefiningThemes(categoryId)
+        .distinctUntilChanged()
+        .flatMapLatest { definingThemes ->
+            val definingThemeIds = definingThemes.map { it.id }.distinct()
             localStatementsRepository.getStatements(definingThemeIds)
+                .distinctUntilChanged()
         }
-        .flatMapLatest { it }
-        .map { StatementsUiState(it) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = StatementsUiState()
+
+    val uiState = combine(statementsFlow, internetStatusFlow) { statements, internetStatus ->
+        StatementsUiState(
+            statements = statements,
+            internetStatus = internetStatus
         )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+        initialValue = StatementsUiState()
+    )
 
     init {
         getStatements()
@@ -65,7 +67,7 @@ class StatementsViewModel @Inject constructor(
     fun getStatements() {
         viewModelScope.launch {
             try {
-                internetStatus = InternetStatus.LOADING
+                internetStatusFlow.update { InternetStatus.LOADING }
 
                 localUsersRepository.insertUser(FakeDataSource.users[0]) // TODO: Remove after adding login screen
 
@@ -80,12 +82,12 @@ class StatementsViewModel @Inject constructor(
                     .getStatements(remoteDefiningThemeIds)
                 localStatementsRepository.insertStatements(remoteStatements)
 
-                internetStatus = InternetStatus.ONLINE
+                internetStatusFlow.update { InternetStatus.ONLINE }
             } catch (_: IOException) {
                 localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
                 localStatementsRepository.insertStatements(FakeDataSource.statements) // FixMe: remove after implementing server
 
-                internetStatus = InternetStatus.OFFLINE
+                internetStatusFlow.update { InternetStatus.OFFLINE }
             }
         }
     }

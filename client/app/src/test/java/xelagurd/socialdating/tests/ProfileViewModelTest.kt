@@ -3,7 +3,9 @@ package xelagurd.socialdating.tests
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import androidx.lifecycle.SavedStateHandle
@@ -33,6 +35,8 @@ class ProfileViewModelTest {
 
     private lateinit var viewModel: ProfileViewModel
     private lateinit var usersFlow: MutableStateFlow<User>
+    private val profileUiState
+        get() = viewModel.uiState.value
 
     private val userId = 1
 
@@ -48,40 +52,44 @@ class ProfileViewModelTest {
         viewModel = ProfileViewModel(savedStateHandle, remoteRepository, localRepository)
     }
 
-    @Test
-    fun usersViewModel_checkInitialState() = runTest {
-        mockDataWithInternet()
-
-        assertEquals(InternetStatus.LOADING, viewModel.internetStatus)
-        assertEquals(localUser, localRepository.getUser(userId).first())
+    private fun TestScope.setupUiStateCollecting() {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
     }
 
     @Test
     fun usersViewModel_checkStateWithInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.ONLINE, profileUiState.internetStatus)
         assertEquals(
             remoteUser,
-            localRepository.getUser(userId).first()
+            profileUiState.user
         )
     }
 
     @Test
     fun usersViewModel_checkStateWithoutInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
         assertEquals(
             FakeDataSource.users[0],
-            localRepository.getUser(userId).first()
+            profileUiState.user
         )
     }
 
     @Test
     fun usersViewModel_checkRefreshedOnlineStateWithoutInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithInternet()
         advanceUntilIdle()
 
@@ -89,15 +97,17 @@ class ProfileViewModelTest {
         viewModel.getUser()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
         assertEquals(
             FakeDataSource.users[0],
-            localRepository.getUser(userId).first()
+            profileUiState.user
         )
     }
 
     @Test
     fun usersViewModel_checkRefreshedOfflineStateWithInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithoutInternet()
         advanceUntilIdle()
 
@@ -105,40 +115,44 @@ class ProfileViewModelTest {
         viewModel.getUser()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.ONLINE, profileUiState.internetStatus)
         assertEquals(
             remoteUser,
-            localRepository.getUser(userId).first()
+            profileUiState.user
         )
     }
 
     @Test
     fun usersViewModel_checkRefreshedOnlineStateWithInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithInternet()
         advanceUntilIdle()
 
         viewModel.getUser()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.ONLINE, profileUiState.internetStatus)
         assertEquals(
             remoteUser,
-            localRepository.getUser(userId).first()
+            profileUiState.user
         )
     }
 
     @Test
     fun usersViewModel_checkRefreshedOfflineStateWithoutInternet() = runTest {
+        setupUiStateCollecting()
+
         mockDataWithoutInternet()
         advanceUntilIdle()
 
         viewModel.getUser()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, viewModel.internetStatus)
+        assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
         assertEquals(
             FakeDataSource.users[0],
-            localRepository.getUser(userId).first()
+            profileUiState.user
         )
     }
 

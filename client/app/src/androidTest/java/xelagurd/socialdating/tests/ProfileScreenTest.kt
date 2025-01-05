@@ -37,7 +37,6 @@ class ProfileScreenTest {
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.LOADING,
                 onProfileStatisticsClick = {}
             )
         }
@@ -47,12 +46,11 @@ class ProfileScreenTest {
 
     @Test
     fun profileScreen_offlineStatusAndEmptyData_offlineText() {
-        val profileUiState = ProfileUiState()
+        val profileUiState = ProfileUiState(internetStatus = InternetStatus.OFFLINE)
 
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.OFFLINE,
                 onProfileStatisticsClick = {}
             )
         }
@@ -62,12 +60,11 @@ class ProfileScreenTest {
 
     @Test
     fun profileScreen_onlineStatusAndEmptyData_onlineText() {
-        val profileUiState = ProfileUiState()
+        val profileUiState = ProfileUiState(internetStatus = InternetStatus.ONLINE)
 
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.ONLINE,
                 onProfileStatisticsClick = {}
             )
         }
@@ -77,12 +74,14 @@ class ProfileScreenTest {
 
     @Test
     fun profileScreen_loadingStatusAndData_displayedData() {
-        val profileUiState = ProfileUiState(User(1, "MyName", "", "", "", "", 30, "", "", 50))
+        val profileUiState = ProfileUiState(
+            user = User(1, "MyName", "", "", "", "", 30, "", "", 50),
+            internetStatus = InternetStatus.LOADING
+        )
 
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.LOADING,
                 onProfileStatisticsClick = {}
             )
         }
@@ -92,12 +91,14 @@ class ProfileScreenTest {
 
     @Test
     fun profileScreen_offlineStatusAndData_displayedData() {
-        val profileUiState = ProfileUiState(User(1, "MyName", "", "", "", "", 30, "", "", 50))
+        val profileUiState = ProfileUiState(
+            user = User(1, "MyName", "", "", "", "", 30, "", "", 50),
+            internetStatus = InternetStatus.OFFLINE
+        )
 
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.OFFLINE,
                 onProfileStatisticsClick = {}
             )
         }
@@ -107,12 +108,14 @@ class ProfileScreenTest {
 
     @Test
     fun profileScreen_onlineStatusAndData_displayedData() {
-        val profileUiState = ProfileUiState(User(1, "MyName", "", "", "", "", 30, "", "", 50))
+        val profileUiState = ProfileUiState(
+            user = User(1, "MyName", "", "", "", "", 30, "", "", 50),
+            internetStatus = InternetStatus.ONLINE
+        )
 
         composeTestRule.activity.setContent {
             ProfileBody(
                 profileUiState = profileUiState,
-                internetStatus = InternetStatus.ONLINE,
                 onProfileStatisticsClick = {}
             )
         }
