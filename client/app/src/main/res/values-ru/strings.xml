@@ -18,4 +18,6 @@
     <string name="part_no_maintain">Скорее не поддерживаю</string>
     <string name="full_no_maintain">Полностью не поддерживаю</string>
     <string name="login">Войти</string>
+    <string name="username">Логин</string>
+    <string name="password">Пароль</string>
 </resources>

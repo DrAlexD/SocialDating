@@ -18,6 +18,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
@@ -78,7 +79,7 @@ class ProfileStatisticsViewModel @Inject constructor(
             try {
                 internetStatusFlow.update { InternetStatus.LOADING }
 
-                delay(3000L) // FixMe: remove after implementing server
+                delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
                 val remoteCategories = remoteCategoriesRepository.getCategories()
                 localCategoriesRepository.insertCategories(remoteCategories)

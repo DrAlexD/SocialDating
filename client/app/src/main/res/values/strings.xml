@@ -19,4 +19,6 @@
     <string name="part_no_maintain">Partially don\'t maintain</string>
     <string name="full_no_maintain">Fully don\'t maintain</string>
     <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
 </resources>

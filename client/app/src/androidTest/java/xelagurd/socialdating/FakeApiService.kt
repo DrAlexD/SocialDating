@@ -37,4 +37,7 @@ class FakeApiService : ApiService {
 
     override suspend fun getUserDefiningThemes(userCategoryIds: List<Int>): List<UserDefiningTheme> =
         FakeDataSource.userDefiningThemes
+
+    override suspend fun logInUser(username: String, password: String): User =
+        FakeDataSource.users[0]
 }

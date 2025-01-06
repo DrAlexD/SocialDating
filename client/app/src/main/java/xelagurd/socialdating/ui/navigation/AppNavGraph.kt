@@ -20,6 +20,7 @@ import androidx.navigation.navArgument
 import xelagurd.socialdating.MainViewModel
 import xelagurd.socialdating.R
 import xelagurd.socialdating.ui.screen.CategoriesScreen
+import xelagurd.socialdating.ui.screen.LoginScreen
 import xelagurd.socialdating.ui.screen.ProfileScreen
 import xelagurd.socialdating.ui.screen.ProfileStatisticsScreen
 import xelagurd.socialdating.ui.screen.StatementsScreen
@@ -30,7 +31,7 @@ fun AppNavHost(
     navController: NavHostController = rememberNavController(),
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
-    val currentUserId by mainViewModel.currentUserid.collectAsState()
+    val currentUserId by mainViewModel.currentUserId.collectAsState()
 
     ProfileDestination.currentUserId = currentUserId
     ProfileStatisticsDestination.currentUserId = currentUserId
@@ -39,8 +40,16 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = CategoriesDestination.route
+        startDestination = if (currentUserId == -1) LoginDestination.route else CategoriesDestination.route
     ) {
+        composable(route = LoginDestination.route) {
+            LoginScreen(
+                onSuccessLogIn = {
+                    navController.navigate(CategoriesDestination.route)
+                }
+            )
+        }
+
         composable(route = CategoriesDestination.route) {
             CategoriesScreen(
                 onCategoryClick = {
