@@ -5,9 +5,11 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.isDisplayed
+import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -26,6 +28,7 @@ import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.navigation.AppNavHost
 import xelagurd.socialdating.ui.navigation.CategoriesDestination
+import xelagurd.socialdating.ui.navigation.LoginDestination
 import xelagurd.socialdating.ui.navigation.ProfileDestination
 import xelagurd.socialdating.ui.navigation.ProfileStatisticsDestination
 import xelagurd.socialdating.ui.navigation.StatementDetailsDestination
@@ -59,8 +62,15 @@ class NavigationTest {
 
     @Test
     fun appNavHost_verifyStartScreen() {
+        navController.assertCurrentRouteName(LoginDestination.route)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_performLogIn_navigatesToCategories() {
+        navigateToCategories()
+
         navController.assertCurrentRouteName(CategoriesDestination.route)
-        checkBottomNavBarWithCategoriesTopLevel()
         //navController.assertBackStackDepth(?)
     }
 
@@ -91,6 +101,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_navigateToCategoriesOnCategoriesScreen_stayOnCategoriesScreen() {
+        navigateToCategories()
         val previousRoute = navController.getCurrentRoute()
         navigateToCategoriesFromBottomNavBar()
         val currentRoute = navController.getCurrentRoute()
@@ -112,6 +123,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_navigateToProfileOnCategoriesScreen_navigatesToProfile() {
+        navigateToCategories()
         navigateToProfileFromBottomNavBar()
 
         navController.assertCurrentRouteName(ProfileDestination.routeWithArgs)
@@ -120,6 +132,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_navigateToProfileOnProfileScreen_stayOnProfileScreen() {
+        navigateToCategories()
         navigateToProfileFromBottomNavBar()
         val previousRoute = navController.getCurrentRoute()
         navigateToProfileFromBottomNavBar()
@@ -141,6 +154,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_clickProfileStatistics_navigatesToProfileStatistics() {
+        navigateToCategories()
         navigateToProfileStatistics()
 
         navController.assertCurrentRouteName(ProfileStatisticsDestination.routeWithArgs)
@@ -149,6 +163,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_clickBackOnProfileStatisticsScreen_navigatesToProfile() {
+        navigateToCategories()
         navigateToProfileStatistics()
         performNavigateUp()
 
@@ -158,6 +173,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_navigateToProfileStatisticsOnProfileStatisticsScreen_stayOnProfileStatisticsScreen() {
+        navigateToCategories()
         navigateToProfileStatistics()
         val previousRoute = navController.getCurrentRoute()
         navigateToProfileFromBottomNavBar()
@@ -169,6 +185,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_navigateToCategoriesOnProfileStatisticsScreenAndBack_navigatesToProfileStatisticsScreen() {
+        navigateToCategories()
         navigateToProfileStatistics()
         navigateToCategoriesFromBottomNavBar()
         navigateToProfileFromBottomNavBar()
@@ -177,7 +194,24 @@ class NavigationTest {
         //navController.assertBackStackDepth(?)
     }
 
+    private fun navigateToCategories() {
+        composeTestRule.onNodeWithTextId(R.string.username)
+            .performTextInput("username")
+        composeTestRule.onNodeWithTextId(R.string.password)
+            .performTextInput("password")
+
+        composeTestRule.onNodeWithTextId(R.string.login)
+            .performClick()
+        composeTestRule.waitUntil(TIMEOUT_MILLIS) {
+            composeTestRule.onNodeWithTextId(R.string.login).isNotDisplayed()
+        }
+
+        checkBottomNavBarWithCategoriesTopLevel()
+    }
+
     private fun navigateToStatements() {
+        navigateToCategories()
+
         composeTestRule.waitUntil(TIMEOUT_MILLIS) {
             composeTestRule.onNodeWithText(FakeDataSource.categories[0].name).isDisplayed()
         }
@@ -244,6 +278,6 @@ class NavigationTest {
     }
 
     companion object {
-        private const val TIMEOUT_MILLIS = 5_000L // FixMe: remove after implementing server
+        private const val TIMEOUT_MILLIS = 3_000L // FixMe: remove after implementing server
     }
 }

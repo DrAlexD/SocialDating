@@ -39,4 +39,10 @@ interface ApiService {
 
     @GET("userDefiningThemes")
     suspend fun getUserDefiningThemes(@Query("userCategoryIds") userCategoryIds: List<Int>): List<UserDefiningTheme>
+
+    @GET("users")
+    suspend fun logInUser(
+        @Query("username") username: String,
+        @Query("password") password: String
+    ): User
 }

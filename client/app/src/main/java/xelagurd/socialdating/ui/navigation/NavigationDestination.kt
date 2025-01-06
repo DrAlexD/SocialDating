@@ -24,11 +24,17 @@ data class TopLevelDestination(
 lateinit var topLevelDestinations: List<TopLevelDestination>
 
 enum class AppScreen {
+    Login,
     Categories,
     Statements,
     StatementDetails,
     Profile,
     ProfileStatistics
+}
+
+object LoginDestination : NavigationDestination() {
+    override val route = AppScreen.Login.name
+    override val topLevelRoute = route
 }
 
 object CategoriesDestination : NavigationDestination() {

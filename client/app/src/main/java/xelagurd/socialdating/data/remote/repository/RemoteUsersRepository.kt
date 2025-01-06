@@ -11,4 +11,7 @@ class RemoteUsersRepository @Inject constructor(
 ) {
     suspend fun getUser(userId: Int): User =
         apiService.getUser(userId)
+
+    suspend fun logInUser(username: String, password: String): User =
+        apiService.logInUser(username, password)
 }
