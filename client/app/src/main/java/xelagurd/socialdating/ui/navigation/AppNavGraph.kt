@@ -31,7 +31,7 @@ fun AppNavHost(
     navController: NavHostController = rememberNavController(),
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
-    val currentUserId by mainViewModel.currentUserid.collectAsState()
+    val currentUserId by mainViewModel.currentUserId.collectAsState()
 
     ProfileDestination.currentUserId = currentUserId
     ProfileStatisticsDestination.currentUserId = currentUserId

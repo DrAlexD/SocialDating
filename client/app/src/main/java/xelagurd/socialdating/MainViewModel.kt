@@ -13,7 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 class MainViewModel @Inject constructor(
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
-    val currentUserid = preferencesRepository.currentUserId
+    val currentUserId = preferencesRepository.currentUserId
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

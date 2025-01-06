@@ -3,6 +3,7 @@ package xelagurd.socialdating.tests
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -17,6 +18,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainDispatcherRule
+import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
@@ -38,6 +40,7 @@ class StatementsViewModelTest {
     private val localStatementsRepository: LocalStatementsRepository = mockk()
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository = mockk()
     private val localDefiningThemesRepository: LocalDefiningThemesRepository = mockk()
+    private val preferencesRepository: PreferencesRepository = mockk()
 
     private lateinit var viewModel: StatementsViewModel
     private lateinit var definingThemesFlow: MutableStateFlow<List<DefiningTheme>>
@@ -81,7 +84,8 @@ class StatementsViewModelTest {
             remoteStatementsRepository,
             localStatementsRepository,
             remoteDefiningThemesRepository,
-            localDefiningThemesRepository
+            localDefiningThemesRepository,
+            preferencesRepository
         )
     }
 
@@ -196,6 +200,7 @@ class StatementsViewModelTest {
     }
 
     private fun mockGeneralMethods() {
+        every { preferencesRepository.currentUserId } returns flowOf(FakeDataSource.users[0].id)
         every { savedStateHandle.get<Int>("categoryId") } returns categoryId
         every { localDefiningThemesRepository.getDefiningThemes(categoryId) } returns definingThemesFlow
         mockLocalStatements()

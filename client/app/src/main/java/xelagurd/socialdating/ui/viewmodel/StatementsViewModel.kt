@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -17,6 +18,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
@@ -35,8 +37,11 @@ class StatementsViewModel @Inject constructor(
     private val remoteStatementsRepository: RemoteStatementsRepository,
     private val localStatementsRepository: LocalStatementsRepository,
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository,
-    private val localDefiningThemesRepository: LocalDefiningThemesRepository
+    private val localDefiningThemesRepository: LocalDefiningThemesRepository,
+    private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
+    private var currentUserId: Int? = null
+
     private val categoryId: Int = checkNotNull(savedStateHandle[StatementsDestination.categoryId])
 
     private val internetStatusFlow = MutableStateFlow(InternetStatus.LOADING)
@@ -60,7 +65,14 @@ class StatementsViewModel @Inject constructor(
     )
 
     init {
+        initCurrentUserId()
         getStatements()
+    }
+
+    fun initCurrentUserId() {
+        viewModelScope.launch {
+            currentUserId = preferencesRepository.currentUserId.first()
+        }
     }
 
     fun getStatements() {
@@ -90,15 +102,17 @@ class StatementsViewModel @Inject constructor(
     }
 
     fun onStatementReactionClick(statementId: Int, reactionType: StatementReactionType) {
-        viewModelScope.launch {
-            try {
-                remoteStatementsRepository.postStatementReaction(
-                    1, // TODO: Remove after adding login screen
-                    statementId,
-                    reactionType
-                )
-            } catch (_: IOException) {
-                //
+        if (currentUserId != null) {
+            viewModelScope.launch {
+                try {
+                    remoteStatementsRepository.postStatementReaction(
+                        currentUserId!!,
+                        statementId,
+                        reactionType
+                    )
+                } catch (_: IOException) {
+                    //
+                }
             }
         }
     }
