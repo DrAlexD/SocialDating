@@ -53,7 +53,7 @@ fun CategoriesScreen(
             AppTopBar(
                 title = stringResource(CategoriesDestination.titleRes),
                 internetStatus = categoriesUiState.internetStatus,
-                refreshAction = { categoriesViewModel.getCategories() },
+                refreshAction = categoriesViewModel::getCategories,
                 scrollBehavior = scrollBehavior
             )
         },

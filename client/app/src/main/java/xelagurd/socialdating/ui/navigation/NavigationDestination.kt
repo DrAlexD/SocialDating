@@ -25,6 +25,7 @@ lateinit var topLevelDestinations: List<TopLevelDestination>
 
 enum class AppScreen {
     Login,
+    Registration,
     Categories,
     Statements,
     StatementDetails,
@@ -34,6 +35,11 @@ enum class AppScreen {
 
 object LoginDestination : NavigationDestination() {
     override val route = AppScreen.Login.name
+    override val topLevelRoute = route
+}
+
+object RegistrationDestination : NavigationDestination() {
+    override val route = AppScreen.Registration.name
     override val topLevelRoute = route
 }
 

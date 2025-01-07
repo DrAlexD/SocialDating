@@ -55,7 +55,7 @@ class ProfileViewModel @Inject constructor(
                 delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
                 val remoteUser = remoteRepository.getUser(userId)
-                localRepository.insertUser(remoteUser)
+                remoteUser?.let { localRepository.insertUser(it) }
 
                 internetStatusFlow.update { InternetStatus.ONLINE }
             } catch (_: IOException) {

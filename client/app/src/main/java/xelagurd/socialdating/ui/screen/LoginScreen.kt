@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
@@ -25,8 +24,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
-import xelagurd.socialdating.ui.state.LoginDetails
+import xelagurd.socialdating.data.model.additional.LoginDetails
+import xelagurd.socialdating.ui.navigation.LoginDestination
 import xelagurd.socialdating.ui.state.LoginUiState
 import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.theme.AppTheme
@@ -36,17 +37,25 @@ import xelagurd.socialdating.ui.viewmodel.LoginViewModel
 @Composable
 fun LoginScreen(
     onSuccessLogIn: () -> Unit,
+    onRegistrationClick: () -> Unit,
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     val loginUiState by loginViewModel.uiState.collectAsState()
 
-    Scaffold { innerPadding ->
+    Scaffold(
+        topBar = {
+            AppTopBar(
+                title = stringResource(LoginDestination.titleRes)
+            )
+        }
+    ) { innerPadding ->
         LoginBody(
             loginUiState = loginUiState,
             onValueChange = loginViewModel::updateUiState,
-            onLogInClick = loginViewModel::logIn,
+            onLogInClick = loginViewModel::login,
             onSuccessLogIn = onSuccessLogIn,
+            onRegistrationClick = onRegistrationClick,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding
         )
@@ -59,6 +68,7 @@ internal fun LoginBody(
     onValueChange: (LoginDetails) -> Unit,
     onLogInClick: () -> Unit,
     onSuccessLogIn: () -> Unit,
+    onRegistrationClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -67,6 +77,7 @@ internal fun LoginBody(
             loginDetails = loginUiState.loginDetails,
             onValueChange = onValueChange,
             onLogInClick = onLogInClick,
+            onRegistrationClick = onRegistrationClick,
             modifier = modifier
         )
         LoginStatus(
@@ -82,6 +93,7 @@ private fun LoginDetails(
     loginDetails: LoginDetails,
     onValueChange: (LoginDetails) -> Unit,
     onLogInClick: () -> Unit,
+    onRegistrationClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -115,6 +127,22 @@ private fun LoginDetails(
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium))
             )
         }
+        Text(
+            text = stringResource(R.string.or),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_large))
+        )
+        Card(
+            onClick = onRegistrationClick,
+            elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
+        ) {
+            Text(
+                text = stringResource(R.string.register),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
+            )
+        }
     }
 }
 
@@ -130,11 +158,7 @@ private fun LoginStatus(
         modifier = modifier
     ) {
         when (requestStatus) {
-            RequestStatus.UNDEFINED -> {
-                Spacer(
-                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-                )
-            }
+            RequestStatus.UNDEFINED -> {}
 
             RequestStatus.LOADING -> {
                 CircularProgressIndicator(
@@ -145,6 +169,14 @@ private fun LoginStatus(
             RequestStatus.ERROR -> {
                 Text(
                     text = stringResource(R.string.no_internet_connection),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+                )
+            }
+
+            RequestStatus.FAILED -> {
+                Text(
+                    text = stringResource(R.string.failed_login),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
                 )
@@ -162,7 +194,8 @@ fun LoginDetailsPreview() {
         LoginDetails(
             loginDetails = LoginDetails(),
             onValueChange = {},
-            onLogInClick = {}
+            onLogInClick = {},
+            onRegistrationClick = {}
         )
     }
 }
