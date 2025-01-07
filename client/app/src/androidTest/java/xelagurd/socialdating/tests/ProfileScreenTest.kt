@@ -12,6 +12,8 @@ import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.User
+import xelagurd.socialdating.data.model.enums.Gender
+import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.ProfileBody
 import xelagurd.socialdating.ui.state.InternetStatus
@@ -75,7 +77,7 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_loadingStatusAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            user = User(1, "MyName", "", "", "", "", 30, "", "", 50),
+            user = User(1, "MyName", Gender.MALE, "", "", "", 30, "", Purpose.ALL_AT_ONCE, 50),
             internetStatus = InternetStatus.LOADING
         )
 
@@ -92,7 +94,7 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_offlineStatusAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            user = User(1, "MyName", "", "", "", "", 30, "", "", 50),
+            user = User(1, "MyName", Gender.MALE, "", "", "", 30, "", Purpose.ALL_AT_ONCE, 50),
             internetStatus = InternetStatus.OFFLINE
         )
 
@@ -109,7 +111,7 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_onlineStatusAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            user = User(1, "MyName", "", "", "", "", 30, "", "", 50),
+            user = User(1, "MyName", Gender.MALE, "", "", "", 30, "", Purpose.ALL_AT_ONCE, 50),
             internetStatus = InternetStatus.ONLINE
         )
 

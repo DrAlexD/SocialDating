@@ -122,14 +122,14 @@ fun initializeTopLevelDestinations(navController: NavHostController) {
         TopLevelDestination(
             navigationDestination = ProfileDestination,
             navigateTo = { navigateTo(ProfileDestination.topLevelRoute) },
-            selectedIcon = Icons.Filled.AccountCircle,
+            selectedIcon = Icons.Default.AccountCircle,
             unselectedIcon = Icons.Outlined.AccountCircle,
             contentDescription = R.string.nav_profile
         ),
         TopLevelDestination(
             navigationDestination = CategoriesDestination,
             navigateTo = { navigateTo(CategoriesDestination.topLevelRoute) },
-            selectedIcon = Icons.Filled.Home,
+            selectedIcon = Icons.Default.Home,
             unselectedIcon = Icons.Outlined.Home,
             contentDescription = R.string.nav_categories
         )

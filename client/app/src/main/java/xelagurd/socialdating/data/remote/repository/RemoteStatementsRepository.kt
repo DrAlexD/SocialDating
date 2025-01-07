@@ -3,7 +3,7 @@ package xelagurd.socialdating.data.remote.repository
 import javax.inject.Inject
 import javax.inject.Singleton
 import xelagurd.socialdating.data.model.Statement
-import xelagurd.socialdating.data.model.StatementReactionType
+import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.data.remote.ApiService
 
 @Singleton

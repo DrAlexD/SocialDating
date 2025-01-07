@@ -12,8 +12,8 @@ import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
-import xelagurd.socialdating.data.model.UserCategoryWithData
-import xelagurd.socialdating.data.model.UserDefiningThemeWithData
+import xelagurd.socialdating.data.model.additional.UserCategoryWithData
+import xelagurd.socialdating.data.model.additional.UserDefiningThemeWithData
 import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId

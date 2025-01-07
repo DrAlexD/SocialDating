@@ -35,6 +35,7 @@ import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.User
+import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.ui.navigation.ProfileDestination
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileUiState
@@ -149,30 +150,30 @@ private fun ProfileDetails(
 private fun UserInfo(user: User) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_very_small))) {
         Text(
-            text = "Никнейм:",
+            text = stringResource(R.string.username) + ":",
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = "Имя:",
+            text = stringResource(R.string.name) + ":",
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = "Возраст:",
+            text = stringResource(R.string.age) + ":",
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = "Город:",
+            text = stringResource(R.string.city) + ":",
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = "Цель:",
+            text = stringResource(R.string.purpose) + ":",
             style = MaterialTheme.typography.bodyLarge
         )
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_very_small))) {
         Text(
-            text = user.nickname,
+            text = user.username,
             style = MaterialTheme.typography.bodyLarge
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -192,19 +193,18 @@ private fun UserInfo(user: User) {
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = user.purpose,
+            text = stringResource(user.purpose.descriptionRes),
             style = MaterialTheme.typography.bodyLarge
         )
     }
 }
 
 @Composable
-fun AvatarIcon(gender: String) {
-    val avatarColor = if (gender == "female") Color(0xFFFFC1E3) else Color(0xFFADD8E6)
+fun AvatarIcon(gender: Gender) {
     Box(
         modifier = Modifier
             .size(15.dp)
-            .background(avatarColor, CircleShape)
+            .background(gender.color, CircleShape)
     )
 }
 

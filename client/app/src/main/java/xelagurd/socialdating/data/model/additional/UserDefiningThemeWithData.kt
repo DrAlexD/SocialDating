@@ -1,6 +1,7 @@
-package xelagurd.socialdating.data.model
+package xelagurd.socialdating.data.model.additional
 
 import kotlinx.serialization.Serializable
+import xelagurd.socialdating.data.model.UserDefiningTheme
 
 @Serializable
 data class UserDefiningThemeWithData(

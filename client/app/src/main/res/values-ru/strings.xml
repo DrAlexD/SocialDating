@@ -20,4 +20,11 @@
     <string name="login">Войти</string>
     <string name="username">Логин</string>
     <string name="password">Пароль</string>
+    <string name="friends">Найти друзей</string>
+    <string name="relationships">Найти отношения</string>
+    <string name="all_at_once">Всё и сразу</string>
+    <string name="name">Имя</string>
+    <string name="age">Возраст</string>
+    <string name="city">Город</string>
+    <string name="purpose">Цель</string>
 </resources>

@@ -19,6 +19,8 @@ import org.junit.Test
 import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.model.User
+import xelagurd.socialdating.data.model.enums.Gender
+import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.viewmodel.ProfileViewModel
@@ -39,8 +41,10 @@ class ProfileViewModelTest {
 
     private val userId = 1
 
-    private val localUser = User(userId, "", "", "", "", "", 30, "", "", 50)
-    private val remoteUser = User(userId, "abc", "qwe", "", "", "", 40, "", "", 20)
+    private val localUser =
+        User(userId, "", Gender.MALE, "", "", "", 30, "", Purpose.ALL_AT_ONCE, 50)
+    private val remoteUser =
+        User(userId, "abc", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20)
 
     @Before
     fun setup() {

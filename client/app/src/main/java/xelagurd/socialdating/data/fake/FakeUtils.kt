@@ -1,9 +1,9 @@
 package xelagurd.socialdating.data.fake
 
 import xelagurd.socialdating.data.model.UserCategory
-import xelagurd.socialdating.data.model.UserCategoryWithData
+import xelagurd.socialdating.data.model.additional.UserCategoryWithData
 import xelagurd.socialdating.data.model.UserDefiningTheme
-import xelagurd.socialdating.data.model.UserDefiningThemeWithData
+import xelagurd.socialdating.data.model.additional.UserDefiningThemeWithData
 
 const val FAKE_SERVER_LATENCY = 2_000L
 
