@@ -60,8 +60,8 @@ fun StatementsScreen(
             AppTopBar(
                 title = stringResource(StatementsDestination.titleRes),
                 internetStatus = statementsUiState.internetStatus,
-                refreshAction = { statementsViewModel.getStatements() },
-                navigateUp = { onNavigateUp.invoke() },
+                refreshAction = statementsViewModel::getStatements,
+                navigateUp = onNavigateUp,
                 scrollBehavior = scrollBehavior
             )
         },

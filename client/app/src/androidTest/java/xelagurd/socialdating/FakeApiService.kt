@@ -4,10 +4,12 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.Statement
-import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.UserCategory
 import xelagurd.socialdating.data.model.UserDefiningTheme
+import xelagurd.socialdating.data.model.additional.LoginDetails
+import xelagurd.socialdating.data.model.additional.RegistrationDetails
+import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.data.remote.ApiService
 
 class FakeApiService : ApiService {
@@ -29,7 +31,7 @@ class FakeApiService : ApiService {
     ) {
     }
 
-    override suspend fun getUser(userId: Int): User =
+    override suspend fun getUser(userId: Int): User? =
         FakeDataSource.users[0]
 
     override suspend fun getUserCategories(userId: Int): List<UserCategory> =
@@ -38,6 +40,9 @@ class FakeApiService : ApiService {
     override suspend fun getUserDefiningThemes(userCategoryIds: List<Int>): List<UserDefiningTheme> =
         FakeDataSource.userDefiningThemes
 
-    override suspend fun logInUser(username: String, password: String): User =
+    override suspend fun loginUser(loginDetails: LoginDetails): User? =
+        FakeDataSource.users[0]
+
+    override suspend fun registerUser(registrationDetails: RegistrationDetails): User? =
         FakeDataSource.users[0]
 }

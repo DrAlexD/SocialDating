@@ -42,9 +42,9 @@ fun SocialDatingApp() {
 @Composable
 fun AppTopBar(
     title: String,
-    internetStatus: InternetStatus,
-    refreshAction: () -> Unit,
     modifier: Modifier = Modifier,
+    internetStatus: InternetStatus? = null,
+    refreshAction: (() -> Unit)? = null,
     navigateUp: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
@@ -61,30 +61,32 @@ fun AppTopBar(
             }
         },
         actions = {
-            val onCardStatusClick =
-                refreshAction.takeIf { internetStatus.isAllowedRefresh() } ?: {}
-            Card(onClick = onCardStatusClick) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(
-                            when (internetStatus) {
-                                InternetStatus.ONLINE -> R.string.online
-                                InternetStatus.LOADING -> R.string.loading
-                                InternetStatus.OFFLINE -> R.string.offline
-                            }
-                        ),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
-                    )
-                    if (internetStatus.isAllowedRefresh()) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = stringResource(R.string.refresh),
-                            modifier = Modifier.graphicsLayer {
-                                this.scaleX = 0.8f
-                                this.scaleY = 0.8f
-                            }
+            if (internetStatus != null) {
+                val onCardStatusClick =
+                    refreshAction.takeIf { internetStatus.isAllowedRefresh() } ?: {}
+                Card(onClick = onCardStatusClick) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = stringResource(
+                                when (internetStatus) {
+                                    InternetStatus.ONLINE -> R.string.online
+                                    InternetStatus.LOADING -> R.string.loading
+                                    InternetStatus.OFFLINE -> R.string.offline
+                                }
+                            ),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
                         )
+                        if (internetStatus.isAllowedRefresh()) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.refresh),
+                                modifier = Modifier.graphicsLayer {
+                                    this.scaleX = 0.8f
+                                    this.scaleY = 0.8f
+                                }
+                            )
+                        }
                     }
                 }
             }

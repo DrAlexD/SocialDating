@@ -4,5 +4,6 @@ enum class RequestStatus {
     SUCCESS,
     LOADING,
     ERROR,
+    FAILED,
     UNDEFINED
 }

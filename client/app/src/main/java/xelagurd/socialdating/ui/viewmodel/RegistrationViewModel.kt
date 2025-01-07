@@ -13,39 +13,40 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import org.mindrot.jbcrypt.BCrypt
 import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
+import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
-import xelagurd.socialdating.data.model.additional.LoginDetails
+import xelagurd.socialdating.data.model.additional.RegistrationDetails
 import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
-import xelagurd.socialdating.ui.state.LoginUiState
+import xelagurd.socialdating.ui.state.RegistrationUiState
 import xelagurd.socialdating.ui.state.RequestStatus
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
+class RegistrationViewModel @Inject constructor(
     private val remoteRepository: RemoteUsersRepository,
     private val localRepository: LocalUsersRepository,
     private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(LoginUiState())
+    private val _uiState = MutableStateFlow(RegistrationUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun updateUiState(loginDetails: LoginDetails) {
+    fun updateUiState(registrationDetails: RegistrationDetails) {
         _uiState.update {
-            it.copy(loginDetails = loginDetails)
+            it.copy(registrationDetails = registrationDetails)
         }
     }
 
-    fun login() {
+    fun register() {
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(requestStatus = RequestStatus.LOADING) }
 
                 delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
-                val loginDetails = uiState.value.loginDetails
-                val user = remoteRepository.loginUser(
-                    loginDetails.copy(
-                        password = BCrypt.hashpw(loginDetails.password, BCrypt.gensalt())
+                val registrationDetails = uiState.value.registrationDetails
+                val user = remoteRepository.registerUser(
+                    registrationDetails.copy(
+                        password = BCrypt.hashpw(registrationDetails.password, BCrypt.gensalt())
                     )
                 )
 
@@ -58,7 +59,10 @@ class LoginViewModel @Inject constructor(
                     _uiState.update { it.copy(requestStatus = RequestStatus.FAILED) }
                 }
             } catch (_: IOException) {
-                _uiState.update { it.copy(requestStatus = RequestStatus.ERROR) }
+                localRepository.insertUser(FakeDataSource.users[0]) // TODO: remove after implementing server
+                preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) // TODO: remove after implementing server
+
+                _uiState.update { it.copy(requestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing server
             }
         }
     }

@@ -23,6 +23,7 @@ import xelagurd.socialdating.ui.screen.CategoriesScreen
 import xelagurd.socialdating.ui.screen.LoginScreen
 import xelagurd.socialdating.ui.screen.ProfileScreen
 import xelagurd.socialdating.ui.screen.ProfileStatisticsScreen
+import xelagurd.socialdating.ui.screen.RegistrationScreen
 import xelagurd.socialdating.ui.screen.StatementsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +47,19 @@ fun AppNavHost(
             LoginScreen(
                 onSuccessLogIn = {
                     navController.navigate(CategoriesDestination.route)
+                },
+                onRegistrationClick = {
+                    navController.navigate(RegistrationDestination.route)
                 }
+            )
+        }
+
+        composable(route = RegistrationDestination.route) {
+            RegistrationScreen(
+                onSuccessRegistration = {
+                    navController.navigate(CategoriesDestination.route)
+                },
+                onNavigateUp = { navController.navigateUp() }
             )
         }
 

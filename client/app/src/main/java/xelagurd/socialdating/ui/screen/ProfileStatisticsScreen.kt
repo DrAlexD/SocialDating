@@ -74,8 +74,8 @@ fun ProfileStatisticsScreen(
             AppTopBar(
                 title = stringResource(ProfileStatisticsDestination.titleRes),
                 internetStatus = profileStatisticsUiState.internetStatus,
-                refreshAction = { profileStatisticsViewModel.getProfileStatistics() },
-                navigateUp = { onNavigateUp.invoke() },
+                refreshAction = profileStatisticsViewModel::getProfileStatistics,
+                navigateUp = onNavigateUp,
                 scrollBehavior = scrollBehavior
             )
         },

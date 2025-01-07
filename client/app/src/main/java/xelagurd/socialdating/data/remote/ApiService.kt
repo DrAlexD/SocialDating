@@ -1,15 +1,18 @@
 package xelagurd.socialdating.data.remote
 
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.Statement
-import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.UserCategory
 import xelagurd.socialdating.data.model.UserDefiningTheme
+import xelagurd.socialdating.data.model.additional.LoginDetails
+import xelagurd.socialdating.data.model.additional.RegistrationDetails
+import xelagurd.socialdating.data.model.enums.StatementReactionType
 
 interface ApiService {
     @GET("categories")
@@ -32,7 +35,7 @@ interface ApiService {
     )
 
     @GET("users")
-    suspend fun getUser(@Query("userId") userId: Int): User
+    suspend fun getUser(@Query("userId") userId: Int): User?
 
     @GET("userCategories")
     suspend fun getUserCategories(@Query("userId") userId: Int): List<UserCategory>
@@ -40,9 +43,9 @@ interface ApiService {
     @GET("userDefiningThemes")
     suspend fun getUserDefiningThemes(@Query("userCategoryIds") userCategoryIds: List<Int>): List<UserDefiningTheme>
 
-    @GET("users")
-    suspend fun logInUser(
-        @Query("username") username: String,
-        @Query("password") password: String
-    ): User
+    @POST("users/login")
+    suspend fun loginUser(@Body loginDetails: LoginDetails): User?
+
+    @POST("users/register")
+    suspend fun registerUser(@Body registrationDetails: RegistrationDetails): User?
 }

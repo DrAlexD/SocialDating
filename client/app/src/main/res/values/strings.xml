@@ -19,13 +19,20 @@
     <string name="part_no_maintain">Partially don\'t maintain</string>
     <string name="full_no_maintain">Fully don\'t maintain</string>
     <string name="login">Login</string>
+    <string name="failed_login">Check credentials or register</string>
+    <string name="register">Register</string>
+    <string name="or">OR</string>
+    <string name="failed_registration">Failed to register</string>
     <string name="username">Username</string>
-    <string name="password">Password</string>
-    <string name="friends">Find friends</string>
-    <string name="relationships">Find relationships</string>
-    <string name="all_at_once">All at once</string>
     <string name="name">Name</string>
+    <string name="gender">Gender</string>
+    <string name="email_optional">Email (optional)</string>
     <string name="age">Age</string>
     <string name="city">City</string>
     <string name="purpose">Purpose</string>
+    <string name="password">Password</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="friends">Find friends</string>
+    <string name="relationships">Find relationships</string>
+    <string name="all_at_once">All at once</string>
 </resources>

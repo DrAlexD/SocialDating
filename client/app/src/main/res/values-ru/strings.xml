@@ -18,13 +18,20 @@
     <string name="part_no_maintain">Скорее не поддерживаю</string>
     <string name="full_no_maintain">Полностью не поддерживаю</string>
     <string name="login">Войти</string>
+    <string name="failed_login">Проверьте данные или зарегистрируйтесь</string>
+    <string name="register">Зарегистрироваться</string>
+    <string name="or">ИЛИ</string>
+    <string name="failed_registration">Не удалось зарегистроваться</string>
     <string name="username">Логин</string>
-    <string name="password">Пароль</string>
-    <string name="friends">Найти друзей</string>
-    <string name="relationships">Найти отношения</string>
-    <string name="all_at_once">Всё и сразу</string>
     <string name="name">Имя</string>
+    <string name="gender">Пол</string>
+    <string name="email_optional">Email (опционально)</string>
     <string name="age">Возраст</string>
     <string name="city">Город</string>
     <string name="purpose">Цель</string>
+    <string name="password">Пароль</string>
+    <string name="repeat_password">Повторите пароль</string>
+    <string name="friends">Найти друзей</string>
+    <string name="relationships">Найти отношения</string>
+    <string name="all_at_once">Всё и сразу</string>
 </resources>
