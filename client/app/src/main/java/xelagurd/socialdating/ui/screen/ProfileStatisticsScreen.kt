@@ -51,8 +51,8 @@ import xelagurd.socialdating.data.fake.toUserCategoriesWithData
 import xelagurd.socialdating.data.fake.toUserCategoryWithData
 import xelagurd.socialdating.data.fake.toUserDefiningThemeWithData
 import xelagurd.socialdating.data.fake.toUserDefiningThemesWithData
-import xelagurd.socialdating.data.model.UserCategoryWithData
-import xelagurd.socialdating.data.model.UserDefiningThemeWithData
+import xelagurd.socialdating.data.model.additional.UserCategoryWithData
+import xelagurd.socialdating.data.model.additional.UserDefiningThemeWithData
 import xelagurd.socialdating.ui.navigation.ProfileStatisticsDestination
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileStatisticsUiState
@@ -221,7 +221,7 @@ private fun ExpandButton(
 ) {
     IconButton(onClick = onClick) {
         Icon(
-            imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+            imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
             contentDescription = stringResource(R.string.expand_list)
         )
     }

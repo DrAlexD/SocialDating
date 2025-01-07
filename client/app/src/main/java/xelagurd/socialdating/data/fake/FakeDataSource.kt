@@ -6,6 +6,8 @@ import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.UserCategory
 import xelagurd.socialdating.data.model.UserDefiningTheme
+import xelagurd.socialdating.data.model.enums.Gender
+import xelagurd.socialdating.data.model.enums.Purpose
 
 // FixMe: remove after implementing server
 object FakeDataSource {
@@ -64,9 +66,9 @@ object FakeDataSource {
     )
 
     val users = listOf(
-        User(1, "Alexander", "male", "abc1", "abc1", "adas1@gmail.com", 25, "Moscow", "qwe", 50),
-        User(2, "Denis", "male", "abc2", "abc2", "adas2@gmail.com", 27, "St. Petersburg", "qwe", 50),
-        User(3, "Andrey", "male", "abc3", "abc3", "adas3@gmail.com", 28, "Moscow", "qwe", 50),
+        User(1, "Alexander", Gender.MALE, "abc1", "abc1", "adas1@gmail.com", 25, "Moscow", Purpose.ALL_AT_ONCE, 50),
+        User(2, "Denis", Gender.MALE, "abc2", "abc2", "adas2@gmail.com", 27, "St. Petersburg", Purpose.FRIENDS, 50),
+        User(3, "Andrey", Gender.MALE, "abc3", "abc3", "adas3@gmail.com", 28, "Moscow", Purpose.RELATIONSHIPS, 50),
     )
 
     val userCategories = listOf(

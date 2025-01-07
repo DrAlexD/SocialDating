@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,7 +37,7 @@ import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.Statement
-import xelagurd.socialdating.data.model.StatementReactionType
+import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.ui.navigation.StatementsDestination
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.StatementsUiState
@@ -187,39 +184,16 @@ fun ReactionsBody(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth()
     ) {
-        IconButton(onClick = { onStatementReactionClick.invoke(StatementReactionType.FULL_MAINTAIN) }) {
-            Icon(
-                imageVector = Icons.Filled.ThumbUp,
-                contentDescription = stringResource(R.string.full_maintain)
-            )
-        }
-        VerticalDivider()
-        IconButton(onClick = { onStatementReactionClick.invoke(StatementReactionType.PART_MAINTAIN) }) {
-            Icon(
-                imageVector = Icons.Outlined.ThumbUp,
-                contentDescription = stringResource(R.string.part_maintain)
-            )
-        }
-        VerticalDivider()
-        IconButton(onClick = { onStatementReactionClick.invoke(StatementReactionType.NOT_SURE) }) {
-            Icon(
-                imageVector = Icons.Outlined.ThumbUp,
-                contentDescription = stringResource(R.string.not_sure)
-            )
-        }
-        VerticalDivider()
-        IconButton(onClick = { onStatementReactionClick.invoke(StatementReactionType.PART_NO_MAINTAIN) }) {
-            Icon(
-                imageVector = Icons.Outlined.ThumbUp,
-                contentDescription = stringResource(R.string.part_no_maintain)
-            )
-        }
-        VerticalDivider()
-        IconButton(onClick = { onStatementReactionClick.invoke(StatementReactionType.FULL_NO_MAINTAIN) }) {
-            Icon(
-                imageVector = Icons.Filled.ThumbUp,
-                contentDescription = stringResource(R.string.full_no_maintain)
-            )
+        StatementReactionType.entries.forEachIndexed { index, statementReactionType ->
+            IconButton(onClick = { onStatementReactionClick.invoke(statementReactionType) }) {
+                Icon(
+                    imageVector = statementReactionType.imageVector,
+                    contentDescription = stringResource(statementReactionType.descriptionRes)
+                )
+            }
+            if (index != StatementReactionType.entries.lastIndex) {
+                VerticalDivider()
+            }
         }
     }
 }

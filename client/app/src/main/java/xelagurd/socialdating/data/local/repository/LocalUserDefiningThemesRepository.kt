@@ -5,7 +5,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import xelagurd.socialdating.data.local.dao.UserDefiningThemesDao
 import xelagurd.socialdating.data.model.UserDefiningTheme
-import xelagurd.socialdating.data.model.UserDefiningThemeWithData
+import xelagurd.socialdating.data.model.additional.UserDefiningThemeWithData
 
 @Singleton
 class LocalUserDefiningThemesRepository @Inject constructor(

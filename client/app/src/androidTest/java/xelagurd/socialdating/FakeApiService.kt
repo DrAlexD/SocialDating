@@ -4,7 +4,7 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.Statement
-import xelagurd.socialdating.data.model.StatementReactionType
+import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.UserCategory
 import xelagurd.socialdating.data.model.UserDefiningTheme

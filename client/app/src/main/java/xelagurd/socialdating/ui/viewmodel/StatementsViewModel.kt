@@ -23,7 +23,7 @@ import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
-import xelagurd.socialdating.data.model.StatementReactionType
+import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.ui.navigation.StatementsDestination

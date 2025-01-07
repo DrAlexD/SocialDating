@@ -5,7 +5,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import xelagurd.socialdating.data.local.dao.UserCategoriesDao
 import xelagurd.socialdating.data.model.UserCategory
-import xelagurd.socialdating.data.model.UserCategoryWithData
+import xelagurd.socialdating.data.model.additional.UserCategoryWithData
 
 @Singleton
 class LocalUserCategoriesRepository @Inject constructor(
