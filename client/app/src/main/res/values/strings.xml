@@ -11,6 +11,7 @@
     <string name="offline">Offline</string>
     <string name="nav_categories">Navigate to Categories</string>
     <string name="nav_profile">Navigate to Profile</string>
+    <string name="nav_settings">Navigate to Settings</string>
     <string name="expand_list">Expand list</string>
     <string name="open_profile_statistics">Open profile statistics</string>
     <string name="full_maintain">Fully maintain</string>
@@ -23,6 +24,8 @@
     <string name="register">Register</string>
     <string name="or">OR</string>
     <string name="failed_registration">Failed to register</string>
+    <string name="logout">Logout</string>
+    <string name="unknown_error">Unknown error</string>
     <string name="username">Username</string>
     <string name="name">Name</string>
     <string name="gender">Gender</string>

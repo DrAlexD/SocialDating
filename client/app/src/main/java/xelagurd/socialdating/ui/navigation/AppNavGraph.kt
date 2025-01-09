@@ -3,8 +3,10 @@ package xelagurd.socialdating.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -24,6 +26,7 @@ import xelagurd.socialdating.ui.screen.LoginScreen
 import xelagurd.socialdating.ui.screen.ProfileScreen
 import xelagurd.socialdating.ui.screen.ProfileStatisticsScreen
 import xelagurd.socialdating.ui.screen.RegistrationScreen
+import xelagurd.socialdating.ui.screen.SettingsScreen
 import xelagurd.socialdating.ui.screen.StatementsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,6 +63,14 @@ fun AppNavHost(
                     navController.navigate(CategoriesDestination.route)
                 },
                 onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        composable(route = SettingsDestination.route) {
+            SettingsScreen(
+                onSuccessLogout = {
+                    navController.navigate(LoginDestination.route)
+                },
             )
         }
 
@@ -144,6 +155,13 @@ fun initializeTopLevelDestinations(navController: NavHostController) {
             navigateTo = { navigateTo(CategoriesDestination.topLevelRoute) },
             selectedIcon = Icons.Default.Home,
             unselectedIcon = Icons.Outlined.Home,
+            contentDescription = R.string.nav_categories
+        ),
+        TopLevelDestination(
+            navigationDestination = SettingsDestination,
+            navigateTo = { navigateTo(SettingsDestination.topLevelRoute) },
+            selectedIcon = Icons.Default.Settings,
+            unselectedIcon = Icons.Outlined.Settings,
             contentDescription = R.string.nav_categories
         )
     )
