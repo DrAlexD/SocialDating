@@ -37,14 +37,7 @@ class RegistrationScreenTest {
     fun registrationScreen_failedStatus_failedText() {
         val registrationUiState = RegistrationUiState(requestStatus = RequestStatus.FAILED)
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
+        setContentToRegistrationBody(registrationUiState)
 
         composeTestRule.onNodeWithTextId(R.string.failed_registration).assertIsDisplayed()
     }
@@ -53,14 +46,7 @@ class RegistrationScreenTest {
     fun registrationScreen_errorStatus_errorText() {
         val registrationUiState = RegistrationUiState(requestStatus = RequestStatus.ERROR)
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
+        setContentToRegistrationBody(registrationUiState)
 
         composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
     }
@@ -72,16 +58,7 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsNotEnabled()
+        assertRegisterButtonIsDisabled(registrationUiState)
     }
 
     @Test
@@ -93,16 +70,7 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsEnabled()
+        assertRegisterButtonIsEnabled(registrationUiState)
     }
 
     @Test
@@ -114,16 +82,7 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsEnabled()
+        assertRegisterButtonIsEnabled(registrationUiState)
     }
 
     @Test
@@ -135,16 +94,7 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsNotEnabled()
+        assertRegisterButtonIsDisabled(registrationUiState)
     }
 
     @Test
@@ -156,16 +106,7 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsNotEnabled()
+        assertRegisterButtonIsDisabled(registrationUiState)
     }
 
     @Test
@@ -177,16 +118,7 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsNotEnabled()
+        assertRegisterButtonIsDisabled(registrationUiState)
     }
 
     @Test
@@ -198,16 +130,7 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsNotEnabled()
+        assertRegisterButtonIsDisabled(registrationUiState)
     }
 
     @Test
@@ -219,16 +142,7 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsNotEnabled()
+        assertRegisterButtonIsDisabled(registrationUiState)
     }
 
     @Test
@@ -240,16 +154,7 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsNotEnabled()
+        assertRegisterButtonIsDisabled(registrationUiState)
     }
 
     @Test
@@ -261,16 +166,7 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsNotEnabled()
+        assertRegisterButtonIsDisabled(registrationUiState)
     }
 
     @Test
@@ -282,16 +178,7 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsNotEnabled()
+        assertRegisterButtonIsDisabled(registrationUiState)
     }
 
     @Test
@@ -303,6 +190,22 @@ class RegistrationScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
+        assertRegisterButtonIsDisabled(registrationUiState)
+    }
+
+    private fun assertRegisterButtonIsEnabled(registrationUiState: RegistrationUiState) {
+        setContentToRegistrationBody(registrationUiState)
+
+        composeTestRule.onNodeWithTextId(R.string.register).assertIsEnabled()
+    }
+
+    private fun assertRegisterButtonIsDisabled(registrationUiState: RegistrationUiState) {
+        setContentToRegistrationBody(registrationUiState)
+
+        composeTestRule.onNodeWithTextId(R.string.register).assertIsNotEnabled()
+    }
+
+    private fun setContentToRegistrationBody(registrationUiState: RegistrationUiState) {
         composeTestRule.activity.setContent {
             RegistrationBody(
                 registrationUiState = registrationUiState,
@@ -311,7 +214,5 @@ class RegistrationScreenTest {
                 onSuccessRegistration = {}
             )
         }
-
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsNotEnabled()
     }
 }

@@ -35,15 +35,7 @@ class LoginScreenTest {
     fun loginScreen_failedStatus_failedText() {
         val loginUiState = LoginUiState(requestStatus = RequestStatus.FAILED)
 
-        composeTestRule.activity.setContent {
-            LoginBody(
-                loginUiState = loginUiState,
-                onValueChange = {},
-                onLoginClick = {},
-                onSuccessLogin = {},
-                onRegistrationClick = {}
-            )
-        }
+        setContentToLoginBody(loginUiState)
 
         composeTestRule.onNodeWithTextId(R.string.failed_login).assertIsDisplayed()
     }
@@ -52,15 +44,7 @@ class LoginScreenTest {
     fun loginScreen_errorStatus_errorText() {
         val loginUiState = LoginUiState(requestStatus = RequestStatus.ERROR)
 
-        composeTestRule.activity.setContent {
-            LoginBody(
-                loginUiState = loginUiState,
-                onValueChange = {},
-                onLoginClick = {},
-                onSuccessLogin = {},
-                onRegistrationClick = {}
-            )
-        }
+        setContentToLoginBody(loginUiState)
 
         composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
     }
@@ -72,18 +56,7 @@ class LoginScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            LoginBody(
-                loginUiState = loginUiState,
-                onValueChange = {},
-                onLoginClick = {},
-                onSuccessLogin = {},
-                onRegistrationClick = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.login).assertIsNotEnabled()
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsEnabled()
+        assertLoginButtonIsDisabled(loginUiState)
     }
 
     @Test
@@ -93,18 +66,7 @@ class LoginScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            LoginBody(
-                loginUiState = loginUiState,
-                onValueChange = {},
-                onLoginClick = {},
-                onSuccessLogin = {},
-                onRegistrationClick = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.login).assertIsEnabled()
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsEnabled()
+        assertLoginButtonIsEnabled(loginUiState)
     }
 
     @Test
@@ -114,18 +76,7 @@ class LoginScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
-        composeTestRule.activity.setContent {
-            LoginBody(
-                loginUiState = loginUiState,
-                onValueChange = {},
-                onLoginClick = {},
-                onSuccessLogin = {},
-                onRegistrationClick = {}
-            )
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.login).assertIsNotEnabled()
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsEnabled()
+        assertLoginButtonIsDisabled(loginUiState)
     }
 
     @Test
@@ -135,6 +86,24 @@ class LoginScreenTest {
             requestStatus = RequestStatus.UNDEFINED
         )
 
+        assertLoginButtonIsDisabled(loginUiState)
+    }
+
+    private fun assertLoginButtonIsEnabled(loginUiState: LoginUiState) {
+        setContentToLoginBody(loginUiState)
+
+        composeTestRule.onNodeWithTextId(R.string.login).assertIsEnabled()
+        composeTestRule.onNodeWithTextId(R.string.register).assertIsEnabled()
+    }
+
+    private fun assertLoginButtonIsDisabled(loginUiState: LoginUiState) {
+        setContentToLoginBody(loginUiState)
+
+        composeTestRule.onNodeWithTextId(R.string.login).assertIsNotEnabled()
+        composeTestRule.onNodeWithTextId(R.string.register).assertIsEnabled()
+    }
+
+    private fun setContentToLoginBody(loginUiState: LoginUiState) {
         composeTestRule.activity.setContent {
             LoginBody(
                 loginUiState = loginUiState,
@@ -144,8 +113,5 @@ class LoginScreenTest {
                 onRegistrationClick = {}
             )
         }
-
-        composeTestRule.onNodeWithTextId(R.string.login).assertIsNotEnabled()
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsEnabled()
     }
 }

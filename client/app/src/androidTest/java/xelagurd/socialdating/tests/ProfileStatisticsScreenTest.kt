@@ -38,11 +38,7 @@ class ProfileStatisticsScreenTest {
     fun profileStatisticsScreen_loadingStatusAndEmptyData_loadingText() {
         val profileStatisticsUiState = ProfileStatisticsUiState()
 
-        composeTestRule.activity.setContent {
-            ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState
-            )
-        }
+        setContentToProfileStatisticsBody(profileStatisticsUiState)
 
         composeTestRule.onNodeWithTextId(R.string.loading).assertIsDisplayed()
     }
@@ -51,11 +47,7 @@ class ProfileStatisticsScreenTest {
     fun profileStatisticsScreen_offlineStatusAndEmptyData_offlineText() {
         val profileStatisticsUiState = ProfileStatisticsUiState(internetStatus = InternetStatus.OFFLINE)
 
-        composeTestRule.activity.setContent {
-            ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState
-            )
-        }
+        setContentToProfileStatisticsBody(profileStatisticsUiState)
 
         composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
     }
@@ -64,11 +56,7 @@ class ProfileStatisticsScreenTest {
     fun profileStatisticsScreen_onlineStatusAndEmptyData_onlineText() {
         val profileStatisticsUiState = ProfileStatisticsUiState(internetStatus = InternetStatus.ONLINE)
 
-        composeTestRule.activity.setContent {
-            ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState
-            )
-        }
+        setContentToProfileStatisticsBody(profileStatisticsUiState)
 
         composeTestRule.onNodeWithTextId(R.string.no_data).assertIsDisplayed()
     }
@@ -83,20 +71,7 @@ class ProfileStatisticsScreenTest {
             internetStatus = InternetStatus.LOADING
         )
 
-        composeTestRule.activity.setContent {
-            ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState
-            )
-        }
-
-        composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list)
-            .performClick()
-
-        composeTestRule.onNodeWithText("MyCategory").assertIsDisplayed()
-        composeTestRule.onNodeWithText("MyTheme").assertIsDisplayed()
-        composeTestRule.onNodeWithText("No").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Yes").assertIsDisplayed()
-        composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsDisplayed()
+        assertDataIsDisplayed(profileStatisticsUiState)
     }
 
     @Test
@@ -109,20 +84,7 @@ class ProfileStatisticsScreenTest {
             internetStatus = InternetStatus.OFFLINE
         )
 
-        composeTestRule.activity.setContent {
-            ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState
-            )
-        }
-
-        composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list)
-            .performClick()
-
-        composeTestRule.onNodeWithText("MyCategory").assertIsDisplayed()
-        composeTestRule.onNodeWithText("MyTheme").assertIsDisplayed()
-        composeTestRule.onNodeWithText("No").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Yes").assertIsDisplayed()
-        composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsDisplayed()
+        assertDataIsDisplayed(profileStatisticsUiState)
     }
 
     @Test
@@ -135,11 +97,11 @@ class ProfileStatisticsScreenTest {
             internetStatus = InternetStatus.ONLINE
         )
 
-        composeTestRule.activity.setContent {
-            ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState
-            )
-        }
+        assertDataIsDisplayed(profileStatisticsUiState)
+    }
+
+    private fun assertDataIsDisplayed(profileStatisticsUiState: ProfileStatisticsUiState) {
+        setContentToProfileStatisticsBody(profileStatisticsUiState)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list)
             .performClick()
@@ -149,5 +111,13 @@ class ProfileStatisticsScreenTest {
         composeTestRule.onNodeWithText("No").assertIsDisplayed()
         composeTestRule.onNodeWithText("Yes").assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsDisplayed()
+    }
+
+    private fun setContentToProfileStatisticsBody(profileStatisticsUiState: ProfileStatisticsUiState) {
+        composeTestRule.activity.setContent {
+            ProfileStatisticsBody(
+                profileStatisticsUiState = profileStatisticsUiState
+            )
+        }
     }
 }

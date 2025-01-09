@@ -34,12 +34,7 @@ class CategoriesScreenTest {
     fun categoriesScreen_loadingStatusAndEmptyData_loadingText() {
         val categoriesUiState = CategoriesUiState()
 
-        composeTestRule.activity.setContent {
-            CategoriesBody(
-                categoriesUiState = categoriesUiState,
-                onCategoryClick = {}
-            )
-        }
+        setContentToCategoriesBody(categoriesUiState)
 
         composeTestRule.onNodeWithTextId(R.string.loading).assertIsDisplayed()
     }
@@ -48,12 +43,7 @@ class CategoriesScreenTest {
     fun categoriesScreen_offlineStatusAndEmptyData_offlineText() {
         val categoriesUiState = CategoriesUiState(internetStatus = InternetStatus.OFFLINE)
 
-        composeTestRule.activity.setContent {
-            CategoriesBody(
-                categoriesUiState = categoriesUiState,
-                onCategoryClick = {}
-            )
-        }
+        setContentToCategoriesBody(categoriesUiState)
 
         composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
     }
@@ -62,12 +52,7 @@ class CategoriesScreenTest {
     fun categoriesScreen_onlineStatusAndEmptyData_onlineText() {
         val categoriesUiState = CategoriesUiState(internetStatus = InternetStatus.ONLINE)
 
-        composeTestRule.activity.setContent {
-            CategoriesBody(
-                categoriesUiState = categoriesUiState,
-                onCategoryClick = {}
-            )
-        }
+        setContentToCategoriesBody(categoriesUiState)
 
         composeTestRule.onNodeWithTextId(R.string.no_data).assertIsDisplayed()
     }
@@ -79,14 +64,7 @@ class CategoriesScreenTest {
             internetStatus = InternetStatus.LOADING
         )
 
-        composeTestRule.activity.setContent {
-            CategoriesBody(
-                categoriesUiState = categoriesUiState,
-                onCategoryClick = {}
-            )
-        }
-
-        composeTestRule.onNodeWithText("MyCategory").assertIsDisplayed()
+        assertDataIsDisplayed(categoriesUiState)
     }
 
     @Test
@@ -96,14 +74,7 @@ class CategoriesScreenTest {
             internetStatus = InternetStatus.OFFLINE
         )
 
-        composeTestRule.activity.setContent {
-            CategoriesBody(
-                categoriesUiState = categoriesUiState,
-                onCategoryClick = {}
-            )
-        }
-
-        composeTestRule.onNodeWithText("MyCategory").assertIsDisplayed()
+        assertDataIsDisplayed(categoriesUiState)
     }
 
     @Test
@@ -113,13 +84,21 @@ class CategoriesScreenTest {
             internetStatus = InternetStatus.ONLINE
         )
 
+        assertDataIsDisplayed(categoriesUiState)
+    }
+
+    private fun assertDataIsDisplayed(categoriesUiState: CategoriesUiState) {
+        setContentToCategoriesBody(categoriesUiState)
+
+        composeTestRule.onNodeWithText("MyCategory").assertIsDisplayed()
+    }
+
+    private fun setContentToCategoriesBody(categoriesUiState: CategoriesUiState) {
         composeTestRule.activity.setContent {
             CategoriesBody(
                 categoriesUiState = categoriesUiState,
                 onCategoryClick = {}
             )
         }
-
-        composeTestRule.onNodeWithText("MyCategory").assertIsDisplayed()
     }
 }

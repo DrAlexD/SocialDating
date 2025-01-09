@@ -35,13 +35,7 @@ class StatementsScreenTest {
     fun statementsScreen_loadingStatusAndEmptyData_loadingText() {
         val statementsUiState = StatementsUiState()
 
-        composeTestRule.activity.setContent {
-            StatementsBody(
-                statementsUiState = statementsUiState,
-                onStatementClick = {},
-                onStatementReactionClick = { _, _ -> null }
-            )
-        }
+        setContentToStatementsBody(statementsUiState)
 
         composeTestRule.onNodeWithTextId(R.string.loading).assertIsDisplayed()
     }
@@ -50,13 +44,7 @@ class StatementsScreenTest {
     fun statementsScreen_offlineStatusAndEmptyData_offlineText() {
         val statementsUiState = StatementsUiState(internetStatus = InternetStatus.OFFLINE)
 
-        composeTestRule.activity.setContent {
-            StatementsBody(
-                statementsUiState = statementsUiState,
-                onStatementClick = {},
-                onStatementReactionClick = { _, _ -> null }
-            )
-        }
+        setContentToStatementsBody(statementsUiState)
 
         composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
     }
@@ -65,13 +53,7 @@ class StatementsScreenTest {
     fun statementsScreen_onlineStatusAndEmptyData_onlineText() {
         val statementsUiState = StatementsUiState(internetStatus = InternetStatus.ONLINE)
 
-        composeTestRule.activity.setContent {
-            StatementsBody(
-                statementsUiState = statementsUiState,
-                onStatementClick = {},
-                onStatementReactionClick = { _, _ -> null }
-            )
-        }
+        setContentToStatementsBody(statementsUiState)
 
         composeTestRule.onNodeWithTextId(R.string.no_data).assertIsDisplayed()
     }
@@ -83,22 +65,7 @@ class StatementsScreenTest {
             internetStatus = InternetStatus.LOADING
         )
 
-        composeTestRule.activity.setContent {
-            StatementsBody(
-                statementsUiState = statementsUiState,
-                onStatementClick = {},
-                onStatementReactionClick = { _, _ -> null }
-            )
-        }
-
-        composeTestRule.onNodeWithText("MyStatement").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.part_maintain).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.not_sure).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.part_no_maintain)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.full_no_maintain)
-            .assertIsDisplayed()
+        assertDataIsDisplayed(statementsUiState)
     }
 
     @Test
@@ -108,13 +75,21 @@ class StatementsScreenTest {
             internetStatus = InternetStatus.OFFLINE
         )
 
-        composeTestRule.activity.setContent {
-            StatementsBody(
-                statementsUiState = statementsUiState,
-                onStatementClick = {},
-                onStatementReactionClick = { _, _ -> null }
-            )
-        }
+        assertDataIsDisplayed(statementsUiState)
+    }
+
+    @Test
+    fun statementsScreen_onlineStatusAndData_displayedData() {
+        val statementsUiState = StatementsUiState(
+            statements = listOf(Statement(1, "MyStatement", 1, 1)),
+            internetStatus = InternetStatus.ONLINE
+        )
+
+        assertDataIsDisplayed(statementsUiState)
+    }
+
+    private fun assertDataIsDisplayed(statementsUiState: StatementsUiState) {
+        setContentToStatementsBody(statementsUiState)
 
         composeTestRule.onNodeWithText("MyStatement").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).assertIsDisplayed()
@@ -126,13 +101,7 @@ class StatementsScreenTest {
             .assertIsDisplayed()
     }
 
-    @Test
-    fun statementsScreen_onlineStatusAndData_displayedData() {
-        val statementsUiState = StatementsUiState(
-            statements = listOf(Statement(1, "MyStatement", 1, 1)),
-            internetStatus = InternetStatus.ONLINE
-        )
-
+    private fun setContentToStatementsBody(statementsUiState: StatementsUiState) {
         composeTestRule.activity.setContent {
             StatementsBody(
                 statementsUiState = statementsUiState,
@@ -140,14 +109,5 @@ class StatementsScreenTest {
                 onStatementReactionClick = { _, _ -> null }
             )
         }
-
-        composeTestRule.onNodeWithText("MyStatement").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.part_maintain).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.not_sure).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.part_no_maintain)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.full_no_maintain)
-            .assertIsDisplayed()
     }
 }
