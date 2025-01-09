@@ -162,7 +162,7 @@ fun initializeTopLevelDestinations(navController: NavHostController) {
             navigateTo = { navigateTo(SettingsDestination.topLevelRoute) },
             selectedIcon = Icons.Default.Settings,
             unselectedIcon = Icons.Outlined.Settings,
-            contentDescription = R.string.nav_categories
+            contentDescription = R.string.nav_settings
         )
     )
 }
