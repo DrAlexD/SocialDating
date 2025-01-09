@@ -62,7 +62,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun usersViewModel_checkStateWithInternet() = runTest {
+    fun profileViewModel_checkStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -76,7 +76,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun usersViewModel_checkStateWithoutInternet() = runTest {
+    fun profileViewModel_checkStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
@@ -90,7 +90,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun usersViewModel_checkRefreshedOnlineStateWithoutInternet() = runTest {
+    fun profileViewModel_checkRefreshedOnlineStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -108,7 +108,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun usersViewModel_checkRefreshedOfflineStateWithInternet() = runTest {
+    fun profileViewModel_checkRefreshedOfflineStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
@@ -126,7 +126,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun usersViewModel_checkRefreshedOnlineStateWithInternet() = runTest {
+    fun profileViewModel_checkRefreshedOnlineStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -143,7 +143,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun usersViewModel_checkRefreshedOfflineStateWithoutInternet() = runTest {
+    fun profileViewModel_checkRefreshedOfflineStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()

@@ -31,6 +31,7 @@ import xelagurd.socialdating.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.ui.navigation.LoginDestination
 import xelagurd.socialdating.ui.navigation.ProfileDestination
 import xelagurd.socialdating.ui.navigation.ProfileStatisticsDestination
+import xelagurd.socialdating.ui.navigation.RegistrationDestination
 import xelagurd.socialdating.ui.navigation.StatementDetailsDestination
 import xelagurd.socialdating.ui.navigation.StatementsDestination
 
@@ -67,8 +68,34 @@ class NavigationTest {
     }
 
     @Test
-    fun appNavHost_performLogIn_navigatesToCategories() {
-        navigateToCategories()
+    fun appNavHost_clickRegistration_navigatesToRegistration() {
+        navigateToRegistration()
+
+        navController.assertCurrentRouteName(RegistrationDestination.route)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_clickBackOnRegistrationScreen_navigatesToLogin() {
+        navigateToRegistration()
+        performNavigateUp()
+
+        navController.assertCurrentRouteName(LoginDestination.route)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_performRegistration_navigatesToCategories() {
+        navigateToRegistration()
+        registerAndNavigateToCategories()
+
+        navController.assertCurrentRouteName(CategoriesDestination.route)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_performLogin_navigatesToCategories() {
+        loginAndNavigateToCategories()
 
         navController.assertCurrentRouteName(CategoriesDestination.route)
         //navController.assertBackStackDepth(?)
@@ -101,7 +128,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_navigateToCategoriesOnCategoriesScreen_stayOnCategoriesScreen() {
-        navigateToCategories()
+        loginAndNavigateToCategories()
         val previousRoute = navController.getCurrentRoute()
         navigateToCategoriesFromBottomNavBar()
         val currentRoute = navController.getCurrentRoute()
@@ -123,7 +150,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_navigateToProfileOnCategoriesScreen_navigatesToProfile() {
-        navigateToCategories()
+        loginAndNavigateToCategories()
         navigateToProfileFromBottomNavBar()
 
         navController.assertCurrentRouteName(ProfileDestination.routeWithArgs)
@@ -132,7 +159,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_navigateToProfileOnProfileScreen_stayOnProfileScreen() {
-        navigateToCategories()
+        loginAndNavigateToCategories()
         navigateToProfileFromBottomNavBar()
         val previousRoute = navController.getCurrentRoute()
         navigateToProfileFromBottomNavBar()
@@ -154,7 +181,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_clickProfileStatistics_navigatesToProfileStatistics() {
-        navigateToCategories()
+        loginAndNavigateToCategories()
         navigateToProfileStatistics()
 
         navController.assertCurrentRouteName(ProfileStatisticsDestination.routeWithArgs)
@@ -163,7 +190,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_clickBackOnProfileStatisticsScreen_navigatesToProfile() {
-        navigateToCategories()
+        loginAndNavigateToCategories()
         navigateToProfileStatistics()
         performNavigateUp()
 
@@ -173,7 +200,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_navigateToProfileStatisticsOnProfileStatisticsScreen_stayOnProfileStatisticsScreen() {
-        navigateToCategories()
+        loginAndNavigateToCategories()
         navigateToProfileStatistics()
         val previousRoute = navController.getCurrentRoute()
         navigateToProfileFromBottomNavBar()
@@ -185,7 +212,7 @@ class NavigationTest {
 
     @Test
     fun appNavHost_navigateToCategoriesOnProfileStatisticsScreenAndBack_navigatesToProfileStatisticsScreen() {
-        navigateToCategories()
+        loginAndNavigateToCategories()
         navigateToProfileStatistics()
         navigateToCategoriesFromBottomNavBar()
         navigateToProfileFromBottomNavBar()
@@ -194,7 +221,12 @@ class NavigationTest {
         //navController.assertBackStackDepth(?)
     }
 
-    private fun navigateToCategories() {
+    private fun navigateToRegistration() {
+        composeTestRule.onNodeWithTextId(R.string.register)
+            .performClick()
+    }
+
+    private fun loginAndNavigateToCategories() {
         composeTestRule.onNodeWithTextId(R.string.username)
             .performTextInput("username")
         composeTestRule.onNodeWithTextId(R.string.password)
@@ -209,8 +241,35 @@ class NavigationTest {
         checkBottomNavBarWithCategoriesTopLevel()
     }
 
+    private fun registerAndNavigateToCategories() {
+        composeTestRule.onNodeWithTextId(R.string.username)
+            .performTextInput("username")
+        composeTestRule.onNodeWithTextId(R.string.name)
+            .performTextInput("name")
+        composeTestRule.onNodeWithTagId(R.string.male)
+            .performClick()
+        composeTestRule.onNodeWithTextId(R.string.age)
+            .performTextInput("20")
+        composeTestRule.onNodeWithTextId(R.string.city)
+            .performTextInput("Moscow")
+        composeTestRule.onNodeWithTagId(R.string.all_at_once)
+            .performClick()
+        composeTestRule.onNodeWithTextId(R.string.password)
+            .performTextInput("1234")
+        composeTestRule.onNodeWithTextId(R.string.repeat_password)
+            .performTextInput("1234")
+
+        composeTestRule.onNodeWithTextId(R.string.register)
+            .performClick()
+        composeTestRule.waitUntil(TIMEOUT_MILLIS) {
+            composeTestRule.onNodeWithTextId(R.string.register).isNotDisplayed()
+        }
+
+        checkBottomNavBarWithCategoriesTopLevel()
+    }
+
     private fun navigateToStatements() {
-        navigateToCategories()
+        loginAndNavigateToCategories()
 
         composeTestRule.waitUntil(TIMEOUT_MILLIS) {
             composeTestRule.onNodeWithText(FakeDataSource.categories[0].name).isDisplayed()

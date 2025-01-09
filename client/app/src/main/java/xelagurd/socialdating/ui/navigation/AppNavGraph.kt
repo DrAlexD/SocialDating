@@ -45,7 +45,7 @@ fun AppNavHost(
     ) {
         composable(route = LoginDestination.route) {
             LoginScreen(
-                onSuccessLogIn = {
+                onSuccessLogin = {
                     navController.navigate(CategoriesDestination.route)
                 },
                 onRegistrationClick = {

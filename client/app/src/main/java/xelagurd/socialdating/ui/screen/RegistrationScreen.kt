@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -131,6 +132,7 @@ private fun RegistrationDetails(
                 RadioButton(
                     selected = registrationDetails.gender == it,
                     onClick = { onValueChange(registrationDetails.copy(gender = it)) },
+                    modifier = Modifier.testTag(stringResource(it.descriptionRes))
                 )
                 Text(
                     text = it.name.lowercase(),
@@ -181,6 +183,7 @@ private fun RegistrationDetails(
                         RadioButton(
                             selected = registrationDetails.purpose == it,
                             onClick = { onValueChange(registrationDetails.copy(purpose = it)) },
+                            modifier = Modifier.testTag(stringResource(it.descriptionRes))
                         )
                         Text(
                             text = stringResource(it.descriptionRes),
