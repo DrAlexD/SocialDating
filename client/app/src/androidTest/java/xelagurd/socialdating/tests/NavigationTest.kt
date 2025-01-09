@@ -261,7 +261,7 @@ class NavigationTest {
 
         composeTestRule.onNodeWithTextId(R.string.register)
             .performClick()
-        composeTestRule.waitUntil(TIMEOUT_MILLIS) {
+        composeTestRule.waitUntil(20_000L) {
             composeTestRule.onNodeWithTextId(R.string.register).isNotDisplayed()
         }
 
