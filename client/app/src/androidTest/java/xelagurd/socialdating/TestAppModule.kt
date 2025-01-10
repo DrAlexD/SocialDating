@@ -3,6 +3,7 @@ package xelagurd.socialdating
 import java.util.UUID
 import javax.inject.Singleton
 import android.content.Context
+import androidx.credentials.CredentialManager
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
@@ -26,6 +27,11 @@ object TestAppModule {
     fun provideDataStore(@ApplicationContext context: Context) = PreferenceDataStoreFactory.create {
         context.preferencesDataStoreFile("social-dating-app-test-${UUID.randomUUID()}")
     }
+
+    @Provides
+    @Singleton
+    fun provideCredentialManager(@ApplicationContext context: Context) =
+        CredentialManager.create(context)
 
     @Provides
     @Singleton

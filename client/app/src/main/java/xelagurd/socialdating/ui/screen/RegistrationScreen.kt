@@ -142,7 +142,7 @@ private fun RegistrationDetails(
                     modifier = Modifier.testTag(stringResource(it.descriptionRes))
                 )
                 Text(
-                    text = it.name.lowercase(),
+                    text = stringResource(it.descriptionRes),
                     style = MaterialTheme.typography.titleMedium
                 )
             }

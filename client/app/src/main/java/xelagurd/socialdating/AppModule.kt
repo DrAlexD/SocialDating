@@ -3,6 +3,7 @@ package xelagurd.socialdating
 import javax.inject.Singleton
 import kotlinx.serialization.json.Json
 import android.content.Context
+import androidx.credentials.CredentialManager
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
@@ -26,6 +27,11 @@ object AppModule {
     fun provideDataStore(@ApplicationContext context: Context) = PreferenceDataStoreFactory.create {
         context.preferencesDataStoreFile("social-dating-app")
     }
+
+    @Provides
+    @Singleton
+    fun provideCredentialManager(@ApplicationContext context: Context) =
+        CredentialManager.create(context)
 
     @Provides
     @Singleton

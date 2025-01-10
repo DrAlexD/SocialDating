@@ -53,7 +53,7 @@ fun LoginScreen(
         LoginBody(
             loginUiState = loginUiState,
             onValueChange = loginViewModel::updateUiState,
-            onLoginClick = loginViewModel::login,
+            onLoginClick = loginViewModel::loginWithInput,
             onSuccessLogin = onSuccessLogin,
             onRegistrationClick = onRegistrationClick,
             modifier = modifier.fillMaxSize(),
