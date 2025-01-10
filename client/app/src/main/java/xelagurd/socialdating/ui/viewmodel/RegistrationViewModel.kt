@@ -24,7 +24,7 @@ import xelagurd.socialdating.ui.state.RequestStatus
 class RegistrationViewModel @Inject constructor(
     private val remoteRepository: RemoteUsersRepository,
     private val localRepository: LocalUsersRepository,
-    private val preferencesRepository: PreferencesRepository,
+    private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegistrationUiState())

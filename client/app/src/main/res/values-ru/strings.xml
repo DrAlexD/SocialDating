@@ -10,6 +10,7 @@
     <string name="offline">Не в сети</string>
     <string name="nav_categories">Перейти к Категориям</string>
     <string name="nav_profile">Перейти к Профилю</string>
+    <string name="nav_settings">Перейти к Настройкам</string>
     <string name="expand_list">Раскрыть список</string>
     <string name="open_profile_statistics">Открыть статистику профиля</string>
     <string name="full_maintain">Полностью поддерживаю</string>
@@ -22,6 +23,8 @@
     <string name="register">Зарегистрироваться</string>
     <string name="or">ИЛИ</string>
     <string name="failed_registration">Не удалось зарегистроваться</string>
+    <string name="logout">Выйти из аккаунта</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
     <string name="username">Логин</string>
     <string name="name">Имя</string>
     <string name="gender">Пол</string>

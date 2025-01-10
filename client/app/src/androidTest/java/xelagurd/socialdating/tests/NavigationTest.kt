@@ -33,6 +33,7 @@ import xelagurd.socialdating.ui.navigation.LoginDestination
 import xelagurd.socialdating.ui.navigation.ProfileDestination
 import xelagurd.socialdating.ui.navigation.ProfileStatisticsDestination
 import xelagurd.socialdating.ui.navigation.RegistrationDestination
+import xelagurd.socialdating.ui.navigation.SettingsDestination
 import xelagurd.socialdating.ui.navigation.StatementDetailsDestination
 import xelagurd.socialdating.ui.navigation.StatementsDestination
 
@@ -222,6 +223,25 @@ class NavigationTest {
         //navController.assertBackStackDepth(?)
     }
 
+    @Test
+    fun appNavHost_navigateToSettingsOnCategoriesScreen_navigatesToSettings() {
+        loginAndNavigateToCategories()
+        navigateToSettingsFromBottomNavBar()
+
+        navController.assertCurrentRouteName(SettingsDestination.route)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_performLogout_navigatesToLoginScreen() {
+        loginAndNavigateToCategories()
+        navigateToSettingsFromBottomNavBar()
+        logoutAndNavigateToLoginScreen()
+
+        navController.assertCurrentRouteName(LoginDestination.route)
+        //navController.assertBackStackDepth(?)
+    }
+
     private fun navigateToRegistration() {
         composeTestRule.onNodeWithTextId(R.string.register).checkButtonAndClick()
     }
@@ -259,6 +279,13 @@ class NavigationTest {
         checkBottomNavBarWithCategoriesTopLevel()
     }
 
+    private fun logoutAndNavigateToLoginScreen() {
+        composeTestRule.onNodeWithTextId(R.string.logout).checkButtonAndClick()
+        composeTestRule.waitUntil(TIMEOUT_MILLIS) {
+            composeTestRule.onNodeWithTextId(R.string.logout).isNotDisplayed()
+        }
+    }
+
     private fun navigateToStatements() {
         loginAndNavigateToCategories()
 
@@ -291,6 +318,11 @@ class NavigationTest {
         checkBottomNavBarWithProfileTopLevel()
     }
 
+    private fun navigateToSettingsFromBottomNavBar() {
+        composeTestRule.onNodeWithTagId(R.string.nav_settings).checkButtonAndClick()
+        checkBottomNavBarWithSettingsTopLevel()
+    }
+
     private fun navigateToProfileStatistics() {
         navigateToProfileFromBottomNavBar()
 
@@ -310,6 +342,9 @@ class NavigationTest {
         composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsNotSelected()
 
+        composeTestRule.onNodeWithTagId(R.string.nav_settings).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.nav_settings).assertIsNotSelected()
+
         composeTestRule.onNodeWithTagId(R.string.nav_categories).assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.nav_categories).assertIsSelected()
     }
@@ -318,8 +353,22 @@ class NavigationTest {
         composeTestRule.onNodeWithTagId(R.string.nav_categories).assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.nav_categories).assertIsNotSelected()
 
+        composeTestRule.onNodeWithTagId(R.string.nav_settings).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.nav_settings).assertIsNotSelected()
+
         composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsDisplayed()
         // FixMe: composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsSelected()
+    }
+
+    private fun checkBottomNavBarWithSettingsTopLevel() {
+        composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsNotSelected()
+
+        composeTestRule.onNodeWithTagId(R.string.nav_categories).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.nav_categories).assertIsNotSelected()
+
+        composeTestRule.onNodeWithTagId(R.string.nav_settings).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.nav_settings).assertIsSelected()
     }
 
     companion object {
