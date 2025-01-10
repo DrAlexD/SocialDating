@@ -17,18 +17,6 @@ import org.junit.Assert.assertEquals
 
 fun NavController.getCurrentRoute() = currentBackStackEntry?.destination?.route
 
-fun SemanticsNodeInteraction.checkButtonAndClick() {
-    this.assertIsDisplayed()
-    this.assertIsEnabled()
-    this.performClick()
-}
-
-fun SemanticsNodeInteraction.checkTextFieldAndInput(text: String) {
-    this.assertIsDisplayed()
-    this.assertIsEnabled()
-    this.performTextInput(text)
-}
-
 fun NavController.assertCurrentRouteName(expectedRouteName: String) {
     assertEquals(expectedRouteName, getCurrentRoute())
 }
@@ -48,3 +36,15 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.o
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithTextId(
     @StringRes id: Int
 ): SemanticsNodeInteraction = onNodeWithText(activity.getString(id))
+
+fun SemanticsNodeInteraction.checkButtonAndClick() {
+    this.assertIsDisplayed()
+    this.assertIsEnabled()
+    this.performClick()
+}
+
+fun SemanticsNodeInteraction.checkTextFieldAndInput(text: String) {
+    this.assertIsDisplayed()
+    this.assertIsEnabled()
+    this.performTextInput(text)
+}

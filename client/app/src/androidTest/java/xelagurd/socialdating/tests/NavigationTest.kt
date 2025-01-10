@@ -8,6 +8,7 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -242,6 +243,9 @@ class NavigationTest {
         composeTestRule.onNodeWithTextId(R.string.name).checkTextFieldAndInput("name")
         composeTestRule.onNodeWithTagId(R.string.male).checkButtonAndClick()
         composeTestRule.onNodeWithTextId(R.string.age).checkTextFieldAndInput("20")
+
+        composeTestRule.onNodeWithTextId(R.string.register).performScrollTo()
+
         composeTestRule.onNodeWithTextId(R.string.city).checkTextFieldAndInput("Moscow")
         composeTestRule.onNodeWithTagId(R.string.all_at_once).checkButtonAndClick()
         composeTestRule.onNodeWithTextId(R.string.password).checkTextFieldAndInput("1234")
