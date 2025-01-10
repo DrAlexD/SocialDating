@@ -12,11 +12,13 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.AccountManager
 import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.model.User
+import xelagurd.socialdating.data.model.additional.LoginDetails
 import xelagurd.socialdating.data.model.additional.RegistrationDetails
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
@@ -32,6 +34,7 @@ class RegistrationViewModelTest {
     private val remoteRepository: RemoteUsersRepository = mockk()
     private val localRepository: LocalUsersRepository = mockk()
     private val preferencesRepository: PreferencesRepository = mockk()
+    private val accountManager: AccountManager = mockk()
 
     private lateinit var viewModel: RegistrationViewModel
     private val registrationUiState
@@ -45,7 +48,12 @@ class RegistrationViewModelTest {
 
     @Before
     fun setup() {
-        viewModel = RegistrationViewModel(remoteRepository, localRepository, preferencesRepository)
+        viewModel = RegistrationViewModel(
+            remoteRepository,
+            localRepository,
+            preferencesRepository,
+            accountManager
+        )
         viewModel.updateUiState(registrationDetails)
         viewModel.register()
     }
@@ -63,7 +71,8 @@ class RegistrationViewModelTest {
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, registrationUiState.requestStatus) // TODO: Change to ERROR after implementing server
+        // TODO: Change to ERROR after implementing server
+        assertEquals(RequestStatus.SUCCESS, registrationUiState.requestStatus)
     }
 
     @Test
@@ -100,6 +109,7 @@ class RegistrationViewModelTest {
 
     private fun mockDataWithInternet() {
         coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns remoteUser
+        coEvery { accountManager.saveCredentials(registrationDetails.toLoginDetails()) } just Runs
         coEvery { localRepository.insertUser(remoteUser) } just Runs
         coEvery { preferencesRepository.saveCurrentUserId(remoteUser.id) } just Runs
     }
@@ -110,6 +120,14 @@ class RegistrationViewModelTest {
 
     private fun mockDataWithoutInternet() {
         coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } throws IOException()
+        coEvery {
+            accountManager.saveCredentials(
+                LoginDetails(
+                    FakeDataSource.users[0].username,
+                    FakeDataSource.users[0].password
+                )
+            )
+        } just Runs // TODO: remove after implementing server
         coEvery { localRepository.insertUser(FakeDataSource.users[0]) } just Runs // TODO: remove after implementing server
         coEvery { preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) } just Runs // TODO: remove after implementing server
     }

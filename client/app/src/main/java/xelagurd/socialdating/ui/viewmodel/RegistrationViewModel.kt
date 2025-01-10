@@ -11,10 +11,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.mindrot.jbcrypt.BCrypt
+import xelagurd.socialdating.AccountManager
 import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
+import xelagurd.socialdating.data.model.additional.LoginDetails
 import xelagurd.socialdating.data.model.additional.RegistrationDetails
 import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.ui.state.RegistrationUiState
@@ -24,7 +26,8 @@ import xelagurd.socialdating.ui.state.RequestStatus
 class RegistrationViewModel @Inject constructor(
     private val remoteRepository: RemoteUsersRepository,
     private val localRepository: LocalUsersRepository,
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val accountManager: AccountManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegistrationUiState())
@@ -51,6 +54,8 @@ class RegistrationViewModel @Inject constructor(
                 )
 
                 if (user != null) {
+                    accountManager.saveCredentials(registrationDetails.toLoginDetails())
+
                     localRepository.insertUser(user)
                     preferencesRepository.saveCurrentUserId(user.id)
 
@@ -59,6 +64,13 @@ class RegistrationViewModel @Inject constructor(
                     _uiState.update { it.copy(requestStatus = RequestStatus.FAILED) }
                 }
             } catch (_: IOException) {
+                accountManager.saveCredentials(
+                    LoginDetails(
+                        FakeDataSource.users[0].username,
+                        FakeDataSource.users[0].password
+                    )
+                ) // TODO: remove after implementing server
+
                 localRepository.insertUser(FakeDataSource.users[0]) // TODO: remove after implementing server
                 preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) // TODO: remove after implementing server
 

@@ -20,4 +20,6 @@ data class RegistrationDetails(
         get() = name.isNotBlank() && gender != null && username.isNotBlank() && password.isNotBlank() &&
                 repeatedPassword.isNotBlank() && password == repeatedPassword && age.isNotBlank() &&
                 city.isNotBlank() && purpose != null
+
+    fun toLoginDetails() = LoginDetails(username, password)
 }

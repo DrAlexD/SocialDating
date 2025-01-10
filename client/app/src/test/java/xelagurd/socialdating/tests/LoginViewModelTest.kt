@@ -4,6 +4,8 @@ import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import androidx.credentials.GetCredentialResponse
+import androidx.credentials.PasswordCredential
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.just
@@ -12,6 +14,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.AccountManager
 import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
@@ -31,6 +34,7 @@ class LoginViewModelTest {
     private val remoteRepository: RemoteUsersRepository = mockk()
     private val localRepository: LocalUsersRepository = mockk()
     private val preferencesRepository: PreferencesRepository = mockk()
+    private val accountManager: AccountManager = mockk()
 
     private lateinit var viewModel: LoginViewModel
     private val loginUiState
@@ -42,9 +46,16 @@ class LoginViewModelTest {
 
     @Before
     fun setup() {
-        viewModel = LoginViewModel(remoteRepository, localRepository, preferencesRepository)
+        mockFindCredentialsWithError()
+
+        viewModel = LoginViewModel(
+            remoteRepository,
+            localRepository,
+            preferencesRepository,
+            accountManager
+        )
         viewModel.updateUiState(loginDetails)
-        viewModel.login()
+        viewModel.loginWithInput()
     }
 
     @Test
@@ -77,7 +88,7 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         mockDataWithInternet()
-        viewModel.login()
+        viewModel.loginWithInput()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, loginUiState.requestStatus)
@@ -89,10 +100,25 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         mockDataWithInternet()
-        viewModel.login()
+        viewModel.loginWithInput()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, loginUiState.requestStatus)
+    }
+
+    private fun mockFindCredentialsWithData() {
+        // FixMe: Can't test due to `BaseBundle not mocked`
+        coEvery { accountManager.findCredentials() } returns GetCredentialResponse(
+            PasswordCredential(
+                id = loginDetails.username,
+                password = loginDetails.password
+            )
+        )
+    }
+
+    private fun mockFindCredentialsWithError() {
+        coEvery { accountManager.findCredentials() } returns null
+        coEvery { accountManager.saveCredentials(loginDetails) } just Runs
     }
 
     private fun mockDataWithInternet() {
