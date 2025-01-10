@@ -321,6 +321,9 @@ class NavigationTest {
     }
 
     private fun checkBottomNavBarWithCategoriesTopLevel() {
+        composeTestRule.waitUntil(20_000L) {
+            composeTestRule.onNodeWithTagId(R.string.nav_profile).isDisplayed()
+        }
         composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsNotSelected()
 
