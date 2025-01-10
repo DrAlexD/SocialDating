@@ -36,7 +36,7 @@ import xelagurd.socialdating.ui.viewmodel.LoginViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onSuccessLogIn: () -> Unit,
+    onSuccessLogin: () -> Unit,
     onRegistrationClick: () -> Unit,
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = hiltViewModel()
@@ -53,8 +53,8 @@ fun LoginScreen(
         LoginBody(
             loginUiState = loginUiState,
             onValueChange = loginViewModel::updateUiState,
-            onLogInClick = loginViewModel::login,
-            onSuccessLogIn = onSuccessLogIn,
+            onLoginClick = loginViewModel::login,
+            onSuccessLogin = onSuccessLogin,
             onRegistrationClick = onRegistrationClick,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding
@@ -66,8 +66,8 @@ fun LoginScreen(
 internal fun LoginBody(
     loginUiState: LoginUiState,
     onValueChange: (LoginDetails) -> Unit,
-    onLogInClick: () -> Unit,
-    onSuccessLogIn: () -> Unit,
+    onLoginClick: () -> Unit,
+    onSuccessLogin: () -> Unit,
     onRegistrationClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -76,13 +76,13 @@ internal fun LoginBody(
         LoginDetails(
             loginDetails = loginUiState.loginDetails,
             onValueChange = onValueChange,
-            onLogInClick = onLogInClick,
+            onLoginClick = onLoginClick,
             onRegistrationClick = onRegistrationClick,
             modifier = modifier
         )
         LoginStatus(
             requestStatus = loginUiState.requestStatus,
-            onSuccessLogIn = onSuccessLogIn,
+            onSuccessLogin = onSuccessLogin,
             modifier = modifier
         )
     }
@@ -92,7 +92,7 @@ internal fun LoginBody(
 private fun LoginDetails(
     loginDetails: LoginDetails,
     onValueChange: (LoginDetails) -> Unit,
-    onLogInClick: () -> Unit,
+    onLoginClick: () -> Unit,
     onRegistrationClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -117,7 +117,7 @@ private fun LoginDetails(
         )
         Card(
             enabled = loginDetails.isValid,
-            onClick = onLogInClick,
+            onClick = onLoginClick,
             elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
         ) {
@@ -149,7 +149,7 @@ private fun LoginDetails(
 @Composable
 private fun LoginStatus(
     requestStatus: RequestStatus,
-    onSuccessLogIn: () -> Unit,
+    onSuccessLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -182,7 +182,7 @@ private fun LoginStatus(
                 )
             }
 
-            RequestStatus.SUCCESS -> onSuccessLogIn.invoke()
+            RequestStatus.SUCCESS -> onSuccessLogin.invoke()
         }
     }
 }
@@ -194,7 +194,7 @@ fun LoginDetailsPreview() {
         LoginDetails(
             loginDetails = LoginDetails(),
             onValueChange = {},
-            onLogInClick = {},
+            onLoginClick = {},
             onRegistrationClick = {}
         )
     }

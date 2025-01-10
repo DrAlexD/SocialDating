@@ -25,6 +25,8 @@
     <string name="username">Логин</string>
     <string name="name">Имя</string>
     <string name="gender">Пол</string>
+    <string name="male">Мужчина</string>
+    <string name="female">Женщина</string>
     <string name="email_optional">Email (опционально)</string>
     <string name="age">Возраст</string>
     <string name="city">Город</string>

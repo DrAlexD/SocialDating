@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -17,11 +19,14 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,14 +53,17 @@ fun RegistrationScreen(
     registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
     val registrationUiState by registrationViewModel.uiState.collectAsState()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
         topBar = {
             AppTopBar(
                 title = stringResource(RegistrationDestination.titleRes),
-                navigateUp = onNavigateUp
+                navigateUp = onNavigateUp,
+                scrollBehavior = scrollBehavior
             )
-        }
+        },
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         RegistrationBody(
             registrationUiState = registrationUiState,
@@ -102,7 +110,7 @@ private fun RegistrationDetails(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
-        modifier = modifier
+        modifier = modifier.verticalScroll(rememberScrollState())
     ) {
         TextField(
             value = registrationDetails.username,
@@ -131,6 +139,7 @@ private fun RegistrationDetails(
                 RadioButton(
                     selected = registrationDetails.gender == it,
                     onClick = { onValueChange(registrationDetails.copy(gender = it)) },
+                    modifier = Modifier.testTag(stringResource(it.descriptionRes))
                 )
                 Text(
                     text = it.name.lowercase(),
@@ -181,6 +190,7 @@ private fun RegistrationDetails(
                         RadioButton(
                             selected = registrationDetails.purpose == it,
                             onClick = { onValueChange(registrationDetails.copy(purpose = it)) },
+                            modifier = Modifier.testTag(stringResource(it.descriptionRes))
                         )
                         Text(
                             text = stringResource(it.descriptionRes),

@@ -39,22 +39,7 @@ class TopBarTest {
 
     @Test
     fun topBar_loadingStatus_loadingText() {
-        composeTestRule.activity.setContent {
-            Scaffold(
-                topBar = {
-                    AppTopBar(
-                        title = stringResource(CategoriesDestination.titleRes),
-                        internetStatus = InternetStatus.LOADING,
-                        refreshAction = { }
-                    )
-                }
-            ) { innerPadding ->
-                Text(
-                    text = "",
-                    modifier = Modifier.padding(innerPadding)
-                )
-            }
-        }
+        setContentToAppTopBar(InternetStatus.LOADING)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsNotDisplayed()
@@ -63,22 +48,7 @@ class TopBarTest {
 
     @Test
     fun topBar_offlineStatus_offlineTextWithRefresh() {
-        composeTestRule.activity.setContent {
-            Scaffold(
-                topBar = {
-                    AppTopBar(
-                        title = stringResource(CategoriesDestination.titleRes),
-                        internetStatus = InternetStatus.OFFLINE,
-                        refreshAction = { }
-                    )
-                }
-            ) { innerPadding ->
-                Text(
-                    text = "",
-                    modifier = Modifier.padding(innerPadding)
-                )
-            }
-        }
+        setContentToAppTopBar(InternetStatus.OFFLINE)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsDisplayed()
@@ -87,22 +57,7 @@ class TopBarTest {
 
     @Test
     fun topBar_onlineStatus_onlineText() {
-        composeTestRule.activity.setContent {
-            Scaffold(
-                topBar = {
-                    AppTopBar(
-                        title = stringResource(CategoriesDestination.titleRes),
-                        internetStatus = InternetStatus.ONLINE,
-                        refreshAction = { }
-                    )
-                }
-            ) { innerPadding ->
-                Text(
-                    text = "",
-                    modifier = Modifier.padding(innerPadding)
-                )
-            }
-        }
+        setContentToAppTopBar(InternetStatus.ONLINE)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsNotDisplayed()
@@ -111,14 +66,23 @@ class TopBarTest {
 
     @Test
     fun topBar_backButton() {
+        setContentToAppTopBar(InternetStatus.ONLINE, {})
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsDisplayed()
+    }
+
+    private fun setContentToAppTopBar(
+        internetStatus: InternetStatus,
+        navigateUp: (() -> Unit)? = null
+    ) {
         composeTestRule.activity.setContent {
             Scaffold(
                 topBar = {
                     AppTopBar(
                         title = stringResource(CategoriesDestination.titleRes),
-                        internetStatus = InternetStatus.ONLINE,
+                        internetStatus = internetStatus,
                         refreshAction = { },
-                        navigateUp = {}
+                        navigateUp = navigateUp
                     )
                 }
             ) { innerPadding ->
@@ -128,7 +92,5 @@ class TopBarTest {
                 )
             }
         }
-
-        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsDisplayed()
     }
 }

@@ -26,6 +26,8 @@
     <string name="username">Username</string>
     <string name="name">Name</string>
     <string name="gender">Gender</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
     <string name="email_optional">Email (optional)</string>
     <string name="age">Age</string>
     <string name="city">City</string>
