@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +51,7 @@ import xelagurd.socialdating.ui.viewmodel.StatementsViewModel
 @Composable
 fun StatementsScreen(
     onStatementClick: (Int) -> Unit,
+    onStatementAddingClick: (Int) -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     statementsViewModel: StatementsViewModel = hiltViewModel()
@@ -69,6 +73,18 @@ fun StatementsScreen(
             AppBottomNavigationBar(
                 currentTopLevelRoute = StatementsDestination.topLevelRoute
             )
+        },
+        floatingActionButton = {
+            if (statementsUiState.internetStatus.isLoaded()) {
+                FloatingActionButton(
+                    onClick = { onStatementAddingClick.invoke(statementsUiState.categoryId) },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add_statement)
+                    )
+                }
+            }
         },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->

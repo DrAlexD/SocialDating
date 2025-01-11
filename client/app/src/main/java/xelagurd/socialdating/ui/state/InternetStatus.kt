@@ -6,4 +6,6 @@ enum class InternetStatus {
     OFFLINE;
 
     fun isAllowedRefresh() = this == OFFLINE
+
+    fun isLoaded() = this != LOADING
 }

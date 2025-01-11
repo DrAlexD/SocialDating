@@ -34,6 +34,7 @@ import xelagurd.socialdating.ui.navigation.ProfileDestination
 import xelagurd.socialdating.ui.navigation.ProfileStatisticsDestination
 import xelagurd.socialdating.ui.navigation.RegistrationDestination
 import xelagurd.socialdating.ui.navigation.SettingsDestination
+import xelagurd.socialdating.ui.navigation.StatementAddingDestination
 import xelagurd.socialdating.ui.navigation.StatementDetailsDestination
 import xelagurd.socialdating.ui.navigation.StatementsDestination
 
@@ -104,18 +105,21 @@ class NavigationTest {
     }
 
     @Test
-    fun appNavHost_clickCategory_navigatesToStatements() {
-        navigateToStatements()
+    fun appNavHost_navigateToCategoriesOnCategoriesScreen_stayOnCategoriesScreen() {
+        loginAndNavigateToCategories()
+        val previousRoute = navController.getCurrentRoute()
+        navigateToCategoriesFromBottomNavBar()
+        val currentRoute = navController.getCurrentRoute()
 
-        navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
+        assertEquals(previousRoute, currentRoute)
         //navController.assertBackStackDepth(?)
     }
 
     @Test
-    fun appNavHost_clickStatement_navigatesToStatementDetails() {
-        navigateToStatementDetails()
+    fun appNavHost_clickCategory_navigatesToStatements() {
+        navigateToStatements()
 
-        navController.assertCurrentRouteName(StatementDetailsDestination.routeWithArgs)
+        navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
         //navController.assertBackStackDepth(?)
     }
 
@@ -129,8 +133,8 @@ class NavigationTest {
     }
 
     @Test
-    fun appNavHost_navigateToCategoriesOnCategoriesScreen_stayOnCategoriesScreen() {
-        loginAndNavigateToCategories()
+    fun appNavHost_navigateToCategoriesOnStatementsScreen_stayOnStatementsScreen() {
+        navigateToStatements()
         val previousRoute = navController.getCurrentRoute()
         navigateToCategoriesFromBottomNavBar()
         val currentRoute = navController.getCurrentRoute()
@@ -140,13 +144,36 @@ class NavigationTest {
     }
 
     @Test
-    fun appNavHost_navigateToCategoriesOnStatementsScreen_stayOnStatementsScreen() {
-        navigateToStatements()
-        val previousRoute = navController.getCurrentRoute()
-        navigateToCategoriesFromBottomNavBar()
-        val currentRoute = navController.getCurrentRoute()
+    fun appNavHost_clickAddStatementOnStatementsScreen_navigatesToStatementAddingScreen() {
+        navigateToStatementAdding()
 
-        assertEquals(previousRoute, currentRoute)
+        navController.assertCurrentRouteName(StatementAddingDestination.routeWithArgs)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_clickBackOnStatementAddingScreen_navigatesToStatements() {
+        navigateToStatementAdding()
+        performNavigateUp()
+
+        navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_performStatementAdding_navigatesToStatements() {
+        navigateToStatementAdding()
+        addStatementAndNavigateToStatementsScreen()
+
+        navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
+        //navController.assertBackStackDepth(?)
+    }
+
+    @Test
+    fun appNavHost_clickStatement_navigatesToStatementDetails() {
+        navigateToStatementDetails()
+
+        navController.assertCurrentRouteName(StatementDetailsDestination.routeWithArgs)
         //navController.assertBackStackDepth(?)
     }
 
@@ -242,10 +269,6 @@ class NavigationTest {
         //navController.assertBackStackDepth(?)
     }
 
-    private fun navigateToRegistration() {
-        composeTestRule.onNodeWithTextId(R.string.register).checkButtonAndClick()
-    }
-
     private fun loginAndNavigateToCategories() {
         composeTestRule.onNodeWithTextId(R.string.username).checkTextFieldAndInput("username")
         composeTestRule.onNodeWithTextId(R.string.password).checkTextFieldAndInput("password")
@@ -256,6 +279,10 @@ class NavigationTest {
         }
 
         checkBottomNavBarWithCategoriesTopLevel()
+    }
+
+    private fun navigateToRegistration() {
+        composeTestRule.onNodeWithTextId(R.string.register).checkButtonAndClick()
     }
 
     private fun registerAndNavigateToCategories() {
@@ -297,6 +324,30 @@ class NavigationTest {
         checkBottomNavBarWithCategoriesTopLevel()
     }
 
+    private fun navigateToStatementAdding() {
+        navigateToStatements()
+
+        composeTestRule.waitUntil(TIMEOUT_MILLIS) {
+            composeTestRule.onNodeWithText(FakeDataSource.statements[0].text).isDisplayed()
+        }
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.add_statement).checkButtonAndClick()
+        checkBottomNavBarWithCategoriesTopLevel()
+    }
+
+    private fun addStatementAndNavigateToStatementsScreen() {
+        composeTestRule.onNodeWithTextId(R.string.statement_text).checkTextFieldAndInput("Statement text")
+        composeTestRule.onNodeWithText(FakeDataSource.definingThemes[0].name).checkButtonAndClick()
+        composeTestRule.onNodeWithTagId(R.string.yes).checkButtonAndClick()
+
+        composeTestRule.onNodeWithTextId(R.string.add_statement).checkButtonAndClick()
+        composeTestRule.waitUntil(TIMEOUT_MILLIS) {
+            composeTestRule.onNodeWithTextId(R.string.add_statement).isNotDisplayed()
+        }
+
+        checkBottomNavBarWithCategoriesTopLevel()
+    }
+
     private fun navigateToStatementDetails() {
         navigateToStatements()
 
@@ -306,6 +357,17 @@ class NavigationTest {
 
         composeTestRule.onNodeWithText(FakeDataSource.statements[0].text).checkButtonAndClick()
         //checkBottomNavBarWithCategoriesTopLevel()
+    }
+
+    private fun navigateToProfileStatistics() {
+        navigateToProfileFromBottomNavBar()
+
+        composeTestRule.waitUntil(TIMEOUT_MILLIS) {
+            composeTestRule.onNodeWithTextId(R.string.open_profile_statistics).isDisplayed()
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.open_profile_statistics).checkButtonAndClick()
+        checkBottomNavBarWithProfileTopLevel()
     }
 
     private fun navigateToCategoriesFromBottomNavBar() {
@@ -321,21 +383,6 @@ class NavigationTest {
     private fun navigateToSettingsFromBottomNavBar() {
         composeTestRule.onNodeWithTagId(R.string.nav_settings).checkButtonAndClick()
         checkBottomNavBarWithSettingsTopLevel()
-    }
-
-    private fun navigateToProfileStatistics() {
-        navigateToProfileFromBottomNavBar()
-
-        composeTestRule.waitUntil(TIMEOUT_MILLIS) {
-            composeTestRule.onNodeWithTextId(R.string.open_profile_statistics).isDisplayed()
-        }
-
-        composeTestRule.onNodeWithTextId(R.string.open_profile_statistics).checkButtonAndClick()
-        checkBottomNavBarWithProfileTopLevel()
-    }
-
-    private fun performNavigateUp() {
-        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).checkButtonAndClick()
     }
 
     private fun checkBottomNavBarWithCategoriesTopLevel() {
@@ -369,6 +416,10 @@ class NavigationTest {
 
         composeTestRule.onNodeWithTagId(R.string.nav_settings).assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.nav_settings).assertIsSelected()
+    }
+
+    private fun performNavigateUp() {
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).checkButtonAndClick()
     }
 
     companion object {

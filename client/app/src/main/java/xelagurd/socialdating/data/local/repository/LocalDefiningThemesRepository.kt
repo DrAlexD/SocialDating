@@ -2,7 +2,6 @@ package xelagurd.socialdating.data.local.repository
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.flow.Flow
 import xelagurd.socialdating.data.local.dao.DefiningThemesDao
 import xelagurd.socialdating.data.model.DefiningTheme
 
@@ -10,10 +9,10 @@ import xelagurd.socialdating.data.model.DefiningTheme
 class LocalDefiningThemesRepository @Inject constructor(
     private val definingThemesDao: DefiningThemesDao
 ) {
-    fun getDefiningThemes(categoryId: Int): Flow<List<DefiningTheme>> =
+    fun getDefiningThemes(categoryId: Int) =
         definingThemesDao.getDefiningThemes(categoryId)
 
-    fun getDefiningThemes(categoryIds: List<Int>): Flow<List<DefiningTheme>> =
+    fun getDefiningThemes(categoryIds: List<Int>) =
         definingThemesDao.getDefiningThemes(categoryIds)
 
     suspend fun insertDefiningThemes(definingThemes: List<DefiningTheme>) =

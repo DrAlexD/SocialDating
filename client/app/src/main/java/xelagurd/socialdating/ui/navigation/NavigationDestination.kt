@@ -29,6 +29,7 @@ enum class AppScreen {
     Settings,
     Categories,
     Statements,
+    StatementAdding,
     StatementDetails,
     Profile,
     ProfileStatistics
@@ -56,6 +57,14 @@ object CategoriesDestination : NavigationDestination() {
 
 object StatementsDestination : NavigationDestination() {
     override val route = AppScreen.Statements.name
+    override val topLevelRoute = CategoriesDestination.route
+
+    const val categoryId = "categoryId"
+    val routeWithArgs = "$route/{$categoryId}"
+}
+
+object StatementAddingDestination : NavigationDestination() {
+    override val route = AppScreen.StatementAdding.name
     override val topLevelRoute = CategoriesDestination.route
 
     const val categoryId = "categoryId"

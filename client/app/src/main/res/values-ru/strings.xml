@@ -39,4 +39,11 @@
     <string name="friends">Найти друзей</string>
     <string name="relationships">Найти отношения</string>
     <string name="all_at_once">Всё и сразу</string>
+    <string name="add_statement">Добавить высказывание</string>
+    <string name="statement_text">Текст высказывания</string>
+    <string name="defining_theme">Определяющая тема</string>
+    <string name="is_support_defining_theme">Поддерживает ли высказывание определяющую тему?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="failed_add_statement">Не удалось добавить высказывание</string>
 </resources>

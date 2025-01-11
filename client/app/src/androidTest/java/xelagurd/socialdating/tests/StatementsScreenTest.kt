@@ -61,7 +61,7 @@ class StatementsScreenTest {
     @Test
     fun statementsScreen_loadingStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
-            statements = listOf(Statement(1, "MyStatement", 1, 1)),
+            statements = listOf(Statement(1, "MyStatement", true, 1, 1)),
             internetStatus = InternetStatus.LOADING
         )
 
@@ -71,7 +71,7 @@ class StatementsScreenTest {
     @Test
     fun statementsScreen_offlineStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
-            statements = listOf(Statement(1, "MyStatement", 1, 1)),
+            statements = listOf(Statement(1, "MyStatement", true, 1, 1)),
             internetStatus = InternetStatus.OFFLINE
         )
 
@@ -81,7 +81,7 @@ class StatementsScreenTest {
     @Test
     fun statementsScreen_onlineStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
-            statements = listOf(Statement(1, "MyStatement", 1, 1)),
+            statements = listOf(Statement(1, "MyStatement", true, 1, 1)),
             internetStatus = InternetStatus.ONLINE
         )
 

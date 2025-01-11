@@ -23,6 +23,7 @@ import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
+import xelagurd.socialdating.data.model.additional.StatementReaction
 import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
@@ -55,6 +56,7 @@ class StatementsViewModel @Inject constructor(
 
     val uiState = combine(statementsFlow, internetStatusFlow) { statements, internetStatus ->
         StatementsUiState(
+            categoryId = categoryId,
             statements = statements,
             internetStatus = internetStatus
         )
@@ -106,9 +108,7 @@ class StatementsViewModel @Inject constructor(
             viewModelScope.launch {
                 try {
                     remoteStatementsRepository.postStatementReaction(
-                        currentUserId!!,
-                        statementId,
-                        reactionType
+                        StatementReaction(currentUserId!!, statementId, reactionType)
                     )
                 } catch (_: IOException) {
                     //

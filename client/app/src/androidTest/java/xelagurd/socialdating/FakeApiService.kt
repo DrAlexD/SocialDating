@@ -9,7 +9,8 @@ import xelagurd.socialdating.data.model.UserCategory
 import xelagurd.socialdating.data.model.UserDefiningTheme
 import xelagurd.socialdating.data.model.additional.LoginDetails
 import xelagurd.socialdating.data.model.additional.RegistrationDetails
-import xelagurd.socialdating.data.model.enums.StatementReactionType
+import xelagurd.socialdating.data.model.additional.StatementDetails
+import xelagurd.socialdating.data.model.additional.StatementReaction
 import xelagurd.socialdating.data.remote.ApiService
 
 class FakeApiService : ApiService {
@@ -24,12 +25,10 @@ class FakeApiService : ApiService {
     override suspend fun getStatements(definingThemeIds: List<Int>): List<Statement> =
         FakeDataSource.statements
 
-    override suspend fun postStatementReaction(
-        userId: Int,
-        statementId: Int,
-        reactionType: StatementReactionType
-    ) {
-    }
+    override suspend fun postStatementReaction(statementReaction: StatementReaction) {}
+
+    override suspend fun statementAdding(statementDetails: StatementDetails): Statement? =
+        FakeDataSource.newStatement
 
     override suspend fun getUser(userId: Int): User? =
         FakeDataSource.users[0]
