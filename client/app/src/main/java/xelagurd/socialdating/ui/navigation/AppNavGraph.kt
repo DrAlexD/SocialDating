@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import xelagurd.socialdating.MainViewModel
 import xelagurd.socialdating.R
+import xelagurd.socialdating.ui.screen.StatementAddingScreen
 import xelagurd.socialdating.ui.screen.CategoriesScreen
 import xelagurd.socialdating.ui.screen.LoginScreen
 import xelagurd.socialdating.ui.screen.ProfileScreen
@@ -92,6 +93,21 @@ fun AppNavHost(
                 onStatementClick = {
                     navController.navigate("${StatementDetailsDestination.route}/$it")
                 },
+                onStatementAddingClick = {
+                    navController.navigate("${StatementAddingDestination.route}/$it")
+                },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        composable(
+            route = StatementAddingDestination.routeWithArgs,
+            arguments = listOf(navArgument(StatementAddingDestination.categoryId) {
+                type = NavType.IntType
+            })
+        ) {
+            StatementAddingScreen(
+                onSuccessStatementAdding = { navController.navigateUp() },
                 onNavigateUp = { navController.navigateUp() }
             )
         }

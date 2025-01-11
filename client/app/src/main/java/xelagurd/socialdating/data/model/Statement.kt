@@ -27,6 +27,7 @@ data class Statement(
     @PrimaryKey
     val id: Int,
     val text: String,
+    val isSupportDefiningTheme: Boolean,
     val definingThemeId: Int,
     val userId: Int
 )

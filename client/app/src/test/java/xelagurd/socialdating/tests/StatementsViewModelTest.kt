@@ -58,15 +58,15 @@ class StatementsViewModelTest {
         DefiningTheme(2, "", "", "", categoryId)
     )
     private val localStatements = listOf(
-        Statement(1, "", 1, 1),
-        Statement(2, "", 1, 1)
+        Statement(1, "", true, 1, 1),
+        Statement(2, "", true, 1, 1)
     )
     private val remoteStatements = listOf(
-        Statement(1, "", 1, 1),
-        Statement(2, "", 1, 1),
-        Statement(3, "", 1, 1),
-        Statement(4, "", 2, 1),
-        Statement(5, "", 2, 1),
+        Statement(1, "", true, 1, 1),
+        Statement(2, "", true, 1, 1),
+        Statement(3, "", true, 1, 1),
+        Statement(4, "", true, 2, 1),
+        Statement(5, "", true, 2, 1),
     )
 
     private fun List<DefiningTheme>.toIds() = this.map { it.id }

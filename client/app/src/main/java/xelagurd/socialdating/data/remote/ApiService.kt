@@ -12,7 +12,8 @@ import xelagurd.socialdating.data.model.UserCategory
 import xelagurd.socialdating.data.model.UserDefiningTheme
 import xelagurd.socialdating.data.model.additional.LoginDetails
 import xelagurd.socialdating.data.model.additional.RegistrationDetails
-import xelagurd.socialdating.data.model.enums.StatementReactionType
+import xelagurd.socialdating.data.model.additional.StatementDetails
+import xelagurd.socialdating.data.model.additional.StatementReaction
 
 interface ApiService {
     @GET("categories")
@@ -27,12 +28,11 @@ interface ApiService {
     @GET("statements")
     suspend fun getStatements(@Query("definingThemeIds") definingThemeIds: List<Int>): List<Statement>
 
+    @POST("statements/reaction")
+    suspend fun postStatementReaction(@Body statementReaction: StatementReaction)
+
     @POST("statements")
-    suspend fun postStatementReaction(
-        @Query("userId") userId: Int,
-        @Query("statementId") statementId: Int,
-        @Query("reactionType") reactionType: StatementReactionType
-    )
+    suspend fun statementAdding(@Body statementDetails: StatementDetails): Statement?
 
     @GET("users")
     suspend fun getUser(@Query("userId") userId: Int): User?

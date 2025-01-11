@@ -14,4 +14,7 @@ interface StatementsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStatements(statements: List<Statement>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertStatement(statement: Statement)
 }

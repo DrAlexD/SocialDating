@@ -2,16 +2,14 @@ package xelagurd.socialdating.data.local.repository
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.flow.Flow
 import xelagurd.socialdating.data.local.dao.UserCategoriesDao
 import xelagurd.socialdating.data.model.UserCategory
-import xelagurd.socialdating.data.model.additional.UserCategoryWithData
 
 @Singleton
 class LocalUserCategoriesRepository @Inject constructor(
     private val userCategoriesDao: UserCategoriesDao
 ) {
-    fun getUserCategories(userId: Int): Flow<List<UserCategoryWithData>> =
+    fun getUserCategories(userId: Int) =
         userCategoriesDao.getUserCategories(userId)
 
     suspend fun insertUserCategories(userCategories: List<UserCategory>) =
