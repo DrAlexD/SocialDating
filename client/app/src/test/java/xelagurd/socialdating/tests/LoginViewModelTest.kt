@@ -40,9 +40,9 @@ class LoginViewModelTest {
     private val loginUiState
         get() = viewModel.uiState.value
 
-    private val loginDetails = LoginDetails("abc", "123")
+    private val loginDetails = LoginDetails("", "")
     private val remoteUser =
-        User(1, "abc", Gender.FEMALE, "abc", "123", "", 40, "", Purpose.RELATIONSHIPS, 20)
+        User(1, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20)
 
     @Before
     fun setup() {

@@ -2,8 +2,6 @@ package xelagurd.socialdating.tests
 
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsEnabled
-import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -12,6 +10,9 @@ import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
+import xelagurd.socialdating.checkDisabledButton
+import xelagurd.socialdating.checkEnabledButton
+import xelagurd.socialdating.checkTextField
 import xelagurd.socialdating.data.model.additional.LoginDetails
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.LoginBody
@@ -29,6 +30,13 @@ class LoginScreenTest {
     @Before
     fun setup() {
         hiltRule.inject()
+    }
+
+    @Test
+    fun loginScreen_assertContentIsDisplayed() {
+        val loginUiState = LoginUiState()
+
+        assertContentIsDisplayed(loginUiState)
     }
 
     @Test
@@ -52,7 +60,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyData_disabledButton() {
         val loginUiState = LoginUiState(
-            LoginDetails("", ""),
+            loginDetails = LoginDetails("", ""),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -62,7 +70,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_allData_enabledButton() {
         val loginUiState = LoginUiState(
-            LoginDetails("abc", "123"),
+            loginDetails = LoginDetails("login", "password"),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -72,7 +80,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyUsername_disabledButton() {
         val loginUiState = LoginUiState(
-            LoginDetails("", "123"),
+            loginDetails = LoginDetails("", "password"),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -82,7 +90,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyPassword_disabledButton() {
         val loginUiState = LoginUiState(
-            LoginDetails("abc", ""),
+            loginDetails = LoginDetails("login", ""),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -92,15 +100,22 @@ class LoginScreenTest {
     private fun assertLoginButtonIsEnabled(loginUiState: LoginUiState) {
         setContentToLoginBody(loginUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.login).assertIsEnabled()
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsEnabled()
+        composeTestRule.onNodeWithTextId(R.string.login).checkEnabledButton()
     }
 
     private fun assertLoginButtonIsDisabled(loginUiState: LoginUiState) {
         setContentToLoginBody(loginUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.login).assertIsNotEnabled()
-        composeTestRule.onNodeWithTextId(R.string.register).assertIsEnabled()
+        composeTestRule.onNodeWithTextId(R.string.login).checkDisabledButton()
+    }
+
+    private fun assertContentIsDisplayed(loginUiState: LoginUiState) {
+        setContentToLoginBody(loginUiState)
+
+        composeTestRule.onNodeWithTextId(R.string.username).checkTextField()
+        composeTestRule.onNodeWithTextId(R.string.password).checkTextField()
+
+        composeTestRule.onNodeWithTextId(R.string.register).checkEnabledButton()
     }
 
     private fun setContentToLoginBody(loginUiState: LoginUiState) {

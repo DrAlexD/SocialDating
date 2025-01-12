@@ -290,10 +290,10 @@ class NavigationTest {
         composeTestRule.onNodeWithTextId(R.string.name).checkTextFieldAndInput("name")
         composeTestRule.onNodeWithTagId(R.string.male).checkButtonAndClick()
         composeTestRule.onNodeWithTextId(R.string.age).checkTextFieldAndInput("20")
+        composeTestRule.onNodeWithTextId(R.string.city).checkTextFieldAndInput("Moscow")
 
         composeTestRule.onNodeWithTextId(R.string.register).performScrollTo()
 
-        composeTestRule.onNodeWithTextId(R.string.city).checkTextFieldAndInput("Moscow")
         composeTestRule.onNodeWithTagId(R.string.all_at_once).checkButtonAndClick()
         composeTestRule.onNodeWithTextId(R.string.password).checkTextFieldAndInput("1234")
         composeTestRule.onNodeWithTextId(R.string.repeat_password).checkTextFieldAndInput("1234")
@@ -336,7 +336,8 @@ class NavigationTest {
     }
 
     private fun addStatementAndNavigateToStatementsScreen() {
-        composeTestRule.onNodeWithTextId(R.string.statement_text).checkTextFieldAndInput("Statement text")
+        composeTestRule.onNodeWithTextId(R.string.statement_text)
+            .checkTextFieldAndInput("StatementText")
         composeTestRule.onNodeWithText(FakeDataSource.definingThemes[0].name).checkButtonAndClick()
         composeTestRule.onNodeWithTagId(R.string.yes).checkButtonAndClick()
 

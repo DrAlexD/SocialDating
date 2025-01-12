@@ -44,7 +44,7 @@ class ProfileViewModelTest {
     private val localUser =
         User(userId, "", Gender.MALE, "", "", "", 30, "", Purpose.ALL_AT_ONCE, 50)
     private val remoteUser =
-        User(userId, "abc", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20)
+        User(userId, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20)
 
     @Before
     fun setup() {

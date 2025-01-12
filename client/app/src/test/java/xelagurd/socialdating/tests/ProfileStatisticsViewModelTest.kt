@@ -29,8 +29,8 @@ import xelagurd.socialdating.data.local.repository.LocalUserDefiningThemesReposi
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.UserCategory
-import xelagurd.socialdating.data.model.additional.UserCategoryWithData
 import xelagurd.socialdating.data.model.UserDefiningTheme
+import xelagurd.socialdating.data.model.additional.UserCategoryWithData
 import xelagurd.socialdating.data.model.additional.UserDefiningThemeWithData
 import xelagurd.socialdating.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
@@ -98,7 +98,6 @@ class ProfileStatisticsViewModelTest {
 
     private fun List<Category>.toCategoryIds() = this.map { it.id }
     private fun List<UserCategory>.toUserCategoryIds() = this.map { it.id }
-    private fun MutableStateFlow<List<UserCategoryWithData>>.toIds() = this.value.map { it.id }
 
     @Before
     fun setup() {

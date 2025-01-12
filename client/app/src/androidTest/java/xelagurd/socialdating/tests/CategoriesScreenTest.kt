@@ -60,7 +60,7 @@ class CategoriesScreenTest {
     @Test
     fun categoriesScreen_loadingStatusAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
-            categories = listOf(Category(1, "MyCategory")),
+            categories = listOf(Category(1, "Category1")),
             internetStatus = InternetStatus.LOADING
         )
 
@@ -70,7 +70,7 @@ class CategoriesScreenTest {
     @Test
     fun categoriesScreen_offlineStatusAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
-            categories = listOf(Category(1, "MyCategory")),
+            categories = listOf(Category(1, "Category1")),
             internetStatus = InternetStatus.OFFLINE
         )
 
@@ -80,7 +80,7 @@ class CategoriesScreenTest {
     @Test
     fun categoriesScreen_onlineStatusAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
-            categories = listOf(Category(1, "MyCategory")),
+            categories = listOf(Category(1, "Category1")),
             internetStatus = InternetStatus.ONLINE
         )
 
@@ -90,7 +90,7 @@ class CategoriesScreenTest {
     private fun assertDataIsDisplayed(categoriesUiState: CategoriesUiState) {
         setContentToCategoriesBody(categoriesUiState)
 
-        composeTestRule.onNodeWithText("MyCategory").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Category1").assertIsDisplayed()
     }
 
     private fun setContentToCategoriesBody(categoriesUiState: CategoriesUiState) {

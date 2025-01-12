@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name" translatable="false">Social Dating</string>
     <string name="progress_indicator" translatable="false">Progress indicator</string>
+    <string name="text_with_colon" translatable="false">%1$s:</string>
     <string name="back_button">Back</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="no_data">No data</string>

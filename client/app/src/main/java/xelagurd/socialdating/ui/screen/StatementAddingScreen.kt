@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -38,8 +40,8 @@ import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.additional.StatementDetails
 import xelagurd.socialdating.ui.navigation.StatementAddingDestination
-import xelagurd.socialdating.ui.state.StatementAddingUiState
 import xelagurd.socialdating.ui.state.RequestStatus
+import xelagurd.socialdating.ui.state.StatementAddingUiState
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.StatementAddingViewModel
 
@@ -112,7 +114,7 @@ private fun StatementAddingDetails(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
         TextField(
@@ -127,7 +129,7 @@ private fun StatementAddingDetails(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_large))
         ) {
             Text(
-                text = stringResource(R.string.defining_theme) + ":",
+                text = stringResourceWithColon(R.string.defining_theme),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small))
             )
@@ -234,8 +236,10 @@ private fun DefiningThemesList(
     onDefiningThemeClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val maxHeight = LocalConfiguration.current.screenHeightDp.dp / 4
+
     LazyColumn(
-        modifier = modifier
+        modifier = modifier.heightIn(0.dp, maxHeight)
     ) {
         items(items = definingThemes, key = { it.id }) {
             DefiningThemeCard(

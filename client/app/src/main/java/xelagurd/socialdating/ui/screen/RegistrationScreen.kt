@@ -131,7 +131,7 @@ private fun RegistrationDetails(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(R.string.gender) + ":",
+                text = stringResourceWithColon(R.string.gender),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small))
             )
@@ -174,7 +174,7 @@ private fun RegistrationDetails(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(R.string.purpose) + ":",
+                text = stringResourceWithColon(R.string.purpose),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small))
             )

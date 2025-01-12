@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -37,14 +38,32 @@ fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.o
     @StringRes id: Int
 ): SemanticsNodeInteraction = onNodeWithText(activity.getString(id))
 
-fun SemanticsNodeInteraction.checkButtonAndClick() {
+fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithTextIdWithColon(
+    @StringRes id: Int
+): SemanticsNodeInteraction =
+    onNodeWithText(activity.getString(R.string.text_with_colon, activity.getString(id)))
+
+fun SemanticsNodeInteraction.checkEnabledButton() {
     this.assertIsDisplayed()
     this.assertIsEnabled()
+}
+
+fun SemanticsNodeInteraction.checkDisabledButton() {
+    this.assertIsDisplayed()
+    this.assertIsNotEnabled()
+}
+
+fun SemanticsNodeInteraction.checkButtonAndClick() {
+    this.checkEnabledButton()
     this.performClick()
 }
 
-fun SemanticsNodeInteraction.checkTextFieldAndInput(text: String) {
+fun SemanticsNodeInteraction.checkTextField() {
     this.assertIsDisplayed()
     this.assertIsEnabled()
+}
+
+fun SemanticsNodeInteraction.checkTextFieldAndInput(text: String) {
+    this.checkTextField()
     this.performTextInput(text)
 }
