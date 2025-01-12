@@ -52,6 +52,7 @@ class CategoriesViewModel @Inject constructor(
 
                 val remoteCategories = remoteRepository.getCategories()
                 localRepository.insertCategories(remoteCategories)
+
                 internetStatusFlow.update { InternetStatus.ONLINE }
             } catch (_: IOException) {
                 localRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server

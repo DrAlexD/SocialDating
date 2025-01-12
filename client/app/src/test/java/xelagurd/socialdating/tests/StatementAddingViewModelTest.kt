@@ -46,8 +46,8 @@ class StatementAddingViewModelTest {
 
     private val localDefiningThemes = listOf(DefiningTheme(1, "", "", "", categoryId))
 
-    private val statementDetails = StatementDetails("dsaf", false, 1, 1)
-    private val statement = Statement(22, "dsaf", false, 1, 1)
+    private val statementDetails = StatementDetails("", false, 1, 1)
+    private val statement = Statement(22, "", false, 1, 1)
 
     @Before
     fun setup() {

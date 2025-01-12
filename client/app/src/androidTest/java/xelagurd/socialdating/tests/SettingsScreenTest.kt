@@ -10,6 +10,7 @@ import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
+import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.SettingsBody
 import xelagurd.socialdating.ui.state.RequestStatus
@@ -29,12 +30,25 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun registrationScreen_assertContentIsDisplayed() {
+        val settingsUiState = SettingsUiState()
+
+        assertContentIsDisplayed(settingsUiState)
+    }
+
+    @Test
     fun settingsScreen_errorStatus_errorText() {
         val settingsUiState = SettingsUiState(requestStatus = RequestStatus.ERROR)
 
         setContentToSettingsBody(settingsUiState)
 
         composeTestRule.onNodeWithTextId(R.string.unknown_error).assertIsDisplayed()
+    }
+
+    private fun assertContentIsDisplayed(settingsUiState: SettingsUiState) {
+        setContentToSettingsBody(settingsUiState)
+
+        composeTestRule.onNodeWithTextId(R.string.logout).checkEnabledButton()
     }
 
     private fun setContentToSettingsBody(settingsUiState: SettingsUiState) {

@@ -70,7 +70,6 @@ class StatementsViewModelTest {
     )
 
     private fun List<DefiningTheme>.toIds() = this.map { it.id }
-    private fun MutableStateFlow<List<DefiningTheme>>.toIds() = this.value.map { it.id }
 
     @Before
     fun setup() {

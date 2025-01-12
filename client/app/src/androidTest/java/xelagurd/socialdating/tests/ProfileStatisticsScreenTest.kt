@@ -2,9 +2,9 @@ package xelagurd.socialdating.tests
 
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -12,6 +12,7 @@ import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
+import xelagurd.socialdating.checkButtonAndClick
 import xelagurd.socialdating.data.model.additional.UserCategoryWithData
 import xelagurd.socialdating.data.model.additional.UserDefiningThemeWithData
 import xelagurd.socialdating.onNodeWithContentDescriptionId
@@ -45,7 +46,8 @@ class ProfileStatisticsScreenTest {
 
     @Test
     fun profileStatisticsScreen_offlineStatusAndEmptyData_offlineText() {
-        val profileStatisticsUiState = ProfileStatisticsUiState(internetStatus = InternetStatus.OFFLINE)
+        val profileStatisticsUiState =
+            ProfileStatisticsUiState(internetStatus = InternetStatus.OFFLINE)
 
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
@@ -54,7 +56,8 @@ class ProfileStatisticsScreenTest {
 
     @Test
     fun profileStatisticsScreen_onlineStatusAndEmptyData_onlineText() {
-        val profileStatisticsUiState = ProfileStatisticsUiState(internetStatus = InternetStatus.ONLINE)
+        val profileStatisticsUiState =
+            ProfileStatisticsUiState(internetStatus = InternetStatus.ONLINE)
 
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
@@ -64,9 +67,9 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_loadingStatusAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "MyCategory")),
+            userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
             userCategoryToDefiningThemes = mapOf(
-                1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "MyTheme", "No", "Yes"))
+                1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
             ),
             internetStatus = InternetStatus.LOADING
         )
@@ -77,9 +80,9 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_offlineStatusAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "MyCategory")),
+            userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
             userCategoryToDefiningThemes = mapOf(
-                1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "MyTheme", "No", "Yes"))
+                1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
             ),
             internetStatus = InternetStatus.OFFLINE
         )
@@ -90,9 +93,9 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_onlineStatusAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "MyCategory")),
+            userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
             userCategoryToDefiningThemes = mapOf(
-                1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "MyTheme", "No", "Yes"))
+                1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
             ),
             internetStatus = InternetStatus.ONLINE
         )
@@ -103,11 +106,17 @@ class ProfileStatisticsScreenTest {
     private fun assertDataIsDisplayed(profileStatisticsUiState: ProfileStatisticsUiState) {
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
-        composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list)
-            .performClick()
+        composeTestRule.onNodeWithText("Category1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Theme1").assertIsNotDisplayed()
+        composeTestRule.onNodeWithText("No").assertIsNotDisplayed()
+        composeTestRule.onNodeWithText("Yes").assertIsNotDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsNotDisplayed()
 
-        composeTestRule.onNodeWithText("MyCategory").assertIsDisplayed()
-        composeTestRule.onNodeWithText("MyTheme").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list)
+            .checkButtonAndClick()
+
+        composeTestRule.onNodeWithText("Category1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Theme1").assertIsDisplayed()
         composeTestRule.onNodeWithText("No").assertIsDisplayed()
         composeTestRule.onNodeWithText("Yes").assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsDisplayed()

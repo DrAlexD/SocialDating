@@ -149,23 +149,23 @@ private fun ProfileDetails(
 private fun UserInfo(user: User) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_very_small))) {
         Text(
-            text = stringResource(R.string.username) + ":",
+            text = stringResourceWithColon(R.string.username),
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = stringResource(R.string.name) + ":",
+            text = stringResourceWithColon(R.string.name),
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = stringResource(R.string.age) + ":",
+            text = stringResourceWithColon(R.string.age),
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = stringResource(R.string.city) + ":",
+            text = stringResourceWithColon(R.string.city),
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = stringResource(R.string.purpose) + ":",
+            text = stringResourceWithColon(R.string.purpose),
             style = MaterialTheme.typography.bodyLarge
         )
     }

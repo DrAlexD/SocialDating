@@ -11,6 +11,7 @@ import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
+import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTextId
@@ -61,7 +62,7 @@ class StatementsScreenTest {
     @Test
     fun statementsScreen_loadingStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
-            statements = listOf(Statement(1, "MyStatement", true, 1, 1)),
+            statements = listOf(Statement(1, "Statement1", true, 1, 1)),
             internetStatus = InternetStatus.LOADING
         )
 
@@ -71,7 +72,7 @@ class StatementsScreenTest {
     @Test
     fun statementsScreen_offlineStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
-            statements = listOf(Statement(1, "MyStatement", true, 1, 1)),
+            statements = listOf(Statement(1, "Statement1", true, 1, 1)),
             internetStatus = InternetStatus.OFFLINE
         )
 
@@ -81,7 +82,7 @@ class StatementsScreenTest {
     @Test
     fun statementsScreen_onlineStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
-            statements = listOf(Statement(1, "MyStatement", true, 1, 1)),
+            statements = listOf(Statement(1, "Statement1", true, 1, 1)),
             internetStatus = InternetStatus.ONLINE
         )
 
@@ -91,14 +92,14 @@ class StatementsScreenTest {
     private fun assertDataIsDisplayed(statementsUiState: StatementsUiState) {
         setContentToStatementsBody(statementsUiState)
 
-        composeTestRule.onNodeWithText("MyStatement").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.part_maintain).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.not_sure).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Statement1").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).checkEnabledButton()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.part_maintain).checkEnabledButton()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.not_sure).checkEnabledButton()
         composeTestRule.onNodeWithContentDescriptionId(R.string.part_no_maintain)
-            .assertIsDisplayed()
+            .checkEnabledButton()
         composeTestRule.onNodeWithContentDescriptionId(R.string.full_no_maintain)
-            .assertIsDisplayed()
+            .checkEnabledButton()
     }
 
     private fun setContentToStatementsBody(statementsUiState: StatementsUiState) {

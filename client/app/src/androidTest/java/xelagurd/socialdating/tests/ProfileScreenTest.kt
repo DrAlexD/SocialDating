@@ -11,10 +11,12 @@ import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
+import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.onNodeWithTextId
+import xelagurd.socialdating.onNodeWithTextIdWithColon
 import xelagurd.socialdating.ui.screen.ProfileBody
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileUiState
@@ -62,7 +64,10 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_loadingStatusAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            user = User(1, "MyName", Gender.MALE, "", "", "", 30, "", Purpose.ALL_AT_ONCE, 50),
+            user = User(
+                1, "User1", Gender.MALE, "username1", "password1",
+                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
+            ),
             internetStatus = InternetStatus.LOADING
         )
 
@@ -72,7 +77,10 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_offlineStatusAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            user = User(1, "MyName", Gender.MALE, "", "", "", 30, "", Purpose.ALL_AT_ONCE, 50),
+            user = User(
+                1, "User1", Gender.MALE, "username1", "password1",
+                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
+            ),
             internetStatus = InternetStatus.OFFLINE
         )
 
@@ -82,7 +90,10 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_onlineStatusAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            user = User(1, "MyName", Gender.MALE, "", "", "", 30, "", Purpose.ALL_AT_ONCE, 50),
+            user = User(
+                1, "User1", Gender.MALE, "username1", "password1",
+                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
+            ),
             internetStatus = InternetStatus.ONLINE
         )
 
@@ -92,7 +103,19 @@ class ProfileScreenTest {
     private fun assertDataIsDisplayed(profileUiState: ProfileUiState) {
         setContentToProfileBody(profileUiState)
 
-        composeTestRule.onNodeWithText("MyName").assertIsDisplayed()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.username).assertIsDisplayed()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.name).assertIsDisplayed()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.age).assertIsDisplayed()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.city).assertIsDisplayed()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.purpose).assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("username1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("User1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("30").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Moscow").assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.all_at_once).assertIsDisplayed()
+
+        composeTestRule.onNodeWithTextId(R.string.open_profile_statistics).checkEnabledButton()
     }
 
     private fun setContentToProfileBody(profileUiState: ProfileUiState) {

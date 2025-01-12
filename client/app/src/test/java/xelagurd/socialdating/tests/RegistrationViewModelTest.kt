@@ -40,11 +40,10 @@ class RegistrationViewModelTest {
     private val registrationUiState
         get() = viewModel.uiState.value
 
-    private val registrationDetails = RegistrationDetails(
-        "qwe", Gender.MALE, "abc", "123", "123", "", "20", "Moscow", Purpose.ALL_AT_ONCE
-    )
+    private val registrationDetails =
+        RegistrationDetails("", Gender.MALE, "", "", "", "", "", "", Purpose.ALL_AT_ONCE)
     private val remoteUser =
-        User(1, "abc", Gender.FEMALE, "abc", "123", "", 40, "", Purpose.RELATIONSHIPS, 20)
+        User(1, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20)
 
     @Before
     fun setup() {

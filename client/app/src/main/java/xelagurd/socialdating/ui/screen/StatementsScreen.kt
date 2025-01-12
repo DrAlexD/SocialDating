@@ -75,7 +75,7 @@ fun StatementsScreen(
             )
         },
         floatingActionButton = {
-            if (statementsUiState.internetStatus.isLoaded()) {
+            if (statementsUiState.statements.isNotEmpty()) {
                 FloatingActionButton(
                     onClick = { onStatementAddingClick.invoke(statementsUiState.categoryId) },
                 ) {
