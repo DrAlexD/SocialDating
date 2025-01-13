@@ -10,13 +10,4 @@ data class UserCategoryWithData(
     val userId: Int,
     val categoryId: Int,
     val categoryName: String
-) {
-    fun toUserCategory() =
-        UserCategory(
-            id = id,
-            interest = interest,
-            userId = userId,
-            categoryId = categoryId
-        )
-}
-
+)
