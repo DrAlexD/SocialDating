@@ -13,13 +13,4 @@ data class UserDefiningThemeWithData(
     val definingThemeName: String,
     val definingThemeFromOpinion: String,
     val definingThemeToOpinion: String
-) {
-    fun toUserDefiningTheme() =
-        UserDefiningTheme(
-            id = id,
-            value = value,
-            interest = interest,
-            userCategoryId = userCategoryId,
-            definingThemeId = definingThemeId
-        )
-}
+)

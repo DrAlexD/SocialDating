@@ -287,7 +287,7 @@ private fun RegistrationStatus(
                 )
             }
 
-            RequestStatus.SUCCESS -> onSuccessRegistration.invoke()
+            RequestStatus.SUCCESS -> onSuccessRegistration()
         }
     }
 }

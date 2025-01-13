@@ -87,7 +87,7 @@ internal fun ProfileBody(
         if (profileUiState.user != null) {
             ProfileDetails(
                 user = profileUiState.user,
-                onProfileStatisticsClick = { onProfileStatisticsClick.invoke(profileUiState.user.id) },
+                onProfileStatisticsClick = { onProfileStatisticsClick(profileUiState.user.id) },
                 modifier = modifier.padding(contentPadding)
             )
         } else {

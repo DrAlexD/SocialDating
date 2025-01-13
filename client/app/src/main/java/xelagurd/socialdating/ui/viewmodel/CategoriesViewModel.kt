@@ -30,7 +30,7 @@ class CategoriesViewModel @Inject constructor(
 
     val uiState = combine(categoriesFlow, internetStatusFlow) { categories, internetStatus ->
         CategoriesUiState(
-            categories = categories,
+            entities = categories,
             internetStatus = internetStatus
         )
     }.stateIn(

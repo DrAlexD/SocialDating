@@ -138,7 +138,7 @@ private fun SettingsStatus(
 
             RequestStatus.FAILED -> {}
 
-            RequestStatus.SUCCESS -> onSuccessLogout.invoke()
+            RequestStatus.SUCCESS -> onSuccessLogout()
         }
     }
 }

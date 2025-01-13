@@ -65,7 +65,7 @@ class CategoriesViewModelTest {
         assertEquals(InternetStatus.ONLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, remoteCategories),
-            categoriesUiState.categories
+            categoriesUiState.entities
         )
     }
 
@@ -79,7 +79,7 @@ class CategoriesViewModelTest {
         assertEquals(InternetStatus.OFFLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, FakeDataSource.categories),
-            categoriesUiState.categories
+            categoriesUiState.entities
         )
     }
 
@@ -97,7 +97,7 @@ class CategoriesViewModelTest {
         assertEquals(InternetStatus.OFFLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, remoteCategories, FakeDataSource.categories),
-            categoriesUiState.categories
+            categoriesUiState.entities
         )
     }
 
@@ -115,7 +115,7 @@ class CategoriesViewModelTest {
         assertEquals(InternetStatus.ONLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, FakeDataSource.categories, remoteCategories),
-            categoriesUiState.categories
+            categoriesUiState.entities
         )
     }
 
@@ -132,7 +132,7 @@ class CategoriesViewModelTest {
         assertEquals(InternetStatus.ONLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, remoteCategories),
-            categoriesUiState.categories
+            categoriesUiState.entities
         )
     }
 
@@ -149,7 +149,7 @@ class CategoriesViewModelTest {
         assertEquals(InternetStatus.OFFLINE, categoriesUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localCategories, FakeDataSource.categories),
-            categoriesUiState.categories
+            categoriesUiState.entities
         )
     }
 

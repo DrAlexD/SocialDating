@@ -25,9 +25,9 @@ import androidx.room.PrimaryKey
 )
 data class Statement(
     @PrimaryKey
-    val id: Int,
+    override val id: Int,
     val text: String,
     val isSupportDefiningTheme: Boolean,
     val definingThemeId: Int,
     val userId: Int
-)
+) : DataEntity

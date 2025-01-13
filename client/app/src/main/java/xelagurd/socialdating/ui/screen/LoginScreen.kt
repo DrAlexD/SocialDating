@@ -182,7 +182,7 @@ private fun LoginStatus(
                 )
             }
 
-            RequestStatus.SUCCESS -> onSuccessLogin.invoke()
+            RequestStatus.SUCCESS -> onSuccessLogin()
         }
     }
 }
