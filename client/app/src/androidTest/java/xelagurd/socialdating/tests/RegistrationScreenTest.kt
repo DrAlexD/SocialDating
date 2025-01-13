@@ -3,7 +3,6 @@ package xelagurd.socialdating.tests
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.performScrollTo
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -206,14 +205,12 @@ class RegistrationScreenTest {
     private fun assertRegisterButtonIsEnabled(registrationUiState: RegistrationUiState) {
         setContentToRegistrationBody(registrationUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.register).performScrollTo()
         composeTestRule.onNodeWithTextId(R.string.register).checkEnabledButton()
     }
 
     private fun assertRegisterButtonIsDisabled(registrationUiState: RegistrationUiState) {
         setContentToRegistrationBody(registrationUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.register).performScrollTo()
         composeTestRule.onNodeWithTextId(R.string.register).checkDisabledButton()
     }
 
@@ -230,8 +227,6 @@ class RegistrationScreenTest {
         composeTestRule.onNodeWithTextId(R.string.email_optional).checkTextField()
         composeTestRule.onNodeWithTextId(R.string.age).checkTextField()
         composeTestRule.onNodeWithTextId(R.string.city).checkTextField()
-
-        composeTestRule.onNodeWithTextId(R.string.register).performScrollTo()
 
         composeTestRule.onNodeWithTextIdWithColon(R.string.purpose).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.friends).assertIsDisplayed()
