@@ -104,8 +104,8 @@ fun StatementCardContent(
 }
 
 @Composable
-fun ReactionsRow(
-    onStatementReactionClick: (StatementReactionType) -> Unit,
+private inline fun ReactionsRow(
+    crossinline onStatementReactionClick: (StatementReactionType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -128,7 +128,7 @@ fun ReactionsRow(
 
 @Preview(showBackground = true)
 @Composable
-fun StatementsBodyOfflineDataPreview() {
+private fun StatementsDataBodyPreview() {
     AppTheme {
         DataListBody(
             uiState = StatementsUiState(entities = FakeDataSource.statements),

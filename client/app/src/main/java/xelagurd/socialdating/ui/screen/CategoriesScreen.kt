@@ -77,7 +77,7 @@ fun CategoryCardContent(
 
 @Preview(showBackground = true)
 @Composable
-fun CategoriesDataBodyPreview() {
+private fun CategoriesDataBodyPreview() {
     AppTheme {
         DataListBody(
             uiState = CategoriesUiState(entities = FakeDataSource.categories),
