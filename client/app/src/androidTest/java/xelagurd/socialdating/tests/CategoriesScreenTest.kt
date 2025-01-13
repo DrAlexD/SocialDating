@@ -13,7 +13,8 @@ import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.onNodeWithTextId
-import xelagurd.socialdating.ui.screen.CategoriesBody
+import xelagurd.socialdating.ui.screen.CategoryCardContent
+import xelagurd.socialdating.ui.screen.DataListBody
 import xelagurd.socialdating.ui.state.CategoriesUiState
 import xelagurd.socialdating.ui.state.InternetStatus
 
@@ -60,7 +61,7 @@ class CategoriesScreenTest {
     @Test
     fun categoriesScreen_loadingStatusAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
-            categories = listOf(Category(1, "Category1")),
+            entities = listOf(Category(1, "Category1")),
             internetStatus = InternetStatus.LOADING
         )
 
@@ -70,7 +71,7 @@ class CategoriesScreenTest {
     @Test
     fun categoriesScreen_offlineStatusAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
-            categories = listOf(Category(1, "Category1")),
+            entities = listOf(Category(1, "Category1")),
             internetStatus = InternetStatus.OFFLINE
         )
 
@@ -80,7 +81,7 @@ class CategoriesScreenTest {
     @Test
     fun categoriesScreen_onlineStatusAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
-            categories = listOf(Category(1, "Category1")),
+            entities = listOf(Category(1, "Category1")),
             internetStatus = InternetStatus.ONLINE
         )
 
@@ -95,9 +96,14 @@ class CategoriesScreenTest {
 
     private fun setContentToCategoriesBody(categoriesUiState: CategoriesUiState) {
         composeTestRule.activity.setContent {
-            CategoriesBody(
-                categoriesUiState = categoriesUiState,
-                onCategoryClick = {}
+            DataListBody(
+                uiState = categoriesUiState,
+                onEntityClick = { },
+                cardContent = {
+                    CategoryCardContent(
+                        category = it as Category
+                    )
+                }
             )
         }
     }

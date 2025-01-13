@@ -310,7 +310,7 @@ private fun StatementAddingStatus(
                 )
             }
 
-            RequestStatus.SUCCESS -> onSuccessStatementAdding.invoke()
+            RequestStatus.SUCCESS -> onSuccessStatementAdding()
         }
     }
 }

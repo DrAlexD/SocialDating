@@ -104,7 +104,7 @@ class StatementsViewModelTest {
         assertEquals(InternetStatus.ONLINE, statementsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localStatements, remoteStatements),
-            statementsUiState.statements
+            statementsUiState.entities
         )
     }
 
@@ -118,7 +118,7 @@ class StatementsViewModelTest {
         assertEquals(InternetStatus.OFFLINE, statementsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localStatements, FakeDataSource.statements),
-            statementsUiState.statements
+            statementsUiState.entities
         )
     }
 
@@ -136,7 +136,7 @@ class StatementsViewModelTest {
         assertEquals(InternetStatus.OFFLINE, statementsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localStatements, remoteStatements, FakeDataSource.statements),
-            statementsUiState.statements
+            statementsUiState.entities
         )
     }
 
@@ -154,7 +154,7 @@ class StatementsViewModelTest {
         assertEquals(InternetStatus.ONLINE, statementsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localStatements, FakeDataSource.statements, remoteStatements),
-            statementsUiState.statements
+            statementsUiState.entities
         )
     }
 
@@ -171,7 +171,7 @@ class StatementsViewModelTest {
         assertEquals(InternetStatus.ONLINE, statementsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localStatements, remoteStatements),
-            statementsUiState.statements
+            statementsUiState.entities
         )
     }
 
@@ -188,7 +188,7 @@ class StatementsViewModelTest {
         assertEquals(InternetStatus.OFFLINE, statementsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localStatements, FakeDataSource.statements),
-            statementsUiState.statements
+            statementsUiState.entities
         )
     }
 

@@ -8,6 +8,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "categories")
 data class Category(
     @PrimaryKey
-    val id: Int,
+    override val id: Int,
     val name: String
-)
+) : DataEntity

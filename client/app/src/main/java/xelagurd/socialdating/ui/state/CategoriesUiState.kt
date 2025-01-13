@@ -3,6 +3,6 @@ package xelagurd.socialdating.ui.state
 import xelagurd.socialdating.data.model.Category
 
 data class CategoriesUiState(
-    val categories: List<Category> = listOf(),
-    val internetStatus: InternetStatus = InternetStatus.LOADING
-)
+    override val entities: List<Category> = listOf(),
+    override val internetStatus: InternetStatus = InternetStatus.LOADING
+) : DataListUiState

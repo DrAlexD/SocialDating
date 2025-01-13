@@ -57,7 +57,7 @@ class StatementsViewModel @Inject constructor(
     val uiState = combine(statementsFlow, internetStatusFlow) { statements, internetStatus ->
         StatementsUiState(
             categoryId = categoryId,
-            statements = statements,
+            entities = statements,
             internetStatus = internetStatus
         )
     }.stateIn(

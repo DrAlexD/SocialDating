@@ -15,7 +15,8 @@ import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTextId
-import xelagurd.socialdating.ui.screen.StatementsBody
+import xelagurd.socialdating.ui.screen.DataListBody
+import xelagurd.socialdating.ui.screen.StatementCardContent
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.StatementsUiState
 
@@ -62,7 +63,7 @@ class StatementsScreenTest {
     @Test
     fun statementsScreen_loadingStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
-            statements = listOf(Statement(1, "Statement1", true, 1, 1)),
+            entities = listOf(Statement(1, "Statement1", true, 1, 1)),
             internetStatus = InternetStatus.LOADING
         )
 
@@ -72,7 +73,7 @@ class StatementsScreenTest {
     @Test
     fun statementsScreen_offlineStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
-            statements = listOf(Statement(1, "Statement1", true, 1, 1)),
+            entities = listOf(Statement(1, "Statement1", true, 1, 1)),
             internetStatus = InternetStatus.OFFLINE
         )
 
@@ -82,7 +83,7 @@ class StatementsScreenTest {
     @Test
     fun statementsScreen_onlineStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
-            statements = listOf(Statement(1, "Statement1", true, 1, 1)),
+            entities = listOf(Statement(1, "Statement1", true, 1, 1)),
             internetStatus = InternetStatus.ONLINE
         )
 
@@ -104,10 +105,15 @@ class StatementsScreenTest {
 
     private fun setContentToStatementsBody(statementsUiState: StatementsUiState) {
         composeTestRule.activity.setContent {
-            StatementsBody(
-                statementsUiState = statementsUiState,
-                onStatementClick = {},
-                onStatementReactionClick = { _, _ -> null }
+            DataListBody(
+                uiState = statementsUiState,
+                onEntityClick = { },
+                cardContent = {
+                    StatementCardContent(
+                        statement = it as Statement,
+                        onStatementReactionClick = { _, _ -> null }
+                    )
+                }
             )
         }
     }
