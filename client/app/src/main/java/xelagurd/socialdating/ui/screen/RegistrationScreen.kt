@@ -7,9 +7,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -19,13 +18,12 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -53,17 +51,14 @@ fun RegistrationScreen(
     registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
     val registrationUiState by registrationViewModel.uiState.collectAsState()
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
         topBar = {
             AppTopBar(
                 title = stringResource(RegistrationDestination.titleRes),
-                navigateUp = onNavigateUp,
-                scrollBehavior = scrollBehavior
+                navigateUp = onNavigateUp
             )
-        },
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        }
     ) { innerPadding ->
         RegistrationBody(
             registrationUiState = registrationUiState,
@@ -109,23 +104,32 @@ private fun RegistrationDetails(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-        modifier = modifier.verticalScroll(rememberScrollState())
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
     ) {
-        TextField(
-            value = registrationDetails.username,
-            onValueChange = { onValueChange(registrationDetails.copy(username = it)) },
-            label = { Text(stringResource(R.string.username)) },
-            singleLine = true,
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
-        )
-        TextField(
-            value = registrationDetails.name,
-            onValueChange = { onValueChange(registrationDetails.copy(name = it)) },
-            label = { Text(stringResource(R.string.name)) },
-            singleLine = true,
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            TextField(
+                value = registrationDetails.username,
+                onValueChange = { onValueChange(registrationDetails.copy(username = it)) },
+                label = { Text(stringResource(R.string.username)) },
+                singleLine = true,
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(id = R.dimen.padding_very_small))
+            )
+            TextField(
+                value = registrationDetails.name,
+                onValueChange = { onValueChange(registrationDetails.copy(name = it)) },
+                label = { Text(stringResource(R.string.name)) },
+                singleLine = true,
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(id = R.dimen.padding_very_small))
+            )
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -154,21 +158,30 @@ private fun RegistrationDetails(
             singleLine = true,
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
         )
-        TextField(
-            value = registrationDetails.age,
-            onValueChange = { onValueChange(registrationDetails.copy(age = it)) },
-            label = { Text(stringResource(R.string.age)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true,
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
-        )
-        TextField(
-            value = registrationDetails.city,
-            onValueChange = { onValueChange(registrationDetails.copy(city = it)) },
-            label = { Text(stringResource(R.string.city)) },
-            singleLine = true,
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            TextField(
+                value = registrationDetails.age,
+                onValueChange = { onValueChange(registrationDetails.copy(age = it)) },
+                label = { Text(stringResource(R.string.age)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(id = R.dimen.padding_very_small))
+            )
+            TextField(
+                value = registrationDetails.city,
+                onValueChange = { onValueChange(registrationDetails.copy(city = it)) },
+                label = { Text(stringResource(R.string.city)) },
+                singleLine = true,
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(id = R.dimen.padding_very_small))
+            )
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -200,20 +213,29 @@ private fun RegistrationDetails(
                 }
             }
         }
-        TextField(
-            value = registrationDetails.password,
-            onValueChange = { onValueChange(registrationDetails.copy(password = it)) },
-            label = { Text(stringResource(R.string.password)) },
-            singleLine = true,
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
-        )
-        TextField(
-            value = registrationDetails.repeatedPassword,
-            onValueChange = { onValueChange(registrationDetails.copy(repeatedPassword = it)) },
-            label = { Text(stringResource(R.string.repeat_password)) },
-            singleLine = true,
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            TextField(
+                value = registrationDetails.password,
+                onValueChange = { onValueChange(registrationDetails.copy(password = it)) },
+                label = { Text(stringResource(R.string.password)) },
+                singleLine = true,
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 + 25.dp)
+            )
+            TextField(
+                value = registrationDetails.repeatedPassword,
+                onValueChange = { onValueChange(registrationDetails.copy(repeatedPassword = it)) },
+                label = { Text(stringResource(R.string.repeat_password)) },
+                singleLine = true,
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 + 25.dp)
+            )
+        }
         Card(
             enabled = registrationDetails.isValid,
             onClick = onRegisterClick,
