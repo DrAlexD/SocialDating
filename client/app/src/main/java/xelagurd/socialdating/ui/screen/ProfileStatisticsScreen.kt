@@ -122,14 +122,14 @@ fun UserCategoryCardContent(
         if (isExpanded) {
             HorizontalDivider(color = Color.Black)
             AppDataList(entities = userDefiningThemes) {
-                UserDefiningThemeDetails(userDefiningTheme = it as UserDefiningThemeWithData)
+                UserDefiningThemeDetailsBody(userDefiningTheme = it as UserDefiningThemeWithData)
             }
         }
     }
 }
 
 @Composable
-private fun UserDefiningThemeDetails(
+private fun UserDefiningThemeDetailsBody(
     userDefiningTheme: UserDefiningThemeWithData,
     modifier: Modifier = Modifier
 ) {

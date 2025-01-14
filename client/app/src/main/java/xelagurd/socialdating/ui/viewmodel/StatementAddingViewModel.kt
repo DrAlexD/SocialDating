@@ -45,7 +45,7 @@ class StatementAddingViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    statementDetails = it.statementDetails.copy(
+                    formDetails = it.formDetails.copy(
                         userId = preferencesRepository.currentUserId.first()
                     )
                 )
@@ -66,7 +66,7 @@ class StatementAddingViewModel @Inject constructor(
 
     fun updateUiState(statementDetails: StatementDetails) {
         _uiState.update {
-            it.copy(statementDetails = statementDetails)
+            it.copy(formDetails = statementDetails)
         }
     }
 
@@ -77,7 +77,7 @@ class StatementAddingViewModel @Inject constructor(
 
                 delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
-                val statementDetails = uiState.value.statementDetails
+                val statementDetails = uiState.value.formDetails
                 val statement = remoteStatementsRepository.statementAdding(statementDetails)
 
                 if (statement != null) {

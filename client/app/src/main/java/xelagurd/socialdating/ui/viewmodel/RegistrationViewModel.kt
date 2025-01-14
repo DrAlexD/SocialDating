@@ -35,7 +35,7 @@ class RegistrationViewModel @Inject constructor(
 
     fun updateUiState(registrationDetails: RegistrationDetails) {
         _uiState.update {
-            it.copy(registrationDetails = registrationDetails)
+            it.copy(formDetails = registrationDetails)
         }
     }
 
@@ -46,7 +46,7 @@ class RegistrationViewModel @Inject constructor(
 
                 delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
-                val registrationDetails = uiState.value.registrationDetails
+                val registrationDetails = uiState.value.formDetails
                 val user = remoteRepository.registerUser(
                     registrationDetails.copy(
                         password = BCrypt.hashpw(registrationDetails.password, BCrypt.gensalt())

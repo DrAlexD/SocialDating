@@ -15,7 +15,7 @@ data class RegistrationDetails(
     val age: String = "",
     val city: String = "",
     val purpose: Purpose? = null
-) {
+): FormDetails {
     val isValid
         get() = name.isNotBlank() && gender != null && username.isNotBlank() && password.isNotBlank() &&
                 repeatedPassword.isNotBlank() && password == repeatedPassword && age.isNotBlank() &&

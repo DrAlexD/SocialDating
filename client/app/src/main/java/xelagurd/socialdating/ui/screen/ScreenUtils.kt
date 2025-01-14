@@ -13,6 +13,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
@@ -83,9 +84,11 @@ fun AppLargeTitleText(
 fun AppMediumTextCard(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = true
 ) {
     AppTextCard(
+        isEnabled = isEnabled,
         onClick = onClick,
         elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_small))
     ) {
@@ -97,9 +100,11 @@ fun AppMediumTextCard(
 fun AppLargeTextCard(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = true
 ) {
     AppTextCard(
+        isEnabled = isEnabled,
         onClick = onClick,
         elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium))
     ) {
@@ -108,17 +113,36 @@ fun AppLargeTextCard(
 }
 
 @Composable
-fun AppTextCard(
+private fun AppTextCard(
+    isEnabled: Boolean,
     onClick: () -> Unit,
     elevation: CardElevation,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
+        enabled = isEnabled,
         onClick = onClick,
         elevation = elevation,
         modifier = modifier.padding(dimensionResource(id = R.dimen.padding_small)),
         content = content
+    )
+}
+
+@Composable
+fun AppTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    singleLine: Boolean = true
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        singleLine = singleLine,
+        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_small))
     )
 }
 

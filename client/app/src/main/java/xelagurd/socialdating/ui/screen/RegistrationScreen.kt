@@ -82,7 +82,7 @@ internal fun RegistrationBody(
 ) {
     Box(modifier.padding(contentPadding)) {
         RegistrationDetails(
-            registrationDetails = registrationUiState.registrationDetails,
+            registrationDetails = registrationUiState.formDetails,
             onValueChange = onValueChange,
             onRegisterClick = onRegisterClick,
             modifier = modifier
