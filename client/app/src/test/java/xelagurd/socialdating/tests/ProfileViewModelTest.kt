@@ -71,7 +71,7 @@ class ProfileViewModelTest {
         assertEquals(InternetStatus.ONLINE, profileUiState.internetStatus)
         assertEquals(
             remoteUser,
-            profileUiState.user
+            profileUiState.entity
         )
     }
 
@@ -85,7 +85,7 @@ class ProfileViewModelTest {
         assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
         assertEquals(
             localUser,
-            profileUiState.user
+            profileUiState.entity
         )
     }
 
@@ -103,7 +103,7 @@ class ProfileViewModelTest {
         assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
         assertEquals(
             remoteUser,
-            profileUiState.user
+            profileUiState.entity
         )
     }
 
@@ -121,7 +121,7 @@ class ProfileViewModelTest {
         assertEquals(InternetStatus.ONLINE, profileUiState.internetStatus)
         assertEquals(
             remoteUser,
-            profileUiState.user
+            profileUiState.entity
         )
     }
 
@@ -138,7 +138,7 @@ class ProfileViewModelTest {
         assertEquals(InternetStatus.ONLINE, profileUiState.internetStatus)
         assertEquals(
             remoteUser,
-            profileUiState.user
+            profileUiState.entity
         )
     }
 
@@ -155,7 +155,7 @@ class ProfileViewModelTest {
         assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
         assertEquals(
             localUser,
-            profileUiState.user
+            profileUiState.entity
         )
     }
 

@@ -10,7 +10,7 @@ import xelagurd.socialdating.data.model.enums.Purpose
 @Entity(tableName = "users")
 data class User(
     @PrimaryKey
-    val id: Int,
+    override val id: Int,
     val name: String,
     val gender: Gender,
     val username: String,
@@ -20,4 +20,4 @@ data class User(
     val city: String,
     val purpose: Purpose,
     val activity: Int
-)
+) : DataEntity

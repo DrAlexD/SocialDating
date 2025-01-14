@@ -25,8 +25,8 @@ import androidx.room.PrimaryKey
 )
 data class UserCategory(
     @PrimaryKey
-    val id: Int,
+    override val id: Int,
     val interest: Int,
     val userId: Int,
     val categoryId: Int
-)
+) : DataEntity

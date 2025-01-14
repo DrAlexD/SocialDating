@@ -34,7 +34,7 @@ class ProfileViewModel @Inject constructor(
 
     val uiState = combine(userFlow, internetStatusFlow) { user, internetStatus ->
         ProfileUiState(
-            user = user,
+            entity = user,
             internetStatus = internetStatus
         )
     }.stateIn(

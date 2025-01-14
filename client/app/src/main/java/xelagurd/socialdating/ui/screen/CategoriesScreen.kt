@@ -49,16 +49,19 @@ fun CategoriesScreen(
         },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
-        DataListBody(
-            uiState = categoriesUiState,
-            onEntityClick = onCategoryClick,
-            contentPadding = innerPadding,
-            cardContent = {
+        DataListComponent(
+            dataListUiState = categoriesUiState,
+            contentPadding = innerPadding
+        ) {
+            AppEntityCard(
+                entity = it,
+                onEntityClick = onCategoryClick
+            ) {
                 CategoryCardContent(
                     category = it as Category
                 )
             }
-        )
+        }
     }
 }
 
@@ -71,22 +74,25 @@ fun CategoryCardContent(
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxWidth()
     ) {
-        AppLargeText(text = category.name)
+        AppLargeTitleText(text = category.name)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun CategoriesDataBodyPreview() {
+private fun CategoriesComponentPreview() {
     AppTheme {
-        DataListBody(
-            uiState = CategoriesUiState(entities = FakeDataSource.categories),
-            onEntityClick = { },
-            cardContent = {
+        DataListComponent(
+            dataListUiState = CategoriesUiState(entities = FakeDataSource.categories)
+        ) {
+            AppEntityCard(
+                entity = it,
+                onEntityClick = { }
+            ) {
                 CategoryCardContent(
                     category = it as Category
                 )
             }
-        )
+        }
     }
 }

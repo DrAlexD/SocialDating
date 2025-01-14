@@ -25,9 +25,9 @@ import androidx.room.PrimaryKey
 )
 data class UserDefiningTheme(
     @PrimaryKey
-    val id: Int,
+    override val id: Int,
     val value: Int,
     val interest: Int,
     val userCategoryId: Int,
     val definingThemeId: Int
-)
+) : DataEntity

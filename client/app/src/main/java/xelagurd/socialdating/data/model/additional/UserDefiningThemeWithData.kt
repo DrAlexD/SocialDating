@@ -1,11 +1,11 @@
 package xelagurd.socialdating.data.model.additional
 
 import kotlinx.serialization.Serializable
-import xelagurd.socialdating.data.model.UserDefiningTheme
+import xelagurd.socialdating.data.model.DataEntity
 
 @Serializable
 data class UserDefiningThemeWithData(
-    val id: Int,
+    override val id: Int,
     val value: Int,
     val interest: Int,
     val userCategoryId: Int,
@@ -13,4 +13,4 @@ data class UserDefiningThemeWithData(
     val definingThemeName: String,
     val definingThemeFromOpinion: String,
     val definingThemeToOpinion: String
-)
+) : DataEntity

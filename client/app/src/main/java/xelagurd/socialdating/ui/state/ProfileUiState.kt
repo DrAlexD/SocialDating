@@ -3,6 +3,6 @@ package xelagurd.socialdating.ui.state
 import xelagurd.socialdating.data.model.User
 
 data class ProfileUiState(
-    val user: User? = null,
-    val internetStatus: InternetStatus = InternetStatus.LOADING
-)
+    override val entity: User? = null,
+    override val internetStatus: InternetStatus = InternetStatus.LOADING
+): DataEntityUiState

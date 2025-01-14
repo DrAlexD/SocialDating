@@ -1,7 +1,6 @@
 package xelagurd.socialdating.ui.screen
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,19 +10,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.DataEntity
-import xelagurd.socialdating.ui.state.InternetStatus
-import xelagurd.socialdating.ui.state.DataListUiState
 
 @Composable
 @ReadOnlyComposable
@@ -31,99 +32,158 @@ fun stringResourceWithColon(@StringRes id: Int) =
     stringResource(R.string.text_with_colon, stringResource(id))
 
 @Composable
-fun AppLargeText(
+fun AppLargeBodyText(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
+    )
+}
+
+@Composable
+fun AppSmallTitleText(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
+    )
+}
+
+@Composable
+fun AppMediumTitleText(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium,
+        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_small))
+    )
+}
+
+@Composable
+fun AppLargeTitleText(
     text: String,
     modifier: Modifier = Modifier
 ) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleLarge,
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_large))
+        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium))
     )
 }
 
 @Composable
-fun DataListBody(
-    uiState: DataListUiState,
-    onEntityClick: (Int) -> Unit,
-    cardContent: @Composable ColumnScope.(DataEntity) -> Unit,
+fun AppMediumTextCard(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppTextCard(
+        onClick = onClick,
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_small))
+    ) {
+        AppMediumTitleText(text)
+    }
+}
+
+@Composable
+fun AppLargeTextCard(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppTextCard(
+        onClick = onClick,
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium))
+    ) {
+        AppLargeTitleText(text)
+    }
+}
+
+@Composable
+fun AppTextCard(
+    onClick: () -> Unit,
+    elevation: CardElevation,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()
-    ) {
-        if (uiState.entities.isNotEmpty()) {
-            AppDataList(
-                entities = uiState.entities,
-                onEntityClick = onEntityClick,
-                contentPadding = contentPadding,
-                cardContent = cardContent
-            )
-        } else {
-            InternetStatusBody(
-                uiState.internetStatus
-            )
-        }
-    }
+    Card(
+        onClick = onClick,
+        elevation = elevation,
+        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_small)),
+        content = content
+    )
 }
 
 @Composable
-private fun InternetStatusBody(
-    internetStatus: InternetStatus,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
-    ) {
-        AppLargeText(
-            text = stringResource(
-                when (internetStatus) {
-                    InternetStatus.ONLINE -> R.string.no_data
-                    InternetStatus.LOADING -> R.string.loading
-                    InternetStatus.OFFLINE -> R.string.no_internet_connection
-                }
-            )
-        )
-    }
-}
-
-@Composable
-private inline fun AppDataList(
+inline fun AppDataLazyList(
     entities: List<DataEntity>,
-    crossinline onEntityClick: (Int) -> Unit,
     contentPadding: PaddingValues,
-    crossinline cardContent: @Composable ColumnScope.(DataEntity) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    crossinline card: @Composable (DataEntity) -> Unit
 ) {
     LazyColumn(
         contentPadding = contentPadding,
         modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
     ) {
         items(items = entities, key = { it.id }) {
-            AppEntityCard(
-                entity = it,
-                onEntityClick = onEntityClick,
-                content = cardContent
-            )
+            card(it)
         }
     }
 }
 
 @Composable
-private inline fun AppEntityCard(
+inline fun AppDataList(
+    entities: List<DataEntity>,
+    modifier: Modifier = Modifier,
+    content: @Composable (DataEntity) -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+    ) {
+        entities.forEach {
+            content(it)
+        }
+    }
+}
+
+@Composable
+inline fun AppEntityCard(
     entity: DataEntity,
     crossinline onEntityClick: (Int) -> Unit,
-    crossinline content: @Composable ColumnScope.(DataEntity) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    crossinline content: @Composable (DataEntity) -> Unit
 ) {
     Card(
         onClick = { onEntityClick(entity.id) },
         elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
         modifier = modifier.padding(dimensionResource(id = R.dimen.padding_small)),
         content = { content(entity) }
+    )
+}
+
+@Composable
+inline fun AppExpandedEntityCard(
+    entity: DataEntity,
+    modifier: Modifier = Modifier,
+    crossinline content: @Composable (DataEntity, Boolean) -> Unit
+) {
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
+
+    Card(
+        onClick = { isExpanded = !isExpanded },
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
+        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_small)),
+        content = { content(entity, isExpanded) }
     )
 }

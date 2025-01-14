@@ -60,8 +60,8 @@ class ProfileStatisticsViewModel @Inject constructor(
     val uiState = combine(userCategoriesFlow, userDefiningThemesFlow, internetStatusFlow)
     { userCategories, userDefiningThemes, internetStatus ->
         ProfileStatisticsUiState(
-            userCategories = userCategories,
-            userCategoryToDefiningThemes = userDefiningThemes.groupBy { it.userCategoryId },
+            entities = userCategories,
+            entityIdToData = userDefiningThemes.groupBy { it.userCategoryId },
             internetStatus = internetStatus
         )
     }.stateIn(
