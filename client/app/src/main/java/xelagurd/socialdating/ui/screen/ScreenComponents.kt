@@ -1,22 +1,28 @@
 package xelagurd.socialdating.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.DataEntity
+import xelagurd.socialdating.data.model.additional.FormDetails
 import xelagurd.socialdating.ui.state.DataEntityUiState
 import xelagurd.socialdating.ui.state.DataListUiState
+import xelagurd.socialdating.ui.state.FormUiState
 import xelagurd.socialdating.ui.state.InternetStatus
-import xelagurd.socialdating.ui.state.UiState
+import xelagurd.socialdating.ui.state.InternetUiState
+import xelagurd.socialdating.ui.state.RequestStatus
 
 
 @Composable
@@ -27,7 +33,7 @@ fun DataListComponent(
     card: @Composable (DataEntity) -> Unit
 ) {
     DataComponent(
-        uiState = dataListUiState,
+        internetUiState = dataListUiState,
         modifier = modifier
     ) {
         AppDataLazyList(
@@ -46,7 +52,7 @@ fun DataEntityComponent(
     content: @Composable ColumnScope.(DataEntity) -> Unit
 ) {
     DataComponent(
-        uiState = dataEntityUiState,
+        internetUiState = dataEntityUiState,
         modifier = modifier
     ) {
         Column(
@@ -61,14 +67,14 @@ fun DataEntityComponent(
 
 @Composable
 private inline fun DataComponent(
-    uiState: UiState,
+    internetUiState: InternetUiState,
     modifier: Modifier = Modifier,
-    dataContent: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
-    if (uiState.isDataExist()) {
-        dataContent()
+    if (internetUiState.isDataExist()) {
+        content()
     } else {
-        InternetStatusComponent(uiState.internetStatus)
+        InternetStatusComponent(internetUiState.internetStatus)
     }
 }
 
@@ -91,5 +97,57 @@ private fun InternetStatusComponent(
                 }
             )
         )
+    }
+}
+
+@Composable
+fun ComponentWithRequestStatus(
+    formUiState: FormUiState,
+    onSuccess: () -> Unit,
+    failedText: String,
+    errorText: String,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    content: @Composable (FormDetails) -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(contentPadding)
+    ) {
+        content(formUiState.formDetails)
+        RequestStatusComponent(
+            requestStatus = formUiState.requestStatus,
+            onSuccess = onSuccess,
+            failedText = failedText,
+            errorText = errorText
+        )
+    }
+}
+
+@Composable
+private inline fun RequestStatusComponent(
+    requestStatus: RequestStatus,
+    onSuccess: () -> Unit,
+    failedText: String,
+    errorText: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom,
+        modifier = modifier.fillMaxSize()
+    ) {
+        when (requestStatus) {
+            RequestStatus.UNDEFINED -> {}
+            RequestStatus.LOADING ->
+                CircularProgressIndicator(
+                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+                )
+
+            RequestStatus.FAILED -> AppLargeTitleText(failedText)
+            RequestStatus.ERROR -> AppLargeTitleText(errorText)
+            RequestStatus.SUCCESS -> onSuccess()
+        }
     }
 }

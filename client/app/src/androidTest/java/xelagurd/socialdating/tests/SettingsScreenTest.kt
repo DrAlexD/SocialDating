@@ -1,6 +1,7 @@
 package xelagurd.socialdating.tests
 
 import androidx.activity.compose.setContent
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -12,7 +13,8 @@ import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
 import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.onNodeWithTextId
-import xelagurd.socialdating.ui.screen.SettingsBody
+import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
+import xelagurd.socialdating.ui.screen.SettingsDetailsBody
 import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.state.SettingsUiState
 
@@ -53,11 +55,16 @@ class SettingsScreenTest {
 
     private fun setContentToSettingsBody(settingsUiState: SettingsUiState) {
         composeTestRule.activity.setContent {
-            SettingsBody(
-                settingsUiState = settingsUiState,
-                onLogoutClick = {},
-                onSuccessLogout = {}
-            )
+            ComponentWithRequestStatus(
+                formUiState = settingsUiState,
+                onSuccess = { },
+                failedText = "",
+                errorText = stringResource(R.string.unknown_error)
+            ) {
+                SettingsDetailsBody(
+                    onLogoutClick = { }
+                )
+            }
         }
     }
 }

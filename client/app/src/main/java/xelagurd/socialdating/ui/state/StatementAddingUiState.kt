@@ -5,6 +5,6 @@ import xelagurd.socialdating.data.model.additional.StatementDetails
 
 data class StatementAddingUiState(
     val definingThemes: List<DefiningTheme> = listOf(),
-    val statementDetails: StatementDetails = StatementDetails(),
-    val requestStatus: RequestStatus = RequestStatus.UNDEFINED
-)
+    override val formDetails: StatementDetails = StatementDetails(),
+    override val requestStatus: RequestStatus = RequestStatus.UNDEFINED
+) : FormUiState

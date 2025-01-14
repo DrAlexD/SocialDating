@@ -64,14 +64,14 @@ class LoginViewModel @Inject constructor(
 
     fun updateUiState(loginDetails: LoginDetails) {
         _uiState.update {
-            it.copy(loginDetails = loginDetails)
+            it.copy(formDetails = loginDetails)
         }
     }
 
     fun loginWithInput() {
         viewModelScope.launch {
             loginUser(
-                loginDetails = uiState.value.loginDetails,
+                loginDetails = uiState.value.formDetails,
                 isLoginWithInput = true
             )
         }

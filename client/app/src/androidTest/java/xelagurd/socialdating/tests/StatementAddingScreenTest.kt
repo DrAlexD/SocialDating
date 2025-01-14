@@ -48,7 +48,7 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_chosenDefiningThemeData_assertContentIsDisplayed() {
         val statementAddingUiState = StatementAddingUiState(
             definingThemes = FakeDataSource.definingThemes,
-            statementDetails = StatementDetails("StatementText1", true, 1, 1),
+            formDetails = StatementDetails("StatementText1", true, 1, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -61,7 +61,7 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_definingThemesData_assertContentIsDisplayed() {
         val statementAddingUiState = StatementAddingUiState(
             definingThemes = FakeDataSource.definingThemes,
-            statementDetails = StatementDetails("StatementText1", true, null, 1),
+            formDetails = StatementDetails("StatementText1", true, null, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -92,7 +92,7 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptyData_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             definingThemes = FakeDataSource.definingThemes,
-            statementDetails = StatementDetails("", null, null, 1),
+            formDetails = StatementDetails("", null, null, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -103,7 +103,7 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_allData_enabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             definingThemes = FakeDataSource.definingThemes,
-            statementDetails = StatementDetails("StatementText1", true, 1, 1),
+            formDetails = StatementDetails("StatementText1", true, 1, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -114,7 +114,7 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptyStatementText_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             definingThemes = FakeDataSource.definingThemes,
-            statementDetails = StatementDetails("", true, 1, 1),
+            formDetails = StatementDetails("", true, 1, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -125,7 +125,7 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptySupportDefiningTheme_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             definingThemes = FakeDataSource.definingThemes,
-            statementDetails = StatementDetails("StatementText1", null, 1, 1),
+            formDetails = StatementDetails("StatementText1", null, 1, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -136,7 +136,7 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptyDefiningTheme_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             definingThemes = FakeDataSource.definingThemes,
-            statementDetails = StatementDetails("StatementText1", true, null, 1),
+            formDetails = StatementDetails("StatementText1", true, null, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
 

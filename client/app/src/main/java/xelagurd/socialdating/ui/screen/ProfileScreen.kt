@@ -64,7 +64,7 @@ fun ProfileScreen(
             dataEntityUiState = profileUiState,
             contentPadding = innerPadding
         ) {
-            ProfileDetails(
+            ProfileDetailsBody(
                 user = it as User,
                 onProfileStatisticsClick = { onProfileStatisticsClick(it.id) }
             )
@@ -73,7 +73,7 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileDetails(
+fun ProfileDetailsBody(
     user: User,
     onProfileStatisticsClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -86,7 +86,7 @@ fun ProfileDetails(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(1f)
         ) {
-            UserDetails(user)
+            UserDetailsBody(user)
         }
 
         Column(
@@ -103,7 +103,7 @@ fun ProfileDetails(
 }
 
 @Composable
-private fun UserDetails(user: User) {
+private fun UserDetailsBody(user: User) {
     UserInfoHints()
     UserData(user)
 }
@@ -155,7 +155,7 @@ private fun ProfileComponentPreview() {
         DataEntityComponent(
             dataEntityUiState = ProfileUiState(entity = FakeDataSource.users[0])
         ) {
-            ProfileDetails(
+            ProfileDetailsBody(
                 user = it as User,
                 onProfileStatisticsClick = { }
             )

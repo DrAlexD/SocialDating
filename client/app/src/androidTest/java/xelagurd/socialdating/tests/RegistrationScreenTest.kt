@@ -63,7 +63,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyData_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails("", null, "", "", "", "", "", "", null),
+            formDetails = RegistrationDetails("", null, "", "", "", "", "", "", null),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -73,7 +73,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_allData_enabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails(
+            formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
             requestStatus = RequestStatus.UNDEFINED
@@ -85,7 +85,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyEmail_enabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails(
+            formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
             requestStatus = RequestStatus.UNDEFINED
@@ -97,7 +97,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyName_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails(
+            formDetails = RegistrationDetails(
                 "", Gender.MALE, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
             requestStatus = RequestStatus.UNDEFINED
@@ -109,7 +109,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyGender_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails(
+            formDetails = RegistrationDetails(
                 "Alex", null, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
             requestStatus = RequestStatus.UNDEFINED
@@ -121,7 +121,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyUsername_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails(
+            formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
             requestStatus = RequestStatus.UNDEFINED
@@ -133,7 +133,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyPassword_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails(
+            formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
             requestStatus = RequestStatus.UNDEFINED
@@ -145,7 +145,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyRepeatedPassword_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails(
+            formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
             requestStatus = RequestStatus.UNDEFINED
@@ -157,7 +157,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_passwordIsNotEqualToRepeatedPassword_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails(
+            formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "456", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
             requestStatus = RequestStatus.UNDEFINED
@@ -169,7 +169,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyAge_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails(
+            formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "", "Mos", Purpose.ALL_AT_ONCE
             ),
             requestStatus = RequestStatus.UNDEFINED
@@ -181,7 +181,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyCity_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails(
+            formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "", Purpose.ALL_AT_ONCE
             ),
             requestStatus = RequestStatus.UNDEFINED
@@ -193,7 +193,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyPurpose_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            registrationDetails = RegistrationDetails(
+            formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "Mos", null
             ),
             requestStatus = RequestStatus.UNDEFINED

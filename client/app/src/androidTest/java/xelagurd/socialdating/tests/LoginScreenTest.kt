@@ -1,6 +1,7 @@
 package xelagurd.socialdating.tests
 
 import androidx.activity.compose.setContent
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -15,7 +16,8 @@ import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.checkTextField
 import xelagurd.socialdating.data.model.additional.LoginDetails
 import xelagurd.socialdating.onNodeWithTextId
-import xelagurd.socialdating.ui.screen.LoginBody
+import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
+import xelagurd.socialdating.ui.screen.LoginDetailsBody
 import xelagurd.socialdating.ui.state.LoginUiState
 import xelagurd.socialdating.ui.state.RequestStatus
 
@@ -60,7 +62,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyData_disabledButton() {
         val loginUiState = LoginUiState(
-            loginDetails = LoginDetails("", ""),
+            formDetails = LoginDetails("", ""),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -70,7 +72,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_allData_enabledButton() {
         val loginUiState = LoginUiState(
-            loginDetails = LoginDetails("login", "password"),
+            formDetails = LoginDetails("login", "password"),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -80,7 +82,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyUsername_disabledButton() {
         val loginUiState = LoginUiState(
-            loginDetails = LoginDetails("", "password"),
+            formDetails = LoginDetails("", "password"),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -90,7 +92,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyPassword_disabledButton() {
         val loginUiState = LoginUiState(
-            loginDetails = LoginDetails("login", ""),
+            formDetails = LoginDetails("login", ""),
             requestStatus = RequestStatus.UNDEFINED
         )
 
@@ -120,13 +122,19 @@ class LoginScreenTest {
 
     private fun setContentToLoginBody(loginUiState: LoginUiState) {
         composeTestRule.activity.setContent {
-            LoginBody(
-                loginUiState = loginUiState,
-                onValueChange = {},
-                onLoginClick = {},
-                onSuccessLogin = {},
-                onRegistrationClick = {}
-            )
+            ComponentWithRequestStatus(
+                formUiState = loginUiState,
+                onSuccess = { },
+                failedText = stringResource(R.string.failed_login),
+                errorText = stringResource(R.string.no_internet_connection)
+            ) {
+                LoginDetailsBody(
+                    loginDetails = it as LoginDetails,
+                    onValueChange = { },
+                    onLoginClick = { },
+                    onRegistrationClick = { }
+                )
+            }
         }
     }
 }

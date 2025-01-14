@@ -18,7 +18,7 @@ import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.onNodeWithTextIdWithColon
 import xelagurd.socialdating.ui.screen.DataEntityComponent
-import xelagurd.socialdating.ui.screen.ProfileDetails
+import xelagurd.socialdating.ui.screen.ProfileDetailsBody
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileUiState
 
@@ -124,7 +124,7 @@ class ProfileScreenTest {
             DataEntityComponent(
                 dataEntityUiState = profileUiState
             ) {
-                ProfileDetails(
+                ProfileDetailsBody(
                     user = it as User,
                     onProfileStatisticsClick = { }
                 )

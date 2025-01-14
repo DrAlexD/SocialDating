@@ -110,7 +110,7 @@ private fun StatementAddingDetails(
     onStatementAddingClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val statementDetails = statementAddingUiState.statementDetails
+    val statementDetails = statementAddingUiState.formDetails
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
