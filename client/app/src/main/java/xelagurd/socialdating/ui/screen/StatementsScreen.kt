@@ -74,11 +74,14 @@ fun StatementsScreen(
         },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
-        DataListBody(
-            uiState = statementsUiState,
-            onEntityClick = onStatementClick,
-            contentPadding = innerPadding,
-            cardContent = {
+        DataListComponent(
+            dataListUiState = statementsUiState,
+            contentPadding = innerPadding
+        ) {
+            AppEntityCard(
+                entity = it,
+                onEntityClick = onStatementClick
+            ) {
                 StatementCardContent(
                     statement = it as Statement,
                     onStatementReactionClick = { id, type ->
@@ -86,7 +89,7 @@ fun StatementsScreen(
                     }
                 )
             }
-        )
+        }
     }
 }
 
@@ -96,7 +99,7 @@ fun StatementCardContent(
     onStatementReactionClick: (Int, StatementReactionType) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AppLargeText(text = statement.text)
+    AppLargeTitleText(text = statement.text)
     HorizontalDivider(color = Color.Black)
     ReactionsRow(
         onStatementReactionClick = { onStatementReactionClick(statement.id, it) }
@@ -128,17 +131,20 @@ private inline fun ReactionsRow(
 
 @Preview(showBackground = true)
 @Composable
-private fun StatementsDataBodyPreview() {
+private fun StatementsComponentPreview() {
     AppTheme {
-        DataListBody(
-            uiState = StatementsUiState(entities = FakeDataSource.statements),
-            onEntityClick = { },
-            cardContent = {
+        DataListComponent(
+            dataListUiState = StatementsUiState(entities = FakeDataSource.statements)
+        ) {
+            AppEntityCard(
+                entity = it,
+                onEntityClick = { }
+            ) {
                 StatementCardContent(
                     statement = it as Statement,
                     onStatementReactionClick = { _, _ -> null }
                 )
             }
-        )
+        }
     }
 }

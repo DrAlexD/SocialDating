@@ -18,7 +18,9 @@ import xelagurd.socialdating.data.model.additional.UserDefiningThemeWithData
 import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
-import xelagurd.socialdating.ui.screen.ProfileStatisticsBody
+import xelagurd.socialdating.ui.screen.AppExpandedEntityCard
+import xelagurd.socialdating.ui.screen.DataListComponent
+import xelagurd.socialdating.ui.screen.UserCategoryCardContent
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileStatisticsUiState
 
@@ -67,8 +69,8 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_loadingStatusAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
-            userCategoryToDefiningThemes = mapOf(
+            entities = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
+            entityIdToData = mapOf(
                 1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
             ),
             internetStatus = InternetStatus.LOADING
@@ -80,8 +82,8 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_offlineStatusAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
-            userCategoryToDefiningThemes = mapOf(
+            entities = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
+            entityIdToData = mapOf(
                 1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
             ),
             internetStatus = InternetStatus.OFFLINE
@@ -93,8 +95,8 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_onlineStatusAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            userCategories = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
-            userCategoryToDefiningThemes = mapOf(
+            entities = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
+            entityIdToData = mapOf(
                 1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
             ),
             internetStatus = InternetStatus.ONLINE
@@ -124,9 +126,20 @@ class ProfileStatisticsScreenTest {
 
     private fun setContentToProfileStatisticsBody(profileStatisticsUiState: ProfileStatisticsUiState) {
         composeTestRule.activity.setContent {
-            ProfileStatisticsBody(
-                profileStatisticsUiState = profileStatisticsUiState
-            )
+            DataListComponent(
+                dataListUiState = profileStatisticsUiState
+            ) {
+                AppExpandedEntityCard(
+                    entity = it
+                ) { entity, isExpanded ->
+                    UserCategoryCardContent(
+                        userCategory = entity as UserCategoryWithData,
+                        userDefiningThemes = profileStatisticsUiState.entityIdToData
+                            .getOrDefault(entity.id, listOf()),
+                        isExpanded = isExpanded
+                    )
+                }
+            }
         }
     }
 }

@@ -136,13 +136,13 @@ class ProfileStatisticsViewModelTest {
         assertEquals(InternetStatus.ONLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, remoteUserCategories).toUserCategoriesWithData(),
-            profileStatisticsUiState.userCategories
+            profileStatisticsUiState.entities
         )
         assertEquals(
             mergeListsAsSets(localUserDefiningThemes, remoteUserDefiningThemes)
                 .toUserDefiningThemesWithData()
                 .groupBy { it.userCategoryId },
-            profileStatisticsUiState.userCategoryToDefiningThemes
+            profileStatisticsUiState.entityIdToData
         )
     }
 
@@ -157,13 +157,13 @@ class ProfileStatisticsViewModelTest {
         assertEquals(
             mergeListsAsSets(localUserCategories, FakeDataSource.userCategories)
                 .toUserCategoriesWithData(),
-            profileStatisticsUiState.userCategories
+            profileStatisticsUiState.entities
         )
         assertEquals(
             mergeListsAsSets(localUserDefiningThemes, FakeDataSource.userDefiningThemes)
                 .toUserDefiningThemesWithData()
                 .groupBy { it.userCategoryId },
-            profileStatisticsUiState.userCategoryToDefiningThemes
+            profileStatisticsUiState.entityIdToData
         )
     }
 
@@ -185,7 +185,7 @@ class ProfileStatisticsViewModelTest {
                 remoteUserCategories,
                 FakeDataSource.userCategories
             ).toUserCategoriesWithData(),
-            profileStatisticsUiState.userCategories
+            profileStatisticsUiState.entities
         )
         assertEquals(
             mergeListsAsSets(
@@ -195,7 +195,7 @@ class ProfileStatisticsViewModelTest {
             )
                 .toUserDefiningThemesWithData()
                 .groupBy { it.userCategoryId },
-            profileStatisticsUiState.userCategoryToDefiningThemes
+            profileStatisticsUiState.entityIdToData
         )
     }
 
@@ -217,7 +217,7 @@ class ProfileStatisticsViewModelTest {
                 FakeDataSource.userCategories,
                 remoteUserCategories
             ).toUserCategoriesWithData(),
-            profileStatisticsUiState.userCategories
+            profileStatisticsUiState.entities
         )
         assertEquals(
             mergeListsAsSets(
@@ -227,7 +227,7 @@ class ProfileStatisticsViewModelTest {
             )
                 .toUserDefiningThemesWithData()
                 .groupBy { it.userCategoryId },
-            profileStatisticsUiState.userCategoryToDefiningThemes
+            profileStatisticsUiState.entityIdToData
         )
     }
 
@@ -244,13 +244,13 @@ class ProfileStatisticsViewModelTest {
         assertEquals(InternetStatus.ONLINE, profileStatisticsUiState.internetStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, remoteUserCategories).toUserCategoriesWithData(),
-            profileStatisticsUiState.userCategories
+            profileStatisticsUiState.entities
         )
         assertEquals(
             mergeListsAsSets(localUserDefiningThemes, remoteUserDefiningThemes)
                 .toUserDefiningThemesWithData()
                 .groupBy { it.userCategoryId },
-            profileStatisticsUiState.userCategoryToDefiningThemes
+            profileStatisticsUiState.entityIdToData
         )
     }
 
@@ -268,13 +268,13 @@ class ProfileStatisticsViewModelTest {
         assertEquals(
             mergeListsAsSets(localUserCategories, FakeDataSource.userCategories)
                 .toUserCategoriesWithData(),
-            profileStatisticsUiState.userCategories
+            profileStatisticsUiState.entities
         )
         assertEquals(
             mergeListsAsSets(localUserDefiningThemes, FakeDataSource.userDefiningThemes)
                 .toUserDefiningThemesWithData()
                 .groupBy { it.userCategoryId },
-            profileStatisticsUiState.userCategoryToDefiningThemes
+            profileStatisticsUiState.entityIdToData
         )
     }
 

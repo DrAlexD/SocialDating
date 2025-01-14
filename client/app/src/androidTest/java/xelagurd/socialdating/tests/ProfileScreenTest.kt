@@ -17,7 +17,8 @@ import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.onNodeWithTextIdWithColon
-import xelagurd.socialdating.ui.screen.ProfileBody
+import xelagurd.socialdating.ui.screen.DataEntityComponent
+import xelagurd.socialdating.ui.screen.ProfileDetails
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileUiState
 
@@ -64,7 +65,7 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_loadingStatusAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            user = User(
+            entity = User(
                 1, "User1", Gender.MALE, "username1", "password1",
                 "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
             ),
@@ -77,7 +78,7 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_offlineStatusAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            user = User(
+            entity = User(
                 1, "User1", Gender.MALE, "username1", "password1",
                 "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
             ),
@@ -90,7 +91,7 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_onlineStatusAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            user = User(
+            entity = User(
                 1, "User1", Gender.MALE, "username1", "password1",
                 "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
             ),
@@ -120,10 +121,14 @@ class ProfileScreenTest {
 
     private fun setContentToProfileBody(profileUiState: ProfileUiState) {
         composeTestRule.activity.setContent {
-            ProfileBody(
-                profileUiState = profileUiState,
-                onProfileStatisticsClick = {}
-            )
+            DataEntityComponent(
+                dataEntityUiState = profileUiState
+            ) {
+                ProfileDetails(
+                    user = it as User,
+                    onProfileStatisticsClick = { }
+                )
+            }
         }
     }
 }

@@ -4,19 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,7 +30,6 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.ui.navigation.ProfileDestination
-import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileUiState
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.ProfileViewModel
@@ -67,139 +60,87 @@ fun ProfileScreen(
         },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
-        ProfileBody(
-            profileUiState = profileUiState,
-            onProfileStatisticsClick = onProfileStatisticsClick,
-            modifier = modifier.fillMaxSize(),
+        DataEntityComponent(
+            dataEntityUiState = profileUiState,
             contentPadding = innerPadding
-        )
-    }
-}
-
-@Composable
-internal fun ProfileBody(
-    profileUiState: ProfileUiState,
-    onProfileStatisticsClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
-) {
-    Column(modifier = modifier) {
-        if (profileUiState.user != null) {
+        ) {
             ProfileDetails(
-                user = profileUiState.user,
-                onProfileStatisticsClick = { onProfileStatisticsClick(profileUiState.user.id) },
-                modifier = modifier.padding(contentPadding)
+                user = it as User,
+                onProfileStatisticsClick = { onProfileStatisticsClick(it.id) }
             )
-        } else {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = modifier
-            ) {
-                Text(
-                    text = stringResource(
-                        when (profileUiState.internetStatus) {
-                            InternetStatus.ONLINE -> R.string.no_data
-                            InternetStatus.LOADING -> R.string.loading
-                            InternetStatus.OFFLINE -> R.string.no_internet_connection
-                        }
-                    ),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
-                )
-            }
         }
     }
 }
 
 @Composable
-private fun ProfileDetails(
+fun ProfileDetails(
     user: User,
     onProfileStatisticsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
         horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
     ) {
         Row(
-            modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
+            modifier = Modifier.weight(1f)
         ) {
-            UserInfo(user)
+            UserDetails(user)
         }
 
         Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Top
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier.weight(1f)
         ) {
-            Card(onClick = onProfileStatisticsClick) {
-                Text(
-                    text = stringResource(R.string.open_profile_statistics),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun UserInfo(user: User) {
-    Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_very_small))) {
-        Text(
-            text = stringResourceWithColon(R.string.username),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = stringResourceWithColon(R.string.name),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = stringResourceWithColon(R.string.age),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = stringResourceWithColon(R.string.city),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = stringResourceWithColon(R.string.purpose),
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-
-    Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_very_small))) {
-        Text(
-            text = user.username,
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = user.name,
-                style = MaterialTheme.typography.bodyLarge
+            AppMediumTextCard(
+                text = stringResource(R.string.open_profile_statistics),
+                onClick = onProfileStatisticsClick
             )
-            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_very_small)))
-            AvatarIcon(gender = user.gender)
         }
-        Text(
-            text = "${user.age}",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = user.city,
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            text = stringResource(user.purpose.descriptionRes),
-            style = MaterialTheme.typography.bodyLarge
-        )
     }
 }
 
 @Composable
-fun AvatarIcon(gender: Gender) {
+private fun UserDetails(user: User) {
+    UserInfoHints()
+    UserData(user)
+}
+
+@Composable
+private fun UserInfoHints() {
+    Column {
+        AppLargeBodyText(text = stringResourceWithColon(R.string.username))
+        AppLargeBodyText(text = stringResourceWithColon(R.string.name))
+        AppLargeBodyText(text = stringResourceWithColon(R.string.age))
+        AppLargeBodyText(text = stringResourceWithColon(R.string.city))
+        AppLargeBodyText(text = stringResourceWithColon(R.string.purpose))
+    }
+}
+
+@Composable
+private fun UserData(user: User) {
+    Column {
+        AppLargeBodyText(text = user.username)
+        UserNameWithAvatar(user)
+        AppLargeBodyText(text = "${user.age}")
+        AppLargeBodyText(text = user.city)
+        AppLargeBodyText(text = stringResource(user.purpose.descriptionRes))
+    }
+}
+
+@Composable
+private fun UserNameWithAvatar(user: User) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        AppLargeBodyText(text = user.name)
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_very_small)))
+        AvatarIcon(gender = user.gender)
+    }
+}
+
+@Composable
+private fun AvatarIcon(gender: Gender) {
     Box(
         modifier = Modifier
             .size(15.dp)
@@ -209,11 +150,15 @@ fun AvatarIcon(gender: Gender) {
 
 @Preview(showBackground = true)
 @Composable
-fun ProfileCardPreview() {
+private fun ProfileComponentPreview() {
     AppTheme {
-        ProfileDetails(
-            user = FakeDataSource.users[0],
-            onProfileStatisticsClick = {}
-        )
+        DataEntityComponent(
+            dataEntityUiState = ProfileUiState(entity = FakeDataSource.users[0])
+        ) {
+            ProfileDetails(
+                user = it as User,
+                onProfileStatisticsClick = { }
+            )
+        }
     }
 }

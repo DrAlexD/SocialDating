@@ -13,8 +13,9 @@ import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.onNodeWithTextId
+import xelagurd.socialdating.ui.screen.AppEntityCard
 import xelagurd.socialdating.ui.screen.CategoryCardContent
-import xelagurd.socialdating.ui.screen.DataListBody
+import xelagurd.socialdating.ui.screen.DataListComponent
 import xelagurd.socialdating.ui.state.CategoriesUiState
 import xelagurd.socialdating.ui.state.InternetStatus
 
@@ -96,15 +97,18 @@ class CategoriesScreenTest {
 
     private fun setContentToCategoriesBody(categoriesUiState: CategoriesUiState) {
         composeTestRule.activity.setContent {
-            DataListBody(
-                uiState = categoriesUiState,
-                onEntityClick = { },
-                cardContent = {
+            DataListComponent(
+                dataListUiState = categoriesUiState
+            ) {
+                AppEntityCard(
+                    entity = it,
+                    onEntityClick = { }
+                ) {
                     CategoryCardContent(
                         category = it as Category
                     )
                 }
-            )
+            }
         }
     }
 }

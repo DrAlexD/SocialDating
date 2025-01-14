@@ -15,7 +15,8 @@ import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTextId
-import xelagurd.socialdating.ui.screen.DataListBody
+import xelagurd.socialdating.ui.screen.AppEntityCard
+import xelagurd.socialdating.ui.screen.DataListComponent
 import xelagurd.socialdating.ui.screen.StatementCardContent
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.StatementsUiState
@@ -105,16 +106,19 @@ class StatementsScreenTest {
 
     private fun setContentToStatementsBody(statementsUiState: StatementsUiState) {
         composeTestRule.activity.setContent {
-            DataListBody(
-                uiState = statementsUiState,
-                onEntityClick = { },
-                cardContent = {
+            DataListComponent(
+                dataListUiState = statementsUiState
+            ) {
+                AppEntityCard(
+                    entity = it,
+                    onEntityClick = { }
+                ) {
                     StatementCardContent(
                         statement = it as Statement,
                         onStatementReactionClick = { _, _ -> null }
                     )
                 }
-            )
+            }
         }
     }
 }
