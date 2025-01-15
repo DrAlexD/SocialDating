@@ -16,7 +16,6 @@ import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
 import xelagurd.socialdating.ui.screen.SettingsDetailsBody
-import xelagurd.socialdating.ui.state.RegistrationUiState
 import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.state.SettingsUiState
 

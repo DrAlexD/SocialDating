@@ -22,7 +22,6 @@ import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.onNodeWithTextIdWithColon
 import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
 import xelagurd.socialdating.ui.screen.RegistrationDetailsBody
-import xelagurd.socialdating.ui.state.LoginUiState
 import xelagurd.socialdating.ui.state.RegistrationUiState
 import xelagurd.socialdating.ui.state.RequestStatus
 
