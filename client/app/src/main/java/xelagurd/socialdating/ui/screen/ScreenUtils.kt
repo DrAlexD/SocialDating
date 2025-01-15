@@ -2,7 +2,6 @@ package xelagurd.socialdating.ui.screen
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -236,12 +235,7 @@ inline fun AppDataChoosingList(
     crossinline card: @Composable (DataEntity, Boolean) -> Unit
 ) {
     if (chosenEntityId != null) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            card(entities.first { it.id == chosenEntityId }, true)
-        }
+        card(entities.first { it.id == chosenEntityId }, true)
     } else {
         AppDataList(
             entities = entities,

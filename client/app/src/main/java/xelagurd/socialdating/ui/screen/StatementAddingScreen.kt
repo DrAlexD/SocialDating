@@ -186,3 +186,24 @@ private fun StatementAddingComponentWithChosenPreview() {
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+private fun StatementAddingComponentEmptyDataPreview() {
+    AppTheme {
+        val statementAddingUiState = StatementAddingUiState()
+
+        ComponentWithRequestStatus(
+            requestStatus = statementAddingUiState.requestStatus,
+            onSuccess = { },
+            failedText = stringResource(R.string.failed_add_statement),
+            errorText = stringResource(R.string.no_internet_connection)
+        ) {
+            StatementDetailsBody(
+                statementAddingUiState = statementAddingUiState,
+                onValueChange = { },
+                onStatementAddingClick = { }
+            )
+        }
+    }
+}

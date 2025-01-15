@@ -29,7 +29,8 @@ fun DataListComponent(
     card: @Composable (DataEntity) -> Unit
 ) {
     DataComponent(
-        internetUiState = dataListUiState
+        internetUiState = dataListUiState,
+        modifier = Modifier.fillMaxSize()
     ) {
         AppDataList(
             entities = dataListUiState.entities,
@@ -70,7 +71,8 @@ fun DataEntityComponent(
     content: @Composable (DataEntity) -> Unit
 ) {
     DataComponent(
-        internetUiState = dataEntityUiState
+        internetUiState = dataEntityUiState,
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -85,12 +87,19 @@ fun DataEntityComponent(
 @Composable
 private inline fun DataComponent(
     internetUiState: InternetUiState,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    if (internetUiState.isDataExist()) {
-        content()
-    } else {
-        InternetStatusComponent(internetUiState.internetStatus)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+    ) {
+        if (internetUiState.isDataExist()) {
+            content()
+        } else {
+            InternetStatusComponent(internetUiState.internetStatus)
+        }
     }
 }
 
@@ -98,16 +107,10 @@ private inline fun DataComponent(
 private fun InternetStatusComponent(
     internetStatus: InternetStatus
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        when (internetStatus) {
-            InternetStatus.LOADING -> AppLoadingIndicator()
-            InternetStatus.OFFLINE -> AppLargeTitleText(text = stringResource(R.string.no_internet_connection))
-            InternetStatus.ONLINE -> AppLargeTitleText(text = stringResource(R.string.no_data))
-        }
+    when (internetStatus) {
+        InternetStatus.LOADING -> AppLoadingIndicator()
+        InternetStatus.OFFLINE -> AppLargeTitleText(text = stringResource(R.string.no_internet_connection))
+        InternetStatus.ONLINE -> AppLargeTitleText(text = stringResource(R.string.no_data))
     }
 }
 
