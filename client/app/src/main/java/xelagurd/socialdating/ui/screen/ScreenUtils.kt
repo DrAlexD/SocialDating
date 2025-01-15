@@ -2,10 +2,12 @@ package xelagurd.socialdating.ui.screen
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.DataEntity
@@ -38,9 +41,11 @@ fun stringResourceWithColon(@StringRes id: Int) =
     stringResource(R.string.text_with_colon, stringResource(id))
 
 @Composable
-fun AppLoadingIndicator() {
+fun AppLoadingIndicator(
+    modifier: Modifier = Modifier
+) {
     CircularProgressIndicator(
-        modifier = Modifier
+        modifier = modifier
             .padding(dimensionResource(R.dimen.padding_large))
             .testTag(stringResource(R.string.loading))
     )
@@ -115,7 +120,7 @@ fun AppSmallTextCard(
         isHasBorder = isHasBorder,
         modifier = modifier
     ) {
-        AppSmallTitleText(text)
+        AppSmallTitleText(text = text)
     }
 }
 
@@ -134,7 +139,7 @@ fun AppMediumTextCard(
         isHasBorder = isHasBorder,
         modifier = modifier
     ) {
-        AppMediumTitleText(text)
+        AppMediumTitleText(text = text)
     }
 }
 
@@ -153,7 +158,7 @@ fun AppLargeTextCard(
         isHasBorder = isHasBorder,
         modifier = modifier
     ) {
-        AppLargeTitleText(text)
+        AppLargeTitleText(text = text)
     }
 }
 
@@ -205,7 +210,7 @@ fun AppTextField(
 }
 
 @Composable
-inline fun AppDataLazyList(
+inline fun AppDataList(
     entities: List<DataEntity>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -222,14 +227,39 @@ inline fun AppDataLazyList(
 }
 
 @Composable
-inline fun AppDataList(
+inline fun AppDataChoosingList(
     entities: List<DataEntity>,
+    chosenEntityId: Int?,
+    maxHeight: Dp,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    crossinline card: @Composable (DataEntity, Boolean) -> Unit
+) {
+    if (chosenEntityId != null) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            card(entities.first { it.id == chosenEntityId }, true)
+        }
+    } else {
+        AppDataList(
+            entities = entities,
+            modifier = modifier.heightIn(Dp.Unspecified, maxHeight),
+            contentPadding = contentPadding,
+            card = { card(it, false) }
+        )
+    }
+}
+
+@Composable
+inline fun AppList(
+    entities: List<DataEntity>,
     content: @Composable (DataEntity) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = dimensionResource(R.dimen.padding_small))
     ) {

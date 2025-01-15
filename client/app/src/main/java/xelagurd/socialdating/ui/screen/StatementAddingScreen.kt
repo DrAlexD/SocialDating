@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
@@ -93,20 +92,27 @@ fun StatementDetailsBody(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_very_large))
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
         ) {
             AppMediumTitleText(text = stringResourceWithColon(R.string.defining_theme))
-            DefiningThemesBody(
-                definingThemes = statementAddingUiState.definingThemes,
-                onDefiningThemeClick = {
-                    onValueChange(
-                        statementDetails.copy(
-                            definingThemeId = it.takeIf { statementDetails.definingThemeId == null }
+            DataChoosingListComponent(
+                dataListUiState = statementAddingUiState,
+                chosenEntityId = statementDetails.definingThemeId,
+                maxHeight = LocalConfiguration.current.screenHeightDp.dp / 4
+            ) { entity, isHasBorder ->
+                AppMediumTextCard(
+                    text = (entity as DefiningTheme).name,
+                    onClick = {
+                        onValueChange(
+                            statementDetails.copy(
+                                definingThemeId = entity.id
+                                    .takeIf { statementDetails.definingThemeId == null }
+                            )
                         )
-                    )
-                },
-                chosenDefiningThemeId = statementDetails.definingThemeId
-            )
+                    },
+                    isHasBorder = isHasBorder
+                )
+            }
         }
         AppMediumTitleText(text = stringResource(R.string.is_support_defining_theme))
         Row(
@@ -134,50 +140,36 @@ fun StatementDetailsBody(
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-private fun DefiningThemesBody(
-    definingThemes: List<DefiningTheme>,
-    onDefiningThemeClick: (Int) -> Unit,
-    chosenDefiningThemeId: Int?,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = modifier
-    ) {
-        if (definingThemes.isNotEmpty()) {
-            if (chosenDefiningThemeId != null) {
-                val definingTheme = definingThemes.first { it.id == chosenDefiningThemeId }
-                AppSmallTextCard(
-                    text = definingTheme.name,
-                    onClick = { onDefiningThemeClick(definingTheme.id) },
-                    isHasBorder = true
-                )
-            } else {
-                val maxHeight = LocalConfiguration.current.screenHeightDp.dp / 4
-                AppDataLazyList(
-                    entities = definingThemes,
-                    modifier = Modifier.heightIn(0.dp, maxHeight)
-                ) {
-                    AppSmallTextCard(
-                        text = (it as DefiningTheme).name,
-                        onClick = { onDefiningThemeClick(it.id) }
-                    )
-                }
-            }
-        } else {
-            AppLargeTitleText(text = stringResource(R.string.no_data))
+private fun StatementAddingComponentPreview() {
+    AppTheme {
+        val statementAddingUiState = StatementAddingUiState(
+            entities = FakeDataSource.definingThemes
+        )
+
+        ComponentWithRequestStatus(
+            requestStatus = statementAddingUiState.requestStatus,
+            onSuccess = { },
+            failedText = stringResource(R.string.failed_add_statement),
+            errorText = stringResource(R.string.no_internet_connection)
+        ) {
+            StatementDetailsBody(
+                statementAddingUiState = statementAddingUiState,
+                onValueChange = { },
+                onStatementAddingClick = { }
+            )
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun StatementAddingComponentPreview() {
+private fun StatementAddingComponentWithChosenPreview() {
     AppTheme {
         val statementAddingUiState = StatementAddingUiState(
-            definingThemes = FakeDataSource.definingThemes
+            entities = FakeDataSource.definingThemes,
+            formDetails = StatementDetails(definingThemeId = 1)
         )
 
         ComponentWithRequestStatus(

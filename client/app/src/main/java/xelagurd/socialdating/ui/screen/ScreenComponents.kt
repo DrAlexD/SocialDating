@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.DataEntity
@@ -28,11 +29,34 @@ fun DataListComponent(
     card: @Composable (DataEntity) -> Unit
 ) {
     DataComponent(
-        internetUiState = dataListUiState,
-        modifier = modifier
+        internetUiState = dataListUiState
     ) {
-        AppDataLazyList(
+        AppDataList(
             entities = dataListUiState.entities,
+            modifier = modifier,
+            contentPadding = contentPadding,
+            card = card
+        )
+    }
+}
+
+@Composable
+fun DataChoosingListComponent(
+    dataListUiState: DataListUiState,
+    chosenEntityId: Int?,
+    maxHeight: Dp,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    card: @Composable (DataEntity, Boolean) -> Unit
+) {
+    DataComponent(
+        internetUiState = dataListUiState
+    ) {
+        AppDataChoosingList(
+            entities = dataListUiState.entities,
+            chosenEntityId = chosenEntityId,
+            maxHeight = maxHeight,
+            modifier = modifier,
             contentPadding = contentPadding,
             card = card
         )
@@ -42,13 +66,11 @@ fun DataListComponent(
 @Composable
 fun DataEntityComponent(
     dataEntityUiState: DataEntityUiState,
-    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable (DataEntity) -> Unit
 ) {
     DataComponent(
-        internetUiState = dataEntityUiState,
-        modifier = modifier
+        internetUiState = dataEntityUiState
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -63,7 +85,6 @@ fun DataEntityComponent(
 @Composable
 private inline fun DataComponent(
     internetUiState: InternetUiState,
-    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     if (internetUiState.isDataExist()) {
@@ -75,13 +96,12 @@ private inline fun DataComponent(
 
 @Composable
 private fun InternetStatusComponent(
-    internetStatus: InternetStatus,
-    modifier: Modifier = Modifier
+    internetStatus: InternetStatus
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         when (internetStatus) {
             InternetStatus.LOADING -> AppLoadingIndicator()
@@ -97,12 +117,11 @@ fun ComponentWithRequestStatus(
     onSuccess: () -> Unit,
     failedText: String,
     errorText: String,
-    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable () -> Unit
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(contentPadding)
     ) {
@@ -121,13 +140,12 @@ private inline fun RequestStatusComponent(
     requestStatus: RequestStatus,
     onSuccess: () -> Unit,
     failedText: String,
-    errorText: String,
-    modifier: Modifier = Modifier
+    errorText: String
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         when (requestStatus) {
             RequestStatus.UNDEFINED -> {}

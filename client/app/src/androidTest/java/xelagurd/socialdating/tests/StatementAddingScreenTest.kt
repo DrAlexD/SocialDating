@@ -24,7 +24,6 @@ import xelagurd.socialdating.onNodeWithTextIdWithColon
 import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
 import xelagurd.socialdating.ui.screen.StatementDetailsBody
 import xelagurd.socialdating.ui.state.RequestStatus
-import xelagurd.socialdating.ui.state.SettingsUiState
 import xelagurd.socialdating.ui.state.StatementAddingUiState
 
 @HiltAndroidTest
@@ -51,7 +50,7 @@ class StatementAddingScreenTest {
     @Test
     fun statementAddingScreen_chosenDefiningThemeData_assertContentIsDisplayed() {
         val statementAddingUiState = StatementAddingUiState(
-            definingThemes = FakeDataSource.definingThemes,
+            entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("StatementText1", true, 1, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
@@ -64,7 +63,7 @@ class StatementAddingScreenTest {
     @Test
     fun statementAddingScreen_definingThemesData_assertContentIsDisplayed() {
         val statementAddingUiState = StatementAddingUiState(
-            definingThemes = FakeDataSource.definingThemes,
+            entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("StatementText1", true, null, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
@@ -104,7 +103,7 @@ class StatementAddingScreenTest {
     @Test
     fun statementAddingScreen_emptyData_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
-            definingThemes = FakeDataSource.definingThemes,
+            entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("", null, null, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
@@ -115,7 +114,7 @@ class StatementAddingScreenTest {
     @Test
     fun statementAddingScreen_allData_enabledButton() {
         val statementAddingUiState = StatementAddingUiState(
-            definingThemes = FakeDataSource.definingThemes,
+            entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("StatementText1", true, 1, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
@@ -126,7 +125,7 @@ class StatementAddingScreenTest {
     @Test
     fun statementAddingScreen_emptyStatementText_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
-            definingThemes = FakeDataSource.definingThemes,
+            entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("", true, 1, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
@@ -137,7 +136,7 @@ class StatementAddingScreenTest {
     @Test
     fun statementAddingScreen_emptySupportDefiningTheme_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
-            definingThemes = FakeDataSource.definingThemes,
+            entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("StatementText1", null, 1, 1),
             requestStatus = RequestStatus.UNDEFINED
         )
@@ -148,7 +147,7 @@ class StatementAddingScreenTest {
     @Test
     fun statementAddingScreen_emptyDefiningTheme_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
-            definingThemes = FakeDataSource.definingThemes,
+            entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("StatementText1", true, null, 1),
             requestStatus = RequestStatus.UNDEFINED
         )

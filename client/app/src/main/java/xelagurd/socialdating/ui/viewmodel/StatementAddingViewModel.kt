@@ -20,8 +20,8 @@ import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.data.model.additional.StatementDetails
 import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.ui.navigation.StatementAddingDestination
-import xelagurd.socialdating.ui.state.StatementAddingUiState
 import xelagurd.socialdating.ui.state.RequestStatus
+import xelagurd.socialdating.ui.state.StatementAddingUiState
 
 @HiltViewModel
 class StatementAddingViewModel @Inject constructor(
@@ -31,7 +31,8 @@ class StatementAddingViewModel @Inject constructor(
     private val localStatementsRepository: LocalStatementsRepository,
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
-    private val categoryId: Int = checkNotNull(savedStateHandle[StatementAddingDestination.categoryId])
+    private val categoryId: Int =
+        checkNotNull(savedStateHandle[StatementAddingDestination.categoryId])
 
     private val _uiState = MutableStateFlow(StatementAddingUiState())
     val uiState = _uiState.asStateFlow()
@@ -57,8 +58,7 @@ class StatementAddingViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    definingThemes = localDefiningThemesRepository.getDefiningThemes(categoryId)
-                        .first()
+                    entities = localDefiningThemesRepository.getDefiningThemes(categoryId).first()
                 )
             }
         }
