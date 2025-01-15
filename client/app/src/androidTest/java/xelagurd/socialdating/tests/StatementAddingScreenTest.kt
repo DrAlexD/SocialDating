@@ -1,6 +1,7 @@
 package xelagurd.socialdating.tests
 
 import androidx.activity.compose.setContent
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -17,10 +18,13 @@ import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.checkTextField
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.additional.StatementDetails
+import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.onNodeWithTextIdWithColon
-import xelagurd.socialdating.ui.screen.StatementAddingBody
+import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
+import xelagurd.socialdating.ui.screen.StatementDetailsBody
 import xelagurd.socialdating.ui.state.RequestStatus
+import xelagurd.socialdating.ui.state.SettingsUiState
 import xelagurd.socialdating.ui.state.StatementAddingUiState
 
 @HiltAndroidTest
@@ -68,6 +72,15 @@ class StatementAddingScreenTest {
         assertContentIsDisplayed(statementAddingUiState)
         composeTestRule.onNodeWithText(FakeDataSource.definingThemes[0].name).assertIsDisplayed()
         composeTestRule.onNodeWithText(FakeDataSource.definingThemes[1].name).assertIsDisplayed()
+    }
+
+    @Test
+    fun statementAddingScreen_loadingStatus_loadingIndicator() {
+        val statementAddingUiState = StatementAddingUiState(requestStatus = RequestStatus.LOADING)
+
+        setContentToStatementAddingBody(statementAddingUiState)
+
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
@@ -170,12 +183,18 @@ class StatementAddingScreenTest {
 
     private fun setContentToStatementAddingBody(statementAddingUiState: StatementAddingUiState) {
         composeTestRule.activity.setContent {
-            StatementAddingBody(
-                statementAddingUiState = statementAddingUiState,
-                onValueChange = { },
-                onStatementAddingClick = { },
-                onSuccessStatementAdding = { },
-            )
+            ComponentWithRequestStatus(
+                requestStatus = statementAddingUiState.requestStatus,
+                onSuccess = { },
+                failedText = stringResource(R.string.failed_add_statement),
+                errorText = stringResource(R.string.no_internet_connection)
+            ) {
+                StatementDetailsBody(
+                    statementAddingUiState = statementAddingUiState,
+                    onValueChange = { },
+                    onStatementAddingClick = { }
+                )
+            }
         }
     }
 }

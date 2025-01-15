@@ -15,6 +15,7 @@ import xelagurd.socialdating.checkDisabledButton
 import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.checkTextField
 import xelagurd.socialdating.data.model.additional.LoginDetails
+import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
 import xelagurd.socialdating.ui.screen.LoginDetailsBody
@@ -39,6 +40,15 @@ class LoginScreenTest {
         val loginUiState = LoginUiState()
 
         assertContentIsDisplayed(loginUiState)
+    }
+
+    @Test
+    fun loginScreen_loadingStatus_loadingIndicator() {
+        val loginUiState = LoginUiState(requestStatus = RequestStatus.LOADING)
+
+        setContentToLoginBody(loginUiState)
+
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
@@ -123,13 +133,13 @@ class LoginScreenTest {
     private fun setContentToLoginBody(loginUiState: LoginUiState) {
         composeTestRule.activity.setContent {
             ComponentWithRequestStatus(
-                formUiState = loginUiState,
+                requestStatus = loginUiState.requestStatus,
                 onSuccess = { },
                 failedText = stringResource(R.string.failed_login),
                 errorText = stringResource(R.string.no_internet_connection)
             ) {
                 LoginDetailsBody(
-                    loginDetails = it as LoginDetails,
+                    loginDetails = loginUiState.formDetails,
                     onValueChange = { },
                     onLoginClick = { },
                     onRegistrationClick = { }

@@ -1,6 +1,7 @@
 package xelagurd.socialdating.ui.screen
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -22,8 +24,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.DataEntity
 
@@ -33,6 +38,15 @@ fun stringResourceWithColon(@StringRes id: Int) =
     stringResource(R.string.text_with_colon, stringResource(id))
 
 @Composable
+fun AppLoadingIndicator() {
+    CircularProgressIndicator(
+        modifier = Modifier
+            .padding(dimensionResource(R.dimen.padding_large))
+            .testTag(stringResource(R.string.loading))
+    )
+}
+
+@Composable
 fun AppLargeBodyText(
     text: String,
     modifier: Modifier = Modifier
@@ -40,7 +54,7 @@ fun AppLargeBodyText(
     Text(
         text = text,
         style = MaterialTheme.typography.bodyLarge,
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_very_small))
     )
 }
 
@@ -52,7 +66,7 @@ fun AppSmallTitleText(
     Text(
         text = text,
         style = MaterialTheme.typography.titleSmall,
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_very_small))
     )
 }
 
@@ -64,7 +78,7 @@ fun AppMediumTitleText(
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium,
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_small))
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_small))
     )
 }
 
@@ -76,8 +90,27 @@ fun AppLargeTitleText(
     Text(
         text = text,
         style = MaterialTheme.typography.titleLarge,
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium))
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_medium))
     )
+}
+
+@Composable
+fun AppSmallTextCard(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
+    isHasBorder: Boolean = false
+) {
+    AppTextCard(
+        isEnabled = isEnabled,
+        onClick = onClick,
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_very_small)),
+        isHasBorder = isHasBorder,
+        modifier = modifier
+    ) {
+        AppSmallTitleText(text)
+    }
 }
 
 @Composable
@@ -85,12 +118,15 @@ fun AppMediumTextCard(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isEnabled: Boolean = true
+    isEnabled: Boolean = true,
+    isHasBorder: Boolean = false
 ) {
     AppTextCard(
         isEnabled = isEnabled,
         onClick = onClick,
-        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_small))
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_small)),
+        isHasBorder = isHasBorder,
+        modifier = modifier
     ) {
         AppMediumTitleText(text)
     }
@@ -101,12 +137,15 @@ fun AppLargeTextCard(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isEnabled: Boolean = true
+    isEnabled: Boolean = true,
+    isHasBorder: Boolean = false
 ) {
     AppTextCard(
         isEnabled = isEnabled,
         onClick = onClick,
-        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium))
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
+        isHasBorder = isHasBorder,
+        modifier = modifier
     ) {
         AppLargeTitleText(text)
     }
@@ -117,6 +156,7 @@ private fun AppTextCard(
     isEnabled: Boolean,
     onClick: () -> Unit,
     elevation: CardElevation,
+    isHasBorder: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -124,7 +164,8 @@ private fun AppTextCard(
         enabled = isEnabled,
         onClick = onClick,
         elevation = elevation,
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_small)),
+        border = BorderStroke(1.dp, Color.Black).takeIf { isHasBorder },
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_small)),
         content = content
     )
 }
@@ -142,20 +183,20 @@ fun AppTextField(
         onValueChange = onValueChange,
         label = { Text(label) },
         singleLine = singleLine,
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_small))
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_small))
     )
 }
 
 @Composable
 inline fun AppDataLazyList(
     entities: List<DataEntity>,
-    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     crossinline card: @Composable (DataEntity) -> Unit
 ) {
     LazyColumn(
         contentPadding = contentPadding,
-        modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+        modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_small))
     ) {
         items(items = entities, key = { it.id }) {
             card(it)
@@ -173,7 +214,7 @@ inline fun AppDataList(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+            .padding(horizontal = dimensionResource(R.dimen.padding_small))
     ) {
         entities.forEach {
             content(it)
@@ -191,7 +232,7 @@ inline fun AppEntityCard(
     Card(
         onClick = { onEntityClick(entity.id) },
         elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_small)),
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_small)),
         content = { content(entity) }
     )
 }
@@ -207,7 +248,7 @@ inline fun AppExpandedEntityCard(
     Card(
         onClick = { isExpanded = !isExpanded },
         elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_small)),
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_small)),
         content = { content(entity, isExpanded) }
     )
 }

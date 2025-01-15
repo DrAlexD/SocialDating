@@ -12,9 +12,11 @@ import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
 import xelagurd.socialdating.checkEnabledButton
+import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
 import xelagurd.socialdating.ui.screen.SettingsDetailsBody
+import xelagurd.socialdating.ui.state.RegistrationUiState
 import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.state.SettingsUiState
 
@@ -39,6 +41,15 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun settingsScreen_loadingStatus_loadingIndicator() {
+        val settingsUiState = SettingsUiState(requestStatus = RequestStatus.LOADING)
+
+        setContentToSettingsBody(settingsUiState)
+
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+    }
+
+    @Test
     fun settingsScreen_errorStatus_errorText() {
         val settingsUiState = SettingsUiState(requestStatus = RequestStatus.ERROR)
 
@@ -56,7 +67,7 @@ class SettingsScreenTest {
     private fun setContentToSettingsBody(settingsUiState: SettingsUiState) {
         composeTestRule.activity.setContent {
             ComponentWithRequestStatus(
-                formUiState = settingsUiState,
+                requestStatus = settingsUiState.requestStatus,
                 onSuccess = { },
                 failedText = "",
                 errorText = stringResource(R.string.unknown_error)

@@ -38,12 +38,12 @@ class ProfileStatisticsScreenTest {
     }
 
     @Test
-    fun profileStatisticsScreen_loadingStatusAndEmptyData_loadingText() {
+    fun profileStatisticsScreen_loadingStatusAndEmptyData_loadingIndicator() {
         val profileStatisticsUiState = ProfileStatisticsUiState()
 
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test

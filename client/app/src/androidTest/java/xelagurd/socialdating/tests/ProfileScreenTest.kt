@@ -15,6 +15,7 @@ import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
+import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.onNodeWithTextIdWithColon
 import xelagurd.socialdating.ui.screen.DataEntityComponent
@@ -36,12 +37,12 @@ class ProfileScreenTest {
     }
 
     @Test
-    fun profileScreen_loadingStatusAndEmptyData_loadingText() {
+    fun profileScreen_loadingStatusAndEmptyData_loadingIndicator() {
         val profileUiState = ProfileUiState()
 
         setContentToProfileBody(profileUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test

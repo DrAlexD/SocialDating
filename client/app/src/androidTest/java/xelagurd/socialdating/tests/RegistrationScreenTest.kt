@@ -1,6 +1,7 @@
 package xelagurd.socialdating.tests
 
 import androidx.activity.compose.setContent
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -16,9 +17,12 @@ import xelagurd.socialdating.checkTextField
 import xelagurd.socialdating.data.model.additional.RegistrationDetails
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
+import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.onNodeWithTextIdWithColon
-import xelagurd.socialdating.ui.screen.RegistrationBody
+import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
+import xelagurd.socialdating.ui.screen.RegistrationDetailsBody
+import xelagurd.socialdating.ui.state.LoginUiState
 import xelagurd.socialdating.ui.state.RegistrationUiState
 import xelagurd.socialdating.ui.state.RequestStatus
 
@@ -40,6 +44,15 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState()
 
         assertContentIsDisplayed(registrationUiState)
+    }
+
+    @Test
+    fun registrationScreen_loadingStatus_loadingIndicator() {
+        val registrationUiState = RegistrationUiState(requestStatus = RequestStatus.LOADING)
+
+        setContentToRegistrationBody(registrationUiState)
+
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
@@ -239,12 +252,18 @@ class RegistrationScreenTest {
 
     private fun setContentToRegistrationBody(registrationUiState: RegistrationUiState) {
         composeTestRule.activity.setContent {
-            RegistrationBody(
-                registrationUiState = registrationUiState,
-                onValueChange = {},
-                onRegisterClick = {},
-                onSuccessRegistration = {}
-            )
+            ComponentWithRequestStatus(
+                requestStatus = registrationUiState.requestStatus,
+                onSuccess = { },
+                failedText = stringResource(R.string.failed_registration),
+                errorText = stringResource(R.string.no_internet_connection)
+            ) {
+                RegistrationDetailsBody(
+                    registrationDetails = registrationUiState.formDetails,
+                    onValueChange = { },
+                    onRegisterClick = { }
+                )
+            }
         }
     }
 }
