@@ -73,12 +73,18 @@ fun AppSmallTitleText(
 @Composable
 fun AppMediumTitleText(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isOverrideModifier: Boolean = false
 ) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium,
-        modifier = modifier.padding(dimensionResource(R.dimen.padding_small))
+        modifier = with(modifier) {
+            if (!isOverrideModifier)
+                padding(dimensionResource(R.dimen.padding_small))
+            else
+                this
+        }
     )
 }
 
@@ -176,14 +182,25 @@ fun AppTextField(
     onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
+    isOverrideModifier: Boolean = false,
     singleLine: Boolean = true
 ) {
     TextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = {
+            AppMediumTitleText(
+                text = label,
+                isOverrideModifier = true
+            )
+        },
         singleLine = singleLine,
-        modifier = modifier.padding(dimensionResource(R.dimen.padding_small))
+        modifier = with(modifier) {
+            if (!isOverrideModifier)
+                padding(dimensionResource(R.dimen.padding_small))
+            else
+                this
+        }
     )
 }
 

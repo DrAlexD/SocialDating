@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
@@ -14,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -84,15 +86,19 @@ fun RegistrationDetailsBody(
                 value = registrationDetails.username,
                 onValueChange = { onValueChange(registrationDetails.copy(username = it)) },
                 label = stringResource(R.string.username),
+                isOverrideModifier = true,
                 modifier = Modifier
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_small))
+                    .padding(dimensionResource(R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
             )
             AppTextField(
                 value = registrationDetails.name,
                 onValueChange = { onValueChange(registrationDetails.copy(name = it)) },
                 label = stringResource(R.string.name),
+                isOverrideModifier = true,
                 modifier = Modifier
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_small))
+                    .padding(dimensionResource(R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
             )
         }
         Row(
@@ -112,7 +118,9 @@ fun RegistrationDetailsBody(
         AppTextField(
             value = registrationDetails.email,
             onValueChange = { onValueChange(registrationDetails.copy(email = it)) },
-            label = stringResource(R.string.email_optional)
+            label = stringResource(R.string.email_optional),
+            isOverrideModifier = true,
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -122,15 +130,19 @@ fun RegistrationDetailsBody(
                 value = registrationDetails.age,
                 onValueChange = { onValueChange(registrationDetails.copy(age = it)) },
                 label = stringResource(R.string.age),
+                isOverrideModifier = true,
                 modifier = Modifier
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_small))
+                    .padding(dimensionResource(R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
             )
             AppTextField(
                 value = registrationDetails.city,
                 onValueChange = { onValueChange(registrationDetails.copy(city = it)) },
                 label = stringResource(R.string.city),
+                isOverrideModifier = true,
                 modifier = Modifier
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_small))
+                    .padding(dimensionResource(R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
             )
         }
         Row(
@@ -165,15 +177,19 @@ fun RegistrationDetailsBody(
                 value = registrationDetails.password,
                 onValueChange = { onValueChange(registrationDetails.copy(password = it)) },
                 label = stringResource(R.string.password),
+                isOverrideModifier = true,
                 modifier = Modifier
-                    .width(TextFieldDefaults.MinWidth / 2 + 40.dp)
+                    .padding(dimensionResource(R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 + 25.dp)
             )
             AppTextField(
                 value = registrationDetails.repeatedPassword,
                 onValueChange = { onValueChange(registrationDetails.copy(repeatedPassword = it)) },
                 label = stringResource(R.string.repeat_password),
+                isOverrideModifier = true,
                 modifier = Modifier
-                    .width(TextFieldDefaults.MinWidth / 2 + 40.dp)
+                    .padding(dimensionResource(R.dimen.padding_very_small))
+                    .width(TextFieldDefaults.MinWidth / 2 + 25.dp)
             )
         }
         AppLargeTextCard(
