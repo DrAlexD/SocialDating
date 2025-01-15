@@ -17,7 +17,7 @@ import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.additional.LoginDetails
 import xelagurd.socialdating.ui.navigation.LoginDestination
-import xelagurd.socialdating.ui.state.LoginUiState
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.LoginViewModel
 
@@ -39,14 +39,14 @@ fun LoginScreen(
         }
     ) { innerPadding ->
         ComponentWithRequestStatus(
-            formUiState = loginUiState,
+            requestStatus = loginUiState.requestStatus,
             onSuccess = onSuccessLogin,
             failedText = stringResource(R.string.failed_login),
             errorText = stringResource(R.string.no_internet_connection),
             contentPadding = innerPadding
         ) {
             LoginDetailsBody(
-                loginDetails = it as LoginDetails,
+                loginDetails = loginUiState.formDetails,
                 onValueChange = loginViewModel::updateUiState,
                 onLoginClick = loginViewModel::loginWithInput,
                 onRegistrationClick = onRegistrationClick
@@ -96,13 +96,13 @@ fun LoginDetailsBody(
 private fun LoginComponentPreview() {
     AppTheme {
         ComponentWithRequestStatus(
-            formUiState = LoginUiState(),
+            requestStatus = RequestStatus.UNDEFINED,
             onSuccess = { },
             failedText = stringResource(R.string.failed_login),
             errorText = stringResource(R.string.no_internet_connection)
         ) {
             LoginDetailsBody(
-                loginDetails = it as LoginDetails,
+                loginDetails = LoginDetails(),
                 onValueChange = { },
                 onLoginClick = { },
                 onRegistrationClick = { }

@@ -1,32 +1,18 @@
 package xelagurd.socialdating.ui.screen
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
@@ -37,10 +23,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import xelagurd.socialdating.AppBottomNavigationBar
 import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
+import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.additional.StatementDetails
 import xelagurd.socialdating.ui.navigation.StatementAddingDestination
-import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.state.StatementAddingUiState
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.StatementAddingViewModel
@@ -68,43 +54,24 @@ fun StatementAddingScreen(
             )
         }
     ) { innerPadding ->
-        StatementAddingBody(
-            statementAddingUiState = statementAddingUiState,
-            onValueChange = statementAddingViewModel::updateUiState,
-            onStatementAddingClick = statementAddingViewModel::statementAdding,
-            onSuccessStatementAdding = onSuccessStatementAdding,
-            modifier = modifier.fillMaxSize(),
-            contentPadding = innerPadding
-        )
-    }
-}
-
-@Composable
-internal fun StatementAddingBody(
-    statementAddingUiState: StatementAddingUiState,
-    onValueChange: (StatementDetails) -> Unit,
-    onStatementAddingClick: () -> Unit,
-    onSuccessStatementAdding: () -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
-) {
-    Box(modifier.padding(contentPadding)) {
-        StatementAddingDetails(
-            statementAddingUiState = statementAddingUiState,
-            onValueChange = onValueChange,
-            onStatementAddingClick = onStatementAddingClick,
-            modifier = modifier
-        )
-        StatementAddingStatus(
+        ComponentWithRequestStatus(
             requestStatus = statementAddingUiState.requestStatus,
-            onSuccessStatementAdding = onSuccessStatementAdding,
-            modifier = modifier
-        )
+            onSuccess = onSuccessStatementAdding,
+            failedText = stringResource(R.string.failed_add_statement),
+            errorText = stringResource(R.string.no_internet_connection),
+            contentPadding = innerPadding
+        ) {
+            StatementDetailsBody(
+                statementAddingUiState = statementAddingUiState,
+                onValueChange = statementAddingViewModel::updateUiState,
+                onStatementAddingClick = statementAddingViewModel::statementAdding
+            )
+        }
     }
 }
 
 @Composable
-private fun StatementAddingDetails(
+fun StatementDetailsBody(
     statementAddingUiState: StatementAddingUiState,
     onValueChange: (StatementDetails) -> Unit,
     onStatementAddingClick: () -> Unit,
@@ -115,41 +82,39 @@ private fun StatementAddingDetails(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier
+        modifier = modifier.fillMaxSize()
     ) {
-        TextField(
+        AppTextField(
             value = statementDetails.text,
             onValueChange = { onValueChange(statementDetails.copy(text = it)) },
-            label = { Text(stringResource(R.string.statement_text)) },
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
+            label = stringResource(R.string.statement_text)
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_large))
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
         ) {
-            Text(
-                text = stringResourceWithColon(R.string.defining_theme),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small))
-            )
-            DefiningThemesBody(
-                definingThemes = statementAddingUiState.definingThemes,
-                onDefiningThemeClick = {
-                    onValueChange(
-                        statementDetails.copy(
-                            definingThemeId = it.takeIf { statementDetails.definingThemeId == null }
+            AppMediumTitleText(text = stringResourceWithColon(R.string.defining_theme))
+            DataChoosingListComponent(
+                dataListUiState = statementAddingUiState,
+                chosenEntityId = statementDetails.definingThemeId,
+                maxHeight = LocalConfiguration.current.screenHeightDp.dp / 4
+            ) { entity, isHasBorder ->
+                AppMediumTextCard(
+                    text = (entity as DefiningTheme).name,
+                    onClick = {
+                        onValueChange(
+                            statementDetails.copy(
+                                definingThemeId = entity.id
+                                    .takeIf { statementDetails.definingThemeId == null }
+                            )
                         )
-                    )
-                },
-                chosenDefiningThemeId = statementDetails.definingThemeId
-            )
+                    },
+                    isHasBorder = isHasBorder
+                )
+            }
         }
-        Text(
-            text = stringResource(R.string.is_support_defining_theme),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(end = dimensionResource(id = R.dimen.padding_small))
-        )
+        AppMediumTitleText(text = stringResource(R.string.is_support_defining_theme))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -159,170 +124,86 @@ private fun StatementAddingDetails(
                 onClick = { onValueChange(statementDetails.copy(isSupportDefiningTheme = true)) },
                 modifier = Modifier.testTag(stringResource(R.string.yes))
             )
-            Text(
-                text = stringResource(R.string.yes),
-                style = MaterialTheme.typography.titleMedium
-            )
+            AppMediumTitleText(text = stringResource(R.string.yes))
             RadioButton(
                 selected = statementDetails.isSupportDefiningTheme == false,
                 onClick = { onValueChange(statementDetails.copy(isSupportDefiningTheme = false)) },
                 modifier = Modifier.testTag(stringResource(R.string.no))
             )
-            Text(
-                text = stringResource(R.string.no),
-                style = MaterialTheme.typography.titleMedium
-            )
+            AppMediumTitleText(text = stringResource(R.string.no))
         }
-        Card(
-            enabled = statementDetails.isValid,
-            onClick = onStatementAddingClick,
-            elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
-        ) {
-            Text(
-                text = stringResource(R.string.add_statement),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
-            )
-        }
-    }
-}
-
-@Composable
-internal fun DefiningThemesBody(
-    definingThemes: List<DefiningTheme>,
-    onDefiningThemeClick: (Int) -> Unit,
-    chosenDefiningThemeId: Int?,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        if (definingThemes.isNotEmpty()) {
-            if (chosenDefiningThemeId != null) {
-                DefiningThemeCard(
-                    definingTheme = definingThemes.first { it.id == chosenDefiningThemeId },
-                    onDefiningThemeClick = onDefiningThemeClick,
-                    isChosen = true,
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
-                )
-            } else {
-                DefiningThemesList(
-                    definingThemes = definingThemes,
-                    onDefiningThemeClick = onDefiningThemeClick,
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
-                )
-            }
-        } else {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = modifier
-            ) {
-                Text(
-                    text = stringResource(R.string.no_data),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun DefiningThemesList(
-    definingThemes: List<DefiningTheme>,
-    onDefiningThemeClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val maxHeight = LocalConfiguration.current.screenHeightDp.dp / 4
-
-    LazyColumn(
-        modifier = modifier.heightIn(0.dp, maxHeight)
-    ) {
-        items(items = definingThemes, key = { it.id }) {
-            DefiningThemeCard(
-                definingTheme = it,
-                onDefiningThemeClick = onDefiningThemeClick,
-                isChosen = false
-            )
-        }
-    }
-}
-
-@Composable
-fun DefiningThemeCard(
-    definingTheme: DefiningTheme,
-    onDefiningThemeClick: (Int) -> Unit,
-    isChosen: Boolean,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        onClick = { onDefiningThemeClick(definingTheme.id) },
-        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_small)),
-        border = BorderStroke(1.dp, Color.Black).takeIf { isChosen },
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(dimensionResource(id = R.dimen.padding_very_small))
-    ) {
-        Text(
-            text = definingTheme.name,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium))
+        AppLargeTextCard(
+            isEnabled = statementDetails.isValid,
+            text = stringResource(R.string.add_statement),
+            onClick = onStatementAddingClick
         )
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-private fun StatementAddingStatus(
-    requestStatus: RequestStatus,
-    onSuccessStatementAdding: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom,
-        modifier = modifier
-    ) {
-        when (requestStatus) {
-            RequestStatus.UNDEFINED -> {}
+private fun StatementAddingComponentPreview() {
+    AppTheme {
+        val statementAddingUiState = StatementAddingUiState(
+            entities = FakeDataSource.definingThemes
+        )
 
-            RequestStatus.LOADING -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-                )
-            }
-
-            RequestStatus.ERROR -> {
-                Text(
-                    text = stringResource(R.string.no_internet_connection),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-                )
-            }
-
-            RequestStatus.FAILED -> {
-                Text(
-                    text = stringResource(R.string.failed_add_statement),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-                )
-            }
-
-            RequestStatus.SUCCESS -> onSuccessStatementAdding()
+        ComponentWithRequestStatus(
+            requestStatus = statementAddingUiState.requestStatus,
+            onSuccess = { },
+            failedText = stringResource(R.string.failed_add_statement),
+            errorText = stringResource(R.string.no_internet_connection)
+        ) {
+            StatementDetailsBody(
+                statementAddingUiState = statementAddingUiState,
+                onValueChange = { },
+                onStatementAddingClick = { }
+            )
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun StatementDetailsPreview() {
+private fun StatementAddingComponentWithChosenPreview() {
     AppTheme {
-        StatementAddingDetails(
-            statementAddingUiState = StatementAddingUiState(),
-            onValueChange = { },
-            onStatementAddingClick = { }
+        val statementAddingUiState = StatementAddingUiState(
+            entities = FakeDataSource.definingThemes,
+            formDetails = StatementDetails(definingThemeId = 1)
         )
+
+        ComponentWithRequestStatus(
+            requestStatus = statementAddingUiState.requestStatus,
+            onSuccess = { },
+            failedText = stringResource(R.string.failed_add_statement),
+            errorText = stringResource(R.string.no_internet_connection)
+        ) {
+            StatementDetailsBody(
+                statementAddingUiState = statementAddingUiState,
+                onValueChange = { },
+                onStatementAddingClick = { }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun StatementAddingComponentEmptyDataPreview() {
+    AppTheme {
+        val statementAddingUiState = StatementAddingUiState()
+
+        ComponentWithRequestStatus(
+            requestStatus = statementAddingUiState.requestStatus,
+            onSuccess = { },
+            failedText = stringResource(R.string.failed_add_statement),
+            errorText = stringResource(R.string.no_internet_connection)
+        ) {
+            StatementDetailsBody(
+                statementAddingUiState = statementAddingUiState,
+                onValueChange = { },
+                onStatementAddingClick = { }
+            )
+        }
     }
 }

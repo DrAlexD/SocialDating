@@ -72,6 +72,7 @@ jobs:
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
+          profile: "small_phone"
           api-level: 35
           arch: x86_64
           force-avd-creation: false

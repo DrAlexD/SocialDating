@@ -21,13 +21,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import xelagurd.socialdating.MainViewModel
 import xelagurd.socialdating.R
-import xelagurd.socialdating.ui.screen.StatementAddingScreen
 import xelagurd.socialdating.ui.screen.CategoriesScreen
 import xelagurd.socialdating.ui.screen.LoginScreen
 import xelagurd.socialdating.ui.screen.ProfileScreen
 import xelagurd.socialdating.ui.screen.ProfileStatisticsScreen
 import xelagurd.socialdating.ui.screen.RegistrationScreen
 import xelagurd.socialdating.ui.screen.SettingsScreen
+import xelagurd.socialdating.ui.screen.StatementAddingScreen
 import xelagurd.socialdating.ui.screen.StatementsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)

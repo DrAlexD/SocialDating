@@ -121,7 +121,7 @@ fun UserCategoryCardContent(
         }
         if (isExpanded) {
             HorizontalDivider(color = Color.Black)
-            AppDataList(entities = userDefiningThemes) {
+            AppList(entities = userDefiningThemes) {
                 UserDefiningThemeDetailsBody(userDefiningTheme = it as UserDefiningThemeWithData)
             }
         }

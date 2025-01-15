@@ -3,23 +3,19 @@ package xelagurd.socialdating.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.DataEntity
-import xelagurd.socialdating.data.model.additional.FormDetails
 import xelagurd.socialdating.ui.state.DataEntityUiState
 import xelagurd.socialdating.ui.state.DataListUiState
-import xelagurd.socialdating.ui.state.FormUiState
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.InternetUiState
 import xelagurd.socialdating.ui.state.RequestStatus
@@ -34,10 +30,34 @@ fun DataListComponent(
 ) {
     DataComponent(
         internetUiState = dataListUiState,
-        modifier = modifier
+        modifier = Modifier.fillMaxSize()
     ) {
-        AppDataLazyList(
+        AppDataList(
             entities = dataListUiState.entities,
+            modifier = modifier,
+            contentPadding = contentPadding,
+            card = card
+        )
+    }
+}
+
+@Composable
+fun DataChoosingListComponent(
+    dataListUiState: DataListUiState,
+    chosenEntityId: Int?,
+    maxHeight: Dp,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    card: @Composable (DataEntity, Boolean) -> Unit
+) {
+    DataComponent(
+        internetUiState = dataListUiState
+    ) {
+        AppDataChoosingList(
+            entities = dataListUiState.entities,
+            chosenEntityId = chosenEntityId,
+            maxHeight = maxHeight,
+            modifier = modifier,
             contentPadding = contentPadding,
             card = card
         )
@@ -47,13 +67,12 @@ fun DataListComponent(
 @Composable
 fun DataEntityComponent(
     dataEntityUiState: DataEntityUiState,
-    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    content: @Composable ColumnScope.(DataEntity) -> Unit
+    content: @Composable (DataEntity) -> Unit
 ) {
     DataComponent(
         internetUiState = dataEntityUiState,
-        modifier = modifier
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -71,53 +90,47 @@ private inline fun DataComponent(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    if (internetUiState.isDataExist()) {
-        content()
-    } else {
-        InternetStatusComponent(internetUiState.internetStatus)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+    ) {
+        if (internetUiState.isDataExist()) {
+            content()
+        } else {
+            InternetStatusComponent(internetUiState.internetStatus)
+        }
     }
 }
 
 @Composable
 private fun InternetStatusComponent(
-    internetStatus: InternetStatus,
-    modifier: Modifier = Modifier
+    internetStatus: InternetStatus
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
-    ) {
-        AppLargeTitleText(
-            text = stringResource(
-                when (internetStatus) {
-                    InternetStatus.ONLINE -> R.string.no_data
-                    InternetStatus.LOADING -> R.string.loading
-                    InternetStatus.OFFLINE -> R.string.no_internet_connection
-                }
-            )
-        )
+    when (internetStatus) {
+        InternetStatus.LOADING -> AppLoadingIndicator()
+        InternetStatus.OFFLINE -> AppLargeTitleText(text = stringResource(R.string.no_internet_connection))
+        InternetStatus.ONLINE -> AppLargeTitleText(text = stringResource(R.string.no_data))
     }
 }
 
 @Composable
 fun ComponentWithRequestStatus(
-    formUiState: FormUiState,
+    requestStatus: RequestStatus,
     onSuccess: () -> Unit,
     failedText: String,
     errorText: String,
-    modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    content: @Composable (FormDetails) -> Unit
+    content: @Composable () -> Unit
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(contentPadding)
     ) {
-        content(formUiState.formDetails)
+        content()
         RequestStatusComponent(
-            requestStatus = formUiState.requestStatus,
+            requestStatus = requestStatus,
             onSuccess = onSuccess,
             failedText = failedText,
             errorText = errorText
@@ -130,21 +143,16 @@ private inline fun RequestStatusComponent(
     requestStatus: RequestStatus,
     onSuccess: () -> Unit,
     failedText: String,
-    errorText: String,
-    modifier: Modifier = Modifier
+    errorText: String
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         when (requestStatus) {
             RequestStatus.UNDEFINED -> {}
-            RequestStatus.LOADING ->
-                CircularProgressIndicator(
-                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-                )
-
+            RequestStatus.LOADING -> AppLoadingIndicator()
             RequestStatus.FAILED -> AppLargeTitleText(failedText)
             RequestStatus.ERROR -> AppLargeTitleText(errorText)
             RequestStatus.SUCCESS -> onSuccess()

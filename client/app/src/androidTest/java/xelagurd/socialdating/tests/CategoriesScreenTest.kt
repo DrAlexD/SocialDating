@@ -12,6 +12,7 @@ import org.junit.Test
 import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.Category
+import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.AppEntityCard
 import xelagurd.socialdating.ui.screen.CategoryCardContent
@@ -33,12 +34,12 @@ class CategoriesScreenTest {
     }
 
     @Test
-    fun categoriesScreen_loadingStatusAndEmptyData_loadingText() {
+    fun categoriesScreen_loadingStatusAndEmptyData_loadingIndicator() {
         val categoriesUiState = CategoriesUiState()
 
         setContentToCategoriesBody(categoriesUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test

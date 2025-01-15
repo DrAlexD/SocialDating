@@ -14,6 +14,7 @@ import xelagurd.socialdating.R
 import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.onNodeWithContentDescriptionId
+import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.AppEntityCard
 import xelagurd.socialdating.ui.screen.DataListComponent
@@ -35,12 +36,12 @@ class StatementsScreenTest {
     }
 
     @Test
-    fun statementsScreen_loadingStatusAndEmptyData_loadingText() {
+    fun statementsScreen_loadingStatusAndEmptyData_loadingIndicator() {
         val statementsUiState = StatementsUiState()
 
         setContentToStatementsBody(statementsUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test

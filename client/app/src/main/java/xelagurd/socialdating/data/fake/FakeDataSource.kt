@@ -75,7 +75,7 @@ object FakeDataSource {
         Statement(15, "Statement15", true, 3, 1),
         Statement(16, "Statement16", true, 4, 1),
         Statement(17, "Statement17", true, 4, 1),
-        Statement(18, "Statement18", true,  5, 1),
+        Statement(18, "Statement18", true, 5, 1),
         Statement(19, "Statement19", true, 5, 1),
         Statement(20, "Statement20", true, 5, 1),
     )
@@ -83,9 +83,18 @@ object FakeDataSource {
     val newStatement = Statement(21, "NewStatement21", true, 1, 1)
 
     val users = listOf(
-        User(1, "Alexander", Gender.MALE, "username1", "password1", "email1@gmail.com", 25, "Moscow", Purpose.ALL_AT_ONCE, 50),
-        User(2, "Denis", Gender.MALE, "username2", "password2", "email2@gmail.com", 27, "St. Petersburg", Purpose.FRIENDS, 50),
-        User(3, "Andrey", Gender.MALE, "username3", "password3", "email3@gmail.com", 28, "Moscow", Purpose.RELATIONSHIPS, 50),
+        User(
+            1, "Alexander", Gender.MALE, "username1", "password1", "email1@gmail.com",
+            25, "Moscow", Purpose.ALL_AT_ONCE, 50
+        ),
+        User(
+            2, "Denis", Gender.MALE, "username2", "password2", "email2@gmail.com", 27,
+            "St. Petersburg", Purpose.FRIENDS, 50
+        ),
+        User(
+            3, "Andrey", Gender.MALE, "username3", "password3", "email3@gmail.com", 28,
+            "Moscow", Purpose.RELATIONSHIPS, 50
+        ),
     )
 
     val userCategories = listOf(

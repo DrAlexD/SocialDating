@@ -16,9 +16,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import xelagurd.socialdating.AppBottomNavigationBar
 import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
-import xelagurd.socialdating.data.model.additional.SettingsDetails
 import xelagurd.socialdating.ui.navigation.SettingsDestination
-import xelagurd.socialdating.ui.state.SettingsUiState
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.SettingsViewModel
 
@@ -44,7 +43,7 @@ fun SettingsScreen(
         }
     ) { innerPadding ->
         ComponentWithRequestStatus(
-            formUiState = settingsUiState,
+            requestStatus = settingsUiState.requestStatus,
             onSuccess = onSuccessLogout,
             failedText = "",
             errorText = stringResource(R.string.unknown_error),
@@ -79,7 +78,7 @@ fun SettingsDetailsBody(
 private fun SettingsComponentPreview() {
     AppTheme {
         ComponentWithRequestStatus(
-            formUiState = SettingsUiState(),
+            requestStatus = RequestStatus.UNDEFINED,
             onSuccess = { },
             failedText = "",
             errorText = stringResource(R.string.unknown_error)

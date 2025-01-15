@@ -8,7 +8,7 @@ data class StatementDetails(
     val isSupportDefiningTheme: Boolean? = null,
     val definingThemeId: Int? = null,
     val userId: Int? = null
-): FormDetails {
+) : FormDetails {
     val isValid
         get() = text.isNotBlank() && isSupportDefiningTheme != null && definingThemeId != null
                 && userId != null

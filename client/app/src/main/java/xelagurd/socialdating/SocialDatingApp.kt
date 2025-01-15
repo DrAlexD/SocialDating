@@ -75,7 +75,7 @@ fun AppTopBar(
                                 }
                             ),
                             style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_very_small))
+                            modifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
                         )
                         if (internetStatus.isAllowedRefresh()) {
                             Icon(
