@@ -10,7 +10,8 @@ import xelagurd.socialdating.data.model.additional.UserDefiningThemeWithData
 
 @Dao
 interface UserDefiningThemesDao {
-    @Query("""
+    @Query(
+        """
         SELECT 
             udt.id AS id,
             udt.value AS value,
@@ -23,7 +24,8 @@ interface UserDefiningThemesDao {
         FROM user_defining_themes AS udt
         INNER JOIN defining_themes AS dt ON udt.definingThemeId = dt.id
         WHERE udt.userCategoryId IN (:userCategoryIds)
-    """)
+        """
+    )
     fun getUserDefiningThemes(userCategoryIds: List<Int>): Flow<List<UserDefiningThemeWithData>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

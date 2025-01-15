@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class LoginDetails(
     val username: String = "",
     val password: String = ""
-): FormDetails {
+) : FormDetails {
     val isValid
         get() = username.isNotBlank() && password.isNotBlank()
 }
