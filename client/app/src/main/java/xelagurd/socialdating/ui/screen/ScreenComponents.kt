@@ -3,7 +3,6 @@ package xelagurd.socialdating.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -45,7 +44,7 @@ fun DataEntityComponent(
     dataEntityUiState: DataEntityUiState,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    content: @Composable ColumnScope.(DataEntity) -> Unit
+    content: @Composable (DataEntity) -> Unit
 ) {
     DataComponent(
         internetUiState = dataEntityUiState,
