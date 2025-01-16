@@ -36,11 +36,28 @@ import xelagurd.socialdating.ui.viewmodel.StatementAddingViewModel
 fun StatementAddingScreen(
     onSuccessStatementAdding: () -> Unit,
     onNavigateUp: () -> Unit,
-    modifier: Modifier = Modifier,
     statementAddingViewModel: StatementAddingViewModel = hiltViewModel()
 ) {
     val statementAddingUiState by statementAddingViewModel.uiState.collectAsState()
 
+    StatementAddingScreenComponent(
+        statementAddingUiState = statementAddingUiState,
+        onSuccessStatementAdding = onSuccessStatementAdding,
+        onNavigateUp = onNavigateUp,
+        onValueChange = statementAddingViewModel::updateUiState,
+        onStatementAddingClick = statementAddingViewModel::statementAdding
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StatementAddingScreenComponent(
+    statementAddingUiState: StatementAddingUiState = StatementAddingUiState(),
+    onSuccessStatementAdding: () -> Unit = {},
+    onNavigateUp: () -> Unit = {},
+    onValueChange: (StatementDetails) -> Unit = {},
+    onStatementAddingClick: () -> Unit = {}
+) {
     Scaffold(
         topBar = {
             AppTopBar(
@@ -63,26 +80,25 @@ fun StatementAddingScreen(
         ) {
             StatementDetailsBody(
                 statementAddingUiState = statementAddingUiState,
-                onValueChange = statementAddingViewModel::updateUiState,
-                onStatementAddingClick = statementAddingViewModel::statementAdding
+                onValueChange = onValueChange,
+                onStatementAddingClick = onStatementAddingClick
             )
         }
     }
 }
 
 @Composable
-fun StatementDetailsBody(
+private inline fun StatementDetailsBody(
     statementAddingUiState: StatementAddingUiState,
-    onValueChange: (StatementDetails) -> Unit,
-    onStatementAddingClick: () -> Unit,
-    modifier: Modifier = Modifier
+    crossinline onValueChange: (StatementDetails) -> Unit,
+    noinline onStatementAddingClick: () -> Unit
 ) {
     val statementDetails = statementAddingUiState.formDetails
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         AppTextField(
             value = statementDetails.text,
@@ -144,22 +160,11 @@ fun StatementDetailsBody(
 @Composable
 private fun StatementAddingComponentPreview() {
     AppTheme {
-        val statementAddingUiState = StatementAddingUiState(
-            entities = FakeDataSource.definingThemes
-        )
-
-        ComponentWithRequestStatus(
-            requestStatus = statementAddingUiState.requestStatus,
-            onSuccess = { },
-            failedText = stringResource(R.string.failed_add_statement),
-            errorText = stringResource(R.string.no_internet_connection)
-        ) {
-            StatementDetailsBody(
-                statementAddingUiState = statementAddingUiState,
-                onValueChange = { },
-                onStatementAddingClick = { }
+        StatementAddingScreenComponent(
+            statementAddingUiState = StatementAddingUiState(
+                entities = FakeDataSource.definingThemes
             )
-        }
+        )
     }
 }
 
@@ -167,23 +172,12 @@ private fun StatementAddingComponentPreview() {
 @Composable
 private fun StatementAddingComponentWithChosenPreview() {
     AppTheme {
-        val statementAddingUiState = StatementAddingUiState(
-            entities = FakeDataSource.definingThemes,
-            formDetails = StatementDetails(definingThemeId = 1)
-        )
-
-        ComponentWithRequestStatus(
-            requestStatus = statementAddingUiState.requestStatus,
-            onSuccess = { },
-            failedText = stringResource(R.string.failed_add_statement),
-            errorText = stringResource(R.string.no_internet_connection)
-        ) {
-            StatementDetailsBody(
-                statementAddingUiState = statementAddingUiState,
-                onValueChange = { },
-                onStatementAddingClick = { }
+        StatementAddingScreenComponent(
+            statementAddingUiState = StatementAddingUiState(
+                entities = FakeDataSource.definingThemes,
+                formDetails = StatementDetails(definingThemeId = 1)
             )
-        }
+        )
     }
 }
 
@@ -191,19 +185,6 @@ private fun StatementAddingComponentWithChosenPreview() {
 @Composable
 private fun StatementAddingComponentEmptyDataPreview() {
     AppTheme {
-        val statementAddingUiState = StatementAddingUiState()
-
-        ComponentWithRequestStatus(
-            requestStatus = statementAddingUiState.requestStatus,
-            onSuccess = { },
-            failedText = stringResource(R.string.failed_add_statement),
-            errorText = stringResource(R.string.no_internet_connection)
-        ) {
-            StatementDetailsBody(
-                statementAddingUiState = statementAddingUiState,
-                onValueChange = { },
-                onStatementAddingClick = { }
-            )
-        }
+        StatementAddingScreenComponent()
     }
 }

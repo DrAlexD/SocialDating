@@ -21,7 +21,7 @@ data class TopLevelDestination(
     val contentDescription: Int
 )
 
-lateinit var topLevelDestinations: List<TopLevelDestination>
+var topLevelDestinations: List<TopLevelDestination> = listOf()
 
 enum class AppScreen {
     Login,

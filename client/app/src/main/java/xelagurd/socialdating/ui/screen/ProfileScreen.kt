@@ -38,10 +38,24 @@ import xelagurd.socialdating.ui.viewmodel.ProfileViewModel
 @Composable
 fun ProfileScreen(
     onProfileStatisticsClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     val profileUiState by profileViewModel.uiState.collectAsState()
+
+    ProfileScreenComponent(
+        profileUiState = profileUiState,
+        onProfileStatisticsClick = onProfileStatisticsClick,
+        refreshAction = profileViewModel::getUser
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileScreenComponent(
+    profileUiState: ProfileUiState = ProfileUiState(),
+    onProfileStatisticsClick: (Int) -> Unit = {},
+    refreshAction: () -> Unit = {}
+) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
@@ -49,7 +63,7 @@ fun ProfileScreen(
             AppTopBar(
                 title = stringResource(ProfileDestination.titleRes),
                 internetStatus = profileUiState.internetStatus,
-                refreshAction = profileViewModel::getUser,
+                refreshAction = refreshAction,
                 scrollBehavior = scrollBehavior
             )
         },
@@ -58,7 +72,7 @@ fun ProfileScreen(
                 currentTopLevelRoute = ProfileDestination.topLevelRoute
             )
         },
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         DataEntityComponent(
             dataEntityUiState = profileUiState,
@@ -73,14 +87,12 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileDetailsBody(
+private fun ProfileDetailsBody(
     user: User,
-    onProfileStatisticsClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onProfileStatisticsClick: () -> Unit
 ) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -152,13 +164,8 @@ private fun AvatarIcon(gender: Gender) {
 @Composable
 private fun ProfileComponentPreview() {
     AppTheme {
-        DataEntityComponent(
-            dataEntityUiState = ProfileUiState(entity = FakeDataSource.users[0])
-        ) {
-            ProfileDetailsBody(
-                user = it as User,
-                onProfileStatisticsClick = { }
-            )
-        }
+        ProfileScreenComponent(
+            profileUiState = ProfileUiState(entity = FakeDataSource.users[0])
+        )
     }
 }

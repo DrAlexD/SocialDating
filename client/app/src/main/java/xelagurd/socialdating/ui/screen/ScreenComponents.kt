@@ -24,7 +24,7 @@ import xelagurd.socialdating.ui.state.RequestStatus
 @Composable
 fun DataListComponent(
     dataListUiState: DataListUiState,
-    modifier: Modifier = Modifier,
+    listModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     card: @Composable (DataEntity) -> Unit
 ) {
@@ -34,7 +34,7 @@ fun DataListComponent(
     ) {
         AppDataList(
             entities = dataListUiState.entities,
-            modifier = modifier,
+            modifier = listModifier,
             contentPadding = contentPadding,
             card = card
         )
@@ -46,7 +46,7 @@ fun DataChoosingListComponent(
     dataListUiState: DataListUiState,
     chosenEntityId: Int?,
     maxHeight: Dp,
-    modifier: Modifier = Modifier,
+    listModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     card: @Composable (DataEntity, Boolean) -> Unit
 ) {
@@ -57,7 +57,7 @@ fun DataChoosingListComponent(
             entities = dataListUiState.entities,
             chosenEntityId = chosenEntityId,
             maxHeight = maxHeight,
-            modifier = modifier,
+            modifier = listModifier,
             contentPadding = contentPadding,
             card = card
         )

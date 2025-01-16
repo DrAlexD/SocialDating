@@ -17,7 +17,7 @@ import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.additional.LoginDetails
 import xelagurd.socialdating.ui.navigation.LoginDestination
-import xelagurd.socialdating.ui.state.RequestStatus
+import xelagurd.socialdating.ui.state.LoginUiState
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.LoginViewModel
 
@@ -26,11 +26,28 @@ import xelagurd.socialdating.ui.viewmodel.LoginViewModel
 fun LoginScreen(
     onSuccessLogin: () -> Unit,
     onRegistrationClick: () -> Unit,
-    modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     val loginUiState by loginViewModel.uiState.collectAsState()
 
+    LoginScreenComponent(
+        loginUiState = loginUiState,
+        onSuccessLogin = onSuccessLogin,
+        onRegistrationClick = onRegistrationClick,
+        onValueChange = loginViewModel::updateUiState,
+        onLoginClick = loginViewModel::loginWithInput
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoginScreenComponent(
+    loginUiState: LoginUiState = LoginUiState(),
+    onSuccessLogin: () -> Unit = {},
+    onRegistrationClick: () -> Unit = {},
+    onValueChange: (LoginDetails) -> Unit = {},
+    onLoginClick: () -> Unit = {}
+) {
     Scaffold(
         topBar = {
             AppTopBar(
@@ -47,8 +64,8 @@ fun LoginScreen(
         ) {
             LoginDetailsBody(
                 loginDetails = loginUiState.formDetails,
-                onValueChange = loginViewModel::updateUiState,
-                onLoginClick = loginViewModel::loginWithInput,
+                onValueChange = onValueChange,
+                onLoginClick = onLoginClick,
                 onRegistrationClick = onRegistrationClick
             )
         }
@@ -56,17 +73,16 @@ fun LoginScreen(
 }
 
 @Composable
-fun LoginDetailsBody(
+private inline fun LoginDetailsBody(
     loginDetails: LoginDetails,
-    onValueChange: (LoginDetails) -> Unit,
-    onLoginClick: () -> Unit,
-    onRegistrationClick: () -> Unit,
-    modifier: Modifier = Modifier
+    crossinline onValueChange: (LoginDetails) -> Unit,
+    noinline onLoginClick: () -> Unit,
+    noinline onRegistrationClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         AppTextField(
             value = loginDetails.username,
@@ -95,18 +111,6 @@ fun LoginDetailsBody(
 @Composable
 private fun LoginComponentPreview() {
     AppTheme {
-        ComponentWithRequestStatus(
-            requestStatus = RequestStatus.UNDEFINED,
-            onSuccess = { },
-            failedText = stringResource(R.string.failed_login),
-            errorText = stringResource(R.string.no_internet_connection)
-        ) {
-            LoginDetailsBody(
-                loginDetails = LoginDetails(),
-                onValueChange = { },
-                onLoginClick = { },
-                onRegistrationClick = { }
-            )
-        }
+        LoginScreenComponent()
     }
 }

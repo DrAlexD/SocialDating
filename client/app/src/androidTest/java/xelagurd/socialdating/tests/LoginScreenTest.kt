@@ -1,7 +1,6 @@
 package xelagurd.socialdating.tests
 
 import androidx.activity.compose.setContent
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -17,10 +16,10 @@ import xelagurd.socialdating.checkTextField
 import xelagurd.socialdating.data.model.additional.LoginDetails
 import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
-import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
-import xelagurd.socialdating.ui.screen.LoginDetailsBody
+import xelagurd.socialdating.ui.screen.LoginScreenComponent
 import xelagurd.socialdating.ui.state.LoginUiState
 import xelagurd.socialdating.ui.state.RequestStatus
+import xelagurd.socialdating.ui.theme.AppTheme
 
 @HiltAndroidTest
 class LoginScreenTest {
@@ -132,18 +131,8 @@ class LoginScreenTest {
 
     private fun setContentToLoginBody(loginUiState: LoginUiState) {
         composeTestRule.activity.setContent {
-            ComponentWithRequestStatus(
-                requestStatus = loginUiState.requestStatus,
-                onSuccess = { },
-                failedText = stringResource(R.string.failed_login),
-                errorText = stringResource(R.string.no_internet_connection)
-            ) {
-                LoginDetailsBody(
-                    loginDetails = loginUiState.formDetails,
-                    onValueChange = { },
-                    onLoginClick = { },
-                    onRegistrationClick = { }
-                )
+            AppTheme {
+                LoginScreenComponent(loginUiState = loginUiState)
             }
         }
     }

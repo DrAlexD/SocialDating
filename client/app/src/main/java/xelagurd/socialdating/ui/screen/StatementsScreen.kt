@@ -39,10 +39,32 @@ fun StatementsScreen(
     onStatementClick: (Int) -> Unit,
     onStatementAddingClick: (Int) -> Unit,
     onNavigateUp: () -> Unit,
-    modifier: Modifier = Modifier,
     statementsViewModel: StatementsViewModel = hiltViewModel()
 ) {
     val statementsUiState by statementsViewModel.uiState.collectAsState()
+
+    StatementsScreenComponent(
+        statementsUiState = statementsUiState,
+        onStatementClick = onStatementClick,
+        onStatementAddingClick = onStatementAddingClick,
+        onNavigateUp = onNavigateUp,
+        refreshAction = statementsViewModel::getStatements,
+        onStatementReactionClick = { id, type ->
+            statementsViewModel.onStatementReactionClick(id, type)
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StatementsScreenComponent(
+    statementsUiState: StatementsUiState = StatementsUiState(),
+    onStatementClick: (Int) -> Unit = {},
+    onStatementAddingClick: (Int) -> Unit = {},
+    onNavigateUp: () -> Unit = {},
+    refreshAction: () -> Unit = {},
+    onStatementReactionClick: (Int, StatementReactionType) -> Unit = { _, _ -> null }
+) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
@@ -50,7 +72,7 @@ fun StatementsScreen(
             AppTopBar(
                 title = stringResource(StatementsDestination.titleRes),
                 internetStatus = statementsUiState.internetStatus,
-                refreshAction = statementsViewModel::getStatements,
+                refreshAction = refreshAction,
                 navigateUp = onNavigateUp,
                 scrollBehavior = scrollBehavior
             )
@@ -72,7 +94,7 @@ fun StatementsScreen(
                 }
             }
         },
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         DataListComponent(
             dataListUiState = statementsUiState,
@@ -84,9 +106,7 @@ fun StatementsScreen(
             ) {
                 StatementCardContent(
                     statement = it as Statement,
-                    onStatementReactionClick = { id, type ->
-                        statementsViewModel.onStatementReactionClick(id, type)
-                    }
+                    onStatementReactionClick = onStatementReactionClick
                 )
             }
         }
@@ -94,10 +114,9 @@ fun StatementsScreen(
 }
 
 @Composable
-fun StatementCardContent(
+private inline fun StatementCardContent(
     statement: Statement,
-    onStatementReactionClick: (Int, StatementReactionType) -> Unit,
-    modifier: Modifier = Modifier
+    crossinline onStatementReactionClick: (Int, StatementReactionType) -> Unit
 ) {
     AppLargeTitleText(text = statement.text)
     HorizontalDivider(color = Color.Black)
@@ -108,8 +127,7 @@ fun StatementCardContent(
 
 @Composable
 private inline fun ReactionsRow(
-    crossinline onStatementReactionClick: (StatementReactionType) -> Unit,
-    modifier: Modifier = Modifier
+    crossinline onStatementReactionClick: (StatementReactionType) -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -133,18 +151,8 @@ private inline fun ReactionsRow(
 @Composable
 private fun StatementsComponentPreview() {
     AppTheme {
-        DataListComponent(
-            dataListUiState = StatementsUiState(entities = FakeDataSource.statements)
-        ) {
-            AppEntityCard(
-                entity = it,
-                onEntityClick = { }
-            ) {
-                StatementCardContent(
-                    statement = it as Statement,
-                    onStatementReactionClick = { _, _ -> null }
-                )
-            }
-        }
+        StatementsScreenComponent(
+            statementsUiState = StatementsUiState(entities = FakeDataSource.statements)
+        )
     }
 }

@@ -45,10 +45,24 @@ import xelagurd.socialdating.ui.viewmodel.ProfileStatisticsViewModel
 @Composable
 fun ProfileStatisticsScreen(
     onNavigateUp: () -> Unit,
-    modifier: Modifier = Modifier,
     profileStatisticsViewModel: ProfileStatisticsViewModel = hiltViewModel()
 ) {
     val profileStatisticsUiState by profileStatisticsViewModel.uiState.collectAsState()
+
+    ProfileStatisticsScreenComponent(
+        profileStatisticsUiState = profileStatisticsUiState,
+        onNavigateUp = onNavigateUp,
+        refreshAction = profileStatisticsViewModel::getProfileStatistics
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileStatisticsScreenComponent(
+    profileStatisticsUiState: ProfileStatisticsUiState = ProfileStatisticsUiState(),
+    onNavigateUp: () -> Unit = {},
+    refreshAction: () -> Unit = {}
+) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
@@ -56,7 +70,7 @@ fun ProfileStatisticsScreen(
             AppTopBar(
                 title = stringResource(ProfileStatisticsDestination.titleRes),
                 internetStatus = profileStatisticsUiState.internetStatus,
-                refreshAction = profileStatisticsViewModel::getProfileStatistics,
+                refreshAction = refreshAction,
                 navigateUp = onNavigateUp,
                 scrollBehavior = scrollBehavior
             )
@@ -66,7 +80,7 @@ fun ProfileStatisticsScreen(
                 currentTopLevelRoute = ProfileStatisticsDestination.topLevelRoute
             )
         },
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         DataListComponent(
             dataListUiState = profileStatisticsUiState,
@@ -87,11 +101,10 @@ fun ProfileStatisticsScreen(
 }
 
 @Composable
-fun UserCategoryCardContent(
+private fun UserCategoryCardContent(
     userCategory: UserCategoryWithData,
     userDefiningThemes: List<UserDefiningThemeWithData>,
-    isExpanded: Boolean,
-    modifier: Modifier = Modifier
+    isExpanded: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -130,8 +143,7 @@ fun UserCategoryCardContent(
 
 @Composable
 private fun UserDefiningThemeDetailsBody(
-    userDefiningTheme: UserDefiningThemeWithData,
-    modifier: Modifier = Modifier
+    userDefiningTheme: UserDefiningThemeWithData
 ) {
     HorizontalDivider()
     AppMediumTitleText(text = userDefiningTheme.definingThemeName)
@@ -151,26 +163,13 @@ private fun UserDefiningThemeDetailsBody(
 @Composable
 private fun ProfileStatisticsComponentPreview() {
     AppTheme {
-        val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = FakeDataSource.userCategories.toUserCategoriesWithData(),
-            entityIdToData = FakeDataSource.userDefiningThemes
-                .toUserDefiningThemesWithData()
-                .groupBy { it.userCategoryId }
+        ProfileStatisticsScreenComponent(
+            profileStatisticsUiState = ProfileStatisticsUiState(
+                entities = FakeDataSource.userCategories.toUserCategoriesWithData(),
+                entityIdToData = FakeDataSource.userDefiningThemes
+                    .toUserDefiningThemesWithData()
+                    .groupBy { it.userCategoryId }
+            )
         )
-
-        DataListComponent(
-            dataListUiState = profileStatisticsUiState
-        ) {
-            AppExpandedEntityCard(
-                entity = it
-            ) { entity, isExpanded ->
-                UserCategoryCardContent(
-                    userCategory = entity as UserCategoryWithData,
-                    userDefiningThemes = profileStatisticsUiState.entityIdToData
-                        .getOrDefault(entity.id, listOf()),
-                    isExpanded = true
-                )
-            }
-        }
     }
 }

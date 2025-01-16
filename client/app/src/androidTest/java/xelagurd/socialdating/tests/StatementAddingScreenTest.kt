@@ -1,7 +1,6 @@
 package xelagurd.socialdating.tests
 
 import androidx.activity.compose.setContent
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -21,10 +20,10 @@ import xelagurd.socialdating.data.model.additional.StatementDetails
 import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.onNodeWithTextIdWithColon
-import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
-import xelagurd.socialdating.ui.screen.StatementDetailsBody
+import xelagurd.socialdating.ui.screen.StatementAddingScreenComponent
 import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.state.StatementAddingUiState
+import xelagurd.socialdating.ui.theme.AppTheme
 
 @HiltAndroidTest
 class StatementAddingScreenTest {
@@ -182,16 +181,9 @@ class StatementAddingScreenTest {
 
     private fun setContentToStatementAddingBody(statementAddingUiState: StatementAddingUiState) {
         composeTestRule.activity.setContent {
-            ComponentWithRequestStatus(
-                requestStatus = statementAddingUiState.requestStatus,
-                onSuccess = { },
-                failedText = stringResource(R.string.failed_add_statement),
-                errorText = stringResource(R.string.no_internet_connection)
-            ) {
-                StatementDetailsBody(
-                    statementAddingUiState = statementAddingUiState,
-                    onValueChange = { },
-                    onStatementAddingClick = { }
+            AppTheme {
+                StatementAddingScreenComponent(
+                    statementAddingUiState = statementAddingUiState
                 )
             }
         }

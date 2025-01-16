@@ -17,7 +17,7 @@ import xelagurd.socialdating.AppBottomNavigationBar
 import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
 import xelagurd.socialdating.ui.navigation.SettingsDestination
-import xelagurd.socialdating.ui.state.RequestStatus
+import xelagurd.socialdating.ui.state.SettingsUiState
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.SettingsViewModel
 
@@ -25,11 +25,24 @@ import xelagurd.socialdating.ui.viewmodel.SettingsViewModel
 @Composable
 fun SettingsScreen(
     onSuccessLogout: () -> Unit,
-    modifier: Modifier = Modifier,
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val settingsUiState by settingsViewModel.uiState.collectAsState()
 
+    SettingsScreenComponent(
+        settingsUiState = settingsUiState,
+        onSuccessLogout = onSuccessLogout,
+        onLogoutClick = settingsViewModel::logout
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsScreenComponent(
+    settingsUiState: SettingsUiState = SettingsUiState(),
+    onSuccessLogout: () -> Unit = {},
+    onLogoutClick: () -> Unit = {}
+) {
     Scaffold(
         topBar = {
             AppTopBar(
@@ -50,21 +63,20 @@ fun SettingsScreen(
             contentPadding = innerPadding
         ) {
             SettingsDetailsBody(
-                onLogoutClick = settingsViewModel::logout
+                onLogoutClick = onLogoutClick
             )
         }
     }
 }
 
 @Composable
-fun SettingsDetailsBody(
-    onLogoutClick: () -> Unit,
-    modifier: Modifier = Modifier
+private fun SettingsDetailsBody(
+    onLogoutClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         AppLargeTextCard(
             text = stringResource(R.string.logout),
@@ -77,15 +89,6 @@ fun SettingsDetailsBody(
 @Composable
 private fun SettingsComponentPreview() {
     AppTheme {
-        ComponentWithRequestStatus(
-            requestStatus = RequestStatus.UNDEFINED,
-            onSuccess = { },
-            failedText = "",
-            errorText = stringResource(R.string.unknown_error)
-        ) {
-            SettingsDetailsBody(
-                onLogoutClick = { }
-            )
-        }
+        SettingsScreenComponent()
     }
 }
