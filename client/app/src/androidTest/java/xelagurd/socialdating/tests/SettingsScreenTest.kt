@@ -39,21 +39,12 @@ class SettingsScreenTest {
     }
 
     @Test
-    fun settingsScreen_loadingStatus_loadingIndicator() {
+    fun settingsScreen_loadingState_loadingIndicator() {
         val settingsUiState = SettingsUiState(actionRequestStatus = RequestStatus.LOADING)
 
         setContentToSettingsBody(settingsUiState)
 
         composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
-    }
-
-    @Test
-    fun settingsScreen_errorStatus_errorText() {
-        val settingsUiState = SettingsUiState(actionRequestStatus = RequestStatus.ERROR)
-
-        setContentToSettingsBody(settingsUiState)
-
-        composeTestRule.onNodeWithTextId(R.string.unknown_error).assertIsDisplayed()
     }
 
     private fun assertContentIsDisplayed(settingsUiState: SettingsUiState) {

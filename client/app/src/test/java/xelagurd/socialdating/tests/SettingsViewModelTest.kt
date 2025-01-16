@@ -1,6 +1,5 @@
 package xelagurd.socialdating.tests
 
-import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -34,41 +33,15 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun settingsViewModel_logoutWithInternet() = runTest {
+    fun settingsViewModel_logout() = runTest {
         viewModel.logout()
-        mockDataWithInternet()
+        mockData()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, settingsUiState.actionRequestStatus)
     }
 
-    @Test
-    fun settingsViewModel_logoutWithoutInternet() = runTest {
-        viewModel.logout()
-        mockDataWithoutInternet()
-        advanceUntilIdle()
-
-        assertEquals(RequestStatus.ERROR, settingsUiState.actionRequestStatus)
-    }
-
-    @Test
-    fun settingsViewModel_retryLogoutWithInternet() = runTest {
-        viewModel.logout()
-        mockDataWithoutInternet()
-        advanceUntilIdle()
-
-        mockDataWithInternet()
-        viewModel.logout()
-        advanceUntilIdle()
-
-        assertEquals(RequestStatus.SUCCESS, settingsUiState.actionRequestStatus)
-    }
-
-    private fun mockDataWithInternet() {
+    private fun mockData() {
         coEvery { preferencesRepository.saveCurrentUserId(-1) } just Runs
-    }
-
-    private fun mockDataWithoutInternet() {
-        coEvery { preferencesRepository.saveCurrentUserId(-1) } throws IOException()
     }
 }

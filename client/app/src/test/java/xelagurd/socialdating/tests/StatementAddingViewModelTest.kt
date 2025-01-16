@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -32,6 +33,7 @@ class StatementAddingViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private val context: Context = mockk()
     private val savedStateHandle: SavedStateHandle = mockk()
     private val localDefiningThemesRepository: LocalDefiningThemesRepository = mockk()
     private val remoteStatementsRepository: RemoteStatementsRepository = mockk()
@@ -54,6 +56,7 @@ class StatementAddingViewModelTest {
         mockGeneralMethods()
 
         viewModel = StatementAddingViewModel(
+            context,
             savedStateHandle,
             localDefiningThemesRepository,
             remoteStatementsRepository,
@@ -86,7 +89,7 @@ class StatementAddingViewModelTest {
         mockWrongData()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILED, statementAddingUiState.actionRequestStatus)
+        assertEquals(RequestStatus.FAILURE(), statementAddingUiState.actionRequestStatus)
     }
 
     @Test
@@ -126,10 +129,12 @@ class StatementAddingViewModelTest {
     }
 
     private fun mockWrongData() {
+        every { context.getString(any()) } returns ""
         coEvery { remoteStatementsRepository.statementAdding(statementDetails) } returns null
     }
 
     private fun mockDataWithoutInternet() {
+        every { context.getString(any()) } returns ""
         coEvery { remoteStatementsRepository.statementAdding(statementDetails) } throws IOException()
         coEvery { localStatementsRepository.insertStatement(FakeDataSource.newStatement) } just Runs // TODO: remove after implementing server
     }

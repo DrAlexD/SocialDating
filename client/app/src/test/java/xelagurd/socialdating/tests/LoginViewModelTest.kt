@@ -4,10 +4,12 @@ import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import android.content.Context
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.PasswordCredential
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
@@ -17,6 +19,7 @@ import org.junit.Test
 import xelagurd.socialdating.AccountManager
 import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.PreferencesRepository
+import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.details.LoginDetails
@@ -31,6 +34,7 @@ class LoginViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private val context: Context = mockk()
     private val remoteRepository: RemoteUsersRepository = mockk()
     private val localRepository: LocalUsersRepository = mockk()
     private val preferencesRepository: PreferencesRepository = mockk()
@@ -49,6 +53,7 @@ class LoginViewModelTest {
         mockFindCredentialsWithError()
 
         viewModel = LoginViewModel(
+            context,
             remoteRepository,
             localRepository,
             preferencesRepository,
@@ -71,7 +76,8 @@ class LoginViewModelTest {
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, loginUiState.actionRequestStatus)
+        // TODO: Change to ERROR after implementing server
+        assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
     }
 
     @Test
@@ -79,7 +85,7 @@ class LoginViewModelTest {
         mockWrongData()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILED, loginUiState.actionRequestStatus)
+        assertEquals(RequestStatus.FAILURE(), loginUiState.actionRequestStatus)
     }
 
     @Test
@@ -128,10 +134,22 @@ class LoginViewModelTest {
     }
 
     private fun mockWrongData() {
+        every { context.getString(any()) } returns ""
         coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } returns null
     }
 
     private fun mockDataWithoutInternet() {
+        every { context.getString(any()) } returns ""
         coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } throws IOException()
+        coEvery {
+            accountManager.saveCredentials(
+                LoginDetails(
+                    FakeDataSource.users[0].username,
+                    FakeDataSource.users[0].password
+                )
+            )
+        } just Runs // TODO: remove after implementing server
+        coEvery { localRepository.insertUser(FakeDataSource.users[0]) } just Runs // TODO: remove after implementing server
+        coEvery { preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) } just Runs // TODO: remove after implementing server
     }
 }

@@ -15,7 +15,6 @@ import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTagId
-import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.StatementsScreenComponent
 import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.state.StatementsUiState
@@ -35,7 +34,7 @@ class StatementsScreenTest {
     }
 
     @Test
-    fun statementsScreen_loadingStatusAndEmptyData_loadingIndicator() {
+    fun statementsScreen_loadingStateAndEmptyData_loadingIndicator() {
         val statementsUiState = StatementsUiState()
 
         setContentToStatementsBody(statementsUiState)
@@ -44,25 +43,31 @@ class StatementsScreenTest {
     }
 
     @Test
-    fun statementsScreen_offlineStatusAndEmptyData_offlineText() {
-        val statementsUiState = StatementsUiState(dataRequestStatus = RequestStatus.ERROR)
+    fun statementsScreen_errorStateAndEmptyData_errorText() {
+        val errorText = "Error Text"
+        val statementsUiState = StatementsUiState(
+            dataRequestStatus = RequestStatus.ERROR(errorText)
+        )
 
         setContentToStatementsBody(statementsUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
+        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
     }
 
     @Test
-    fun statementsScreen_onlineStatusAndEmptyData_onlineText() {
-        val statementsUiState = StatementsUiState(dataRequestStatus = RequestStatus.SUCCESS)
+    fun statementsScreen_failureStateAndEmptyData_failureText() {
+        val failureText = "Failure Text"
+        val statementsUiState = StatementsUiState(
+            dataRequestStatus = RequestStatus.FAILURE(failureText)
+        )
 
         setContentToStatementsBody(statementsUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.no_data).assertIsDisplayed()
+        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
     }
 
     @Test
-    fun statementsScreen_loadingStatusAndData_displayedData() {
+    fun statementsScreen_loadingStateAndData_displayedData() {
         val statementsUiState = StatementsUiState(
             entities = listOf(Statement(1, "Statement1", true, 1, 1)),
             dataRequestStatus = RequestStatus.LOADING
@@ -72,17 +77,27 @@ class StatementsScreenTest {
     }
 
     @Test
-    fun statementsScreen_offlineStatusAndData_displayedData() {
+    fun statementsScreen_errorStateAndData_displayedData() {
         val statementsUiState = StatementsUiState(
             entities = listOf(Statement(1, "Statement1", true, 1, 1)),
-            dataRequestStatus = RequestStatus.ERROR
+            dataRequestStatus = RequestStatus.ERROR()
         )
 
         assertDataIsDisplayed(statementsUiState)
     }
 
     @Test
-    fun statementsScreen_onlineStatusAndData_displayedData() {
+    fun statementsScreen_failureStateAndData_displayedData() {
+        val statementsUiState = StatementsUiState(
+            entities = listOf(Statement(1, "Statement1", true, 1, 1)),
+            dataRequestStatus = RequestStatus.FAILURE()
+        )
+
+        assertDataIsDisplayed(statementsUiState)
+    }
+
+    @Test
+    fun statementsScreen_successStateAndData_displayedData() {
         val statementsUiState = StatementsUiState(
             entities = listOf(Statement(1, "Statement1", true, 1, 1)),
             dataRequestStatus = RequestStatus.SUCCESS

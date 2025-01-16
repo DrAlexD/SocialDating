@@ -14,11 +14,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.PreferencesRepository
+import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
@@ -34,6 +37,7 @@ import xelagurd.socialdating.ui.state.StatementsUiState
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class StatementsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val remoteStatementsRepository: RemoteStatementsRepository,
     private val localStatementsRepository: LocalStatementsRepository,
@@ -45,7 +49,7 @@ class StatementsViewModel @Inject constructor(
 
     private val categoryId: Int = checkNotNull(savedStateHandle[StatementsDestination.categoryId])
 
-    private val dataRequestStatusFlow = MutableStateFlow(RequestStatus.UNDEFINED)
+    private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val statementsFlow = localDefiningThemesRepository.getDefiningThemes(categoryId)
         .distinctUntilChanged()
         .flatMapLatest { definingThemes ->
@@ -91,14 +95,27 @@ class StatementsViewModel @Inject constructor(
                 val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
                 val remoteStatements = remoteStatementsRepository
                     .getStatements(remoteDefiningThemeIds)
-                localStatementsRepository.insertStatements(remoteStatements)
 
-                dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+                if (remoteStatements.isNotEmpty()) {
+                    localStatementsRepository.insertStatements(remoteStatements)
+
+                    dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+                } else {
+                    dataRequestStatusFlow.update {
+                        RequestStatus.FAILURE(
+                            failureText = context.getString(R.string.no_data)
+                        )
+                    }
+                }
             } catch (_: IOException) {
                 localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
                 localStatementsRepository.insertStatements(FakeDataSource.statements) // FixMe: remove after implementing server
 
-                dataRequestStatusFlow.update { RequestStatus.ERROR }
+                dataRequestStatusFlow.update {
+                    RequestStatus.ERROR(
+                        errorText = context.getString(R.string.no_internet_connection)
+                    )
+                }
             }
         }
     }
@@ -111,7 +128,7 @@ class StatementsViewModel @Inject constructor(
                         StatementReaction(currentUserId!!, statementId, reactionType)
                     )
                 } catch (_: IOException) {
-                    //
+                    // TODO: implement handler
                 }
             }
         }

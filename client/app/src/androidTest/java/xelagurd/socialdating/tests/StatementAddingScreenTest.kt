@@ -39,13 +39,26 @@ class StatementAddingScreenTest {
     }
 
     @Test
-    fun statementAddingScreen_emptyDefiningThemes_assertContentIsDisplayed() {
+    fun statementAddingScree_loadingStateAndEmptyDefiningThemes_assertContentIsDisplayed() {
         val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.SUCCESS
+            dataRequestStatus = RequestStatus.LOADING
         )
 
         assertContentIsDisplayed(statementAddingUiState)
-        composeTestRule.onNodeWithTextId(R.string.no_data).assertIsDisplayed()
+
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+    }
+
+    @Test
+    fun statementAddingScree_failureStateAndEmptyDefiningThemes_assertContentIsDisplayed() {
+        val failureText = "Failure Text"
+        val statementAddingUiState = StatementAddingUiState(
+            dataRequestStatus = RequestStatus.FAILURE(failureText)
+        )
+
+        assertContentIsDisplayed(statementAddingUiState)
+
+        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
     }
 
     @Test
@@ -75,7 +88,7 @@ class StatementAddingScreenTest {
     }
 
     @Test
-    fun statementAddingScreen_loadingStatus_loadingIndicator() {
+    fun statementAddingScreen_loadingState_loadingIndicator() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
             actionRequestStatus = RequestStatus.LOADING
@@ -87,27 +100,29 @@ class StatementAddingScreenTest {
     }
 
     @Test
-    fun statementAddingScreen_failedStatus_failedText() {
+    fun statementAddingScreen_failureState_failureText() {
+        val failureText = "Failure Text"
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            actionRequestStatus = RequestStatus.FAILED
+            actionRequestStatus = RequestStatus.FAILURE(failureText)
         )
 
         setContentToStatementAddingBody(statementAddingUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.failed_add_statement).assertIsDisplayed()
+        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
     }
 
     @Test
-    fun statementAddingScreen_errorStatus_errorText() {
+    fun statementAddingScreen_errorState_errorText() {
+        val errorText = "Error Text"
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            actionRequestStatus = RequestStatus.ERROR
+            actionRequestStatus = RequestStatus.ERROR(errorText)
         )
 
         setContentToStatementAddingBody(statementAddingUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
+        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
     }
 
     @Test

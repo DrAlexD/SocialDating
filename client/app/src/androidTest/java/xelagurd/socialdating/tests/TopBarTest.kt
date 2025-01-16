@@ -38,7 +38,7 @@ class TopBarTest {
     }
 
     @Test
-    fun topBar_loadingStatus_loadingText() {
+    fun topBar_loadingState_loadingText() {
         setContentToAppTopBar(RequestStatus.LOADING)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()
@@ -47,8 +47,8 @@ class TopBarTest {
     }
 
     @Test
-    fun topBar_offlineStatus_offlineTextWithRefresh() {
-        setContentToAppTopBar(RequestStatus.ERROR)
+    fun topBar_errorState_offlineTextWithRefresh() {
+        setContentToAppTopBar(RequestStatus.ERROR())
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsDisplayed()
@@ -56,7 +56,7 @@ class TopBarTest {
     }
 
     @Test
-    fun topBar_onlineStatus_onlineText() {
+    fun topBar_successState_onlineText() {
         setContentToAppTopBar(RequestStatus.SUCCESS)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()

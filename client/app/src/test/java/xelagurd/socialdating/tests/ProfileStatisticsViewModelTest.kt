@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -45,6 +46,7 @@ class ProfileStatisticsViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private val context: Context = mockk()
     private val savedStateHandle: SavedStateHandle = mockk()
     private val remoteUserCategoriesRepository: RemoteUserCategoriesRepository = mockk()
     private val localUserCategoriesRepository: LocalUserCategoriesRepository = mockk()
@@ -108,6 +110,7 @@ class ProfileStatisticsViewModelTest {
         mockGeneralMethods()
 
         viewModel = ProfileStatisticsViewModel(
+            context,
             savedStateHandle,
             remoteUserCategoriesRepository,
             localUserCategoriesRepository,
@@ -127,7 +130,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkDataWithInternet() = runTest {
+    fun profileStatisticsViewModel_checkStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -147,13 +150,33 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkDataWithoutInternet() = runTest {
+    fun profileStatisticsViewModel_checkStateWithEmptyData() = runTest {
+        setupUiStateCollecting()
+
+        mockEmptyData()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.FAILURE(), profileStatisticsUiState.dataRequestStatus)
+        assertEquals(
+            localUserCategories.toUserCategoriesWithData(),
+            profileStatisticsUiState.entities
+        )
+        assertEquals(
+            localUserDefiningThemes
+                .toUserDefiningThemesWithData()
+                .groupBy { it.userCategoryId },
+            profileStatisticsUiState.entityIdToData
+        )
+    }
+
+    @Test
+    fun profileStatisticsViewModel_checkStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, profileStatisticsUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), profileStatisticsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, FakeDataSource.userCategories)
                 .toUserCategoriesWithData(),
@@ -168,7 +191,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkRefreshedOnlineDataWithoutInternet() = runTest {
+    fun profileStatisticsViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -178,7 +201,7 @@ class ProfileStatisticsViewModelTest {
         viewModel.getProfileStatistics()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, profileStatisticsUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), profileStatisticsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(
                 localUserCategories,
@@ -200,7 +223,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkRefreshedOfflineDataWithInternet() = runTest {
+    fun profileStatisticsViewModel_checkRefreshedErrorStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
@@ -232,7 +255,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkRefreshedOnlineDataWithInternet() = runTest {
+    fun profileStatisticsViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -255,7 +278,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkRefreshedOfflineDataWithoutInternet() = runTest {
+    fun profileStatisticsViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
@@ -264,7 +287,7 @@ class ProfileStatisticsViewModelTest {
         viewModel.getProfileStatistics()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, profileStatisticsUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), profileStatisticsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, FakeDataSource.userCategories)
                 .toUserCategoriesWithData(),
@@ -318,7 +341,20 @@ class ProfileStatisticsViewModelTest {
         }
     }
 
+    private fun mockEmptyData() {
+        every { context.getString(any()) } returns ""
+        coEvery { remoteCategoriesRepository.getCategories() } returns emptyList()
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(emptyList()) } returns emptyList()
+        coEvery { remoteUserCategoriesRepository.getUserCategories(userId) } returns emptyList()
+        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(emptyList()) } returns emptyList()
+
+        coEvery { localCategoriesRepository.insertCategories(emptyList()) } just Runs
+        coEvery { localDefiningThemesRepository.insertDefiningThemes(emptyList()) } just Runs
+        coEvery { localUserCategoriesRepository.insertUserCategories(emptyList()) } just Runs
+    }
+
     private fun mockDataWithoutInternet() {
+        every { context.getString(any()) } returns ""
         coEvery { remoteCategoriesRepository.getCategories() } throws IOException()
 
         coEvery { localCategoriesRepository.insertCategories(FakeDataSource.categories) } just Runs

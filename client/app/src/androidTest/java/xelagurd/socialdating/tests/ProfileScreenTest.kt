@@ -37,7 +37,7 @@ class ProfileScreenTest {
     }
 
     @Test
-    fun profileScreen_loadingStatusAndEmptyData_loadingIndicator() {
+    fun profileScreen_loadingStateAndEmptyData_loadingIndicator() {
         val profileUiState = ProfileUiState()
 
         setContentToProfileBody(profileUiState)
@@ -46,25 +46,29 @@ class ProfileScreenTest {
     }
 
     @Test
-    fun profileScreen_offlineStatusAndEmptyData_offlineText() {
-        val profileUiState = ProfileUiState(dataRequestStatus = RequestStatus.ERROR)
+    fun profileScreen_errorStateAndEmptyData_errorText() {
+        val errorText = "Error Text"
+        val profileUiState = ProfileUiState(dataRequestStatus = RequestStatus.ERROR(errorText))
 
         setContentToProfileBody(profileUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
+        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
     }
 
     @Test
-    fun profileScreen_onlineStatusAndEmptyData_onlineText() {
-        val profileUiState = ProfileUiState(dataRequestStatus = RequestStatus.SUCCESS)
+    fun profileScreen_failureStateAndEmptyData_failureText() {
+        val failureText = "Failure Text"
+        val profileUiState = ProfileUiState(
+            dataRequestStatus = RequestStatus.FAILURE(failureText)
+        )
 
         setContentToProfileBody(profileUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.no_data).assertIsDisplayed()
+        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
     }
 
     @Test
-    fun profileScreen_loadingStatusAndData_displayedData() {
+    fun profileScreen_loadingStateAndData_displayedData() {
         val profileUiState = ProfileUiState(
             entity = User(
                 1, "User1", Gender.MALE, "username1", "password1",
@@ -77,20 +81,33 @@ class ProfileScreenTest {
     }
 
     @Test
-    fun profileScreen_offlineStatusAndData_displayedData() {
+    fun profileScreen_errorStateAndData_displayedData() {
         val profileUiState = ProfileUiState(
             entity = User(
                 1, "User1", Gender.MALE, "username1", "password1",
                 "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
             ),
-            dataRequestStatus = RequestStatus.ERROR
+            dataRequestStatus = RequestStatus.ERROR()
         )
 
         assertDataIsDisplayed(profileUiState)
     }
 
     @Test
-    fun profileScreen_onlineStatusAndData_displayedData() {
+    fun profileScreen_failureStateAndData_displayedData() {
+        val profileUiState = ProfileUiState(
+            entity = User(
+                1, "User1", Gender.MALE, "username1", "password1",
+                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
+            ),
+            dataRequestStatus = RequestStatus.FAILURE()
+        )
+
+        assertDataIsDisplayed(profileUiState)
+    }
+
+    @Test
+    fun profileScreen_successStateAndData_displayedData() {
         val profileUiState = ProfileUiState(
             entity = User(
                 1, "User1", Gender.MALE, "username1", "password1",

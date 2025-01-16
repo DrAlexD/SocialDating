@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.DataEntity
 import xelagurd.socialdating.ui.state.DataEntityUiState
 import xelagurd.socialdating.ui.state.DataListUiState
@@ -108,8 +106,9 @@ private fun DataRequestStatusComponent(
 ) {
     when (dataRequestStatus) {
         RequestStatus.UNDEFINED, RequestStatus.LOADING -> AppLoadingIndicator()
-        RequestStatus.FAILED, RequestStatus.ERROR -> AppLargeTitleText(text = stringResource(R.string.no_internet_connection))
-        RequestStatus.SUCCESS -> AppLargeTitleText(text = stringResource(R.string.no_data))
+        is RequestStatus.FAILURE -> AppLargeTitleText(text = dataRequestStatus.failureText)
+        is RequestStatus.ERROR -> AppLargeTitleText(text = dataRequestStatus.errorText)
+        RequestStatus.SUCCESS -> {}
     }
 }
 
@@ -117,8 +116,6 @@ private fun DataRequestStatusComponent(
 fun ComponentWithActionRequestStatus(
     actionRequestStatus: RequestStatus,
     onSuccess: () -> Unit,
-    failedText: String,
-    errorText: String,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable () -> Unit
 ) {
@@ -130,9 +127,7 @@ fun ComponentWithActionRequestStatus(
         content()
         ActionRequestStatusComponent(
             actionRequestStatus = actionRequestStatus,
-            onSuccess = onSuccess,
-            failedText = failedText,
-            errorText = errorText
+            onSuccess = onSuccess
         )
     }
 }
@@ -140,9 +135,7 @@ fun ComponentWithActionRequestStatus(
 @Composable
 private inline fun ActionRequestStatusComponent(
     actionRequestStatus: RequestStatus,
-    onSuccess: () -> Unit,
-    failedText: String,
-    errorText: String
+    onSuccess: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -152,8 +145,8 @@ private inline fun ActionRequestStatusComponent(
         when (actionRequestStatus) {
             RequestStatus.UNDEFINED -> {}
             RequestStatus.LOADING -> AppLoadingIndicator()
-            RequestStatus.FAILED -> AppLargeTitleText(failedText)
-            RequestStatus.ERROR -> AppLargeTitleText(errorText)
+            is RequestStatus.FAILURE -> AppLargeTitleText(actionRequestStatus.failureText)
+            is RequestStatus.ERROR -> AppLargeTitleText(actionRequestStatus.errorText)
             RequestStatus.SUCCESS -> onSuccess()
         }
     }

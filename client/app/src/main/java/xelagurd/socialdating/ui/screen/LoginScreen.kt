@@ -58,8 +58,6 @@ fun LoginScreenComponent(
         ComponentWithActionRequestStatus(
             actionRequestStatus = loginUiState.actionRequestStatus,
             onSuccess = onSuccessLogin,
-            failedText = stringResource(R.string.failed_login),
-            errorText = stringResource(R.string.no_internet_connection),
             contentPadding = innerPadding
         ) {
             LoginDetailsBody(

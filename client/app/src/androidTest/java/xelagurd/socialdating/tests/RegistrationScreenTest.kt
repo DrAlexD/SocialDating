@@ -3,6 +3,7 @@ package xelagurd.socialdating.tests
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -45,7 +46,7 @@ class RegistrationScreenTest {
     }
 
     @Test
-    fun registrationScreen_loadingStatus_loadingIndicator() {
+    fun registrationScreen_loadingState_loadingIndicator() {
         val registrationUiState = RegistrationUiState(actionRequestStatus = RequestStatus.LOADING)
 
         setContentToRegistrationBody(registrationUiState)
@@ -54,21 +55,27 @@ class RegistrationScreenTest {
     }
 
     @Test
-    fun registrationScreen_failedStatus_failedText() {
-        val registrationUiState = RegistrationUiState(actionRequestStatus = RequestStatus.FAILED)
+    fun registrationScreen_failureState_failureText() {
+        val failureText = "Failure Text"
+        val registrationUiState = RegistrationUiState(
+            actionRequestStatus = RequestStatus.FAILURE(failureText)
+        )
 
         setContentToRegistrationBody(registrationUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.failed_registration).assertIsDisplayed()
+        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
     }
 
     @Test
-    fun registrationScreen_errorStatus_errorText() {
-        val registrationUiState = RegistrationUiState(actionRequestStatus = RequestStatus.ERROR)
+    fun registrationScreen_errorState_errorText() {
+        val errorText = "Error Text"
+        val registrationUiState = RegistrationUiState(
+            actionRequestStatus = RequestStatus.ERROR(errorText)
+        )
 
         setContentToRegistrationBody(registrationUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
+        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
     }
 
     @Test

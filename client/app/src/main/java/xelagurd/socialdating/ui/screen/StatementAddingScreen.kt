@@ -74,8 +74,6 @@ fun StatementAddingScreenComponent(
         ComponentWithActionRequestStatus(
             actionRequestStatus = statementAddingUiState.actionRequestStatus,
             onSuccess = onSuccessStatementAdding,
-            failedText = stringResource(R.string.failed_add_statement),
-            errorText = stringResource(R.string.no_internet_connection),
             contentPadding = innerPadding
         ) {
             StatementDetailsBody(

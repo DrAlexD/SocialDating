@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import android.content.Context
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -29,6 +30,7 @@ class CategoriesViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private val context: Context = mockk()
     private val remoteRepository: RemoteCategoriesRepository = mockk()
     private val localRepository: LocalCategoriesRepository = mockk()
 
@@ -46,7 +48,11 @@ class CategoriesViewModelTest {
 
         mockGeneralMethods()
 
-        viewModel = CategoriesViewModel(remoteRepository, localRepository)
+        viewModel = CategoriesViewModel(
+            context,
+            remoteRepository,
+            localRepository
+        )
     }
 
     private fun TestScope.setupUiStateCollecting() {
@@ -70,13 +76,27 @@ class CategoriesViewModelTest {
     }
 
     @Test
+    fun categoriesViewModel_checkStateWithEmptyData() = runTest {
+        setupUiStateCollecting()
+
+        mockEmptyData()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.FAILURE(), categoriesUiState.dataRequestStatus)
+        assertEquals(
+            localCategories,
+            categoriesUiState.entities
+        )
+    }
+
+    @Test
     fun categoriesViewModel_checkStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, categoriesUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), categoriesUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localCategories, FakeDataSource.categories),
             categoriesUiState.entities
@@ -84,7 +104,7 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_checkRefreshedOnlineStateWithoutInternet() = runTest {
+    fun categoriesViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -94,7 +114,7 @@ class CategoriesViewModelTest {
         viewModel.getCategories()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, categoriesUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), categoriesUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localCategories, remoteCategories, FakeDataSource.categories),
             categoriesUiState.entities
@@ -102,7 +122,7 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_checkRefreshedOfflineStateWithInternet() = runTest {
+    fun categoriesViewModel_checkRefreshedErrorStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
@@ -120,7 +140,7 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_checkRefreshedOnlineStateWithInternet() = runTest {
+    fun categoriesViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -137,7 +157,7 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_checkRefreshedOfflineStateWithoutInternet() = runTest {
+    fun categoriesViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
@@ -146,7 +166,7 @@ class CategoriesViewModelTest {
         viewModel.getCategories()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, categoriesUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), categoriesUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localCategories, FakeDataSource.categories),
             categoriesUiState.entities
@@ -164,7 +184,13 @@ class CategoriesViewModelTest {
         }
     }
 
+    private fun mockEmptyData() {
+        every { context.getString(any()) } returns ""
+        coEvery { remoteRepository.getCategories() } returns emptyList()
+    }
+
     private fun mockDataWithoutInternet() {
+        every { context.getString(any()) } returns ""
         coEvery { remoteRepository.getCategories() } throws IOException()
         coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
             categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, FakeDataSource.categories)

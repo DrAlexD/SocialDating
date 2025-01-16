@@ -9,9 +9,12 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
@@ -35,6 +38,7 @@ class StatementsViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private val context: Context = mockk()
     private val savedStateHandle: SavedStateHandle = mockk()
     private val remoteStatementsRepository: RemoteStatementsRepository = mockk()
     private val localStatementsRepository: LocalStatementsRepository = mockk()
@@ -79,6 +83,7 @@ class StatementsViewModelTest {
         mockGeneralMethods()
 
         viewModel = StatementsViewModel(
+            context,
             savedStateHandle,
             remoteStatementsRepository,
             localStatementsRepository,
@@ -95,7 +100,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkDataWithInternet() = runTest {
+    fun statementsViewModel_checkStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -109,13 +114,27 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkDataWithoutInternet() = runTest {
+    fun statementsViewModel_checkStateWithEmptyData() = runTest {
+        setupUiStateCollecting()
+
+        mockEmptyData()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.FAILURE(), statementsUiState.dataRequestStatus)
+        assertEquals(
+            localStatements,
+            statementsUiState.entities
+        )
+    }
+
+    @Test
+    fun statementsViewModel_checkStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, statementsUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localStatements, FakeDataSource.statements),
             statementsUiState.entities
@@ -123,7 +142,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkRefreshedOnlineDataWithoutInternet() = runTest {
+    fun statementsViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -133,7 +152,7 @@ class StatementsViewModelTest {
         viewModel.getStatements()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, statementsUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localStatements, remoteStatements, FakeDataSource.statements),
             statementsUiState.entities
@@ -141,7 +160,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkRefreshedOfflineDataWithInternet() = runTest {
+    fun statementsViewModel_checkRefreshedErrorStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
@@ -159,7 +178,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkRefreshedOnlineDataWithInternet() = runTest {
+    fun statementsViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -176,7 +195,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkRefreshedOfflineDataWithoutInternet() = runTest {
+    fun statementsViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
@@ -185,7 +204,7 @@ class StatementsViewModelTest {
         viewModel.getStatements()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, statementsUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localStatements, FakeDataSource.statements),
             statementsUiState.entities
@@ -218,7 +237,16 @@ class StatementsViewModelTest {
         }
     }
 
+    private fun mockEmptyData() {
+        every { context.getString(any()) } returns ""
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns emptyList()
+        coEvery { remoteStatementsRepository.getStatements(emptyList()) } returns emptyList()
+
+        coEvery { localDefiningThemesRepository.insertDefiningThemes(emptyList()) } just Runs
+    }
+
     private fun mockDataWithoutInternet() {
+        every { context.getString(any()) } returns ""
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } throws IOException()
 
         coEvery { localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) } answers {
