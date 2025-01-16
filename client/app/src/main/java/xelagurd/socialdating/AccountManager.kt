@@ -15,7 +15,7 @@ import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
 import dagger.hilt.android.qualifiers.ApplicationContext
-import xelagurd.socialdating.data.model.additional.LoginDetails
+import xelagurd.socialdating.data.model.details.LoginDetails
 
 @Singleton
 class AccountManager @Inject constructor(

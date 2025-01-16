@@ -19,8 +19,8 @@ import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.onNodeWithTextIdWithColon
 import xelagurd.socialdating.ui.screen.ProfileScreenComponent
-import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileUiState
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 
 @HiltAndroidTest
@@ -47,7 +47,7 @@ class ProfileScreenTest {
 
     @Test
     fun profileScreen_offlineStatusAndEmptyData_offlineText() {
-        val profileUiState = ProfileUiState(internetStatus = InternetStatus.OFFLINE)
+        val profileUiState = ProfileUiState(dataRequestStatus = RequestStatus.ERROR)
 
         setContentToProfileBody(profileUiState)
 
@@ -56,7 +56,7 @@ class ProfileScreenTest {
 
     @Test
     fun profileScreen_onlineStatusAndEmptyData_onlineText() {
-        val profileUiState = ProfileUiState(internetStatus = InternetStatus.ONLINE)
+        val profileUiState = ProfileUiState(dataRequestStatus = RequestStatus.SUCCESS)
 
         setContentToProfileBody(profileUiState)
 
@@ -70,7 +70,7 @@ class ProfileScreenTest {
                 1, "User1", Gender.MALE, "username1", "password1",
                 "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
             ),
-            internetStatus = InternetStatus.LOADING
+            dataRequestStatus = RequestStatus.LOADING
         )
 
         assertDataIsDisplayed(profileUiState)
@@ -83,7 +83,7 @@ class ProfileScreenTest {
                 1, "User1", Gender.MALE, "username1", "password1",
                 "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
             ),
-            internetStatus = InternetStatus.OFFLINE
+            dataRequestStatus = RequestStatus.ERROR
         )
 
         assertDataIsDisplayed(profileUiState)
@@ -96,7 +96,7 @@ class ProfileScreenTest {
                 1, "User1", Gender.MALE, "username1", "password1",
                 "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
             ),
-            internetStatus = InternetStatus.ONLINE
+            dataRequestStatus = RequestStatus.SUCCESS
         )
 
         assertDataIsDisplayed(profileUiState)

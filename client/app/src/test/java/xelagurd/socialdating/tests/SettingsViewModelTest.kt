@@ -39,7 +39,7 @@ class SettingsViewModelTest {
         mockDataWithInternet()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, settingsUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, settingsUiState.actionRequestStatus)
     }
 
     @Test
@@ -48,7 +48,7 @@ class SettingsViewModelTest {
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, settingsUiState.requestStatus)
+        assertEquals(RequestStatus.ERROR, settingsUiState.actionRequestStatus)
     }
 
     @Test
@@ -61,7 +61,7 @@ class SettingsViewModelTest {
         viewModel.logout()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, settingsUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, settingsUiState.actionRequestStatus)
     }
 
     private fun mockDataWithInternet() {

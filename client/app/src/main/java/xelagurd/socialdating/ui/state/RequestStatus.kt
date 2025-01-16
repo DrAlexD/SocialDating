@@ -5,5 +5,7 @@ enum class RequestStatus {
     LOADING,
     ERROR,
     FAILED,
-    UNDEFINED
+    UNDEFINED;
+
+    fun isAllowedRefresh() = this == ERROR || this == FAILED
 }

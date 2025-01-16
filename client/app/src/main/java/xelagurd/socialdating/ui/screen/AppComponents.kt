@@ -16,8 +16,7 @@ import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.DataEntity
 import xelagurd.socialdating.ui.state.DataEntityUiState
 import xelagurd.socialdating.ui.state.DataListUiState
-import xelagurd.socialdating.ui.state.InternetStatus
-import xelagurd.socialdating.ui.state.InternetUiState
+import xelagurd.socialdating.ui.state.DataRequestUiState
 import xelagurd.socialdating.ui.state.RequestStatus
 
 
@@ -29,7 +28,7 @@ fun DataListComponent(
     card: @Composable (DataEntity) -> Unit
 ) {
     DataComponent(
-        internetUiState = dataListUiState,
+        dataRequestUiState = dataListUiState,
         modifier = Modifier.fillMaxSize()
     ) {
         AppDataList(
@@ -51,7 +50,7 @@ fun DataChoosingListComponent(
     card: @Composable (DataEntity, Boolean) -> Unit
 ) {
     DataComponent(
-        internetUiState = dataListUiState
+        dataRequestUiState = dataListUiState
     ) {
         AppDataChoosingList(
             entities = dataListUiState.entities,
@@ -71,7 +70,7 @@ fun DataEntityComponent(
     content: @Composable (DataEntity) -> Unit
 ) {
     DataComponent(
-        internetUiState = dataEntityUiState,
+        dataRequestUiState = dataEntityUiState,
         modifier = Modifier.fillMaxSize()
     ) {
         Column(
@@ -86,7 +85,7 @@ fun DataEntityComponent(
 
 @Composable
 private inline fun DataComponent(
-    internetUiState: InternetUiState,
+    dataRequestUiState: DataRequestUiState,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
@@ -95,28 +94,28 @@ private inline fun DataComponent(
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
-        if (internetUiState.isDataExist()) {
+        if (dataRequestUiState.isDataExist()) {
             content()
         } else {
-            InternetStatusComponent(internetUiState.internetStatus)
+            DataRequestStatusComponent(dataRequestUiState.dataRequestStatus)
         }
     }
 }
 
 @Composable
-private fun InternetStatusComponent(
-    internetStatus: InternetStatus
+private fun DataRequestStatusComponent(
+    dataRequestStatus: RequestStatus
 ) {
-    when (internetStatus) {
-        InternetStatus.LOADING -> AppLoadingIndicator()
-        InternetStatus.OFFLINE -> AppLargeTitleText(text = stringResource(R.string.no_internet_connection))
-        InternetStatus.ONLINE -> AppLargeTitleText(text = stringResource(R.string.no_data))
+    when (dataRequestStatus) {
+        RequestStatus.UNDEFINED, RequestStatus.LOADING -> AppLoadingIndicator()
+        RequestStatus.FAILED, RequestStatus.ERROR -> AppLargeTitleText(text = stringResource(R.string.no_internet_connection))
+        RequestStatus.SUCCESS -> AppLargeTitleText(text = stringResource(R.string.no_data))
     }
 }
 
 @Composable
-fun ComponentWithRequestStatus(
-    requestStatus: RequestStatus,
+fun ComponentWithActionRequestStatus(
+    actionRequestStatus: RequestStatus,
     onSuccess: () -> Unit,
     failedText: String,
     errorText: String,
@@ -129,8 +128,8 @@ fun ComponentWithRequestStatus(
             .padding(contentPadding)
     ) {
         content()
-        RequestStatusComponent(
-            requestStatus = requestStatus,
+        ActionRequestStatusComponent(
+            actionRequestStatus = actionRequestStatus,
             onSuccess = onSuccess,
             failedText = failedText,
             errorText = errorText
@@ -139,8 +138,8 @@ fun ComponentWithRequestStatus(
 }
 
 @Composable
-private inline fun RequestStatusComponent(
-    requestStatus: RequestStatus,
+private inline fun ActionRequestStatusComponent(
+    actionRequestStatus: RequestStatus,
     onSuccess: () -> Unit,
     failedText: String,
     errorText: String
@@ -150,7 +149,7 @@ private inline fun RequestStatusComponent(
         verticalArrangement = Arrangement.Bottom,
         modifier = Modifier.fillMaxSize()
     ) {
-        when (requestStatus) {
+        when (actionRequestStatus) {
             RequestStatus.UNDEFINED -> {}
             RequestStatus.LOADING -> AppLoadingIndicator()
             RequestStatus.FAILED -> AppLargeTitleText(failedText)

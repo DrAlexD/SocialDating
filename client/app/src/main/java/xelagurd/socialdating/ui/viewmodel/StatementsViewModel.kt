@@ -28,7 +28,7 @@ import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.ui.navigation.StatementsDestination
-import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.state.StatementsUiState
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -45,7 +45,7 @@ class StatementsViewModel @Inject constructor(
 
     private val categoryId: Int = checkNotNull(savedStateHandle[StatementsDestination.categoryId])
 
-    private val internetStatusFlow = MutableStateFlow(InternetStatus.LOADING)
+    private val dataRequestStatusFlow = MutableStateFlow(RequestStatus.UNDEFINED)
     private val statementsFlow = localDefiningThemesRepository.getDefiningThemes(categoryId)
         .distinctUntilChanged()
         .flatMapLatest { definingThemes ->
@@ -54,11 +54,11 @@ class StatementsViewModel @Inject constructor(
                 .distinctUntilChanged()
         }
 
-    val uiState = combine(statementsFlow, internetStatusFlow) { statements, internetStatus ->
+    val uiState = combine(statementsFlow, dataRequestStatusFlow) { statements, dataRequestStatus ->
         StatementsUiState(
             categoryId = categoryId,
             entities = statements,
-            internetStatus = internetStatus
+            dataRequestStatus = dataRequestStatus
         )
     }.stateIn(
         scope = viewModelScope,
@@ -80,7 +80,7 @@ class StatementsViewModel @Inject constructor(
     fun getStatements() {
         viewModelScope.launch {
             try {
-                internetStatusFlow.update { InternetStatus.LOADING }
+                dataRequestStatusFlow.update { RequestStatus.LOADING }
 
                 delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
@@ -93,12 +93,12 @@ class StatementsViewModel @Inject constructor(
                     .getStatements(remoteDefiningThemeIds)
                 localStatementsRepository.insertStatements(remoteStatements)
 
-                internetStatusFlow.update { InternetStatus.ONLINE }
+                dataRequestStatusFlow.update { RequestStatus.SUCCESS }
             } catch (_: IOException) {
                 localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
                 localStatementsRepository.insertStatements(FakeDataSource.statements) // FixMe: remove after implementing server
 
-                internetStatusFlow.update { InternetStatus.OFFLINE }
+                dataRequestStatusFlow.update { RequestStatus.ERROR }
             }
         }
     }

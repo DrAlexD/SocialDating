@@ -7,10 +7,10 @@ import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.UserCategory
 import xelagurd.socialdating.data.model.UserDefiningTheme
-import xelagurd.socialdating.data.model.additional.LoginDetails
-import xelagurd.socialdating.data.model.additional.RegistrationDetails
-import xelagurd.socialdating.data.model.additional.StatementDetails
 import xelagurd.socialdating.data.model.additional.StatementReaction
+import xelagurd.socialdating.data.model.details.LoginDetails
+import xelagurd.socialdating.data.model.details.RegistrationDetails
+import xelagurd.socialdating.data.model.details.StatementDetails
 import xelagurd.socialdating.data.remote.ApiService
 
 class FakeApiService : ApiService {

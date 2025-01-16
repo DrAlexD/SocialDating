@@ -1,8 +1,8 @@
 package xelagurd.socialdating.ui.state
 
-import xelagurd.socialdating.data.model.additional.LoginDetails
+import xelagurd.socialdating.data.model.details.LoginDetails
 
 data class LoginUiState(
     override val formDetails: LoginDetails = LoginDetails(),
-    override val requestStatus: RequestStatus = RequestStatus.UNDEFINED
+    override val actionRequestStatus: RequestStatus = RequestStatus.UNDEFINED
 ) : FormUiState

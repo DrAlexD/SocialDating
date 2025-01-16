@@ -13,7 +13,7 @@ import xelagurd.socialdating.R
 import xelagurd.socialdating.checkDisabledButton
 import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.checkTextField
-import xelagurd.socialdating.data.model.additional.LoginDetails
+import xelagurd.socialdating.data.model.details.LoginDetails
 import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.LoginScreenComponent
@@ -43,7 +43,7 @@ class LoginScreenTest {
 
     @Test
     fun loginScreen_loadingStatus_loadingIndicator() {
-        val loginUiState = LoginUiState(requestStatus = RequestStatus.LOADING)
+        val loginUiState = LoginUiState(actionRequestStatus = RequestStatus.LOADING)
 
         setContentToLoginBody(loginUiState)
 
@@ -52,7 +52,7 @@ class LoginScreenTest {
 
     @Test
     fun loginScreen_failedStatus_failedText() {
-        val loginUiState = LoginUiState(requestStatus = RequestStatus.FAILED)
+        val loginUiState = LoginUiState(actionRequestStatus = RequestStatus.FAILED)
 
         setContentToLoginBody(loginUiState)
 
@@ -61,7 +61,7 @@ class LoginScreenTest {
 
     @Test
     fun loginScreen_errorStatus_errorText() {
-        val loginUiState = LoginUiState(requestStatus = RequestStatus.ERROR)
+        val loginUiState = LoginUiState(actionRequestStatus = RequestStatus.ERROR)
 
         setContentToLoginBody(loginUiState)
 
@@ -71,8 +71,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyData_disabledButton() {
         val loginUiState = LoginUiState(
-            formDetails = LoginDetails("", ""),
-            requestStatus = RequestStatus.UNDEFINED
+            formDetails = LoginDetails("", "")
         )
 
         assertLoginButtonIsDisabled(loginUiState)
@@ -81,8 +80,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_allData_enabledButton() {
         val loginUiState = LoginUiState(
-            formDetails = LoginDetails("login", "password"),
-            requestStatus = RequestStatus.UNDEFINED
+            formDetails = LoginDetails("login", "password")
         )
 
         assertLoginButtonIsEnabled(loginUiState)
@@ -91,8 +89,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyUsername_disabledButton() {
         val loginUiState = LoginUiState(
-            formDetails = LoginDetails("", "password"),
-            requestStatus = RequestStatus.UNDEFINED
+            formDetails = LoginDetails("", "password")
         )
 
         assertLoginButtonIsDisabled(loginUiState)
@@ -101,8 +98,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyPassword_disabledButton() {
         val loginUiState = LoginUiState(
-            formDetails = LoginDetails("login", ""),
-            requestStatus = RequestStatus.UNDEFINED
+            formDetails = LoginDetails("login", "")
         )
 
         assertLoginButtonIsDisabled(loginUiState)

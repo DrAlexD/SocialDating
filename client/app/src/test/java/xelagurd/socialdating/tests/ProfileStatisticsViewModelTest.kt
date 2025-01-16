@@ -37,7 +37,7 @@ import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesReposito
 import xelagurd.socialdating.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteUserDefiningThemesRepository
 import xelagurd.socialdating.mergeListsAsSets
-import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.viewmodel.ProfileStatisticsViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -133,7 +133,7 @@ class ProfileStatisticsViewModelTest {
         mockDataWithInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, profileStatisticsUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, remoteUserCategories).toUserCategoriesWithData(),
             profileStatisticsUiState.entities
@@ -153,7 +153,7 @@ class ProfileStatisticsViewModelTest {
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, profileStatisticsUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, profileStatisticsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, FakeDataSource.userCategories)
                 .toUserCategoriesWithData(),
@@ -178,7 +178,7 @@ class ProfileStatisticsViewModelTest {
         viewModel.getProfileStatistics()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, profileStatisticsUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, profileStatisticsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(
                 localUserCategories,
@@ -210,7 +210,7 @@ class ProfileStatisticsViewModelTest {
         viewModel.getProfileStatistics()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, profileStatisticsUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(
                 localUserCategories,
@@ -241,7 +241,7 @@ class ProfileStatisticsViewModelTest {
         viewModel.getProfileStatistics()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, profileStatisticsUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, remoteUserCategories).toUserCategoriesWithData(),
             profileStatisticsUiState.entities
@@ -264,7 +264,7 @@ class ProfileStatisticsViewModelTest {
         viewModel.getProfileStatistics()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, profileStatisticsUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, profileStatisticsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localUserCategories, FakeDataSource.userCategories)
                 .toUserCategoriesWithData(),

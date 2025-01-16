@@ -21,7 +21,7 @@ import xelagurd.socialdating.R
 import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.navigation.CategoriesDestination
-import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.RequestStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @HiltAndroidTest
@@ -39,7 +39,7 @@ class TopBarTest {
 
     @Test
     fun topBar_loadingStatus_loadingText() {
-        setContentToAppTopBar(InternetStatus.LOADING)
+        setContentToAppTopBar(RequestStatus.LOADING)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsNotDisplayed()
@@ -48,7 +48,7 @@ class TopBarTest {
 
     @Test
     fun topBar_offlineStatus_offlineTextWithRefresh() {
-        setContentToAppTopBar(InternetStatus.OFFLINE)
+        setContentToAppTopBar(RequestStatus.ERROR)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsDisplayed()
@@ -57,7 +57,7 @@ class TopBarTest {
 
     @Test
     fun topBar_onlineStatus_onlineText() {
-        setContentToAppTopBar(InternetStatus.ONLINE)
+        setContentToAppTopBar(RequestStatus.SUCCESS)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsNotDisplayed()
@@ -66,13 +66,13 @@ class TopBarTest {
 
     @Test
     fun topBar_backButton() {
-        setContentToAppTopBar(InternetStatus.ONLINE, {})
+        setContentToAppTopBar(RequestStatus.SUCCESS, {})
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsDisplayed()
     }
 
     private fun setContentToAppTopBar(
-        internetStatus: InternetStatus,
+        dataRequestStatus: RequestStatus,
         navigateUp: (() -> Unit)? = null
     ) {
         composeTestRule.activity.setContent {
@@ -80,7 +80,7 @@ class TopBarTest {
                 topBar = {
                     AppTopBar(
                         title = stringResource(CategoriesDestination.titleRes),
-                        internetStatus = internetStatus,
+                        dataRequestStatus = dataRequestStatus,
                         refreshAction = { },
                         navigateUp = navigateUp
                     )

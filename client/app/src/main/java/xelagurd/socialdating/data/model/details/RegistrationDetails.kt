@@ -1,4 +1,4 @@
-package xelagurd.socialdating.data.model.additional
+package xelagurd.socialdating.data.model.details
 
 import kotlinx.serialization.Serializable
 import xelagurd.socialdating.data.model.enums.Gender

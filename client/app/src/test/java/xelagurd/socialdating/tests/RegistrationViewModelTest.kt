@@ -18,8 +18,8 @@ import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.model.User
-import xelagurd.socialdating.data.model.additional.LoginDetails
-import xelagurd.socialdating.data.model.additional.RegistrationDetails
+import xelagurd.socialdating.data.model.details.LoginDetails
+import xelagurd.socialdating.data.model.details.RegistrationDetails
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
@@ -62,7 +62,7 @@ class RegistrationViewModelTest {
         mockDataWithInternet()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, registrationUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, registrationUiState.actionRequestStatus)
     }
 
     @Test
@@ -71,7 +71,7 @@ class RegistrationViewModelTest {
         advanceUntilIdle()
 
         // TODO: Change to ERROR after implementing server
-        assertEquals(RequestStatus.SUCCESS, registrationUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, registrationUiState.actionRequestStatus)
     }
 
     @Test
@@ -79,7 +79,7 @@ class RegistrationViewModelTest {
         mockWrongData()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILED, registrationUiState.requestStatus)
+        assertEquals(RequestStatus.FAILED, registrationUiState.actionRequestStatus)
     }
 
     @Test
@@ -91,7 +91,7 @@ class RegistrationViewModelTest {
         viewModel.register()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, registrationUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, registrationUiState.actionRequestStatus)
     }
 
     @Test
@@ -103,7 +103,7 @@ class RegistrationViewModelTest {
         viewModel.register()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, registrationUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, registrationUiState.actionRequestStatus)
     }
 
     private fun mockDataWithInternet() {

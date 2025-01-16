@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
-import xelagurd.socialdating.data.model.additional.LoginDetails
+import xelagurd.socialdating.data.model.details.LoginDetails
 import xelagurd.socialdating.ui.navigation.LoginDestination
 import xelagurd.socialdating.ui.state.LoginUiState
 import xelagurd.socialdating.ui.theme.AppTheme
@@ -55,8 +55,8 @@ fun LoginScreenComponent(
             )
         }
     ) { innerPadding ->
-        ComponentWithRequestStatus(
-            requestStatus = loginUiState.requestStatus,
+        ComponentWithActionRequestStatus(
+            actionRequestStatus = loginUiState.actionRequestStatus,
             onSuccess = onSuccessLogin,
             failedText = stringResource(R.string.failed_login),
             errorText = stringResource(R.string.no_internet_connection),

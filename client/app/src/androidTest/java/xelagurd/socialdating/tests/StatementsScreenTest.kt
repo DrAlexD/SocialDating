@@ -17,7 +17,7 @@ import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.StatementsScreenComponent
-import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.state.StatementsUiState
 import xelagurd.socialdating.ui.theme.AppTheme
 
@@ -45,7 +45,7 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_offlineStatusAndEmptyData_offlineText() {
-        val statementsUiState = StatementsUiState(internetStatus = InternetStatus.OFFLINE)
+        val statementsUiState = StatementsUiState(dataRequestStatus = RequestStatus.ERROR)
 
         setContentToStatementsBody(statementsUiState)
 
@@ -54,7 +54,7 @@ class StatementsScreenTest {
 
     @Test
     fun statementsScreen_onlineStatusAndEmptyData_onlineText() {
-        val statementsUiState = StatementsUiState(internetStatus = InternetStatus.ONLINE)
+        val statementsUiState = StatementsUiState(dataRequestStatus = RequestStatus.SUCCESS)
 
         setContentToStatementsBody(statementsUiState)
 
@@ -65,7 +65,7 @@ class StatementsScreenTest {
     fun statementsScreen_loadingStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
             entities = listOf(Statement(1, "Statement1", true, 1, 1)),
-            internetStatus = InternetStatus.LOADING
+            dataRequestStatus = RequestStatus.LOADING
         )
 
         assertDataIsDisplayed(statementsUiState)
@@ -75,7 +75,7 @@ class StatementsScreenTest {
     fun statementsScreen_offlineStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
             entities = listOf(Statement(1, "Statement1", true, 1, 1)),
-            internetStatus = InternetStatus.OFFLINE
+            dataRequestStatus = RequestStatus.ERROR
         )
 
         assertDataIsDisplayed(statementsUiState)
@@ -85,7 +85,7 @@ class StatementsScreenTest {
     fun statementsScreen_onlineStatusAndData_displayedData() {
         val statementsUiState = StatementsUiState(
             entities = listOf(Statement(1, "Statement1", true, 1, 1)),
-            internetStatus = InternetStatus.ONLINE
+            dataRequestStatus = RequestStatus.SUCCESS
         )
 
         assertDataIsDisplayed(statementsUiState)

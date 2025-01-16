@@ -24,13 +24,13 @@ class SettingsViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             try {
-                _uiState.update { it.copy(requestStatus = RequestStatus.LOADING) }
+                _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
                 preferencesRepository.saveCurrentUserId(-1)
 
-                _uiState.update { it.copy(requestStatus = RequestStatus.SUCCESS) }
+                _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
             } catch (_: IOException) {
-                _uiState.update { it.copy(requestStatus = RequestStatus.ERROR) }
+                _uiState.update { it.copy(actionRequestStatus = RequestStatus.ERROR) }
             }
         }
     }

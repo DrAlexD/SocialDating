@@ -18,20 +18,20 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.ui.state.CategoriesUiState
-import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.RequestStatus
 
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
     private val remoteRepository: RemoteCategoriesRepository,
     private val localRepository: LocalCategoriesRepository
 ) : ViewModel() {
-    private val internetStatusFlow = MutableStateFlow(InternetStatus.LOADING)
+    private val dataRequestStatusFlow = MutableStateFlow(RequestStatus.UNDEFINED)
     private val categoriesFlow = localRepository.getCategories().distinctUntilChanged()
 
-    val uiState = combine(categoriesFlow, internetStatusFlow) { categories, internetStatus ->
+    val uiState = combine(categoriesFlow, dataRequestStatusFlow) { categories, dataRequestStatus ->
         CategoriesUiState(
             entities = categories,
-            internetStatus = internetStatus
+            dataRequestStatus = dataRequestStatus
         )
     }.stateIn(
         scope = viewModelScope,
@@ -46,17 +46,17 @@ class CategoriesViewModel @Inject constructor(
     fun getCategories() {
         viewModelScope.launch {
             try {
-                internetStatusFlow.update { InternetStatus.LOADING }
+                dataRequestStatusFlow.update { RequestStatus.LOADING }
 
                 delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
                 val remoteCategories = remoteRepository.getCategories()
                 localRepository.insertCategories(remoteCategories)
 
-                internetStatusFlow.update { InternetStatus.ONLINE }
+                dataRequestStatusFlow.update { RequestStatus.SUCCESS }
             } catch (_: IOException) {
                 localRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
-                internetStatusFlow.update { InternetStatus.OFFLINE }
+                dataRequestStatusFlow.update { RequestStatus.ERROR }
             }
         }
     }

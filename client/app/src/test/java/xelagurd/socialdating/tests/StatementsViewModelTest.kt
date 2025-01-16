@@ -27,7 +27,7 @@ import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.mergeListsAsSets
-import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.viewmodel.StatementsViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -101,7 +101,7 @@ class StatementsViewModelTest {
         mockDataWithInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, statementsUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localStatements, remoteStatements),
             statementsUiState.entities
@@ -115,7 +115,7 @@ class StatementsViewModelTest {
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, statementsUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, statementsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localStatements, FakeDataSource.statements),
             statementsUiState.entities
@@ -133,7 +133,7 @@ class StatementsViewModelTest {
         viewModel.getStatements()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, statementsUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, statementsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localStatements, remoteStatements, FakeDataSource.statements),
             statementsUiState.entities
@@ -151,7 +151,7 @@ class StatementsViewModelTest {
         viewModel.getStatements()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, statementsUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localStatements, FakeDataSource.statements, remoteStatements),
             statementsUiState.entities
@@ -168,7 +168,7 @@ class StatementsViewModelTest {
         viewModel.getStatements()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, statementsUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localStatements, remoteStatements),
             statementsUiState.entities
@@ -185,7 +185,7 @@ class StatementsViewModelTest {
         viewModel.getStatements()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, statementsUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, statementsUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localStatements, FakeDataSource.statements),
             statementsUiState.entities

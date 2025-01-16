@@ -71,7 +71,7 @@ fun StatementsScreenComponent(
         topBar = {
             AppTopBar(
                 title = stringResource(StatementsDestination.titleRes),
-                internetStatus = statementsUiState.internetStatus,
+                dataRequestStatus = statementsUiState.dataRequestStatus,
                 refreshAction = refreshAction,
                 navigateUp = onNavigateUp,
                 scrollBehavior = scrollBehavior

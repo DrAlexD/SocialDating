@@ -18,8 +18,8 @@ import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.ui.navigation.ProfileDestination
-import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileUiState
+import xelagurd.socialdating.ui.state.RequestStatus
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -29,13 +29,13 @@ class ProfileViewModel @Inject constructor(
 ) : ViewModel() {
     private val userId: Int = checkNotNull(savedStateHandle[ProfileDestination.userId])
 
-    private val internetStatusFlow = MutableStateFlow(InternetStatus.LOADING)
+    private val dataRequestStatusFlow = MutableStateFlow(RequestStatus.UNDEFINED)
     private val userFlow = localRepository.getUser(userId).distinctUntilChanged()
 
-    val uiState = combine(userFlow, internetStatusFlow) { user, internetStatus ->
+    val uiState = combine(userFlow, dataRequestStatusFlow) { user, dataRequestStatus ->
         ProfileUiState(
             entity = user,
-            internetStatus = internetStatus
+            dataRequestStatus = dataRequestStatus
         )
     }.stateIn(
         scope = viewModelScope,
@@ -50,16 +50,16 @@ class ProfileViewModel @Inject constructor(
     fun getUser() {
         viewModelScope.launch {
             try {
-                internetStatusFlow.update { InternetStatus.LOADING }
+                dataRequestStatusFlow.update { RequestStatus.LOADING }
 
                 delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
                 val remoteUser = remoteRepository.getUser(userId)
                 remoteUser?.let { localRepository.insertUser(it) }
 
-                internetStatusFlow.update { InternetStatus.ONLINE }
+                dataRequestStatusFlow.update { RequestStatus.SUCCESS }
             } catch (_: IOException) {
-                internetStatusFlow.update { InternetStatus.OFFLINE }
+                dataRequestStatusFlow.update { RequestStatus.ERROR }
             }
         }
     }

@@ -16,7 +16,7 @@ import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.CategoriesScreenComponent
 import xelagurd.socialdating.ui.state.CategoriesUiState
-import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 
 @HiltAndroidTest
@@ -43,7 +43,7 @@ class CategoriesScreenTest {
 
     @Test
     fun categoriesScreen_offlineStatusAndEmptyData_offlineText() {
-        val categoriesUiState = CategoriesUiState(internetStatus = InternetStatus.OFFLINE)
+        val categoriesUiState = CategoriesUiState(dataRequestStatus = RequestStatus.ERROR)
 
         setContentToCategoriesBody(categoriesUiState)
 
@@ -52,7 +52,7 @@ class CategoriesScreenTest {
 
     @Test
     fun categoriesScreen_onlineStatusAndEmptyData_onlineText() {
-        val categoriesUiState = CategoriesUiState(internetStatus = InternetStatus.ONLINE)
+        val categoriesUiState = CategoriesUiState(dataRequestStatus = RequestStatus.SUCCESS)
 
         setContentToCategoriesBody(categoriesUiState)
 
@@ -63,7 +63,7 @@ class CategoriesScreenTest {
     fun categoriesScreen_loadingStatusAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
             entities = listOf(Category(1, "Category1")),
-            internetStatus = InternetStatus.LOADING
+            dataRequestStatus = RequestStatus.LOADING
         )
 
         assertDataIsDisplayed(categoriesUiState)
@@ -73,7 +73,7 @@ class CategoriesScreenTest {
     fun categoriesScreen_offlineStatusAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
             entities = listOf(Category(1, "Category1")),
-            internetStatus = InternetStatus.OFFLINE
+            dataRequestStatus = RequestStatus.ERROR
         )
 
         assertDataIsDisplayed(categoriesUiState)
@@ -83,7 +83,7 @@ class CategoriesScreenTest {
     fun categoriesScreen_onlineStatusAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
             entities = listOf(Category(1, "Category1")),
-            internetStatus = InternetStatus.ONLINE
+            dataRequestStatus = RequestStatus.SUCCESS
         )
 
         assertDataIsDisplayed(categoriesUiState)
