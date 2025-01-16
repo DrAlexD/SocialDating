@@ -74,8 +74,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyData_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails("", null, "", "", "", "", "", "", null),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            formDetails = RegistrationDetails("", null, "", "", "", "", "", "", null)
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -86,8 +85,7 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
-            ),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            )
         )
 
         assertRegisterButtonIsEnabled(registrationUiState)
@@ -98,8 +96,7 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "", "20", "Mos", Purpose.ALL_AT_ONCE
-            ),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            )
         )
 
         assertRegisterButtonIsEnabled(registrationUiState)
@@ -110,8 +107,7 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails(
                 "", Gender.MALE, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
-            ),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            )
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -122,8 +118,7 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails(
                 "Alex", null, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
-            ),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            )
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -134,8 +129,7 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
-            ),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            )
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -146,8 +140,7 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
-            ),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            )
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -158,8 +151,7 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "", "email", "20", "Mos", Purpose.ALL_AT_ONCE
-            ),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            )
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -170,8 +162,7 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "456", "email", "20", "Mos", Purpose.ALL_AT_ONCE
-            ),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            )
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -182,8 +173,7 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "", "Mos", Purpose.ALL_AT_ONCE
-            ),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            )
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -194,8 +184,7 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "", Purpose.ALL_AT_ONCE
-            ),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            )
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -206,8 +195,7 @@ class RegistrationScreenTest {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "Mos", null
-            ),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            )
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)

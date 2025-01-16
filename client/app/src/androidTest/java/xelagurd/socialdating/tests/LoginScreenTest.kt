@@ -71,8 +71,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyData_disabledButton() {
         val loginUiState = LoginUiState(
-            formDetails = LoginDetails("", ""),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            formDetails = LoginDetails("", "")
         )
 
         assertLoginButtonIsDisabled(loginUiState)
@@ -81,8 +80,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_allData_enabledButton() {
         val loginUiState = LoginUiState(
-            formDetails = LoginDetails("login", "password"),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            formDetails = LoginDetails("login", "password")
         )
 
         assertLoginButtonIsEnabled(loginUiState)
@@ -91,8 +89,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyUsername_disabledButton() {
         val loginUiState = LoginUiState(
-            formDetails = LoginDetails("", "password"),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            formDetails = LoginDetails("", "password")
         )
 
         assertLoginButtonIsDisabled(loginUiState)
@@ -101,8 +98,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyPassword_disabledButton() {
         val loginUiState = LoginUiState(
-            formDetails = LoginDetails("login", ""),
-            actionRequestStatus = RequestStatus.UNDEFINED
+            formDetails = LoginDetails("login", "")
         )
 
         assertLoginButtonIsDisabled(loginUiState)
