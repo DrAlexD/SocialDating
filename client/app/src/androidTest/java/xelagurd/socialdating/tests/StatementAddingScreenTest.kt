@@ -74,7 +74,9 @@ class StatementAddingScreenTest {
 
     @Test
     fun statementAddingScreen_loadingStatus_loadingIndicator() {
-        val statementAddingUiState = StatementAddingUiState(actionRequestStatus = RequestStatus.LOADING)
+        val statementAddingUiState = StatementAddingUiState(
+            actionRequestStatus = RequestStatus.LOADING
+        )
 
         setContentToStatementAddingBody(statementAddingUiState)
 
@@ -83,7 +85,9 @@ class StatementAddingScreenTest {
 
     @Test
     fun statementAddingScreen_failedStatus_failedText() {
-        val statementAddingUiState = StatementAddingUiState(actionRequestStatus = RequestStatus.FAILED)
+        val statementAddingUiState = StatementAddingUiState(
+            actionRequestStatus = RequestStatus.FAILED
+        )
 
         setContentToStatementAddingBody(statementAddingUiState)
 
@@ -92,7 +96,9 @@ class StatementAddingScreenTest {
 
     @Test
     fun statementAddingScreen_errorStatus_errorText() {
-        val statementAddingUiState = StatementAddingUiState(actionRequestStatus = RequestStatus.ERROR)
+        val statementAddingUiState = StatementAddingUiState(
+            actionRequestStatus = RequestStatus.ERROR
+        )
 
         setContentToStatementAddingBody(statementAddingUiState)
 
