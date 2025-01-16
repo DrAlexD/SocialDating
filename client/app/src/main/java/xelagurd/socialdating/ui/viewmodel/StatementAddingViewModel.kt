@@ -17,7 +17,7 @@ import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
-import xelagurd.socialdating.data.model.additional.StatementDetails
+import xelagurd.socialdating.data.model.details.StatementDetails
 import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.ui.navigation.StatementAddingDestination
 import xelagurd.socialdating.ui.state.RequestStatus
@@ -56,11 +56,15 @@ class StatementAddingViewModel @Inject constructor(
 
     fun initDefiningThemes() {
         viewModelScope.launch {
+            _uiState.update { it.copy(dataRequestStatus = RequestStatus.LOADING) }
+
             _uiState.update {
                 it.copy(
                     entities = localDefiningThemesRepository.getDefiningThemes(categoryId).first()
                 )
             }
+
+            _uiState.update { it.copy(dataRequestStatus = RequestStatus.SUCCESS) }
         }
     }
 
@@ -73,7 +77,7 @@ class StatementAddingViewModel @Inject constructor(
     fun statementAdding() {
         viewModelScope.launch {
             try {
-                _uiState.update { it.copy(requestStatus = RequestStatus.LOADING) }
+                _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
                 delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
@@ -83,14 +87,14 @@ class StatementAddingViewModel @Inject constructor(
                 if (statement != null) {
                     localStatementsRepository.insertStatement(statement)
 
-                    _uiState.update { it.copy(requestStatus = RequestStatus.SUCCESS) }
+                    _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
                 } else {
-                    _uiState.update { it.copy(requestStatus = RequestStatus.FAILED) }
+                    _uiState.update { it.copy(actionRequestStatus = RequestStatus.FAILED) }
                 }
             } catch (_: IOException) {
                 localStatementsRepository.insertStatement(FakeDataSource.newStatement) // TODO: remove after implementing server
 
-                _uiState.update { it.copy(requestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing server
+                _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing server
             }
         }
     }

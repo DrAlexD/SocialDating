@@ -4,5 +4,5 @@ import xelagurd.socialdating.data.model.Category
 
 data class CategoriesUiState(
     override val entities: List<Category> = listOf(),
-    override val internetStatus: InternetStatus = InternetStatus.LOADING
+    override val dataRequestStatus: RequestStatus = RequestStatus.UNDEFINED
 ) : DataListUiState

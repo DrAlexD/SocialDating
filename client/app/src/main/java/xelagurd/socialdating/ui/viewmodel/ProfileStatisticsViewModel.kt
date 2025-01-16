@@ -29,8 +29,8 @@ import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesReposito
 import xelagurd.socialdating.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteUserDefiningThemesRepository
 import xelagurd.socialdating.ui.navigation.ProfileStatisticsDestination
-import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileStatisticsUiState
+import xelagurd.socialdating.ui.state.RequestStatus
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -47,7 +47,7 @@ class ProfileStatisticsViewModel @Inject constructor(
 ) : ViewModel() {
     private val userId: Int = checkNotNull(savedStateHandle[ProfileStatisticsDestination.userId])
 
-    private val internetStatusFlow = MutableStateFlow(InternetStatus.LOADING)
+    private val dataRequestStatusFlow = MutableStateFlow(RequestStatus.UNDEFINED)
     private val userCategoriesFlow = localUserCategoriesRepository.getUserCategories(userId)
     private val userDefiningThemesFlow = userCategoriesFlow
         .distinctUntilChanged()
@@ -57,12 +57,12 @@ class ProfileStatisticsViewModel @Inject constructor(
                 .distinctUntilChanged()
         }
 
-    val uiState = combine(userCategoriesFlow, userDefiningThemesFlow, internetStatusFlow)
-    { userCategories, userDefiningThemes, internetStatus ->
+    val uiState = combine(userCategoriesFlow, userDefiningThemesFlow, dataRequestStatusFlow)
+    { userCategories, userDefiningThemes, dataRequestStatus ->
         ProfileStatisticsUiState(
             entities = userCategories,
             entityIdToData = userDefiningThemes.groupBy { it.userCategoryId },
-            internetStatus = internetStatus
+            dataRequestStatus = dataRequestStatus
         )
     }.stateIn(
         scope = viewModelScope,
@@ -77,7 +77,7 @@ class ProfileStatisticsViewModel @Inject constructor(
     fun getProfileStatistics() {
         viewModelScope.launch {
             try {
-                internetStatusFlow.update { InternetStatus.LOADING }
+                dataRequestStatusFlow.update { RequestStatus.LOADING }
 
                 delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
@@ -100,14 +100,14 @@ class ProfileStatisticsViewModel @Inject constructor(
                     remoteUserDefiningThemes
                 )
 
-                internetStatusFlow.update { InternetStatus.ONLINE }
+                dataRequestStatusFlow.update { RequestStatus.SUCCESS }
             } catch (_: IOException) {
                 localCategoriesRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
                 localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
                 localUserCategoriesRepository.insertUserCategories(FakeDataSource.userCategories) // FixMe: remove after implementing server
                 localUserDefiningThemesRepository.insertUserDefiningThemes(FakeDataSource.userDefiningThemes) // FixMe: remove after implementing server
 
-                internetStatusFlow.update { InternetStatus.OFFLINE }
+                dataRequestStatusFlow.update { RequestStatus.ERROR }
             }
         }
     }

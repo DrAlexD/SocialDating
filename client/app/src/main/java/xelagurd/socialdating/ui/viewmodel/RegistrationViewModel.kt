@@ -16,8 +16,8 @@ import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
-import xelagurd.socialdating.data.model.additional.LoginDetails
-import xelagurd.socialdating.data.model.additional.RegistrationDetails
+import xelagurd.socialdating.data.model.details.LoginDetails
+import xelagurd.socialdating.data.model.details.RegistrationDetails
 import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.ui.state.RegistrationUiState
 import xelagurd.socialdating.ui.state.RequestStatus
@@ -42,7 +42,7 @@ class RegistrationViewModel @Inject constructor(
     fun register() {
         viewModelScope.launch {
             try {
-                _uiState.update { it.copy(requestStatus = RequestStatus.LOADING) }
+                _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
                 delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
@@ -59,9 +59,9 @@ class RegistrationViewModel @Inject constructor(
                     localRepository.insertUser(user)
                     preferencesRepository.saveCurrentUserId(user.id)
 
-                    _uiState.update { it.copy(requestStatus = RequestStatus.SUCCESS) }
+                    _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
                 } else {
-                    _uiState.update { it.copy(requestStatus = RequestStatus.FAILED) }
+                    _uiState.update { it.copy(actionRequestStatus = RequestStatus.FAILED) }
                 }
             } catch (_: IOException) {
                 accountManager.saveCredentials(
@@ -74,7 +74,7 @@ class RegistrationViewModel @Inject constructor(
                 localRepository.insertUser(FakeDataSource.users[0]) // TODO: remove after implementing server
                 preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) // TODO: remove after implementing server
 
-                _uiState.update { it.copy(requestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing server
+                _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing server
             }
         }
     }

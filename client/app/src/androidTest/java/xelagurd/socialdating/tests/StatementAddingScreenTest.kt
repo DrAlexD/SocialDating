@@ -16,7 +16,7 @@ import xelagurd.socialdating.checkDisabledButton
 import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.checkTextField
 import xelagurd.socialdating.data.fake.FakeDataSource
-import xelagurd.socialdating.data.model.additional.StatementDetails
+import xelagurd.socialdating.data.model.details.StatementDetails
 import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.onNodeWithTextIdWithColon
@@ -51,7 +51,7 @@ class StatementAddingScreenTest {
         val statementAddingUiState = StatementAddingUiState(
             entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("StatementText1", true, 1, 1),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertContentIsDisplayed(statementAddingUiState)
@@ -64,7 +64,7 @@ class StatementAddingScreenTest {
         val statementAddingUiState = StatementAddingUiState(
             entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("StatementText1", true, null, 1),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertContentIsDisplayed(statementAddingUiState)
@@ -74,7 +74,7 @@ class StatementAddingScreenTest {
 
     @Test
     fun statementAddingScreen_loadingStatus_loadingIndicator() {
-        val statementAddingUiState = StatementAddingUiState(requestStatus = RequestStatus.LOADING)
+        val statementAddingUiState = StatementAddingUiState(actionRequestStatus = RequestStatus.LOADING)
 
         setContentToStatementAddingBody(statementAddingUiState)
 
@@ -83,7 +83,7 @@ class StatementAddingScreenTest {
 
     @Test
     fun statementAddingScreen_failedStatus_failedText() {
-        val statementAddingUiState = StatementAddingUiState(requestStatus = RequestStatus.FAILED)
+        val statementAddingUiState = StatementAddingUiState(actionRequestStatus = RequestStatus.FAILED)
 
         setContentToStatementAddingBody(statementAddingUiState)
 
@@ -92,7 +92,7 @@ class StatementAddingScreenTest {
 
     @Test
     fun statementAddingScreen_errorStatus_errorText() {
-        val statementAddingUiState = StatementAddingUiState(requestStatus = RequestStatus.ERROR)
+        val statementAddingUiState = StatementAddingUiState(actionRequestStatus = RequestStatus.ERROR)
 
         setContentToStatementAddingBody(statementAddingUiState)
 
@@ -104,7 +104,7 @@ class StatementAddingScreenTest {
         val statementAddingUiState = StatementAddingUiState(
             entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("", null, null, 1),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)
@@ -115,7 +115,7 @@ class StatementAddingScreenTest {
         val statementAddingUiState = StatementAddingUiState(
             entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("StatementText1", true, 1, 1),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertAddStatementButtonIsEnabled(statementAddingUiState)
@@ -126,7 +126,7 @@ class StatementAddingScreenTest {
         val statementAddingUiState = StatementAddingUiState(
             entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("", true, 1, 1),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)
@@ -137,7 +137,7 @@ class StatementAddingScreenTest {
         val statementAddingUiState = StatementAddingUiState(
             entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("StatementText1", null, 1, 1),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)
@@ -148,7 +148,7 @@ class StatementAddingScreenTest {
         val statementAddingUiState = StatementAddingUiState(
             entities = FakeDataSource.definingThemes,
             formDetails = StatementDetails("StatementText1", true, null, 1),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)

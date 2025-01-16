@@ -19,7 +19,7 @@ import xelagurd.socialdating.MainDispatcherRule
 import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.model.User
-import xelagurd.socialdating.data.model.additional.LoginDetails
+import xelagurd.socialdating.data.model.details.LoginDetails
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
@@ -63,7 +63,7 @@ class LoginViewModelTest {
         mockDataWithInternet()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, loginUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
     }
 
     @Test
@@ -71,7 +71,7 @@ class LoginViewModelTest {
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, loginUiState.requestStatus)
+        assertEquals(RequestStatus.ERROR, loginUiState.actionRequestStatus)
     }
 
     @Test
@@ -79,7 +79,7 @@ class LoginViewModelTest {
         mockWrongData()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILED, loginUiState.requestStatus)
+        assertEquals(RequestStatus.FAILED, loginUiState.actionRequestStatus)
     }
 
     @Test
@@ -91,7 +91,7 @@ class LoginViewModelTest {
         viewModel.loginWithInput()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, loginUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
     }
 
     @Test
@@ -103,7 +103,7 @@ class LoginViewModelTest {
         viewModel.loginWithInput()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, loginUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
     }
 
     private fun mockFindCredentialsWithData() {

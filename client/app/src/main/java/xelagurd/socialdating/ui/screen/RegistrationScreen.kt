@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
-import xelagurd.socialdating.data.model.additional.RegistrationDetails
+import xelagurd.socialdating.data.model.details.RegistrationDetails
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.ui.navigation.RegistrationDestination
@@ -66,8 +66,8 @@ fun RegistrationScreenComponent(
             )
         }
     ) { innerPadding ->
-        ComponentWithRequestStatus(
-            requestStatus = registrationUiState.requestStatus,
+        ComponentWithActionRequestStatus(
+            actionRequestStatus = registrationUiState.actionRequestStatus,
             onSuccess = onSuccessRegistration,
             failedText = stringResource(R.string.failed_registration),
             errorText = stringResource(R.string.no_internet_connection),

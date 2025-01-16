@@ -69,7 +69,7 @@ fun ProfileStatisticsScreenComponent(
         topBar = {
             AppTopBar(
                 title = stringResource(ProfileStatisticsDestination.titleRes),
-                internetStatus = profileStatisticsUiState.internetStatus,
+                dataRequestStatus = profileStatisticsUiState.dataRequestStatus,
                 refreshAction = refreshAction,
                 navigateUp = onNavigateUp,
                 scrollBehavior = scrollBehavior

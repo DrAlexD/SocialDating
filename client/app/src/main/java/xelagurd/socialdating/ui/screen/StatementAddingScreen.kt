@@ -25,7 +25,7 @@ import xelagurd.socialdating.AppTopBar
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.DefiningTheme
-import xelagurd.socialdating.data.model.additional.StatementDetails
+import xelagurd.socialdating.data.model.details.StatementDetails
 import xelagurd.socialdating.ui.navigation.StatementAddingDestination
 import xelagurd.socialdating.ui.state.StatementAddingUiState
 import xelagurd.socialdating.ui.theme.AppTheme
@@ -71,8 +71,8 @@ fun StatementAddingScreenComponent(
             )
         }
     ) { innerPadding ->
-        ComponentWithRequestStatus(
-            requestStatus = statementAddingUiState.requestStatus,
+        ComponentWithActionRequestStatus(
+            actionRequestStatus = statementAddingUiState.actionRequestStatus,
             onSuccess = onSuccessStatementAdding,
             failedText = stringResource(R.string.failed_add_statement),
             errorText = stringResource(R.string.no_internet_connection),

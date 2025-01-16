@@ -22,7 +22,7 @@ import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.data.model.DefiningTheme
 import xelagurd.socialdating.data.model.Statement
-import xelagurd.socialdating.data.model.additional.StatementDetails
+import xelagurd.socialdating.data.model.details.StatementDetails
 import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.viewmodel.StatementAddingViewModel
@@ -69,7 +69,7 @@ class StatementAddingViewModelTest {
         mockDataWithInternet()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, statementAddingUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, statementAddingUiState.actionRequestStatus)
     }
 
     @Test
@@ -78,7 +78,7 @@ class StatementAddingViewModelTest {
         advanceUntilIdle()
 
         // TODO: Change to ERROR after implementing server
-        assertEquals(RequestStatus.SUCCESS, statementAddingUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, statementAddingUiState.actionRequestStatus)
     }
 
     @Test
@@ -86,7 +86,7 @@ class StatementAddingViewModelTest {
         mockWrongData()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILED, statementAddingUiState.requestStatus)
+        assertEquals(RequestStatus.FAILED, statementAddingUiState.actionRequestStatus)
     }
 
     @Test
@@ -98,7 +98,7 @@ class StatementAddingViewModelTest {
         viewModel.statementAdding()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, statementAddingUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, statementAddingUiState.actionRequestStatus)
     }
 
     @Test
@@ -110,7 +110,7 @@ class StatementAddingViewModelTest {
         viewModel.statementAdding()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.SUCCESS, statementAddingUiState.requestStatus)
+        assertEquals(RequestStatus.SUCCESS, statementAddingUiState.actionRequestStatus)
     }
 
     private fun mockGeneralMethods() {

@@ -51,7 +51,7 @@ fun CategoriesScreenComponent(
         topBar = {
             AppTopBar(
                 title = stringResource(CategoriesDestination.titleRes),
-                internetStatus = categoriesUiState.internetStatus,
+                dataRequestStatus = categoriesUiState.dataRequestStatus,
                 refreshAction = refreshAction,
                 scrollBehavior = scrollBehavior
             )

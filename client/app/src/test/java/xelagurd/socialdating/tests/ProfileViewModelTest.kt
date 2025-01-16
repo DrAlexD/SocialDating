@@ -22,7 +22,7 @@ import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
-import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -68,7 +68,7 @@ class ProfileViewModelTest {
         mockDataWithInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, profileUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
         assertEquals(
             remoteUser,
             profileUiState.entity
@@ -82,7 +82,7 @@ class ProfileViewModelTest {
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, profileUiState.dataRequestStatus)
         assertEquals(
             localUser,
             profileUiState.entity
@@ -100,7 +100,7 @@ class ProfileViewModelTest {
         viewModel.getUser()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, profileUiState.dataRequestStatus)
         assertEquals(
             remoteUser,
             profileUiState.entity
@@ -118,7 +118,7 @@ class ProfileViewModelTest {
         viewModel.getUser()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, profileUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
         assertEquals(
             remoteUser,
             profileUiState.entity
@@ -135,7 +135,7 @@ class ProfileViewModelTest {
         viewModel.getUser()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, profileUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
         assertEquals(
             remoteUser,
             profileUiState.entity
@@ -152,7 +152,7 @@ class ProfileViewModelTest {
         viewModel.getUser()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, profileUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, profileUiState.dataRequestStatus)
         assertEquals(
             localUser,
             profileUiState.entity

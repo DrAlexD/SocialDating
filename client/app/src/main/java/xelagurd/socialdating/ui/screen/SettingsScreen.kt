@@ -55,8 +55,8 @@ fun SettingsScreenComponent(
             )
         }
     ) { innerPadding ->
-        ComponentWithRequestStatus(
-            requestStatus = settingsUiState.requestStatus,
+        ComponentWithActionRequestStatus(
+            actionRequestStatus = settingsUiState.actionRequestStatus,
             onSuccess = onSuccessLogout,
             failedText = "",
             errorText = stringResource(R.string.unknown_error),

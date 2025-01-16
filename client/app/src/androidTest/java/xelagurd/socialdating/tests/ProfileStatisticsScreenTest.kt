@@ -19,8 +19,8 @@ import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.ProfileStatisticsScreenComponent
-import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileStatisticsUiState
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 
 @HiltAndroidTest
@@ -48,7 +48,7 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_offlineStatusAndEmptyData_offlineText() {
         val profileStatisticsUiState =
-            ProfileStatisticsUiState(internetStatus = InternetStatus.OFFLINE)
+            ProfileStatisticsUiState(dataRequestStatus = RequestStatus.ERROR)
 
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
@@ -58,7 +58,7 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_onlineStatusAndEmptyData_onlineText() {
         val profileStatisticsUiState =
-            ProfileStatisticsUiState(internetStatus = InternetStatus.ONLINE)
+            ProfileStatisticsUiState(dataRequestStatus = RequestStatus.SUCCESS)
 
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
@@ -72,7 +72,7 @@ class ProfileStatisticsScreenTest {
             entityIdToData = mapOf(
                 1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
             ),
-            internetStatus = InternetStatus.LOADING
+            dataRequestStatus = RequestStatus.LOADING
         )
 
         assertDataIsDisplayed(profileStatisticsUiState)
@@ -85,7 +85,7 @@ class ProfileStatisticsScreenTest {
             entityIdToData = mapOf(
                 1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
             ),
-            internetStatus = InternetStatus.OFFLINE
+            dataRequestStatus = RequestStatus.ERROR
         )
 
         assertDataIsDisplayed(profileStatisticsUiState)
@@ -98,7 +98,7 @@ class ProfileStatisticsScreenTest {
             entityIdToData = mapOf(
                 1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
             ),
-            internetStatus = InternetStatus.ONLINE
+            dataRequestStatus = RequestStatus.SUCCESS
         )
 
         assertDataIsDisplayed(profileStatisticsUiState)

@@ -13,7 +13,7 @@ import xelagurd.socialdating.R
 import xelagurd.socialdating.checkDisabledButton
 import xelagurd.socialdating.checkEnabledButton
 import xelagurd.socialdating.checkTextField
-import xelagurd.socialdating.data.model.additional.RegistrationDetails
+import xelagurd.socialdating.data.model.details.RegistrationDetails
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.onNodeWithTagId
@@ -46,7 +46,7 @@ class RegistrationScreenTest {
 
     @Test
     fun registrationScreen_loadingStatus_loadingIndicator() {
-        val registrationUiState = RegistrationUiState(requestStatus = RequestStatus.LOADING)
+        val registrationUiState = RegistrationUiState(actionRequestStatus = RequestStatus.LOADING)
 
         setContentToRegistrationBody(registrationUiState)
 
@@ -55,7 +55,7 @@ class RegistrationScreenTest {
 
     @Test
     fun registrationScreen_failedStatus_failedText() {
-        val registrationUiState = RegistrationUiState(requestStatus = RequestStatus.FAILED)
+        val registrationUiState = RegistrationUiState(actionRequestStatus = RequestStatus.FAILED)
 
         setContentToRegistrationBody(registrationUiState)
 
@@ -64,7 +64,7 @@ class RegistrationScreenTest {
 
     @Test
     fun registrationScreen_errorStatus_errorText() {
-        val registrationUiState = RegistrationUiState(requestStatus = RequestStatus.ERROR)
+        val registrationUiState = RegistrationUiState(actionRequestStatus = RequestStatus.ERROR)
 
         setContentToRegistrationBody(registrationUiState)
 
@@ -75,7 +75,7 @@ class RegistrationScreenTest {
     fun registrationScreen_emptyData_disabledButton() {
         val registrationUiState = RegistrationUiState(
             formDetails = RegistrationDetails("", null, "", "", "", "", "", "", null),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -87,7 +87,7 @@ class RegistrationScreenTest {
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsEnabled(registrationUiState)
@@ -99,7 +99,7 @@ class RegistrationScreenTest {
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsEnabled(registrationUiState)
@@ -111,7 +111,7 @@ class RegistrationScreenTest {
             formDetails = RegistrationDetails(
                 "", Gender.MALE, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -123,7 +123,7 @@ class RegistrationScreenTest {
             formDetails = RegistrationDetails(
                 "Alex", null, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -135,7 +135,7 @@ class RegistrationScreenTest {
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -147,7 +147,7 @@ class RegistrationScreenTest {
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -159,7 +159,7 @@ class RegistrationScreenTest {
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -171,7 +171,7 @@ class RegistrationScreenTest {
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "456", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             ),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -183,7 +183,7 @@ class RegistrationScreenTest {
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "", "Mos", Purpose.ALL_AT_ONCE
             ),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -195,7 +195,7 @@ class RegistrationScreenTest {
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "", Purpose.ALL_AT_ONCE
             ),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -207,7 +207,7 @@ class RegistrationScreenTest {
             formDetails = RegistrationDetails(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "Mos", null
             ),
-            requestStatus = RequestStatus.UNDEFINED
+            actionRequestStatus = RequestStatus.UNDEFINED
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)

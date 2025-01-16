@@ -21,7 +21,7 @@ import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.mergeListsAsSets
-import xelagurd.socialdating.ui.state.InternetStatus
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.viewmodel.CategoriesViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -62,7 +62,7 @@ class CategoriesViewModelTest {
         mockDataWithInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, categoriesUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localCategories, remoteCategories),
             categoriesUiState.entities
@@ -76,7 +76,7 @@ class CategoriesViewModelTest {
         mockDataWithoutInternet()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, categoriesUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, categoriesUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localCategories, FakeDataSource.categories),
             categoriesUiState.entities
@@ -94,7 +94,7 @@ class CategoriesViewModelTest {
         viewModel.getCategories()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, categoriesUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, categoriesUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localCategories, remoteCategories, FakeDataSource.categories),
             categoriesUiState.entities
@@ -112,7 +112,7 @@ class CategoriesViewModelTest {
         viewModel.getCategories()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, categoriesUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localCategories, FakeDataSource.categories, remoteCategories),
             categoriesUiState.entities
@@ -129,7 +129,7 @@ class CategoriesViewModelTest {
         viewModel.getCategories()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.ONLINE, categoriesUiState.internetStatus)
+        assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localCategories, remoteCategories),
             categoriesUiState.entities
@@ -146,7 +146,7 @@ class CategoriesViewModelTest {
         viewModel.getCategories()
         advanceUntilIdle()
 
-        assertEquals(InternetStatus.OFFLINE, categoriesUiState.internetStatus)
+        assertEquals(RequestStatus.ERROR, categoriesUiState.dataRequestStatus)
         assertEquals(
             mergeListsAsSets(localCategories, FakeDataSource.categories),
             categoriesUiState.entities
