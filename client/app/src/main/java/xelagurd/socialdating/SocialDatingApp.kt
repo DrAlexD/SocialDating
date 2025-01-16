@@ -71,7 +71,7 @@ fun AppTopBar(
                                 when (dataRequestStatus) {
                                     RequestStatus.SUCCESS -> R.string.online
                                     RequestStatus.UNDEFINED, RequestStatus.LOADING -> R.string.loading
-                                    RequestStatus.FAILED, RequestStatus.ERROR -> R.string.offline
+                                    is RequestStatus.FAILURE, is RequestStatus.ERROR -> R.string.offline
                                 }
                             ),
                             style = MaterialTheme.typography.titleMedium,
@@ -129,7 +129,7 @@ fun AppTopBarOfflinePreview() {
     AppTheme {
         AppTopBar(
             title = stringResource(CategoriesDestination.titleRes),
-            dataRequestStatus = RequestStatus.ERROR,
+            dataRequestStatus = RequestStatus.ERROR(),
             refreshAction = {},
             navigateUp = {}
         )

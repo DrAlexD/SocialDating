@@ -58,8 +58,6 @@ fun SettingsScreenComponent(
         ComponentWithActionRequestStatus(
             actionRequestStatus = settingsUiState.actionRequestStatus,
             onSuccess = onSuccessLogout,
-            failedText = "",
-            errorText = stringResource(R.string.unknown_error),
             contentPadding = innerPadding
         ) {
             SettingsDetailsBody(

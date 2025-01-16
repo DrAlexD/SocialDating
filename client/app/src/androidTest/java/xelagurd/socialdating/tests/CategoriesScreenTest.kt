@@ -13,7 +13,6 @@ import xelagurd.socialdating.MainActivity
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.onNodeWithTagId
-import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.CategoriesScreenComponent
 import xelagurd.socialdating.ui.state.CategoriesUiState
 import xelagurd.socialdating.ui.state.RequestStatus
@@ -33,7 +32,7 @@ class CategoriesScreenTest {
     }
 
     @Test
-    fun categoriesScreen_loadingStatusAndEmptyData_loadingIndicator() {
+    fun categoriesScreen_loadingStateAndEmptyData_loadingIndicator() {
         val categoriesUiState = CategoriesUiState()
 
         setContentToCategoriesBody(categoriesUiState)
@@ -42,25 +41,31 @@ class CategoriesScreenTest {
     }
 
     @Test
-    fun categoriesScreen_offlineStatusAndEmptyData_offlineText() {
-        val categoriesUiState = CategoriesUiState(dataRequestStatus = RequestStatus.ERROR)
+    fun categoriesScreen_errorStateAndEmptyData_errorText() {
+        val errorText = "Error Text"
+        val categoriesUiState = CategoriesUiState(
+            dataRequestStatus = RequestStatus.ERROR(errorText)
+        )
 
         setContentToCategoriesBody(categoriesUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
+        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
     }
 
     @Test
-    fun categoriesScreen_onlineStatusAndEmptyData_onlineText() {
-        val categoriesUiState = CategoriesUiState(dataRequestStatus = RequestStatus.SUCCESS)
+    fun categoriesScreen_failureStateAndEmptyData_failureText() {
+        val failureText = "Failure Text"
+        val categoriesUiState = CategoriesUiState(
+            dataRequestStatus = RequestStatus.FAILURE(failureText)
+        )
 
         setContentToCategoriesBody(categoriesUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.no_data).assertIsDisplayed()
+        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
     }
 
     @Test
-    fun categoriesScreen_loadingStatusAndData_displayedData() {
+    fun categoriesScreen_loadingStateAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
             entities = listOf(Category(1, "Category1")),
             dataRequestStatus = RequestStatus.LOADING
@@ -70,17 +75,27 @@ class CategoriesScreenTest {
     }
 
     @Test
-    fun categoriesScreen_offlineStatusAndData_displayedData() {
+    fun categoriesScreen_errorStateAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
             entities = listOf(Category(1, "Category1")),
-            dataRequestStatus = RequestStatus.ERROR
+            dataRequestStatus = RequestStatus.ERROR()
         )
 
         assertDataIsDisplayed(categoriesUiState)
     }
 
     @Test
-    fun categoriesScreen_onlineStatusAndData_displayedData() {
+    fun categoriesScreen_failureStateAndData_displayedData() {
+        val categoriesUiState = CategoriesUiState(
+            entities = listOf(Category(1, "Category1")),
+            dataRequestStatus = RequestStatus.FAILURE()
+        )
+
+        assertDataIsDisplayed(categoriesUiState)
+    }
+
+    @Test
+    fun categoriesScreen_successStateAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
             entities = listOf(Category(1, "Category1")),
             dataRequestStatus = RequestStatus.SUCCESS

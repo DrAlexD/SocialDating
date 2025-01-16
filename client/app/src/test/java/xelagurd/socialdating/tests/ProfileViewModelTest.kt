@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import io.mockk.coEvery
 import io.mockk.every
@@ -30,6 +31,7 @@ class ProfileViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private val context: Context = mockk()
     private val savedStateHandle: SavedStateHandle = mockk()
     private val remoteRepository: RemoteUsersRepository = mockk()
     private val localRepository: LocalUsersRepository = mockk()
@@ -52,7 +54,12 @@ class ProfileViewModelTest {
 
         mockGeneralMethods()
 
-        viewModel = ProfileViewModel(savedStateHandle, remoteRepository, localRepository)
+        viewModel = ProfileViewModel(
+            context,
+            savedStateHandle,
+            remoteRepository,
+            localRepository
+        )
     }
 
     private fun TestScope.setupUiStateCollecting() {
@@ -76,13 +83,13 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkStateWithoutInternet() = runTest {
+    fun profileViewModel_checkStateWithEmptyData() = runTest {
         setupUiStateCollecting()
 
-        mockDataWithoutInternet()
+        mockEmptyData()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, profileUiState.dataRequestStatus)
+        assertEquals(RequestStatus.FAILURE(), profileUiState.dataRequestStatus)
         assertEquals(
             localUser,
             profileUiState.entity
@@ -90,7 +97,21 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkRefreshedOnlineStateWithoutInternet() = runTest {
+    fun profileViewModel_checkStateWithoutInternet() = runTest {
+        setupUiStateCollecting()
+
+        mockDataWithoutInternet()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.ERROR(), profileUiState.dataRequestStatus)
+        assertEquals(
+            localUser,
+            profileUiState.entity
+        )
+    }
+
+    @Test
+    fun profileViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -100,7 +121,7 @@ class ProfileViewModelTest {
         viewModel.getUser()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, profileUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), profileUiState.dataRequestStatus)
         assertEquals(
             remoteUser,
             profileUiState.entity
@@ -108,7 +129,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkRefreshedOfflineStateWithInternet() = runTest {
+    fun profileViewModel_checkRefreshedErrorStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
@@ -126,7 +147,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkRefreshedOnlineStateWithInternet() = runTest {
+    fun profileViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithInternet()
@@ -143,7 +164,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkRefreshedOfflineStateWithoutInternet() = runTest {
+    fun profileViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
         setupUiStateCollecting()
 
         mockDataWithoutInternet()
@@ -152,7 +173,7 @@ class ProfileViewModelTest {
         viewModel.getUser()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.ERROR, profileUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), profileUiState.dataRequestStatus)
         assertEquals(
             localUser,
             profileUiState.entity
@@ -171,7 +192,13 @@ class ProfileViewModelTest {
         }
     }
 
+    private fun mockEmptyData() {
+        every { context.getString(any()) } returns ""
+        coEvery { remoteRepository.getUser(userId) } returns null
+    }
+
     private fun mockDataWithoutInternet() {
+        every { context.getString(any()) } returns ""
         coEvery { remoteRepository.getUser(userId) } throws IOException()
     }
 }

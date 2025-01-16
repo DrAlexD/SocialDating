@@ -1,6 +1,5 @@
 package xelagurd.socialdating.ui.viewmodel
 
-import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,15 +22,11 @@ class SettingsViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
-            try {
-                _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
+            _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
-                preferencesRepository.saveCurrentUserId(-1)
+            preferencesRepository.saveCurrentUserId(-1)
 
-                _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
-            } catch (_: IOException) {
-                _uiState.update { it.copy(actionRequestStatus = RequestStatus.ERROR) }
-            }
+            _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
         }
     }
 }

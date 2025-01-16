@@ -7,12 +7,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import org.mindrot.jbcrypt.BCrypt
 import xelagurd.socialdating.AccountManager
 import xelagurd.socialdating.PreferencesRepository
+import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
@@ -24,6 +27,7 @@ import xelagurd.socialdating.ui.state.RequestStatus
 
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val remoteRepository: RemoteUsersRepository,
     private val localRepository: LocalUsersRepository,
     private val preferencesRepository: PreferencesRepository,
@@ -61,7 +65,13 @@ class RegistrationViewModel @Inject constructor(
 
                     _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
                 } else {
-                    _uiState.update { it.copy(actionRequestStatus = RequestStatus.FAILED) }
+                    _uiState.update {
+                        it.copy(
+                            actionRequestStatus = RequestStatus.FAILURE(
+                                failureText = context.getString(R.string.failed_registration)
+                            )
+                        )
+                    }
                 }
             } catch (_: IOException) {
                 accountManager.saveCredentials(

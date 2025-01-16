@@ -1,11 +1,11 @@
 package xelagurd.socialdating.ui.state
 
-enum class RequestStatus {
-    SUCCESS,
-    LOADING,
-    ERROR,
-    FAILED,
-    UNDEFINED;
+sealed class RequestStatus {
+    object SUCCESS : RequestStatus()
+    object LOADING : RequestStatus()
+    data class ERROR(val errorText: String = "") : RequestStatus()
+    data class FAILURE(val failureText: String = "") : RequestStatus()
+    object UNDEFINED : RequestStatus()
 
-    fun isAllowedRefresh() = this == ERROR || this == FAILED
+    fun isAllowedRefresh() = this is ERROR || this is FAILURE
 }

@@ -17,7 +17,6 @@ import xelagurd.socialdating.data.model.additional.UserCategoryWithData
 import xelagurd.socialdating.data.model.additional.UserDefiningThemeWithData
 import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTagId
-import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.ui.screen.ProfileStatisticsScreenComponent
 import xelagurd.socialdating.ui.state.ProfileStatisticsUiState
 import xelagurd.socialdating.ui.state.RequestStatus
@@ -37,7 +36,7 @@ class ProfileStatisticsScreenTest {
     }
 
     @Test
-    fun profileStatisticsScreen_loadingStatusAndEmptyData_loadingIndicator() {
+    fun profileStatisticsScreen_loadingStateAndEmptyData_loadingIndicator() {
         val profileStatisticsUiState = ProfileStatisticsUiState()
 
         setContentToProfileStatisticsBody(profileStatisticsUiState)
@@ -46,27 +45,31 @@ class ProfileStatisticsScreenTest {
     }
 
     @Test
-    fun profileStatisticsScreen_offlineStatusAndEmptyData_offlineText() {
-        val profileStatisticsUiState =
-            ProfileStatisticsUiState(dataRequestStatus = RequestStatus.ERROR)
+    fun profileStatisticsScreen_errorStateAndEmptyData_errorText() {
+        val errorText = "Error Text"
+        val profileStatisticsUiState = ProfileStatisticsUiState(
+            dataRequestStatus = RequestStatus.ERROR(errorText)
+        )
 
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
+        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
     }
 
     @Test
-    fun profileStatisticsScreen_onlineStatusAndEmptyData_onlineText() {
-        val profileStatisticsUiState =
-            ProfileStatisticsUiState(dataRequestStatus = RequestStatus.SUCCESS)
+    fun profileStatisticsScreen_failureStateAndEmptyData_failureText() {
+        val failureText = "Failure Text"
+        val profileStatisticsUiState = ProfileStatisticsUiState(
+            dataRequestStatus = RequestStatus.FAILURE(failureText)
+        )
 
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.no_data).assertIsDisplayed()
+        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
     }
 
     @Test
-    fun profileStatisticsScreen_loadingStatusAndData_displayedData() {
+    fun profileStatisticsScreen_loadingStateAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
             entities = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
             entityIdToData = mapOf(
@@ -79,20 +82,33 @@ class ProfileStatisticsScreenTest {
     }
 
     @Test
-    fun profileStatisticsScreen_offlineStatusAndData_displayedData() {
+    fun profileStatisticsScreen_errorStateAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
             entities = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
             entityIdToData = mapOf(
                 1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
             ),
-            dataRequestStatus = RequestStatus.ERROR
+            dataRequestStatus = RequestStatus.ERROR()
         )
 
         assertDataIsDisplayed(profileStatisticsUiState)
     }
 
     @Test
-    fun profileStatisticsScreen_onlineStatusAndData_displayedData() {
+    fun profileStatisticsScreen_failureStateAndData_displayedData() {
+        val profileStatisticsUiState = ProfileStatisticsUiState(
+            entities = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
+            entityIdToData = mapOf(
+                1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
+            ),
+            dataRequestStatus = RequestStatus.FAILURE()
+        )
+
+        assertDataIsDisplayed(profileStatisticsUiState)
+    }
+
+    @Test
+    fun profileStatisticsScreen_successStateAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
             entities = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
             entityIdToData = mapOf(

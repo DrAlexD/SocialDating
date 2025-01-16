@@ -3,6 +3,7 @@ package xelagurd.socialdating.tests
 import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -42,7 +43,7 @@ class LoginScreenTest {
     }
 
     @Test
-    fun loginScreen_loadingStatus_loadingIndicator() {
+    fun loginScreen_loadingState_loadingIndicator() {
         val loginUiState = LoginUiState(actionRequestStatus = RequestStatus.LOADING)
 
         setContentToLoginBody(loginUiState)
@@ -51,21 +52,23 @@ class LoginScreenTest {
     }
 
     @Test
-    fun loginScreen_failedStatus_failedText() {
-        val loginUiState = LoginUiState(actionRequestStatus = RequestStatus.FAILED)
+    fun loginScreen_failureState_failureText() {
+        val failureText = "Failure Text"
+        val loginUiState = LoginUiState(actionRequestStatus = RequestStatus.FAILURE(failureText))
 
         setContentToLoginBody(loginUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.failed_login).assertIsDisplayed()
+        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
     }
 
     @Test
-    fun loginScreen_errorStatus_errorText() {
-        val loginUiState = LoginUiState(actionRequestStatus = RequestStatus.ERROR)
+    fun loginScreen_errorState_errorText() {
+        val errorText = "Error Text"
+        val loginUiState = LoginUiState(actionRequestStatus = RequestStatus.ERROR(errorText))
 
         setContentToLoginBody(loginUiState)
 
-        composeTestRule.onNodeWithTextId(R.string.no_internet_connection).assertIsDisplayed()
+        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
     }
 
     @Test

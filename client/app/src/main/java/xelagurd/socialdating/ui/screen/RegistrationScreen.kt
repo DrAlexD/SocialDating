@@ -69,8 +69,6 @@ fun RegistrationScreenComponent(
         ComponentWithActionRequestStatus(
             actionRequestStatus = registrationUiState.actionRequestStatus,
             onSuccess = onSuccessRegistration,
-            failedText = stringResource(R.string.failed_registration),
-            errorText = stringResource(R.string.no_internet_connection),
             contentPadding = innerPadding
         ) {
             RegistrationDetailsBody(

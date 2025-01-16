@@ -4,8 +4,10 @@ import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import android.content.Context
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
@@ -31,6 +33,7 @@ class RegistrationViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private val context: Context = mockk()
     private val remoteRepository: RemoteUsersRepository = mockk()
     private val localRepository: LocalUsersRepository = mockk()
     private val preferencesRepository: PreferencesRepository = mockk()
@@ -48,6 +51,7 @@ class RegistrationViewModelTest {
     @Before
     fun setup() {
         viewModel = RegistrationViewModel(
+            context,
             remoteRepository,
             localRepository,
             preferencesRepository,
@@ -79,7 +83,7 @@ class RegistrationViewModelTest {
         mockWrongData()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILED, registrationUiState.actionRequestStatus)
+        assertEquals(RequestStatus.FAILURE(), registrationUiState.actionRequestStatus)
     }
 
     @Test
@@ -114,10 +118,12 @@ class RegistrationViewModelTest {
     }
 
     private fun mockWrongData() {
+        every { context.getString(any()) } returns ""
         coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns null
     }
 
     private fun mockDataWithoutInternet() {
+        every { context.getString(any()) } returns ""
         coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } throws IOException()
         coEvery {
             accountManager.saveCredentials(
