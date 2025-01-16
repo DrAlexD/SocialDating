@@ -18,11 +18,10 @@ import xelagurd.socialdating.data.model.additional.UserDefiningThemeWithData
 import xelagurd.socialdating.onNodeWithContentDescriptionId
 import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
-import xelagurd.socialdating.ui.screen.AppExpandedEntityCard
-import xelagurd.socialdating.ui.screen.DataListComponent
-import xelagurd.socialdating.ui.screen.UserCategoryCardContent
+import xelagurd.socialdating.ui.screen.ProfileStatisticsScreenComponent
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileStatisticsUiState
+import xelagurd.socialdating.ui.theme.AppTheme
 
 @HiltAndroidTest
 class ProfileStatisticsScreenTest {
@@ -126,19 +125,10 @@ class ProfileStatisticsScreenTest {
 
     private fun setContentToProfileStatisticsBody(profileStatisticsUiState: ProfileStatisticsUiState) {
         composeTestRule.activity.setContent {
-            DataListComponent(
-                dataListUiState = profileStatisticsUiState
-            ) {
-                AppExpandedEntityCard(
-                    entity = it
-                ) { entity, isExpanded ->
-                    UserCategoryCardContent(
-                        userCategory = entity as UserCategoryWithData,
-                        userDefiningThemes = profileStatisticsUiState.entityIdToData
-                            .getOrDefault(entity.id, listOf()),
-                        isExpanded = isExpanded
-                    )
-                }
+            AppTheme {
+                ProfileStatisticsScreenComponent(
+                    profileStatisticsUiState = profileStatisticsUiState
+                )
             }
         }
     }

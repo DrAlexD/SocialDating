@@ -1,7 +1,6 @@
 package xelagurd.socialdating.tests
 
 import androidx.activity.compose.setContent
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -20,10 +19,10 @@ import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.onNodeWithTextIdWithColon
-import xelagurd.socialdating.ui.screen.ComponentWithRequestStatus
-import xelagurd.socialdating.ui.screen.RegistrationDetailsBody
+import xelagurd.socialdating.ui.screen.RegistrationScreenComponent
 import xelagurd.socialdating.ui.state.RegistrationUiState
 import xelagurd.socialdating.ui.state.RequestStatus
+import xelagurd.socialdating.ui.theme.AppTheme
 
 @HiltAndroidTest
 class RegistrationScreenTest {
@@ -251,16 +250,9 @@ class RegistrationScreenTest {
 
     private fun setContentToRegistrationBody(registrationUiState: RegistrationUiState) {
         composeTestRule.activity.setContent {
-            ComponentWithRequestStatus(
-                requestStatus = registrationUiState.requestStatus,
-                onSuccess = { },
-                failedText = stringResource(R.string.failed_registration),
-                errorText = stringResource(R.string.no_internet_connection)
-            ) {
-                RegistrationDetailsBody(
-                    registrationDetails = registrationUiState.formDetails,
-                    onValueChange = { },
-                    onRegisterClick = { }
+            AppTheme {
+                RegistrationScreenComponent(
+                    registrationUiState = registrationUiState
                 )
             }
         }

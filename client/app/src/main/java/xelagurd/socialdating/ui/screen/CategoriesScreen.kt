@@ -27,10 +27,24 @@ import xelagurd.socialdating.ui.viewmodel.CategoriesViewModel
 @Composable
 fun CategoriesScreen(
     onCategoryClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
     categoriesViewModel: CategoriesViewModel = hiltViewModel()
 ) {
     val categoriesUiState by categoriesViewModel.uiState.collectAsState()
+
+    CategoriesScreenComponent(
+        categoriesUiState = categoriesUiState,
+        onCategoryClick = onCategoryClick,
+        refreshAction = categoriesViewModel::getCategories
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoriesScreenComponent(
+    categoriesUiState: CategoriesUiState = CategoriesUiState(),
+    onCategoryClick: (Int) -> Unit = {},
+    refreshAction: () -> Unit = {}
+) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
@@ -38,7 +52,7 @@ fun CategoriesScreen(
             AppTopBar(
                 title = stringResource(CategoriesDestination.titleRes),
                 internetStatus = categoriesUiState.internetStatus,
-                refreshAction = categoriesViewModel::getCategories,
+                refreshAction = refreshAction,
                 scrollBehavior = scrollBehavior
             )
         },
@@ -47,7 +61,7 @@ fun CategoriesScreen(
                 currentTopLevelRoute = CategoriesDestination.topLevelRoute
             )
         },
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         DataListComponent(
             dataListUiState = categoriesUiState,
@@ -66,13 +80,12 @@ fun CategoriesScreen(
 }
 
 @Composable
-fun CategoryCardContent(
-    category: Category,
-    modifier: Modifier = Modifier
+private fun CategoryCardContent(
+    category: Category
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         AppLargeTitleText(text = category.name)
     }
@@ -82,17 +95,8 @@ fun CategoryCardContent(
 @Composable
 private fun CategoriesComponentPreview() {
     AppTheme {
-        DataListComponent(
-            dataListUiState = CategoriesUiState(entities = FakeDataSource.categories)
-        ) {
-            AppEntityCard(
-                entity = it,
-                onEntityClick = { }
-            ) {
-                CategoryCardContent(
-                    category = it as Category
-                )
-            }
-        }
+        CategoriesScreenComponent(
+            categoriesUiState = CategoriesUiState(entities = FakeDataSource.categories)
+        )
     }
 }

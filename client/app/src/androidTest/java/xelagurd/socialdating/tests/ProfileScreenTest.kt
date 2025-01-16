@@ -18,10 +18,10 @@ import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.onNodeWithTagId
 import xelagurd.socialdating.onNodeWithTextId
 import xelagurd.socialdating.onNodeWithTextIdWithColon
-import xelagurd.socialdating.ui.screen.DataEntityComponent
-import xelagurd.socialdating.ui.screen.ProfileDetailsBody
+import xelagurd.socialdating.ui.screen.ProfileScreenComponent
 import xelagurd.socialdating.ui.state.InternetStatus
 import xelagurd.socialdating.ui.state.ProfileUiState
+import xelagurd.socialdating.ui.theme.AppTheme
 
 @HiltAndroidTest
 class ProfileScreenTest {
@@ -122,12 +122,9 @@ class ProfileScreenTest {
 
     private fun setContentToProfileBody(profileUiState: ProfileUiState) {
         composeTestRule.activity.setContent {
-            DataEntityComponent(
-                dataEntityUiState = profileUiState
-            ) {
-                ProfileDetailsBody(
-                    user = it as User,
-                    onProfileStatisticsClick = { }
+            AppTheme {
+                ProfileScreenComponent(
+                    profileUiState = profileUiState
                 )
             }
         }

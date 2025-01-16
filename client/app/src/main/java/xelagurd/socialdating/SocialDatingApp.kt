@@ -97,8 +97,13 @@ fun AppTopBar(
 }
 
 @Composable
-fun AppBottomNavigationBar(currentTopLevelRoute: String) {
-    NavigationBar {
+fun AppBottomNavigationBar(
+    currentTopLevelRoute: String,
+    modifier: Modifier = Modifier
+) {
+    NavigationBar(
+        modifier = modifier
+    ) {
         topLevelDestinations.forEach { item ->
             val selectedRoute = currentTopLevelRoute == item.navigationDestination.route
             NavigationBarItem(

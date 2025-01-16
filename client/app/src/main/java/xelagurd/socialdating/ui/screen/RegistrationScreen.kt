@@ -27,7 +27,7 @@ import xelagurd.socialdating.data.model.additional.RegistrationDetails
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.ui.navigation.RegistrationDestination
-import xelagurd.socialdating.ui.state.RequestStatus
+import xelagurd.socialdating.ui.state.RegistrationUiState
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.RegistrationViewModel
 
@@ -36,11 +36,28 @@ import xelagurd.socialdating.ui.viewmodel.RegistrationViewModel
 fun RegistrationScreen(
     onSuccessRegistration: () -> Unit,
     onNavigateUp: () -> Unit,
-    modifier: Modifier = Modifier,
     registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
     val registrationUiState by registrationViewModel.uiState.collectAsState()
 
+    RegistrationScreenComponent(
+        registrationUiState = registrationUiState,
+        onSuccessRegistration = onSuccessRegistration,
+        onNavigateUp = onNavigateUp,
+        onValueChange = registrationViewModel::updateUiState,
+        onRegisterClick = registrationViewModel::register
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RegistrationScreenComponent(
+    registrationUiState: RegistrationUiState = RegistrationUiState(),
+    onSuccessRegistration: () -> Unit = {},
+    onNavigateUp: () -> Unit = {},
+    onValueChange: (RegistrationDetails) -> Unit = {},
+    onRegisterClick: () -> Unit = {}
+) {
     Scaffold(
         topBar = {
             AppTopBar(
@@ -58,24 +75,23 @@ fun RegistrationScreen(
         ) {
             RegistrationDetailsBody(
                 registrationDetails = registrationUiState.formDetails,
-                onValueChange = registrationViewModel::updateUiState,
-                onRegisterClick = registrationViewModel::register
+                onValueChange = onValueChange,
+                onRegisterClick = onRegisterClick
             )
         }
     }
 }
 
 @Composable
-fun RegistrationDetailsBody(
+private inline fun RegistrationDetailsBody(
     registrationDetails: RegistrationDetails,
-    onValueChange: (RegistrationDetails) -> Unit,
-    onRegisterClick: () -> Unit,
-    modifier: Modifier = Modifier
+    crossinline onValueChange: (RegistrationDetails) -> Unit,
+    noinline onRegisterClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -85,8 +101,7 @@ fun RegistrationDetailsBody(
                 value = registrationDetails.username,
                 onValueChange = { onValueChange(registrationDetails.copy(username = it)) },
                 label = stringResource(R.string.username),
-                isOverrideModifier = true,
-                modifier = Modifier
+                overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_very_small))
                     .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
             )
@@ -94,8 +109,7 @@ fun RegistrationDetailsBody(
                 value = registrationDetails.name,
                 onValueChange = { onValueChange(registrationDetails.copy(name = it)) },
                 label = stringResource(R.string.name),
-                isOverrideModifier = true,
-                modifier = Modifier
+                overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_very_small))
                     .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
             )
@@ -118,8 +132,7 @@ fun RegistrationDetailsBody(
             value = registrationDetails.email,
             onValueChange = { onValueChange(registrationDetails.copy(email = it)) },
             label = stringResource(R.string.email_optional),
-            isOverrideModifier = true,
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
+            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -129,8 +142,7 @@ fun RegistrationDetailsBody(
                 value = registrationDetails.age,
                 onValueChange = { onValueChange(registrationDetails.copy(age = it)) },
                 label = stringResource(R.string.age),
-                isOverrideModifier = true,
-                modifier = Modifier
+                overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_very_small))
                     .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
             )
@@ -138,8 +150,7 @@ fun RegistrationDetailsBody(
                 value = registrationDetails.city,
                 onValueChange = { onValueChange(registrationDetails.copy(city = it)) },
                 label = stringResource(R.string.city),
-                isOverrideModifier = true,
-                modifier = Modifier
+                overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_very_small))
                     .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
             )
@@ -176,8 +187,7 @@ fun RegistrationDetailsBody(
                 value = registrationDetails.password,
                 onValueChange = { onValueChange(registrationDetails.copy(password = it)) },
                 label = stringResource(R.string.password),
-                isOverrideModifier = true,
-                modifier = Modifier
+                overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_very_small))
                     .width(TextFieldDefaults.MinWidth / 2 + 25.dp)
             )
@@ -185,8 +195,7 @@ fun RegistrationDetailsBody(
                 value = registrationDetails.repeatedPassword,
                 onValueChange = { onValueChange(registrationDetails.copy(repeatedPassword = it)) },
                 label = stringResource(R.string.repeat_password),
-                isOverrideModifier = true,
-                modifier = Modifier
+                overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_very_small))
                     .width(TextFieldDefaults.MinWidth / 2 + 25.dp)
             )
@@ -203,17 +212,6 @@ fun RegistrationDetailsBody(
 @Composable
 private fun RegistrationComponentPreview() {
     AppTheme {
-        ComponentWithRequestStatus(
-            requestStatus = RequestStatus.UNDEFINED,
-            onSuccess = { },
-            failedText = stringResource(R.string.failed_registration),
-            errorText = stringResource(R.string.no_internet_connection)
-        ) {
-            RegistrationDetailsBody(
-                registrationDetails = RegistrationDetails(),
-                onValueChange = { },
-                onRegisterClick = { }
-            )
-        }
+        RegistrationScreenComponent()
     }
 }

@@ -78,17 +78,12 @@ fun AppSmallTitleText(
 fun AppMediumTitleText(
     text: String,
     modifier: Modifier = Modifier,
-    isOverrideModifier: Boolean = false
+    overrideModifier: Modifier? = null
 ) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium,
-        modifier = with(modifier) {
-            if (!isOverrideModifier)
-                padding(dimensionResource(R.dimen.padding_small))
-            else
-                this
-        }
+        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_small))
     )
 }
 
@@ -186,7 +181,8 @@ fun AppTextField(
     onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
-    isOverrideModifier: Boolean = false,
+    overrideModifier: Modifier? = null,
+    textModifier: Modifier = Modifier,
     singleLine: Boolean = true
 ) {
     TextField(
@@ -195,16 +191,11 @@ fun AppTextField(
         label = {
             AppMediumTitleText(
                 text = label,
-                isOverrideModifier = true
+                overrideModifier = textModifier
             )
         },
         singleLine = singleLine,
-        modifier = with(modifier) {
-            if (!isOverrideModifier)
-                padding(dimensionResource(R.dimen.padding_small))
-            else
-                this
-        }
+        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_small))
     )
 }
 
