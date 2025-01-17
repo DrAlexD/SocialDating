@@ -17,7 +17,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainDispatcherRule
-import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.remote.repository.RemoteCategoriesRepository
@@ -221,8 +220,5 @@ class CategoriesViewModelTest {
     private fun mockDataWithoutInternet() {
         every { context.getString(any()) } returns ""
         coEvery { remoteRepository.getCategories() } throws IOException()
-        coEvery { localRepository.insertCategories(FakeDataSource.categories) } answers {
-            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, FakeDataSource.categories)
-        }
     }
 }
