@@ -1,6 +1,7 @@
 package xelagurd.socialdating.ui.viewmodel
 
 import java.io.IOException
+import java.lang.Exception
 import javax.inject.Inject
 import kotlin.collections.groupBy
 import kotlin.collections.map
@@ -20,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import retrofit2.HttpException
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
@@ -114,16 +116,22 @@ class ProfileStatisticsViewModel @Inject constructor(
                         )
                     }
                 }
-            } catch (_: IOException) {
-                localCategoriesRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
-                localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
-                localUserCategoriesRepository.insertUserCategories(FakeDataSource.userCategories) // FixMe: remove after implementing server
-                localUserDefiningThemesRepository.insertUserDefiningThemes(FakeDataSource.userDefiningThemes) // FixMe: remove after implementing server
+            } catch (e: Exception) {
+                when (e) {
+                    is IOException, is HttpException -> {
+                        localCategoriesRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
+                        localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
+                        localUserCategoriesRepository.insertUserCategories(FakeDataSource.userCategories) // FixMe: remove after implementing server
+                        localUserDefiningThemesRepository.insertUserDefiningThemes(FakeDataSource.userDefiningThemes) // FixMe: remove after implementing server
 
-                dataRequestStatusFlow.update {
-                    RequestStatus.ERROR(
-                        errorText = context.getString(R.string.no_internet_connection)
-                    )
+                        dataRequestStatusFlow.update {
+                            RequestStatus.ERROR(
+                                errorText = context.getString(R.string.no_internet_connection)
+                            )
+                        }
+                    }
+
+                    else -> throw e
                 }
             }
         }

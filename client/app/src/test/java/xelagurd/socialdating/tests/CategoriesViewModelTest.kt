@@ -47,12 +47,6 @@ class CategoriesViewModelTest {
         categoriesFlow = MutableStateFlow(localCategories)
 
         mockGeneralMethods()
-
-        viewModel = CategoriesViewModel(
-            context,
-            remoteRepository,
-            localRepository
-        )
     }
 
     private fun TestScope.setupUiStateCollecting() {
@@ -63,9 +57,14 @@ class CategoriesViewModelTest {
 
     @Test
     fun categoriesViewModel_checkStateWithInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithInternet()
+
+        viewModel = CategoriesViewModel(
+            context,
+            remoteRepository,
+            localRepository
+        )
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
@@ -77,9 +76,14 @@ class CategoriesViewModelTest {
 
     @Test
     fun categoriesViewModel_checkStateWithEmptyData() = runTest {
-        setupUiStateCollecting()
-
         mockEmptyData()
+
+        viewModel = CategoriesViewModel(
+            context,
+            remoteRepository,
+            localRepository
+        )
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.FAILURE(), categoriesUiState.dataRequestStatus)
@@ -91,23 +95,33 @@ class CategoriesViewModelTest {
 
     @Test
     fun categoriesViewModel_checkStateWithoutInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithoutInternet()
+
+        viewModel = CategoriesViewModel(
+            context,
+            remoteRepository,
+            localRepository
+        )
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.ERROR(), categoriesUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localCategories, FakeDataSource.categories),
+            localCategories,
             categoriesUiState.entities
         )
     }
 
     @Test
     fun categoriesViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithInternet()
+
+        viewModel = CategoriesViewModel(
+            context,
+            remoteRepository,
+            localRepository
+        )
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         mockDataWithoutInternet()
@@ -116,16 +130,21 @@ class CategoriesViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), categoriesUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localCategories, remoteCategories, FakeDataSource.categories),
+            mergeListsAsSets(localCategories, remoteCategories),
             categoriesUiState.entities
         )
     }
 
     @Test
     fun categoriesViewModel_checkRefreshedErrorStateWithInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithoutInternet()
+
+        viewModel = CategoriesViewModel(
+            context,
+            remoteRepository,
+            localRepository
+        )
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         mockDataWithInternet()
@@ -134,16 +153,21 @@ class CategoriesViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localCategories, FakeDataSource.categories, remoteCategories),
+            mergeListsAsSets(localCategories, remoteCategories),
             categoriesUiState.entities
         )
     }
 
     @Test
     fun categoriesViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithInternet()
+
+        viewModel = CategoriesViewModel(
+            context,
+            remoteRepository,
+            localRepository
+        )
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         viewModel.getCategories()
@@ -158,9 +182,14 @@ class CategoriesViewModelTest {
 
     @Test
     fun categoriesViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithoutInternet()
+
+        viewModel = CategoriesViewModel(
+            context,
+            remoteRepository,
+            localRepository
+        )
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         viewModel.getCategories()
@@ -168,7 +197,7 @@ class CategoriesViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), categoriesUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localCategories, FakeDataSource.categories),
+            localCategories,
             categoriesUiState.entities
         )
     }

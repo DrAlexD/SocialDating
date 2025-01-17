@@ -1,6 +1,7 @@
 package xelagurd.socialdating.ui.viewmodel
 
 import java.io.IOException
+import java.lang.Exception
 import javax.inject.Inject
 import kotlin.collections.map
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import retrofit2.HttpException
 import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
@@ -107,14 +109,20 @@ class StatementsViewModel @Inject constructor(
                         )
                     }
                 }
-            } catch (_: IOException) {
-                localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
-                localStatementsRepository.insertStatements(FakeDataSource.statements) // FixMe: remove after implementing server
+            } catch (e: Exception) {
+                when (e) {
+                    is IOException, is HttpException -> {
+                        localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
+                        localStatementsRepository.insertStatements(FakeDataSource.statements) // FixMe: remove after implementing server
 
-                dataRequestStatusFlow.update {
-                    RequestStatus.ERROR(
-                        errorText = context.getString(R.string.no_internet_connection)
-                    )
+                        dataRequestStatusFlow.update {
+                            RequestStatus.ERROR(
+                                errorText = context.getString(R.string.no_internet_connection)
+                            )
+                        }
+                    }
+
+                    else -> throw e
                 }
             }
         }
@@ -127,8 +135,14 @@ class StatementsViewModel @Inject constructor(
                     remoteStatementsRepository.postStatementReaction(
                         StatementReaction(currentUserId!!, statementId, reactionType)
                     )
-                } catch (_: IOException) {
-                    // TODO: implement handler
+                } catch (e: Exception) {
+                    when (e) {
+                        is IOException, is HttpException -> {
+                            // TODO: implement handler
+                        }
+
+                        else -> throw e
+                    }
                 }
             }
         }
