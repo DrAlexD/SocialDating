@@ -31,6 +31,7 @@ jobs:
           ./gradlew test
 
       - name: Upload Unit tests report
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: unit_tests_report
@@ -94,6 +95,7 @@ jobs:
             ./gradlew connectedAndroidTest
 
       - name: Upload Instrumented tests report
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: instrumented_tests_report
