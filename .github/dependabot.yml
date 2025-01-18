@@ -6,11 +6,25 @@ updates:
       interval: "weekly"
     groups:
       minor-version-updates:
-        applies-to: version-updates
+        applies-to: client-version-updates
         update-types:
           - "minor"
           - "patch"
       minor-security-updates:
-        applies-to: security-updates
+        applies-to: client-security-updates
+        update-types:
+          - "patch"
+  - package-ecosystem: "gradle"
+    directory: "/server"
+    schedule:
+      interval: "weekly"
+    groups:
+      minor-version-updates:
+        applies-to: server-version-updates
+        update-types:
+          - "minor"
+          - "patch"
+      minor-security-updates:
+        applies-to: server-security-updates
         update-types:
           - "patch"
