@@ -1,8 +1,8 @@
 package xelagurd.socialdating.ui.viewmodel
 
 import java.io.IOException
+import java.lang.Exception
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -15,9 +15,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import retrofit2.HttpException
 import xelagurd.socialdating.R
-import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
-import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.ui.state.CategoriesUiState
@@ -52,8 +51,6 @@ class CategoriesViewModel @Inject constructor(
             try {
                 dataRequestStatusFlow.update { RequestStatus.LOADING }
 
-                delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
-
                 val remoteCategories = remoteRepository.getCategories()
 
                 if (remoteCategories.isNotEmpty()) {
@@ -67,13 +64,17 @@ class CategoriesViewModel @Inject constructor(
                         )
                     }
                 }
-            } catch (_: IOException) {
-                localRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
+            } catch (e: Exception) {
+                when (e) {
+                    is IOException, is HttpException -> {
+                        dataRequestStatusFlow.update {
+                            RequestStatus.ERROR(
+                                errorText = context.getString(R.string.no_internet_connection)
+                            )
+                        }
+                    }
 
-                dataRequestStatusFlow.update {
-                    RequestStatus.ERROR(
-                        errorText = context.getString(R.string.no_internet_connection)
-                    )
+                    else -> throw e
                 }
             }
         }

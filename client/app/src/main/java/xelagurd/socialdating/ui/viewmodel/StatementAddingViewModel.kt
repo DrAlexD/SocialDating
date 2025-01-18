@@ -1,6 +1,7 @@
 package xelagurd.socialdating.ui.viewmodel
 
 import java.io.IOException
+import java.lang.Exception
 import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +15,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import retrofit2.HttpException
 import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
@@ -108,10 +110,16 @@ class StatementAddingViewModel @Inject constructor(
                         )
                     }
                 }
-            } catch (_: IOException) {
-                localStatementsRepository.insertStatement(FakeDataSource.newStatement) // TODO: remove after implementing server
+            } catch (e: Exception) {
+                when (e) {
+                    is IOException, is HttpException -> {
+                        localStatementsRepository.insertStatement(FakeDataSource.newStatement) // TODO: remove after implementing server
 
-                _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing server
+                        _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing
+                    }
+
+                    else -> throw e
+                }
             }
         }
     }

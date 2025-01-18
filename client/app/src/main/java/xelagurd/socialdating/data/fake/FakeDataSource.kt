@@ -54,7 +54,7 @@ object FakeDataSource {
         DefiningTheme(17, "DefiningTheme17", "No", "Yes", 5),
         DefiningTheme(18, "DefiningTheme18", "No", "Yes", 9),
         DefiningTheme(19, "DefiningTheme19", "No", "Yes", 10),
-        DefiningTheme(20, "DefiningTheme20", "No", "Yes", 15),
+        DefiningTheme(20, "DefiningTheme20", "No", "Yes", 8),
     )
 
     val statements = listOf(

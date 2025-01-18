@@ -357,7 +357,6 @@ class ProfileStatisticsViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteCategoriesRepository.getCategories() } throws IOException()
 
-        coEvery { localCategoriesRepository.insertCategories(FakeDataSource.categories) } just Runs
         coEvery { localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) } just Runs
         coEvery { localUserCategoriesRepository.insertUserCategories(FakeDataSource.userCategories) } answers {
             userCategoriesFlow.value =
