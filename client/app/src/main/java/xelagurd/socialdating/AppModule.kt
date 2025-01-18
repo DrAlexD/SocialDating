@@ -36,7 +36,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRetrofit() = Retrofit.Builder()
-        .baseUrl("https://social-dating.com/")
+        .baseUrl("http://10.0.2.2:8080/api/v1/")
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .build()
 

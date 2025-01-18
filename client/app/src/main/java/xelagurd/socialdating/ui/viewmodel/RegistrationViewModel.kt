@@ -1,6 +1,7 @@
 package xelagurd.socialdating.ui.viewmodel
 
 import java.io.IOException
+import java.lang.Exception
 import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.mindrot.jbcrypt.BCrypt
+import retrofit2.HttpException
 import xelagurd.socialdating.AccountManager
 import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.R
@@ -73,18 +75,24 @@ class RegistrationViewModel @Inject constructor(
                         )
                     }
                 }
-            } catch (_: IOException) {
-                accountManager.saveCredentials(
-                    LoginDetails(
-                        FakeDataSource.users[0].username,
-                        FakeDataSource.users[0].password
-                    )
-                ) // TODO: remove after implementing server
+            } catch (e: Exception) {
+                when (e) {
+                    is IOException, is HttpException -> {
+                        accountManager.saveCredentials(
+                            LoginDetails(
+                                FakeDataSource.users[0].username,
+                                FakeDataSource.users[0].password
+                            )
+                        ) // TODO: remove after implementing server
 
-                localRepository.insertUser(FakeDataSource.users[0]) // TODO: remove after implementing server
-                preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) // TODO: remove after implementing server
+                        localRepository.insertUser(FakeDataSource.users[0]) // TODO: remove after implementing server
+                        preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) // TODO: remove after implementing server
 
-                _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing server
+                        _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing server
+                    }
+
+                    else -> throw e
+                }
             }
         }
     }
