@@ -119,7 +119,6 @@ class ProfileStatisticsViewModel @Inject constructor(
             } catch (e: Exception) {
                 when (e) {
                     is IOException, is HttpException -> {
-                        localCategoriesRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
                         localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
                         localUserCategoriesRepository.insertUserCategories(FakeDataSource.userCategories) // FixMe: remove after implementing server
                         localUserDefiningThemesRepository.insertUserDefiningThemes(FakeDataSource.userDefiningThemes) // FixMe: remove after implementing server
