@@ -20,6 +20,7 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.ui.state.CategoriesUiState
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.CategoriesViewModel
 
@@ -91,12 +92,34 @@ private fun CategoryCardContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
 @Composable
-private fun CategoriesComponentPreview() {
+private fun CategoriesComponentAllDataPreview() {
     AppTheme {
         CategoriesScreenComponent(
             categoriesUiState = CategoriesUiState(entities = FakeDataSource.categories)
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Composable
+private fun CategoriesComponentFewDataPreview() {
+    AppTheme {
+        CategoriesScreenComponent(
+            categoriesUiState = CategoriesUiState(
+                entities = listOf(FakeDataSource.categories[0], FakeDataSource.categories[1])
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Composable
+private fun CategoriesComponentNoDataPreview() {
+    AppTheme {
+        CategoriesScreenComponent(
+            categoriesUiState = CategoriesUiState(dataRequestStatus = RequestStatus.ERROR("Text"))
         )
     }
 }

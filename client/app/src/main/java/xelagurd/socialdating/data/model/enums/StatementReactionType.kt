@@ -1,16 +1,16 @@
 package xelagurd.socialdating.data.model.enums
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.outlined.ThumbUp
-import androidx.compose.ui.graphics.vector.ImageVector
 import xelagurd.socialdating.R
 
-enum class StatementReactionType(@StringRes val descriptionRes: Int, val imageVector: ImageVector) {
-    FULL_NO_MAINTAIN(R.string.full_no_maintain, Icons.Default.ThumbUp),
-    PART_NO_MAINTAIN(R.string.part_no_maintain, Icons.Outlined.ThumbUp),
-    NOT_SURE(R.string.not_sure, Icons.Outlined.ThumbUp),
-    PART_MAINTAIN(R.string.part_maintain, Icons.Outlined.ThumbUp),
-    FULL_MAINTAIN(R.string.full_maintain, Icons.Default.ThumbUp)
+enum class StatementReactionType(
+    @StringRes val descriptionRes: Int,
+    @DrawableRes val iconRes: Int
+) {
+    FULL_NO_MAINTAIN(R.string.full_no_maintain, R.drawable.thumb_down),
+    PART_NO_MAINTAIN(R.string.part_no_maintain, R.drawable.outline_thumb_down),
+    NOT_SURE(R.string.not_sure, R.drawable.outline_thumbs_up_down),
+    PART_MAINTAIN(R.string.part_maintain, R.drawable.outline_thumb_up),
+    FULL_MAINTAIN(R.string.full_maintain, R.drawable.thumb_up)
 }

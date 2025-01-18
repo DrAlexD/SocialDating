@@ -28,6 +28,7 @@ import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.data.model.enums.Purpose
 import xelagurd.socialdating.ui.navigation.RegistrationDestination
 import xelagurd.socialdating.ui.state.RegistrationUiState
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.RegistrationViewModel
 
@@ -116,14 +117,22 @@ private inline fun RegistrationDetailsBody(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            AppMediumTitleText(text = stringResourceWithColon(R.string.gender))
+            AppMediumTitleText(
+                text = stringResourceWithColon(R.string.gender),
+                overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
+            )
             Gender.entries.forEach {
                 RadioButton(
                     selected = registrationDetails.gender == it,
                     onClick = { onValueChange(registrationDetails.copy(gender = it)) },
                     modifier = Modifier.testTag(stringResource(it.descriptionRes))
                 )
-                AppMediumTitleText(stringResource(it.descriptionRes))
+                AppMediumTitleText(
+                    text = stringResource(it.descriptionRes),
+                    overrideModifier = Modifier.padding(
+                        end = dimensionResource(R.dimen.padding_very_small)
+                    )
+                )
             }
         }
         AppTextField(
@@ -157,7 +166,10 @@ private inline fun RegistrationDetailsBody(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            AppMediumTitleText(text = stringResourceWithColon(R.string.purpose))
+            AppMediumTitleText(
+                text = stringResourceWithColon(R.string.purpose),
+                overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
+            )
             Column(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
@@ -172,7 +184,12 @@ private inline fun RegistrationDetailsBody(
                             onClick = { onValueChange(registrationDetails.copy(purpose = it)) },
                             modifier = Modifier.testTag(stringResource(it.descriptionRes))
                         )
-                        AppMediumTitleText(text = stringResource(it.descriptionRes))
+                        AppMediumTitleText(
+                            text = stringResource(it.descriptionRes),
+                            overrideModifier = Modifier.padding(
+                                end = dimensionResource(R.dimen.padding_very_small)
+                            )
+                        )
                     }
                 }
             }
@@ -187,7 +204,7 @@ private inline fun RegistrationDetailsBody(
                 label = stringResource(R.string.password),
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_very_small))
-                    .width(TextFieldDefaults.MinWidth / 2 + 25.dp)
+                    .width(TextFieldDefaults.MinWidth / 2 + 35.dp)
             )
             AppTextField(
                 value = registrationDetails.repeatedPassword,
@@ -195,7 +212,7 @@ private inline fun RegistrationDetailsBody(
                 label = stringResource(R.string.repeat_password),
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_very_small))
-                    .width(TextFieldDefaults.MinWidth / 2 + 25.dp)
+                    .width(TextFieldDefaults.MinWidth / 2 + 35.dp)
             )
         }
         AppLargeTextCard(
@@ -206,10 +223,56 @@ private inline fun RegistrationDetailsBody(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
 @Composable
-private fun RegistrationComponentPreview() {
+private fun RegistrationComponentEmptyFormPreview() {
     AppTheme {
         RegistrationScreenComponent()
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Composable
+private fun RegistrationComponentFullFormPreview() {
+    AppTheme {
+        RegistrationScreenComponent(
+            registrationUiState = RegistrationUiState(
+                formDetails = RegistrationDetails(
+                    "name", Gender.MALE, "username", "password",
+                    "password", "email", "40", "Moscow", Purpose.RELATIONSHIPS
+                )
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true, locale = "ru")
+@Composable
+private fun RegistrationComponentFullFormRuPreview() {
+    AppTheme {
+        RegistrationScreenComponent(
+            registrationUiState = RegistrationUiState(
+                formDetails = RegistrationDetails(
+                    "name", Gender.MALE, "username", "password",
+                    "password", "email", "40", "Moscow", Purpose.RELATIONSHIPS
+                )
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Composable
+private fun RegistrationComponentWrongDataPreview() {
+    AppTheme {
+        RegistrationScreenComponent(
+            registrationUiState = RegistrationUiState(
+                formDetails = RegistrationDetails(
+                    "name", Gender.MALE, "username", "password",
+                    "password", "email", "40", "Moscow", Purpose.RELATIONSHIPS
+                ),
+                actionRequestStatus = RequestStatus.ERROR("Text")
+            )
+        )
     }
 }

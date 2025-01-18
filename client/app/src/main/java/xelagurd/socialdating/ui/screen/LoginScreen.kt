@@ -3,6 +3,7 @@ package xelagurd.socialdating.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -10,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -18,6 +20,7 @@ import xelagurd.socialdating.R
 import xelagurd.socialdating.data.model.details.LoginDetails
 import xelagurd.socialdating.ui.navigation.LoginDestination
 import xelagurd.socialdating.ui.state.LoginUiState
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.LoginViewModel
 
@@ -97,18 +100,59 @@ private inline fun LoginDetailsBody(
             text = stringResource(R.string.login),
             onClick = onLoginClick
         )
-        AppMediumTitleText(text = stringResource(R.string.or))
+        AppSmallTitleText(
+            text = stringResource(R.string.or),
+            overrideModifier = Modifier.padding(top = dimensionResource(R.dimen.padding_medium))
+        )
         AppMediumTextCard(
             text = stringResource(R.string.register),
-            onClick = onRegistrationClick
+            onClick = onRegistrationClick,
+            overrideModifier = Modifier
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
 @Composable
-private fun LoginComponentPreview() {
+private fun LoginComponentEmptyFormPreview() {
     AppTheme {
         LoginScreenComponent()
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Composable
+private fun LoginComponentFullFormPreview() {
+    AppTheme {
+        LoginScreenComponent(
+            loginUiState = LoginUiState(
+                formDetails = LoginDetails("username", "password")
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true, locale = "ru")
+@Composable
+private fun LoginComponentFullFormRuPreview() {
+    AppTheme {
+        LoginScreenComponent(
+            loginUiState = LoginUiState(
+                formDetails = LoginDetails("username", "password")
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Composable
+private fun LoginComponentWrongDataPreview() {
+    AppTheme {
+        LoginScreenComponent(
+            loginUiState = LoginUiState(
+                formDetails = LoginDetails("username", "password"),
+                actionRequestStatus = RequestStatus.ERROR("Text")
+            )
+        )
     }
 }

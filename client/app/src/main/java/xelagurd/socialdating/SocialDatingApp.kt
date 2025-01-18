@@ -1,5 +1,6 @@
 package xelagurd.socialdating
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,7 +12,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import xelagurd.socialdating.ui.navigation.AppNavHost
 import xelagurd.socialdating.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.ui.navigation.topLevelDestinations
+import xelagurd.socialdating.ui.screen.AppMediumTitleText
 import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 
@@ -65,8 +66,11 @@ fun AppTopBar(
                 val onCardStatusClick =
                     refreshAction.takeIf { dataRequestStatus.isAllowedRefresh() } ?: {}
                 Card(onClick = onCardStatusClick) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        AppMediumTitleText(
                             text = stringResource(
                                 when (dataRequestStatus) {
                                     RequestStatus.SUCCESS -> R.string.online
@@ -74,8 +78,7 @@ fun AppTopBar(
                                     is RequestStatus.FAILURE, is RequestStatus.ERROR -> R.string.offline
                                 }
                             ),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
+                            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
                         )
                         if (dataRequestStatus.isAllowedRefresh()) {
                             Icon(
@@ -123,7 +126,7 @@ fun AppBottomNavigationBar(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
 @Composable
 fun AppTopBarOfflinePreview() {
     AppTheme {
@@ -137,9 +140,37 @@ fun AppTopBarOfflinePreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true, locale = "ru")
+@Composable
+fun AppTopBarOfflineRuPreview() {
+    AppTheme {
+        AppTopBar(
+            title = stringResource(CategoriesDestination.titleRes),
+            dataRequestStatus = RequestStatus.ERROR(),
+            refreshAction = {},
+            navigateUp = {}
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
 @Composable
 fun AppTopBarOnlinePreview() {
+    AppTheme {
+        AppTopBar(
+            title = stringResource(CategoriesDestination.titleRes),
+            dataRequestStatus = RequestStatus.SUCCESS,
+            refreshAction = {},
+            navigateUp = {}
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true, locale = "ru")
+@Composable
+fun AppTopBarOnlineRuPreview() {
     AppTheme {
         AppTopBar(
             title = stringResource(CategoriesDestination.titleRes),

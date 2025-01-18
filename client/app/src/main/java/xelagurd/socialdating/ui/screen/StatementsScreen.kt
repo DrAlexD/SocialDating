@@ -3,6 +3,7 @@ package xelagurd.socialdating.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,11 +17,14 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import xelagurd.socialdating.AppBottomNavigationBar
 import xelagurd.socialdating.AppTopBar
@@ -29,6 +33,7 @@ import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.ui.navigation.StatementsDestination
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.state.StatementsUiState
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.StatementsViewModel
@@ -119,7 +124,7 @@ private inline fun StatementCardContent(
     crossinline onStatementReactionClick: (Int, StatementReactionType) -> Unit
 ) {
     AppLargeTitleText(text = statement.text)
-    HorizontalDivider(color = Color.Black)
+    HorizontalDivider()
     ReactionsRow(
         onStatementReactionClick = { onStatementReactionClick(statement.id, it) }
     )
@@ -130,29 +135,56 @@ private inline fun ReactionsRow(
     crossinline onStatementReactionClick: (StatementReactionType) -> Unit
 ) {
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier.fillMaxWidth()
     ) {
         StatementReactionType.entries.forEachIndexed { index, statementReactionType ->
             IconButton(onClick = { onStatementReactionClick(statementReactionType) }) {
                 Icon(
-                    imageVector = statementReactionType.imageVector,
-                    contentDescription = stringResource(statementReactionType.descriptionRes)
+                    painter = painterResource(statementReactionType.iconRes),
+                    contentDescription = stringResource(statementReactionType.descriptionRes),
+                    modifier = Modifier.graphicsLayer {
+                        this.scaleX = 0.9f
+                        this.scaleY = 0.9f
+                    }
                 )
             }
             if (index != StatementReactionType.entries.lastIndex) {
-                VerticalDivider()
+                VerticalDivider(modifier = Modifier.height(30.dp))
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
 @Composable
-private fun StatementsComponentPreview() {
+private fun StatementsComponentAllDataPreview() {
     AppTheme {
         StatementsScreenComponent(
             statementsUiState = StatementsUiState(entities = FakeDataSource.statements)
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Composable
+private fun StatementsComponentFewDataPreview() {
+    AppTheme {
+        StatementsScreenComponent(
+            statementsUiState = StatementsUiState(
+                entities = listOf(FakeDataSource.statements[0], FakeDataSource.statements[1])
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Composable
+private fun StatementsComponentNoDataPreview() {
+    AppTheme {
+        StatementsScreenComponent(
+            statementsUiState = StatementsUiState(dataRequestStatus = RequestStatus.ERROR("Text"))
         )
     }
 }
