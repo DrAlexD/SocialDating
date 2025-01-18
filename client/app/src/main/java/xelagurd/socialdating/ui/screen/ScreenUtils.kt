@@ -1,7 +1,11 @@
 package xelagurd.socialdating.ui.screen
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,6 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -25,7 +30,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -53,24 +57,28 @@ fun AppLoadingIndicator(
 @Composable
 fun AppLargeBodyText(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    overrideModifier: Modifier? = null
 ) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodyLarge,
-        modifier = modifier.padding(dimensionResource(R.dimen.padding_very_small))
+        modifier = overrideModifier
+            ?: modifier.padding(dimensionResource(R.dimen.padding_very_small))
     )
 }
 
 @Composable
 fun AppSmallTitleText(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    overrideModifier: Modifier? = null
 ) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleSmall,
-        modifier = modifier.padding(dimensionResource(R.dimen.padding_very_small))
+        modifier = overrideModifier
+            ?: modifier.padding(dimensionResource(R.dimen.padding_very_small))
     )
 }
 
@@ -90,32 +98,14 @@ fun AppMediumTitleText(
 @Composable
 fun AppLargeTitleText(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    overrideModifier: Modifier? = null
 ) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleLarge,
-        modifier = modifier.padding(dimensionResource(R.dimen.padding_medium))
+        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_medium))
     )
-}
-
-@Composable
-fun AppSmallTextCard(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isEnabled: Boolean = true,
-    isHasBorder: Boolean = false
-) {
-    AppTextCard(
-        isEnabled = isEnabled,
-        onClick = onClick,
-        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_very_small)),
-        isHasBorder = isHasBorder,
-        modifier = modifier
-    ) {
-        AppSmallTitleText(text = text)
-    }
 }
 
 @Composable
@@ -123,6 +113,7 @@ fun AppMediumTextCard(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    overrideModifier: Modifier? = null,
     isEnabled: Boolean = true,
     isHasBorder: Boolean = false
 ) {
@@ -131,7 +122,8 @@ fun AppMediumTextCard(
         onClick = onClick,
         elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_small)),
         isHasBorder = isHasBorder,
-        modifier = modifier
+        modifier = modifier,
+        overrideModifier = overrideModifier
     ) {
         AppMediumTitleText(text = text)
     }
@@ -142,6 +134,7 @@ fun AppLargeTextCard(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    overrideModifier: Modifier? = null,
     isEnabled: Boolean = true,
     isHasBorder: Boolean = false
 ) {
@@ -150,7 +143,8 @@ fun AppLargeTextCard(
         onClick = onClick,
         elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
         isHasBorder = isHasBorder,
-        modifier = modifier
+        modifier = modifier,
+        overrideModifier = overrideModifier
     ) {
         AppLargeTitleText(text = text)
     }
@@ -163,14 +157,15 @@ private fun AppTextCard(
     elevation: CardElevation,
     isHasBorder: Boolean,
     modifier: Modifier = Modifier,
+    overrideModifier: Modifier? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
         enabled = isEnabled,
         onClick = onClick,
         elevation = elevation,
-        border = BorderStroke(1.dp, Color.Black).takeIf { isHasBorder },
-        modifier = modifier.padding(dimensionResource(R.dimen.padding_small)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary).takeIf { isHasBorder },
+        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_small)),
         content = content
     )
 }
@@ -225,15 +220,27 @@ inline fun AppDataChoosingList(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     crossinline card: @Composable (DataEntity, Boolean) -> Unit
 ) {
-    if (chosenEntityId != null) {
-        card(entities.first { it.id == chosenEntityId }, true)
-    } else {
-        AppDataList(
-            entities = entities,
-            modifier = modifier.heightIn(Dp.Unspecified, maxHeight),
-            contentPadding = contentPadding,
-            card = { card(it, false) }
+    Column(
+        modifier = Modifier.animateContentSize(
+            animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)
         )
+    ) {
+        if (chosenEntityId != null) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small))
+            ) {
+                card(entities.first { it.id == chosenEntityId }, true)
+            }
+        } else {
+            AppDataList(
+                entities = entities,
+                modifier = modifier.heightIn(Dp.Unspecified, maxHeight),
+                contentPadding = contentPadding,
+                card = { card(it, false) }
+            )
+        }
     }
 }
 
@@ -248,8 +255,11 @@ inline fun AppList(
             .fillMaxSize()
             .padding(horizontal = dimensionResource(R.dimen.padding_small))
     ) {
-        entities.forEach {
-            content(it)
+        entities.forEachIndexed { index, entity ->
+            content(entity)
+            if (index != entities.lastIndex) {
+                HorizontalDivider()
+            }
         }
     }
 }

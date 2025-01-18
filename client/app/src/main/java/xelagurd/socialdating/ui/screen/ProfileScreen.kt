@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -18,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,6 +28,7 @@ import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.enums.Gender
 import xelagurd.socialdating.ui.navigation.ProfileDestination
 import xelagurd.socialdating.ui.state.ProfileUiState
+import xelagurd.socialdating.ui.state.RequestStatus
 import xelagurd.socialdating.ui.theme.AppTheme
 import xelagurd.socialdating.ui.viewmodel.ProfileViewModel
 
@@ -92,10 +90,12 @@ private fun ProfileDetailsBody(
     onProfileStatisticsClick: () -> Unit
 ) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier.weight(1f)
         ) {
             UserDetailsBody(user)
@@ -144,9 +144,11 @@ private fun UserData(user: User) {
 
 @Composable
 private fun UserNameWithAvatar(user: User) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
         AppLargeBodyText(text = user.name)
-        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_very_small)))
         AvatarIcon(gender = user.gender)
     }
 }
@@ -160,12 +162,32 @@ private fun AvatarIcon(gender: Gender) {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
 @Composable
-private fun ProfileComponentPreview() {
+private fun ProfileComponentAllDataPreview() {
     AppTheme {
         ProfileScreenComponent(
             profileUiState = ProfileUiState(entity = FakeDataSource.users[0])
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true, locale = "ru")
+@Composable
+private fun ProfileComponentAllDataRuPreview() {
+    AppTheme {
+        ProfileScreenComponent(
+            profileUiState = ProfileUiState(entity = FakeDataSource.users[0])
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Composable
+private fun ProfileComponentNoDataPreview() {
+    AppTheme {
+        ProfileScreenComponent(
+            profileUiState = ProfileUiState(dataRequestStatus = RequestStatus.ERROR("Text"))
         )
     }
 }
