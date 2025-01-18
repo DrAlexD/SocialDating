@@ -27,7 +27,7 @@ fun DataListComponent(
 ) {
     DataComponent(
         dataRequestUiState = dataListUiState,
-        modifier = Modifier.fillMaxSize()
+        statusModifier = Modifier.fillMaxSize()
     ) {
         AppDataList(
             entities = dataListUiState.entities,
@@ -69,7 +69,7 @@ fun DataEntityComponent(
 ) {
     DataComponent(
         dataRequestUiState = dataEntityUiState,
-        modifier = Modifier.fillMaxSize()
+        statusModifier = Modifier.fillMaxSize()
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,31 +84,35 @@ fun DataEntityComponent(
 @Composable
 private inline fun DataComponent(
     dataRequestUiState: DataRequestUiState,
-    modifier: Modifier = Modifier,
+    statusModifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = modifier
-    ) {
-        if (dataRequestUiState.isDataExist()) {
-            content()
-        } else {
-            DataRequestStatusComponent(dataRequestUiState.dataRequestStatus)
-        }
+    if (dataRequestUiState.isDataExist()) {
+        content()
+    } else {
+        DataRequestStatusComponent(
+            dataRequestStatus = dataRequestUiState.dataRequestStatus,
+            statusModifier = statusModifier
+        )
     }
 }
 
 @Composable
 private fun DataRequestStatusComponent(
-    dataRequestStatus: RequestStatus
+    dataRequestStatus: RequestStatus,
+    statusModifier: Modifier = Modifier
 ) {
-    when (dataRequestStatus) {
-        RequestStatus.UNDEFINED, RequestStatus.LOADING -> AppLoadingIndicator()
-        is RequestStatus.FAILURE -> AppLargeTitleText(text = dataRequestStatus.failureText)
-        is RequestStatus.ERROR -> AppLargeTitleText(text = dataRequestStatus.errorText)
-        RequestStatus.SUCCESS -> {}
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = statusModifier
+    ) {
+        when (dataRequestStatus) {
+            RequestStatus.UNDEFINED, RequestStatus.LOADING -> AppLoadingIndicator()
+            is RequestStatus.FAILURE -> AppLargeTitleText(text = dataRequestStatus.failureText)
+            is RequestStatus.ERROR -> AppLargeTitleText(text = dataRequestStatus.errorText)
+            RequestStatus.SUCCESS -> {}
+        }
     }
 }
 
