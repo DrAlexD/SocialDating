@@ -52,7 +52,9 @@ class LoginViewModelTest {
     @Before
     fun setup() {
         mockFindCredentialsWithError()
+    }
 
+    private fun initViewModel() {
         viewModel = LoginViewModel(
             context,
             remoteRepository,
@@ -67,6 +69,8 @@ class LoginViewModelTest {
     @Test
     fun loginViewModel_loginWithInternet() = runTest {
         mockDataWithInternet()
+
+        initViewModel()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
@@ -75,6 +79,8 @@ class LoginViewModelTest {
     @Test
     fun loginViewModel_loginWithoutInternet() = runTest {
         mockDataWithoutInternet()
+
+        initViewModel()
         advanceUntilIdle()
 
         // TODO: Change to ERROR after implementing server
@@ -84,6 +90,8 @@ class LoginViewModelTest {
     @Test
     fun loginViewModel_loginWithWrongData() = runTest {
         mockWrongData()
+
+        initViewModel()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.FAILURE(), loginUiState.actionRequestStatus)
@@ -92,9 +100,12 @@ class LoginViewModelTest {
     @Test
     fun loginViewModel_retryLoginWithInternet() = runTest {
         mockDataWithoutInternet()
+
+        initViewModel()
         advanceUntilIdle()
 
         mockDataWithInternet()
+
         viewModel.loginWithInput()
         advanceUntilIdle()
 
@@ -104,9 +115,12 @@ class LoginViewModelTest {
     @Test
     fun loginViewModel_retryLoginWithRightData() = runTest {
         mockWrongData()
+
+        initViewModel()
         advanceUntilIdle()
 
         mockDataWithInternet()
+
         viewModel.loginWithInput()
         advanceUntilIdle()
 

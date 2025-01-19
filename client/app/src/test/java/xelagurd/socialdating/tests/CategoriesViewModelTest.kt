@@ -48,6 +48,14 @@ class CategoriesViewModelTest {
         mockGeneralMethods()
     }
 
+    private fun initViewModel() {
+        viewModel = CategoriesViewModel(
+            context,
+            remoteRepository,
+            localRepository
+        )
+    }
+
     private fun TestScope.setupUiStateCollecting() {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
@@ -58,11 +66,7 @@ class CategoriesViewModelTest {
     fun categoriesViewModel_checkStateWithInternet() = runTest {
         mockDataWithInternet()
 
-        viewModel = CategoriesViewModel(
-            context,
-            remoteRepository,
-            localRepository
-        )
+        initViewModel()
         setupUiStateCollecting()
         advanceUntilIdle()
 
@@ -77,11 +81,7 @@ class CategoriesViewModelTest {
     fun categoriesViewModel_checkStateWithEmptyData() = runTest {
         mockEmptyData()
 
-        viewModel = CategoriesViewModel(
-            context,
-            remoteRepository,
-            localRepository
-        )
+        initViewModel()
         setupUiStateCollecting()
         advanceUntilIdle()
 
@@ -96,11 +96,7 @@ class CategoriesViewModelTest {
     fun categoriesViewModel_checkStateWithoutInternet() = runTest {
         mockDataWithoutInternet()
 
-        viewModel = CategoriesViewModel(
-            context,
-            remoteRepository,
-            localRepository
-        )
+        initViewModel()
         setupUiStateCollecting()
         advanceUntilIdle()
 
@@ -115,15 +111,12 @@ class CategoriesViewModelTest {
     fun categoriesViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
         mockDataWithInternet()
 
-        viewModel = CategoriesViewModel(
-            context,
-            remoteRepository,
-            localRepository
-        )
+        initViewModel()
         setupUiStateCollecting()
         advanceUntilIdle()
 
         mockDataWithoutInternet()
+
         viewModel.getCategories()
         advanceUntilIdle()
 
@@ -138,15 +131,12 @@ class CategoriesViewModelTest {
     fun categoriesViewModel_checkRefreshedErrorStateWithInternet() = runTest {
         mockDataWithoutInternet()
 
-        viewModel = CategoriesViewModel(
-            context,
-            remoteRepository,
-            localRepository
-        )
+        initViewModel()
         setupUiStateCollecting()
         advanceUntilIdle()
 
         mockDataWithInternet()
+
         viewModel.getCategories()
         advanceUntilIdle()
 
@@ -161,11 +151,7 @@ class CategoriesViewModelTest {
     fun categoriesViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
         mockDataWithInternet()
 
-        viewModel = CategoriesViewModel(
-            context,
-            remoteRepository,
-            localRepository
-        )
+        initViewModel()
         setupUiStateCollecting()
         advanceUntilIdle()
 
@@ -183,11 +169,7 @@ class CategoriesViewModelTest {
     fun categoriesViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
         mockDataWithoutInternet()
 
-        viewModel = CategoriesViewModel(
-            context,
-            remoteRepository,
-            localRepository
-        )
+        initViewModel()
         setupUiStateCollecting()
         advanceUntilIdle()
 

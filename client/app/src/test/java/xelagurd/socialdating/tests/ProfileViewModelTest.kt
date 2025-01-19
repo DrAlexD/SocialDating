@@ -53,7 +53,9 @@ class ProfileViewModelTest {
         usersFlow = MutableStateFlow(localUser)
 
         mockGeneralMethods()
+    }
 
+    private fun initViewModel() {
         viewModel = ProfileViewModel(
             context,
             savedStateHandle,
@@ -70,9 +72,10 @@ class ProfileViewModelTest {
 
     @Test
     fun profileViewModel_checkStateWithInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
@@ -84,9 +87,10 @@ class ProfileViewModelTest {
 
     @Test
     fun profileViewModel_checkStateWithEmptyData() = runTest {
-        setupUiStateCollecting()
-
         mockEmptyData()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.FAILURE(), profileUiState.dataRequestStatus)
@@ -98,9 +102,10 @@ class ProfileViewModelTest {
 
     @Test
     fun profileViewModel_checkStateWithoutInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.ERROR(), profileUiState.dataRequestStatus)
@@ -112,12 +117,14 @@ class ProfileViewModelTest {
 
     @Test
     fun profileViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         mockDataWithoutInternet()
+
         viewModel.getUser()
         advanceUntilIdle()
 
@@ -130,12 +137,14 @@ class ProfileViewModelTest {
 
     @Test
     fun profileViewModel_checkRefreshedErrorStateWithInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         mockDataWithInternet()
+
         viewModel.getUser()
         advanceUntilIdle()
 
@@ -148,9 +157,10 @@ class ProfileViewModelTest {
 
     @Test
     fun profileViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         viewModel.getUser()
@@ -165,9 +175,10 @@ class ProfileViewModelTest {
 
     @Test
     fun profileViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         viewModel.getUser()

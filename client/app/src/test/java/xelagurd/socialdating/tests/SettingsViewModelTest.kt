@@ -8,7 +8,6 @@ import io.mockk.coEvery
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainDispatcherRule
@@ -27,21 +26,22 @@ class SettingsViewModelTest {
     private val settingsUiState
         get() = viewModel.uiState.value
 
-    @Before
-    fun setup() {
+    private fun initViewModel() {
         viewModel = SettingsViewModel(preferencesRepository)
     }
 
     @Test
     fun settingsViewModel_logout() = runTest {
+        mockLogout()
+
+        initViewModel()
         viewModel.logout()
-        mockData()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, settingsUiState.actionRequestStatus)
     }
 
-    private fun mockData() {
+    private fun mockLogout() {
         coEvery { preferencesRepository.saveCurrentUserId(-1) } just Runs
     }
 }

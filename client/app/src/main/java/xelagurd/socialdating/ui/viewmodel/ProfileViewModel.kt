@@ -2,7 +2,6 @@ package xelagurd.socialdating.ui.viewmodel
 
 import java.io.IOException
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -18,7 +17,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.HttpException
 import xelagurd.socialdating.R
-import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.ui.navigation.ProfileDestination
@@ -56,8 +54,6 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 dataRequestStatusFlow.update { RequestStatus.LOADING }
-
-                delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
                 val remoteUser = remoteRepository.getUser(userId)
 
