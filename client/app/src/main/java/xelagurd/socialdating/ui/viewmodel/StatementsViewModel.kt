@@ -5,7 +5,6 @@ import java.lang.Exception
 import javax.inject.Inject
 import kotlin.collections.map
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -24,7 +23,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.HttpException
 import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.R
-import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
@@ -87,8 +85,6 @@ class StatementsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 dataRequestStatusFlow.update { RequestStatus.LOADING }
-
-                delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
                 val remoteDefiningThemes = remoteDefiningThemesRepository
                     .getDefiningThemes(categoryId)

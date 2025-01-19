@@ -3,7 +3,6 @@ package xelagurd.socialdating.ui.viewmodel
 import java.io.IOException
 import java.lang.Exception
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -18,7 +17,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.HttpException
 import xelagurd.socialdating.PreferencesRepository
 import xelagurd.socialdating.R
-import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
@@ -91,8 +89,6 @@ class StatementAddingViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
-
-                delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
                 val statementDetails = uiState.value.formDetails
                 val statement = remoteStatementsRepository.statementAdding(statementDetails)

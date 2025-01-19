@@ -420,6 +420,6 @@ class NavigationTest {
     }
 
     companion object {
-        private const val TIMEOUT_MILLIS = 3_000L // FixMe: remove after implementing server
+        private const val TIMEOUT_MILLIS = 3_000L
     }
 }

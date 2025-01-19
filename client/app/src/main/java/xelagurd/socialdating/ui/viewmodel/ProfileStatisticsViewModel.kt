@@ -6,7 +6,6 @@ import javax.inject.Inject
 import kotlin.collections.groupBy
 import kotlin.collections.map
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -24,7 +23,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.HttpException
 import xelagurd.socialdating.R
-import xelagurd.socialdating.data.fake.FAKE_SERVER_LATENCY
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
@@ -85,8 +83,6 @@ class ProfileStatisticsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 dataRequestStatusFlow.update { RequestStatus.LOADING }
-
-                delay(FAKE_SERVER_LATENCY) // FixMe: remove after implementing server
 
                 val remoteCategories = remoteCategoriesRepository.getCategories()
                 localCategoriesRepository.insertCategories(remoteCategories)

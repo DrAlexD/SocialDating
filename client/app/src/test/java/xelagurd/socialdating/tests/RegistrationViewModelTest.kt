@@ -12,7 +12,6 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.AccountManager
@@ -49,8 +48,7 @@ class RegistrationViewModelTest {
     private val remoteUser =
         User(1, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20)
 
-    @Before
-    fun setup() {
+    private fun initViewModel() {
         viewModel = RegistrationViewModel(
             context,
             remoteRepository,
@@ -65,6 +63,8 @@ class RegistrationViewModelTest {
     @Test
     fun registrationViewModel_registrationWithInternet() = runTest {
         mockDataWithInternet()
+
+        initViewModel()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, registrationUiState.actionRequestStatus)
@@ -73,6 +73,8 @@ class RegistrationViewModelTest {
     @Test
     fun registrationViewModel_registrationWithoutInternet() = runTest {
         mockDataWithoutInternet()
+
+        initViewModel()
         advanceUntilIdle()
 
         // TODO: Change to ERROR after implementing server
@@ -82,6 +84,8 @@ class RegistrationViewModelTest {
     @Test
     fun registrationViewModel_registrationWithWrongData() = runTest {
         mockWrongData()
+
+        initViewModel()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.FAILURE(), registrationUiState.actionRequestStatus)
@@ -90,9 +94,12 @@ class RegistrationViewModelTest {
     @Test
     fun registrationViewModel_retryRegistrationWithInternet() = runTest {
         mockDataWithoutInternet()
+
+        initViewModel()
         advanceUntilIdle()
 
         mockDataWithInternet()
+
         viewModel.register()
         advanceUntilIdle()
 
@@ -102,9 +109,12 @@ class RegistrationViewModelTest {
     @Test
     fun registrationViewModel_retryRegistrationWithRightData() = runTest {
         mockWrongData()
+
+        initViewModel()
         advanceUntilIdle()
 
         mockDataWithInternet()
+
         viewModel.register()
         advanceUntilIdle()
 

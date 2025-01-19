@@ -54,7 +54,9 @@ class StatementAddingViewModelTest {
     @Before
     fun setup() {
         mockGeneralMethods()
+    }
 
+    private fun initViewModel() {
         viewModel = StatementAddingViewModel(
             context,
             savedStateHandle,
@@ -70,6 +72,8 @@ class StatementAddingViewModelTest {
     @Test
     fun statementAddingViewModel_statementAddingWithInternet() = runTest {
         mockDataWithInternet()
+
+        initViewModel()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, statementAddingUiState.actionRequestStatus)
@@ -78,6 +82,8 @@ class StatementAddingViewModelTest {
     @Test
     fun statementAddingViewModel_statementAddingWithoutInternet() = runTest {
         mockDataWithoutInternet()
+
+        initViewModel()
         advanceUntilIdle()
 
         // TODO: Change to ERROR after implementing server
@@ -87,6 +93,8 @@ class StatementAddingViewModelTest {
     @Test
     fun statementAddingViewModel_statementAddingWithWrongData() = runTest {
         mockWrongData()
+
+        initViewModel()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.FAILURE(), statementAddingUiState.actionRequestStatus)
@@ -95,6 +103,8 @@ class StatementAddingViewModelTest {
     @Test
     fun statementAddingViewModel_retryStatementAddingWithInternet() = runTest {
         mockDataWithoutInternet()
+
+        initViewModel()
         advanceUntilIdle()
 
         mockDataWithInternet()
@@ -107,6 +117,8 @@ class StatementAddingViewModelTest {
     @Test
     fun statementAddingViewModel_retryStatementAddingWithRightData() = runTest {
         mockWrongData()
+
+        initViewModel()
         advanceUntilIdle()
 
         mockDataWithInternet()

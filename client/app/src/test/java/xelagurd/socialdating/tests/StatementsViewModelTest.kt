@@ -81,7 +81,9 @@ class StatementsViewModelTest {
         statementsFlow = MutableStateFlow(localStatements)
 
         mockGeneralMethods()
+    }
 
+    private fun initViewModel() {
         viewModel = StatementsViewModel(
             context,
             savedStateHandle,
@@ -101,9 +103,10 @@ class StatementsViewModelTest {
 
     @Test
     fun statementsViewModel_checkStateWithInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
@@ -115,9 +118,10 @@ class StatementsViewModelTest {
 
     @Test
     fun statementsViewModel_checkStateWithEmptyData() = runTest {
-        setupUiStateCollecting()
-
         mockEmptyData()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.FAILURE(), statementsUiState.dataRequestStatus)
@@ -129,9 +133,10 @@ class StatementsViewModelTest {
 
     @Test
     fun statementsViewModel_checkStateWithoutInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
@@ -143,12 +148,14 @@ class StatementsViewModelTest {
 
     @Test
     fun statementsViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         mockDataWithoutInternet()
+
         viewModel.getStatements()
         advanceUntilIdle()
 
@@ -161,12 +168,14 @@ class StatementsViewModelTest {
 
     @Test
     fun statementsViewModel_checkRefreshedErrorStateWithInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         mockDataWithInternet()
+
         viewModel.getStatements()
         advanceUntilIdle()
 
@@ -179,9 +188,10 @@ class StatementsViewModelTest {
 
     @Test
     fun statementsViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         viewModel.getStatements()
@@ -196,9 +206,10 @@ class StatementsViewModelTest {
 
     @Test
     fun statementsViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
-        setupUiStateCollecting()
-
         mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
         advanceUntilIdle()
 
         viewModel.getStatements()
