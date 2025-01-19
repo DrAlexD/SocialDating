@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -119,9 +120,22 @@ class ProfileStatisticsViewModel @Inject constructor(
             } catch (e: Exception) {
                 when (e) {
                     is IOException, is HttpException -> {
-                        localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
-                        localUserCategoriesRepository.insertUserCategories(FakeDataSource.userCategories) // FixMe: remove after implementing server
-                        localUserDefiningThemesRepository.insertUserDefiningThemes(FakeDataSource.userDefiningThemes) // FixMe: remove after implementing server
+                        if (localCategoriesRepository.getCategories().first().isEmpty()) {
+                            localCategoriesRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
+                        }
+                        if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
+                            localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
+                        }
+                        if (localUserCategoriesRepository.getUserCategories().first().isEmpty()) {
+                            localUserCategoriesRepository.insertUserCategories(FakeDataSource.userCategories) // FixMe: remove after implementing server
+                        }
+                        if (localUserDefiningThemesRepository.getUserDefiningThemes().first()
+                                .isEmpty()
+                        ) {
+                            localUserDefiningThemesRepository.insertUserDefiningThemes(
+                                FakeDataSource.userDefiningThemes
+                            ) // FixMe: remove after implementing server
+                        }
 
                         dataRequestStatusFlow.update {
                             RequestStatus.ERROR(

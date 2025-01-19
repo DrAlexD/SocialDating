@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import retrofit2.HttpException
 import xelagurd.socialdating.R
+import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.ui.state.CategoriesUiState
@@ -67,6 +69,10 @@ class CategoriesViewModel @Inject constructor(
             } catch (e: Exception) {
                 when (e) {
                     is IOException, is HttpException -> {
+                        if (localRepository.getCategories().first().isEmpty()) {
+                            localRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
+                        }
+
                         dataRequestStatusFlow.update {
                             RequestStatus.ERROR(
                                 errorText = context.getString(R.string.no_internet_connection)

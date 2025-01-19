@@ -2,6 +2,7 @@ package xelagurd.socialdating.tests
 
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import android.content.Context
@@ -141,6 +142,7 @@ class LoginViewModelTest {
     private fun mockDataWithoutInternet() {
         every { context.getString(any()) } returns ""
         coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } throws IOException()
+
         coEvery {
             accountManager.saveCredentials(
                 LoginDetails(
@@ -149,7 +151,7 @@ class LoginViewModelTest {
                 )
             )
         } just Runs // TODO: remove after implementing server
-        coEvery { localRepository.insertUser(FakeDataSource.users[0]) } just Runs // TODO: remove after implementing server
+        every { localRepository.getUsers() } returns flowOf(listOf(FakeDataSource.users[0])) // TODO: remove after implementing server
         coEvery { preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) } just Runs // TODO: remove after implementing server
     }
 }

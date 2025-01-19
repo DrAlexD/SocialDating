@@ -136,7 +136,7 @@ class StatementsViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localStatements, FakeDataSource.statements),
+            localStatements,
             statementsUiState.entities
         )
     }
@@ -154,7 +154,7 @@ class StatementsViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements, FakeDataSource.statements),
+            mergeListsAsSets(localStatements, remoteStatements),
             statementsUiState.entities
         )
     }
@@ -172,7 +172,7 @@ class StatementsViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localStatements, FakeDataSource.statements, remoteStatements),
+            mergeListsAsSets(localStatements, remoteStatements),
             statementsUiState.entities
         )
     }
@@ -206,7 +206,7 @@ class StatementsViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localStatements, FakeDataSource.statements),
+            localStatements,
             statementsUiState.entities
         )
     }
@@ -214,7 +214,6 @@ class StatementsViewModelTest {
     private fun mockLocalStatements() {
         every { localStatementsRepository.getStatements(localDefiningThemes.toIds()) } returns statementsFlow
         every { localStatementsRepository.getStatements(remoteDefiningThemes.toIds()) } returns statementsFlow
-        every { localStatementsRepository.getStatements(FakeDataSource.definingThemes.toIds()) } returns statementsFlow
     }
 
     private fun mockGeneralMethods() {
@@ -249,12 +248,10 @@ class StatementsViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } throws IOException()
 
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) } answers {
-            definingThemesFlow.value =
-                mergeListsAsSets(definingThemesFlow.value, FakeDataSource.definingThemes)
-        }
-        coEvery { localStatementsRepository.insertStatements(FakeDataSource.statements) } answers {
-            statementsFlow.value = mergeListsAsSets(statementsFlow.value, FakeDataSource.statements)
-        }
+        // TODO: remove after implementing server
+        every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(
+            localDefiningThemes
+        )
+        every { localStatementsRepository.getStatements() } returns flowOf(localStatements)
     }
 }

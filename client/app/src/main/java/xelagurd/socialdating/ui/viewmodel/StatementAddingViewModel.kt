@@ -113,7 +113,10 @@ class StatementAddingViewModel @Inject constructor(
             } catch (e: Exception) {
                 when (e) {
                     is IOException, is HttpException -> {
-                        localStatementsRepository.insertStatement(FakeDataSource.newStatement) // TODO: remove after implementing server
+                        if (!localStatementsRepository.getStatements().first().map { it.id }
+                                .contains(FakeDataSource.newStatement.id)) {
+                            localStatementsRepository.insertStatement(FakeDataSource.newStatement) // TODO: remove after implementing server
+                        }
 
                         _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing
                     }

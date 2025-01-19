@@ -112,8 +112,12 @@ class StatementsViewModel @Inject constructor(
             } catch (e: Exception) {
                 when (e) {
                     is IOException, is HttpException -> {
-                        localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
-                        localStatementsRepository.insertStatements(FakeDataSource.statements) // FixMe: remove after implementing server
+                        if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
+                            localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
+                        }
+                        if (localStatementsRepository.getStatements().first().isEmpty()) {
+                            localStatementsRepository.insertStatements(FakeDataSource.statements) // FixMe: remove after implementing server
+                        }
 
                         dataRequestStatusFlow.update {
                             RequestStatus.ERROR(

@@ -9,6 +9,9 @@ import xelagurd.socialdating.data.model.Statement
 class LocalStatementsRepository @Inject constructor(
     private val statementsDao: StatementsDao
 ) {
+    fun getStatements() =
+        statementsDao.getStatements()
+
     fun getStatements(definingThemeIds: List<Int>) =
         statementsDao.getStatements(definingThemeIds)
 

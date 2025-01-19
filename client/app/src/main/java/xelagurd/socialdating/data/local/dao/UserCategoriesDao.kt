@@ -10,6 +10,9 @@ import xelagurd.socialdating.data.model.additional.UserCategoryWithData
 
 @Dao
 interface UserCategoriesDao {
+    @Query("SELECT * FROM user_categories")
+    fun getUserCategories(): Flow<List<UserCategory>>
+
     @Query(
         """
         SELECT 

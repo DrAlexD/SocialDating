@@ -10,6 +10,9 @@ import xelagurd.socialdating.data.model.additional.UserDefiningThemeWithData
 
 @Dao
 interface UserDefiningThemesDao {
+    @Query("SELECT * FROM user_defining_themes")
+    fun getUserDefiningThemes(): Flow<List<UserDefiningTheme>>
+
     @Query(
         """
         SELECT 
