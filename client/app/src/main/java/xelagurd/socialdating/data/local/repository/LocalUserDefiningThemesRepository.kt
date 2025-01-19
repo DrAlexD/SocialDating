@@ -9,6 +9,9 @@ import xelagurd.socialdating.data.model.UserDefiningTheme
 class LocalUserDefiningThemesRepository @Inject constructor(
     private val userDefiningThemesDao: UserDefiningThemesDao
 ) {
+    fun getUserDefiningThemes() =
+        userDefiningThemesDao.getUserDefiningThemes()
+
     fun getUserDefiningThemes(userCategoryIds: List<Int>) =
         userDefiningThemesDao.getUserDefiningThemes(userCategoryIds)
 

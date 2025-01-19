@@ -6,6 +6,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.content.Context
@@ -124,7 +125,11 @@ class LoginViewModel @Inject constructor(
                         )
                     ) // TODO: remove after implementing server
 
-                    localRepository.insertUser(FakeDataSource.users[0]) // TODO: remove after implementing server
+                    if (!localRepository.getUsers().first().map { it.id }
+                            .contains(FakeDataSource.users[0].id)) {
+                        localRepository.insertUser(FakeDataSource.users[0]) // TODO: remove after implementing server
+                    }
+
                     preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) // TODO: remove after implementing server
 
                     _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing server

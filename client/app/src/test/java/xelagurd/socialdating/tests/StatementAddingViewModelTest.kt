@@ -136,6 +136,7 @@ class StatementAddingViewModelTest {
     private fun mockDataWithoutInternet() {
         every { context.getString(any()) } returns ""
         coEvery { remoteStatementsRepository.statementAdding(statementDetails) } throws IOException()
-        coEvery { localStatementsRepository.insertStatement(FakeDataSource.newStatement) } just Runs // TODO: remove after implementing server
+
+        every { localStatementsRepository.getStatements() } returns flowOf(listOf(FakeDataSource.newStatement)) // TODO: remove after implementing server
     }
 }

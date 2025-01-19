@@ -9,6 +9,9 @@ import xelagurd.socialdating.data.model.UserCategory
 class LocalUserCategoriesRepository @Inject constructor(
     private val userCategoriesDao: UserCategoriesDao
 ) {
+    fun getUserCategories() =
+        userCategoriesDao.getUserCategories()
+
     fun getUserCategories(userId: Int) =
         userCategoriesDao.getUserCategories(userId)
 

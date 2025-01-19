@@ -9,6 +9,9 @@ import xelagurd.socialdating.data.model.Statement
 
 @Dao
 interface StatementsDao {
+    @Query("SELECT * FROM statements")
+    fun getStatements(): Flow<List<Statement>>
+
     @Query("SELECT * FROM statements WHERE definingThemeId IN (:definingThemeIds)")
     fun getStatements(definingThemeIds: List<Int>): Flow<List<Statement>>
 

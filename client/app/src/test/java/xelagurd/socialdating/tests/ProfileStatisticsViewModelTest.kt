@@ -3,6 +3,7 @@ package xelagurd.socialdating.tests
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -20,7 +21,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.MainDispatcherRule
-import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.fake.toUserCategoriesWithData
 import xelagurd.socialdating.data.fake.toUserDefiningThemesWithData
 import xelagurd.socialdating.data.local.repository.LocalCategoriesRepository
@@ -178,14 +178,11 @@ class ProfileStatisticsViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), profileStatisticsUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localUserCategories, FakeDataSource.userCategories)
-                .toUserCategoriesWithData(),
+            localUserCategories.toUserCategoriesWithData(),
             profileStatisticsUiState.entities
         )
         assertEquals(
-            mergeListsAsSets(localUserDefiningThemes, FakeDataSource.userDefiningThemes)
-                .toUserDefiningThemesWithData()
-                .groupBy { it.userCategoryId },
+            localUserDefiningThemes.toUserDefiningThemesWithData().groupBy { it.userCategoryId },
             profileStatisticsUiState.entityIdToData
         )
     }
@@ -205,16 +202,14 @@ class ProfileStatisticsViewModelTest {
         assertEquals(
             mergeListsAsSets(
                 localUserCategories,
-                remoteUserCategories,
-                FakeDataSource.userCategories
+                remoteUserCategories
             ).toUserCategoriesWithData(),
             profileStatisticsUiState.entities
         )
         assertEquals(
             mergeListsAsSets(
                 localUserDefiningThemes,
-                remoteUserDefiningThemes,
-                FakeDataSource.userDefiningThemes
+                remoteUserDefiningThemes
             )
                 .toUserDefiningThemesWithData()
                 .groupBy { it.userCategoryId },
@@ -237,7 +232,6 @@ class ProfileStatisticsViewModelTest {
         assertEquals(
             mergeListsAsSets(
                 localUserCategories,
-                FakeDataSource.userCategories,
                 remoteUserCategories
             ).toUserCategoriesWithData(),
             profileStatisticsUiState.entities
@@ -245,7 +239,6 @@ class ProfileStatisticsViewModelTest {
         assertEquals(
             mergeListsAsSets(
                 localUserDefiningThemes,
-                FakeDataSource.userDefiningThemes,
                 remoteUserDefiningThemes
             )
                 .toUserDefiningThemesWithData()
@@ -289,14 +282,11 @@ class ProfileStatisticsViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), profileStatisticsUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localUserCategories, FakeDataSource.userCategories)
-                .toUserCategoriesWithData(),
+            localUserCategories.toUserCategoriesWithData(),
             profileStatisticsUiState.entities
         )
         assertEquals(
-            mergeListsAsSets(localUserDefiningThemes, FakeDataSource.userDefiningThemes)
-                .toUserDefiningThemesWithData()
-                .groupBy { it.userCategoryId },
+            localUserDefiningThemes.toUserDefiningThemesWithData().groupBy { it.userCategoryId },
             profileStatisticsUiState.entityIdToData
         )
     }
@@ -304,7 +294,6 @@ class ProfileStatisticsViewModelTest {
     private fun mockLocalUserDefiningThemes() {
         every { localUserDefiningThemesRepository.getUserDefiningThemes(localUserCategories.toUserCategoryIds()) } returns userDefiningThemesFlow
         every { localUserDefiningThemesRepository.getUserDefiningThemes(remoteUserCategories.toUserCategoryIds()) } returns userDefiningThemesFlow
-        every { localUserDefiningThemesRepository.getUserDefiningThemes(FakeDataSource.userCategories.toUserCategoryIds()) } returns userDefiningThemesFlow
     }
 
     private fun mockGeneralMethods() {
@@ -357,20 +346,16 @@ class ProfileStatisticsViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteCategoriesRepository.getCategories() } throws IOException()
 
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) } just Runs
-        coEvery { localUserCategoriesRepository.insertUserCategories(FakeDataSource.userCategories) } answers {
-            userCategoriesFlow.value =
-                mergeListsAsSets(
-                    userCategoriesFlow.value,
-                    FakeDataSource.userCategories.toUserCategoriesWithData()
-                )
-        }
-        coEvery { localUserDefiningThemesRepository.insertUserDefiningThemes(FakeDataSource.userDefiningThemes) } answers {
-            userDefiningThemesFlow.value =
-                mergeListsAsSets(
-                    userDefiningThemesFlow.value,
-                    FakeDataSource.userDefiningThemes.toUserDefiningThemesWithData()
-                )
-        }
+        // TODO: remove after implementing server
+        every { localCategoriesRepository.getCategories() } returns flowOf(localCategories)
+        every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(
+            localDefiningThemes
+        )
+        every { localUserCategoriesRepository.getUserCategories() } returns flowOf(
+            localUserCategories
+        )
+        every { localUserDefiningThemesRepository.getUserDefiningThemes() } returns flowOf(
+            localUserDefiningThemes
+        )
     }
 }
