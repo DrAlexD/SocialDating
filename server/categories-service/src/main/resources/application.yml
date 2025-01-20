@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: categories-service
+  datasource:
+    generate-unique-name: false
+    name: categories-service
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create-drop
+  sql:
+    init:
+      mode: always
