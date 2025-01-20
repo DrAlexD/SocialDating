@@ -3,9 +3,11 @@ package xelagurd.socialdating
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import xelagurd.socialdating.dto.Category
 import xelagurd.socialdating.repository.CategoriesRepository
 
+@Profile("!test")
 @Configuration
 class DevelopmentConfig {
 

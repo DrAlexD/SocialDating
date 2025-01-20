@@ -11,7 +11,7 @@ import xelagurd.socialdating.dto.Category
 import xelagurd.socialdating.dto.CategoryDetails
 import xelagurd.socialdating.repository.CategoriesRepository
 
-class CategoriesControllerUnitTest {
+class CategoriesServiceUnitTest {
 
     @MockK
     private lateinit var categoriesRepository: CategoriesRepository
@@ -33,10 +33,7 @@ class CategoriesControllerUnitTest {
 
         val result = categoriesService.getCategories()
 
-        assertEquals(
-            listOf(category),
-            result
-        )
+        assertEquals(listOf(category), result)
     }
 
     @Test
@@ -45,9 +42,6 @@ class CategoriesControllerUnitTest {
 
         val result = categoriesService.addCategory(categoryDetails)
 
-        assertEquals(
-            category,
-            result
-        )
+        assertEquals(category, result)
     }
 }
