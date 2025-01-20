@@ -1,19 +1,24 @@
 package xelagurd.socialdating.controller
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import xelagurd.socialdating.dto.Category
-import xelagurd.socialdating.repository.CategoriesRepository
+import xelagurd.socialdating.dto.CategoryDetails
+import xelagurd.socialdating.service.CategoriesService
 
 @RestController
 @RequestMapping(path = ["/api/v1/categories"], produces = ["application/json"])
 class CategoriesController(
-    private val categoriesRepository: CategoriesRepository
+    private val categoriesService: CategoriesService
 ) {
 
     @GetMapping
     fun getCategories(): Iterable<Category> {
-        return categoriesRepository.findAll()
+        return categoriesService.getCategories()
+    }
+
+    // TODO: Add admin privileges
+    @PostMapping
+    fun addCategory(@RequestBody categoryDetails: CategoryDetails): Category {
+        return categoriesService.addCategory(categoryDetails)
     }
 }
