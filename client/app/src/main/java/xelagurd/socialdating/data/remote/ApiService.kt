@@ -19,7 +19,7 @@ interface ApiService {
     @GET("categories")
     suspend fun getCategories(): List<Category>
 
-    @GET("definingThemes")
+    @GET("defining-themes")
     suspend fun getDefiningThemes(@Query("categoryIds") categoryIds: List<Int>): List<DefiningTheme>
 
     @GET("statements")
@@ -34,10 +34,10 @@ interface ApiService {
     @GET("users")
     suspend fun getUser(@Query("userId") userId: Int): User?
 
-    @GET("userCategories")
+    @GET("user-categories")
     suspend fun getUserCategories(@Query("userId") userId: Int): List<UserCategory>
 
-    @GET("userDefiningThemes")
+    @GET("user-defining-themes")
     suspend fun getUserDefiningThemes(@Query("userCategoryIds") userCategoryIds: List<Int>): List<UserDefiningTheme>
 
     @POST("users/login")
