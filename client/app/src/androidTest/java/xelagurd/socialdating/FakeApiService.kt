@@ -16,9 +16,6 @@ import xelagurd.socialdating.data.remote.ApiService
 class FakeApiService : ApiService {
     override suspend fun getCategories(): List<Category> = FakeDataSource.categories
 
-    override suspend fun getDefiningThemes(categoryId: Int): List<DefiningTheme> =
-        FakeDataSource.definingThemes
-
     override suspend fun getDefiningThemes(categoryIds: List<Int>): List<DefiningTheme> =
         FakeDataSource.definingThemes
 

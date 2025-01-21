@@ -59,6 +59,9 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
+[bundles]
+androidx-compose = ["androidx-material3", "androidx-ui-graphics", "androidx-ui", "androidx-ui-text-google-fonts", "androidx-ui-tooling-preview"]
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

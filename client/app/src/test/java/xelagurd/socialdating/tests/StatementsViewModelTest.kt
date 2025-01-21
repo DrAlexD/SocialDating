@@ -235,7 +235,7 @@ class StatementsViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns remoteDefiningThemes
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } returns remoteDefiningThemes
         coEvery { remoteStatementsRepository.getStatements(remoteDefiningThemes.toIds()) } returns remoteStatements
 
         coEvery { localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes) } answers {
@@ -249,7 +249,7 @@ class StatementsViewModelTest {
 
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns emptyList()
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } returns emptyList()
         coEvery { remoteStatementsRepository.getStatements(emptyList()) } returns emptyList()
 
         coEvery { localDefiningThemesRepository.insertDefiningThemes(emptyList()) } just Runs
@@ -257,7 +257,7 @@ class StatementsViewModelTest {
 
     private fun mockDataWithoutInternet() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } throws IOException()
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } throws IOException()
 
         // TODO: remove after implementing server
         every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(
