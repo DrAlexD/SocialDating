@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: categories-service
+          uri: http://localhost:8010
+          predicates:
+            - Path=/api/v1/categories/**
+        - id: defining-themes-service
+          uri: http://localhost:8020
+          predicates:
+            - Path=/api/v1/defining-themes/**
