@@ -87,7 +87,7 @@ class StatementsViewModel @Inject constructor(
                 dataRequestStatusFlow.update { RequestStatus.LOADING }
 
                 val remoteDefiningThemes = remoteDefiningThemesRepository
-                    .getDefiningThemes(categoryId)
+                    .getDefiningThemes(listOf(categoryId))
                 localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
 
                 val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
