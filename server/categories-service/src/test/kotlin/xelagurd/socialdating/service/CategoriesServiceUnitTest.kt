@@ -19,7 +19,11 @@ class CategoriesServiceUnitTest {
     @InjectMockKs
     private lateinit var categoriesService: CategoriesService
 
-    private val category = Category(id = 1, name = "RemoteCategory1")
+    private val categories = listOf(
+        Category(id = 1, name = "RemoteCategory1"),
+        Category(id = 2, name = "RemoteCategory2"),
+        Category(id = 3, name = "RemoteCategory3")
+    )
     private val categoryDetails = CategoryDetails(name = "RemoteCategory1")
 
     @BeforeEach
@@ -29,19 +33,21 @@ class CategoriesServiceUnitTest {
 
     @Test
     fun getCategories() {
-        every { categoriesRepository.findAll() } returns listOf(category)
+        val expected = categories
+        every { categoriesRepository.findAll() } returns expected
 
         val result = categoriesService.getCategories()
 
-        assertEquals(listOf(category), result)
+        assertEquals(expected, result)
     }
 
     @Test
     fun addCategory() {
-        every { categoriesRepository.save(categoryDetails.toCategory()) } returns category
+        val expected = categories[0]
+        every { categoriesRepository.save(categoryDetails.toCategory()) } returns expected
 
         val result = categoriesService.addCategory(categoryDetails)
 
-        assertEquals(category, result)
+        assertEquals(expected, result)
     }
 }

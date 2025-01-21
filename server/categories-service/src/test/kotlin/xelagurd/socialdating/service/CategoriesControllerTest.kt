@@ -22,24 +22,30 @@ class CategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
     @MockitoBean
     private lateinit var categoriesService: CategoriesService
 
-    private val category = Category(id = 1, name = "RemoteCategory1")
+    private val categories = listOf(
+        Category(id = 1, name = "RemoteCategory1"),
+        Category(id = 2, name = "RemoteCategory2"),
+        Category(id = 3, name = "RemoteCategory3")
+    )
     private val categoryDetails = CategoryDetails(name = "RemoteCategory1")
 
     @Test
     fun getCategories() {
-        `when`(categoriesService.getCategories()).thenReturn(listOf(category))
+        val expected = categories
+        `when`(categoriesService.getCategories()).thenReturn(expected)
 
         mockMvc.perform(
             get("/api/v1/categories")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(listOf(category))))
+            .andExpect(content().json(convertObjectToJsonString(expected)))
     }
 
     @Test
     fun addCategory() {
-        `when`(categoriesService.addCategory(categoryDetails)).thenReturn(category)
+        val expected = categories[0]
+        `when`(categoriesService.addCategory(categoryDetails)).thenReturn(expected)
 
         mockMvc.perform(
             post("/api/v1/categories")
@@ -48,6 +54,6 @@ class CategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(category)))
+            .andExpect(content().json(convertObjectToJsonString(expected)))
     }
 }

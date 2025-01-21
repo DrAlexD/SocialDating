@@ -10,5 +10,6 @@ plugins {
 }
 
 include(":categories-service")
+include(":defining-themes-service")
 
 rootProject.name = "SocialDating"
