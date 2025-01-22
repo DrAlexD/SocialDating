@@ -3,6 +3,7 @@ package xelagurd.socialdating.data.remote
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 import xelagurd.socialdating.data.model.Category
 import xelagurd.socialdating.data.model.DefiningTheme
@@ -31,8 +32,8 @@ interface ApiService {
     @POST("statements")
     suspend fun statementAdding(@Body statementDetails: StatementDetails): Statement?
 
-    @GET("users")
-    suspend fun getUser(@Query("userId") userId: Int): User?
+    @GET("users/{id}")
+    suspend fun getUser(@Path("id") userId: Int): User?
 
     @GET("user-categories")
     suspend fun getUserCategories(@Query("userId") userId: Int): List<UserCategory>

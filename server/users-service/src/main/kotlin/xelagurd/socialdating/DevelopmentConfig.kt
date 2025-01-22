@@ -20,8 +20,15 @@ class DevelopmentConfig {
         return CommandLineRunner {
             val users = listOf(
                 User(
-                    1, "Alexander", Gender.MALE, "username1", "password1", "email1@gmail.com",
-                    25, "Moscow", Purpose.ALL_AT_ONCE, 50
+                    name = "Alexander",
+                    gender = Gender.MALE,
+                    username = "username1",
+                    password = "password1",
+                    email = "email1@gmail.com",
+                    age = 25,
+                    city = "Moscow",
+                    purpose = Purpose.ALL_AT_ONCE,
+                    activity = 50
                 )
             )
 
