@@ -10,9 +10,9 @@ class DefiningTheme(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
     val id: Int? = null,
-    val name: String = "",
-    val fromOpinion: String = "",
-    val toOpinion: String = "",
+    val name: String? = null,
+    val fromOpinion: String? = null,
+    val toOpinion: String? = null,
     val categoryId: Int? = null
 ) {
     override fun equals(other: Any?): Boolean {

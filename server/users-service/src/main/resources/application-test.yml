@@ -1,12 +1,7 @@
-server:
-  port: 8030
-
 spring:
-  application:
-    name: defining-themes-service
   datasource:
     generate-unique-name: false
-    name: defining-themes-service
+    name: users-service-test
   jpa:
     defer-datasource-initialization: true
     hibernate:
