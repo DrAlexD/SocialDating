@@ -10,6 +10,7 @@ plugins {
 }
 
 include(":gateway-service")
+include(":users-service")
 include(":categories-service")
 include(":defining-themes-service")
 
