@@ -9,12 +9,16 @@ import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import xelagurd.socialdating.dto.Category
 import xelagurd.socialdating.dto.CategoryDetails
+import xelagurd.socialdating.dto.UserCategory
+import xelagurd.socialdating.dto.UserCategoryDetails
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MicroserviceTest(@Autowired val restTemplate: TestRestTemplate) {
+
+    private val userId = 1
 
     private val categories = listOf(
         Category(id = 1, name = "RemoteCategory1"),
@@ -25,6 +29,17 @@ class MicroserviceTest(@Autowired val restTemplate: TestRestTemplate) {
         CategoryDetails(name = "RemoteCategory1"),
         CategoryDetails(name = "RemoteCategory2"),
         CategoryDetails(name = "RemoteCategory3")
+    )
+
+    private val userCategories = listOf(
+        UserCategory(id = 1, interest = 10, userId = 1, categoryId = 1),
+        UserCategory(id = 2, interest = 15, userId = 1, categoryId = 2),
+        UserCategory(id = 3, interest = 20, userId = 2, categoryId = 3)
+    )
+    private val userCategoriesDetails = listOf(
+        UserCategoryDetails(interest = 10, userId = 1, categoryId = 1),
+        UserCategoryDetails(interest = 15, userId = 1, categoryId = 2),
+        UserCategoryDetails(interest = 20, userId = 2, categoryId = 3)
     )
 
     @Test
@@ -45,5 +60,37 @@ class MicroserviceTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(getResponse.statusCode).isEqualTo(HttpStatus.OK)
         assertEquals(getResponse.body!!.size, 3)
         assertContentEquals(getResponse.body!!, categories.toTypedArray())
+    }
+
+    @Test
+    fun addUserCategoriesAndGetThem() {
+        val postResponse1 = restTemplate.postForEntity(
+            "/api/v1/categories/users",
+            userCategoriesDetails[0],
+            UserCategory::class.java
+        )
+        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.OK)
+        assertEquals(postResponse1.body!!, userCategories[0])
+
+        val postResponse2 = restTemplate.postForEntity(
+            "/api/v1/categories/users",
+            userCategoriesDetails[1],
+            UserCategory::class.java
+        )
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.OK)
+        assertEquals(postResponse2.body!!, userCategories[1])
+
+        val postResponse3 = restTemplate.postForEntity(
+            "/api/v1/categories/users",
+            userCategoriesDetails[2],
+            UserCategory::class.java
+        )
+        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.OK)
+        assertEquals(postResponse3.body!!, userCategories[2])
+
+        val getResponse = restTemplate.getForEntity("/api/v1/categories/users/$userId", Array<UserCategory>::class.java)
+        assertThat(getResponse.statusCode).isEqualTo(HttpStatus.OK)
+        assertEquals(getResponse.body!!.size, 2)
+        assertContentEquals(getResponse.body!!, arrayOf(userCategories[0], userCategories[1]))
     }
 }
