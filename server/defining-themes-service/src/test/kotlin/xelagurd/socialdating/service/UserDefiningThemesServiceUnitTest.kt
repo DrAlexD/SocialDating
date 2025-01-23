@@ -11,7 +11,7 @@ import xelagurd.socialdating.dto.UserDefiningTheme
 import xelagurd.socialdating.dto.UserDefiningThemeDetails
 import xelagurd.socialdating.repository.UserDefiningThemesRepository
 
-class UserUserDefiningThemesServiceUnitTest {
+class UserDefiningThemesServiceUnitTest {
 
     @MockK
     private lateinit var userDefiningThemesRepository: UserDefiningThemesRepository
