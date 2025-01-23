@@ -14,31 +14,31 @@ import xelagurd.socialdating.data.model.details.StatementDetails
 import xelagurd.socialdating.data.remote.ApiService
 
 class FakeApiService : ApiService {
-    override suspend fun getCategories(): List<Category> = FakeDataSource.categories
-
-    override suspend fun getDefiningThemes(categoryIds: List<Int>): List<DefiningTheme> =
-        FakeDataSource.definingThemes
-
-    override suspend fun getStatements(definingThemeIds: List<Int>): List<Statement> =
-        FakeDataSource.statements
-
-    override suspend fun postStatementReaction(statementReaction: StatementReaction) {}
-
-    override suspend fun statementAdding(statementDetails: StatementDetails): Statement? =
-        FakeDataSource.newStatement
-
     override suspend fun getUser(userId: Int): User? =
         FakeDataSource.users[0]
-
-    override suspend fun getUserCategories(userId: Int): List<UserCategory> =
-        FakeDataSource.userCategories
-
-    override suspend fun getUserDefiningThemes(userCategoryIds: List<Int>): List<UserDefiningTheme> =
-        FakeDataSource.userDefiningThemes
 
     override suspend fun loginUser(loginDetails: LoginDetails): User? =
         FakeDataSource.users[0]
 
     override suspend fun registerUser(registrationDetails: RegistrationDetails): User? =
         FakeDataSource.users[0]
+
+    override suspend fun getCategories(): List<Category> = FakeDataSource.categories
+
+    override suspend fun getUserCategories(userId: Int): List<UserCategory> =
+        FakeDataSource.userCategories
+
+    override suspend fun getDefiningThemes(categoryIds: List<Int>): List<DefiningTheme> =
+        FakeDataSource.definingThemes
+
+    override suspend fun getUserDefiningThemes(userCategoryIds: List<Int>): List<UserDefiningTheme> =
+        FakeDataSource.userDefiningThemes
+
+    override suspend fun getStatements(definingThemeIds: List<Int>): List<Statement> =
+        FakeDataSource.statements
+
+    override suspend fun addStatement(statementDetails: StatementDetails): Statement? =
+        FakeDataSource.newStatement
+
+    override suspend fun postStatementReaction(statementReaction: StatementReaction) {}
 }

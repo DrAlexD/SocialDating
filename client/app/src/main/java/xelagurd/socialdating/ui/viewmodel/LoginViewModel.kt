@@ -44,13 +44,13 @@ class LoginViewModel @Inject constructor(
         tryToFindCredentialsAndLogin()
     }
 
-    fun tryToFindCredentialsAndLogin() {
+    private fun tryToFindCredentialsAndLogin() {
         viewModelScope.launch {
             accountManager.findCredentials()?.let { loginWithCredentials(it) }
         }
     }
 
-    suspend fun loginWithCredentials(credentialResponse: GetCredentialResponse) {
+    private suspend fun loginWithCredentials(credentialResponse: GetCredentialResponse) {
         when (val credential = credentialResponse.credential) {
             is PasswordCredential -> {
                 val username = credential.id
@@ -83,7 +83,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    suspend fun loginUser(loginDetails: LoginDetails, isLoginWithInput: Boolean) {
+    private suspend fun loginUser(loginDetails: LoginDetails, isLoginWithInput: Boolean) {
         try {
             _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 

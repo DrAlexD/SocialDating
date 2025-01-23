@@ -15,6 +15,7 @@ import xelagurd.socialdating.controller.DefiningThemesController
 import xelagurd.socialdating.dto.DefiningTheme
 import xelagurd.socialdating.dto.DefiningThemeDetails
 import xelagurd.socialdating.service.TestUtils.convertObjectToJsonString
+import xelagurd.socialdating.service.TestUtils.toRequestParams
 
 @WebMvcTest(DefiningThemesController::class)
 class DefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) {
@@ -52,7 +53,7 @@ class DefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) {
         `when`(definingThemesService.getDefiningThemes(categoryIds)).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/defining-themes?categoryIds=1,3")
+            get("/api/v1/defining-themes?categoryIds=${categoryIds.toRequestParams()}")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))

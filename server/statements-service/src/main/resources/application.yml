@@ -1,0 +1,16 @@
+server:
+  port: 8040
+
+spring:
+  application:
+    name: statements-service
+  datasource:
+    generate-unique-name: false
+    name: statements-service
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create-drop
+  sql:
+    init:
+      mode: always

@@ -17,33 +17,33 @@ import xelagurd.socialdating.data.model.details.RegistrationDetails
 import xelagurd.socialdating.data.model.details.StatementDetails
 
 interface ApiService {
+    @GET("users/{id}")
+    suspend fun getUser(@Path("id") userId: Int): User?
+
+    @POST("users/auth/login")
+    suspend fun loginUser(@Body loginDetails: LoginDetails): User?
+
+    @POST("users/auth/register")
+    suspend fun registerUser(@Body registrationDetails: RegistrationDetails): User?
+
     @GET("categories")
     suspend fun getCategories(): List<Category>
+
+    @GET("categories/users/{id}")
+    suspend fun getUserCategories(@Path("id") userId: Int): List<UserCategory>
 
     @GET("defining-themes")
     suspend fun getDefiningThemes(@Query("categoryIds") categoryIds: List<Int>): List<DefiningTheme>
 
+    @GET("defining-themes/users")
+    suspend fun getUserDefiningThemes(@Query("userCategoryIds") userCategoryIds: List<Int>): List<UserDefiningTheme>
+
     @GET("statements")
     suspend fun getStatements(@Query("definingThemeIds") definingThemeIds: List<Int>): List<Statement>
 
+    @POST("statements")
+    suspend fun addStatement(@Body statementDetails: StatementDetails): Statement?
+
     @POST("statements/reaction")
     suspend fun postStatementReaction(@Body statementReaction: StatementReaction)
-
-    @POST("statements")
-    suspend fun statementAdding(@Body statementDetails: StatementDetails): Statement?
-
-    @GET("users/{id}")
-    suspend fun getUser(@Path("id") userId: Int): User?
-
-    @GET("user-categories")
-    suspend fun getUserCategories(@Query("userId") userId: Int): List<UserCategory>
-
-    @GET("user-defining-themes")
-    suspend fun getUserDefiningThemes(@Query("userCategoryIds") userCategoryIds: List<Int>): List<UserDefiningTheme>
-
-    @POST("users/login")
-    suspend fun loginUser(@Body loginDetails: LoginDetails): User?
-
-    @POST("users/register")
-    suspend fun registerUser(@Body registrationDetails: RegistrationDetails): User?
 }

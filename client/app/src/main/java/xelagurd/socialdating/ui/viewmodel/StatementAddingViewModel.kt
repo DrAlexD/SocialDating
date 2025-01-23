@@ -46,7 +46,7 @@ class StatementAddingViewModel @Inject constructor(
         initDefiningThemes()
     }
 
-    fun initCurrentUserId() {
+    private fun initCurrentUserId() {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
@@ -58,7 +58,7 @@ class StatementAddingViewModel @Inject constructor(
         }
     }
 
-    fun initDefiningThemes() {
+    private fun initDefiningThemes() {
         viewModelScope.launch {
             _uiState.update { it.copy(dataRequestStatus = RequestStatus.LOADING) }
 
@@ -91,7 +91,7 @@ class StatementAddingViewModel @Inject constructor(
                 _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
                 val statementDetails = uiState.value.formDetails
-                val statement = remoteStatementsRepository.statementAdding(statementDetails)
+                val statement = remoteStatementsRepository.addStatement(statementDetails)
 
                 if (statement != null) {
                     localStatementsRepository.insertStatement(statement)
