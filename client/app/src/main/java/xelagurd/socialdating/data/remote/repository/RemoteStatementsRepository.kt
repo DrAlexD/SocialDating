@@ -16,6 +16,6 @@ class RemoteStatementsRepository @Inject constructor(
     suspend fun postStatementReaction(statementReaction: StatementReaction) =
         apiService.postStatementReaction(statementReaction)
 
-    suspend fun statementAdding(statementDetails: StatementDetails) =
-        apiService.statementAdding(statementDetails)
+    suspend fun addStatement(statementDetails: StatementDetails) =
+        apiService.addStatement(statementDetails)
 }

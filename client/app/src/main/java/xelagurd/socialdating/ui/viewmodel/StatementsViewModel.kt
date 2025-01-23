@@ -75,7 +75,7 @@ class StatementsViewModel @Inject constructor(
         getStatements()
     }
 
-    fun initCurrentUserId() {
+    private fun initCurrentUserId() {
         viewModelScope.launch {
             currentUserId = preferencesRepository.currentUserId.first()
         }
