@@ -17,14 +17,14 @@ import xelagurd.socialdating.data.model.details.RegistrationDetails
 import xelagurd.socialdating.data.model.details.StatementDetails
 
 interface ApiService {
-    @GET("users/{id}")
-    suspend fun getUser(@Path("id") userId: Int): User?
-
     @POST("users/auth/login")
     suspend fun loginUser(@Body loginDetails: LoginDetails): User?
 
     @POST("users/auth/register")
     suspend fun registerUser(@Body registrationDetails: RegistrationDetails): User?
+
+    @GET("users/{id}")
+    suspend fun getUser(@Path("id") userId: Int): User?
 
     @GET("categories")
     suspend fun getCategories(): List<Category>

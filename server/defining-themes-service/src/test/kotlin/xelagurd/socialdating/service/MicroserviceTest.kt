@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import xelagurd.socialdating.dto.DefiningTheme
 import xelagurd.socialdating.dto.DefiningThemeDetails
+import xelagurd.socialdating.dto.UserDefiningTheme
+import xelagurd.socialdating.dto.UserDefiningThemeDetails
 import xelagurd.socialdating.service.TestUtils.toRequestParams
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -29,6 +31,19 @@ class MicroserviceTest(@Autowired val restTemplate: TestRestTemplate) {
         DefiningThemeDetails(name = "RemoteDefiningTheme1", fromOpinion = "No", toOpinion = "Yes", categoryId = 1),
         DefiningThemeDetails(name = "RemoteDefiningTheme2", fromOpinion = "No", toOpinion = "Yes", categoryId = 2),
         DefiningThemeDetails(name = "RemoteDefiningTheme3", fromOpinion = "No", toOpinion = "Yes", categoryId = 3)
+    )
+
+    private val userCategoryIds = listOf(1, 3)
+
+    private val userDefiningThemes = listOf(
+        UserDefiningTheme(id = 1, value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1),
+        UserDefiningTheme(id = 2, value = 15, interest = 15, userCategoryId = 2, definingThemeId = 2),
+        UserDefiningTheme(id = 3, value = 20, interest = 20, userCategoryId = 3, definingThemeId = 3)
+    )
+    private val userDefiningThemesDetails = listOf(
+        UserDefiningThemeDetails(value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1),
+        UserDefiningThemeDetails(value = 15, interest = 15, userCategoryId = 2, definingThemeId = 2),
+        UserDefiningThemeDetails(value = 20, interest = 20, userCategoryId = 3, definingThemeId = 3)
     )
 
     @Test
@@ -72,5 +87,40 @@ class MicroserviceTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(getResponse2.statusCode).isEqualTo(HttpStatus.OK)
         assertEquals(getResponse2.body!!.size, 2)
         assertContentEquals(getResponse2.body!!, arrayOf(definingThemes[0], definingThemes[2]))
+    }
+
+    @Test
+    fun addUserDefiningThemesAndGetThem() {
+        val postResponse1 = restTemplate.postForEntity(
+            "/api/v1/defining-themes/users",
+            userDefiningThemesDetails[0],
+            UserDefiningTheme::class.java
+        )
+        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.OK)
+        assertEquals(postResponse1.body!!, userDefiningThemes[0])
+
+        val postResponse2 = restTemplate.postForEntity(
+            "/api/v1/defining-themes/users",
+            userDefiningThemesDetails[1],
+            UserDefiningTheme::class.java
+        )
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.OK)
+        assertEquals(postResponse2.body!!, userDefiningThemes[1])
+
+        val postResponse3 = restTemplate.postForEntity(
+            "/api/v1/defining-themes/users",
+            userDefiningThemesDetails[2],
+            UserDefiningTheme::class.java
+        )
+        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.OK)
+        assertEquals(postResponse3.body!!, userDefiningThemes[2])
+
+        val getResponse2 = restTemplate.getForEntity(
+            "/api/v1/defining-themes/users?userCategoryIds=${userCategoryIds.toRequestParams()}",
+            Array<UserDefiningTheme>::class.java
+        )
+        assertThat(getResponse2.statusCode).isEqualTo(HttpStatus.OK)
+        assertEquals(getResponse2.body!!.size, 2)
+        assertContentEquals(getResponse2.body!!, arrayOf(userDefiningThemes[0], userDefiningThemes[2]))
     }
 }

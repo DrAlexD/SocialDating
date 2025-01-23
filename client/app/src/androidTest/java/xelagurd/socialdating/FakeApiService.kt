@@ -14,13 +14,13 @@ import xelagurd.socialdating.data.model.details.StatementDetails
 import xelagurd.socialdating.data.remote.ApiService
 
 class FakeApiService : ApiService {
-    override suspend fun getUser(userId: Int): User? =
-        FakeDataSource.users[0]
-
     override suspend fun loginUser(loginDetails: LoginDetails): User? =
         FakeDataSource.users[0]
 
     override suspend fun registerUser(registrationDetails: RegistrationDetails): User? =
+        FakeDataSource.users[0]
+
+    override suspend fun getUser(userId: Int): User? =
         FakeDataSource.users[0]
 
     override suspend fun getCategories(): List<Category> = FakeDataSource.categories

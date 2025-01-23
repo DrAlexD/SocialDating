@@ -9,11 +9,11 @@ import jakarta.persistence.Id
 class DefiningTheme(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
-    val id: Int? = null,
-    val name: String? = null,
-    val fromOpinion: String? = null,
-    val toOpinion: String? = null,
-    val categoryId: Int? = null
+    var id: Int? = null,
+    var name: String? = null,
+    var fromOpinion: String? = null,
+    var toOpinion: String? = null,
+    var categoryId: Int? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
