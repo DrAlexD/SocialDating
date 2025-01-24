@@ -18,10 +18,10 @@ import androidx.room.PrimaryKey
         ForeignKey(
             entity = User::class,
             parentColumns = ["id"],
-            childColumns = ["userId"]
+            childColumns = ["creatorUserId"]
         )
     ],
-    indices = [Index(value = ["definingThemeId"]), Index(value = ["userId"])]
+    indices = [Index(value = ["definingThemeId"]), Index(value = ["creatorUserId"])]
 )
 data class Statement(
     @PrimaryKey

@@ -21,3 +21,5 @@ spring:
           uri: http://localhost:8040
           predicates:
             - Path=/api/v1/statements/**
+  kafka:
+    bootstrap-servers: localhost:9092
