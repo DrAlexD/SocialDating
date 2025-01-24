@@ -3,6 +3,7 @@ package xelagurd.socialdating.service
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import xelagurd.socialdating.dto.StatementReaction
+import xelagurd.socialdating.dto.StatementReactionType
 import xelagurd.socialdating.dto.UserDefiningTheme
 
 @Service
@@ -17,7 +18,17 @@ class KafkaStatementReactionConsumer(
             statementReaction.definingThemeId
         )
 
-        val diff = if (statementReaction.isSupportDefiningTheme) 5 else -5
+        var diff = when (statementReaction.reactionType) {
+            StatementReactionType.FULL_NO_MAINTAIN -> -10
+            StatementReactionType.PART_NO_MAINTAIN -> -5
+            StatementReactionType.NOT_SURE -> 0
+            StatementReactionType.PART_MAINTAIN -> 5
+            StatementReactionType.FULL_MAINTAIN -> 10
+        }
+
+        if (!statementReaction.isSupportDefiningTheme) {
+            diff = -diff
+        }
 
         if (userDefiningTheme != null) {
             userDefiningTheme.value = userDefiningTheme.value!! + diff
