@@ -88,16 +88,25 @@ class StatementsViewModel @Inject constructor(
 
                 val remoteDefiningThemes = remoteDefiningThemesRepository
                     .getDefiningThemes(listOf(categoryId))
-                localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
 
-                val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
-                val remoteStatements = remoteStatementsRepository
-                    .getStatements(remoteDefiningThemeIds)
+                if (remoteDefiningThemes.isNotEmpty()) {
+                    localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
 
-                if (remoteStatements.isNotEmpty()) {
-                    localStatementsRepository.insertStatements(remoteStatements)
+                    val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
+                    val remoteStatements = remoteStatementsRepository
+                        .getStatements(remoteDefiningThemeIds)
 
-                    dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+                    if (remoteStatements.isNotEmpty()) {
+                        localStatementsRepository.insertStatements(remoteStatements)
+
+                        dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+                    } else {
+                        dataRequestStatusFlow.update {
+                            RequestStatus.FAILURE(
+                                failureText = context.getString(R.string.no_data)
+                            )
+                        }
+                    }
                 } else {
                     dataRequestStatusFlow.update {
                         RequestStatus.FAILURE(
