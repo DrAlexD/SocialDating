@@ -5,9 +5,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import xelagurd.socialdating.dto.Category
-import xelagurd.socialdating.dto.UserCategory
 import xelagurd.socialdating.repository.CategoriesRepository
-import xelagurd.socialdating.repository.UserCategoriesRepository
 
 @Profile("!test")
 @Configuration
@@ -15,8 +13,7 @@ class DevelopmentConfig {
 
     @Bean
     fun dataLoader(
-        categoriesRepository: CategoriesRepository,
-        userCategoriesRepository: UserCategoriesRepository
+        categoriesRepository: CategoriesRepository
     ): CommandLineRunner {
         return CommandLineRunner {
             val categories = listOf(
@@ -43,12 +40,6 @@ class DevelopmentConfig {
             )
 
             categoriesRepository.saveAll(categories)
-
-            val userCategories = listOf(
-                UserCategory(interest = 10, userId = 1, categoryId = 1)
-            )
-
-            userCategoriesRepository.saveAll(userCategories)
         }
     }
 }
