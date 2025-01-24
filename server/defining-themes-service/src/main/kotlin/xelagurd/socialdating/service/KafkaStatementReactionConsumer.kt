@@ -10,7 +10,7 @@ class KafkaStatementReactionConsumer(
     private val userDefiningThemesService: UserDefiningThemesService
 ) {
 
-    @KafkaListener(topics = ["statement-reaction-to-user-category-topic"], groupId = "defining-themes-group")
+    @KafkaListener(topics = ["statement-reaction-to-user-defining-theme-topic"], groupId = "defining-themes-group")
     fun consumeData(statementReaction: StatementReaction) {
         var userDefiningTheme = userDefiningThemesService.getUserDefiningTheme(
             statementReaction.userOrUserCategoryId,
