@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 import xelagurd.socialdating.data.model.enums.StatementReactionType
 
 @Serializable
-data class StatementReaction(
+data class StatementReactionDetails(
     val userId: Int,
-    val statementId: Int,
+    val categoryId: Int,
     val reactionType: StatementReactionType
 )

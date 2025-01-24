@@ -22,13 +22,13 @@ class MicroserviceTest(@Autowired val restTemplate: TestRestTemplate) {
 
     private val statements = listOf(
         Statement(
-            id = 1, text = "RemoteStatement1", isSupportDefiningTheme = true, definingThemeId = 1, userId = userId
+            id = 1, text = "RemoteStatement1", isSupportDefiningTheme = true, definingThemeId = 1, creatorUserId = userId
         ),
         Statement(
-            id = 2, text = "RemoteStatement2", isSupportDefiningTheme = true, definingThemeId = 2, userId = userId
+            id = 2, text = "RemoteStatement2", isSupportDefiningTheme = true, definingThemeId = 2, creatorUserId = userId
         ),
         Statement(
-            id = 3, text = "RemoteStatement3", isSupportDefiningTheme = true, definingThemeId = 3, userId = userId
+            id = 3, text = "RemoteStatement3", isSupportDefiningTheme = true, definingThemeId = 3, creatorUserId = userId
         )
     )
 

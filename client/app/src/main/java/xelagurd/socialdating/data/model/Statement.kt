@@ -29,5 +29,5 @@ data class Statement(
     val text: String,
     val isSupportDefiningTheme: Boolean,
     val definingThemeId: Int,
-    val userId: Int
+    val creatorUserId: Int
 ) : DataEntity

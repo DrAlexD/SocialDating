@@ -26,7 +26,7 @@ import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
-import xelagurd.socialdating.data.model.additional.StatementReaction
+import xelagurd.socialdating.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
@@ -132,8 +132,9 @@ class StatementsViewModel @Inject constructor(
         if (currentUserId != null) {
             viewModelScope.launch {
                 try {
-                    remoteStatementsRepository.postStatementReaction(
-                        StatementReaction(currentUserId!!, statementId, reactionType)
+                    remoteStatementsRepository.addStatementReaction(
+                        statementId,
+                        StatementReactionDetails(currentUserId!!, categoryId, reactionType)
                     )
                 } catch (e: Exception) {
                     when (e) {

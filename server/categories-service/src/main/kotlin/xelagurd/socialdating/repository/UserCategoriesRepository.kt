@@ -5,4 +5,6 @@ import xelagurd.socialdating.dto.UserCategory
 
 interface UserCategoriesRepository : CrudRepository<UserCategory, Int> {
     fun findAllByUserId(userId: Int): Iterable<UserCategory>
+
+    fun findByUserIdAndCategoryId(userId: Int, categoryId: Int): UserCategory?
 }

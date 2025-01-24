@@ -45,9 +45,7 @@ class DevelopmentConfig {
             categoriesRepository.saveAll(categories)
 
             val userCategories = listOf(
-                UserCategory(interest = 10, userId = 1, categoryId = 1),
-                UserCategory(interest = 5, userId = 1, categoryId = 1),
-                UserCategory(interest = 30, userId = 1, categoryId = 1),
+                UserCategory(interest = 10, userId = 1, categoryId = 1)
             )
 
             userCategoriesRepository.saveAll(userCategories)

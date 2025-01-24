@@ -45,11 +45,7 @@ class DevelopmentConfig {
             definingThemesRepository.saveAll(definingThemes)
 
             val userDefiningThemes = listOf(
-                UserDefiningTheme(value = 17, interest = 10, userCategoryId = 1, definingThemeId = 1),
-                UserDefiningTheme(value = 89, interest = 5, userCategoryId = 1, definingThemeId = 2),
-                UserDefiningTheme(value = 12, interest = 30, userCategoryId = 1, definingThemeId = 3),
-                UserDefiningTheme(value = 57, interest = 15, userCategoryId = 2, definingThemeId = 4),
-                UserDefiningTheme(value = 15, interest = 50, userCategoryId = 3, definingThemeId = 5)
+                UserDefiningTheme(value = 17, interest = 10, userCategoryId = 1, definingThemeId = 1)
             )
 
             userDefiningThemesRepository.saveAll(userDefiningThemes)

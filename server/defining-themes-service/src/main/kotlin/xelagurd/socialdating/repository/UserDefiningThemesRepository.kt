@@ -5,4 +5,6 @@ import xelagurd.socialdating.dto.UserDefiningTheme
 
 interface UserDefiningThemesRepository : CrudRepository<UserDefiningTheme, Int> {
     fun findAllByUserCategoryIdIn(userCategoryIds: Iterable<Int>): Iterable<UserDefiningTheme>
+
+    fun findByUserCategoryIdAndDefiningThemeId(userCategoryId: Int, definingThemeId: Int): UserDefiningTheme?
 }
