@@ -5,9 +5,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import xelagurd.socialdating.dto.DefiningTheme
-import xelagurd.socialdating.dto.UserDefiningTheme
 import xelagurd.socialdating.repository.DefiningThemesRepository
-import xelagurd.socialdating.repository.UserDefiningThemesRepository
 
 @Profile("!test")
 @Configuration
@@ -15,8 +13,7 @@ class DevelopmentConfig {
 
     @Bean
     fun dataLoader(
-        definingThemesRepository: DefiningThemesRepository,
-        userDefiningThemesRepository: UserDefiningThemesRepository
+        definingThemesRepository: DefiningThemesRepository
     ): CommandLineRunner {
         return CommandLineRunner {
             val definingThemes = listOf(
@@ -43,16 +40,6 @@ class DevelopmentConfig {
             )
 
             definingThemesRepository.saveAll(definingThemes)
-
-            val userDefiningThemes = listOf(
-                UserDefiningTheme(value = 17, interest = 10, userCategoryId = 1, definingThemeId = 1),
-                UserDefiningTheme(value = 89, interest = 5, userCategoryId = 1, definingThemeId = 2),
-                UserDefiningTheme(value = 12, interest = 30, userCategoryId = 1, definingThemeId = 3),
-                UserDefiningTheme(value = 57, interest = 15, userCategoryId = 2, definingThemeId = 4),
-                UserDefiningTheme(value = 15, interest = 50, userCategoryId = 3, definingThemeId = 5)
-            )
-
-            userDefiningThemesRepository.saveAll(userDefiningThemes)
         }
     }
 }

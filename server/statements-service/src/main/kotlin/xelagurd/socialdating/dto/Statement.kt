@@ -13,7 +13,7 @@ class Statement(
     var text: String? = null,
     var isSupportDefiningTheme: Boolean? = null,
     var definingThemeId: Int? = null,
-    var userId: Int? = null
+    var creatorUserId: Int? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -25,7 +25,7 @@ class Statement(
         if (isSupportDefiningTheme != other.isSupportDefiningTheme) return false
         if (text != other.text) return false
         if (definingThemeId != other.definingThemeId) return false
-        if (userId != other.userId) return false
+        if (creatorUserId != other.creatorUserId) return false
 
         return true
     }
@@ -35,7 +35,7 @@ class Statement(
         result = 31 * result + (isSupportDefiningTheme?.hashCode() ?: 0)
         result = 31 * result + (text?.hashCode() ?: 0)
         result = 31 * result + (definingThemeId?.hashCode() ?: 0)
-        result = 31 * result + (userId?.hashCode() ?: 0)
+        result = 31 * result + (creatorUserId?.hashCode() ?: 0)
         return result
     }
 }

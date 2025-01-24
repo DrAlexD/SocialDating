@@ -9,6 +9,7 @@ springCloudGateway = "4.2.0"
 jacksonKotlin = "2.18.2"
 kotlinLogging = "7.0.3"
 h2database = "2.3.232"
+springKafka = "3.3.2"
 mockk = "1.13.16"
 
 [libraries]
@@ -25,6 +26,7 @@ spring-boot-data-jpa = { module = "org.springframework.boot:spring-boot-starter-
 spring-boot-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux", version.ref = "springBoot" }
 spring-cloud-gateway = { module = "org.springframework.cloud:spring-cloud-starter-gateway", version.ref = "springCloudGateway" }
 h2database = { module = "com.h2database:h2", version.ref = "h2database" }
+spring-kafka = { module = "org.springframework.kafka:spring-kafka", version.ref = "springKafka" }
 kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
 spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }

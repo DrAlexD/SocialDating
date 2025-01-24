@@ -26,7 +26,7 @@ import xelagurd.socialdating.R
 import xelagurd.socialdating.data.fake.FakeDataSource
 import xelagurd.socialdating.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.data.local.repository.LocalStatementsRepository
-import xelagurd.socialdating.data.model.additional.StatementReaction
+import xelagurd.socialdating.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.data.model.enums.StatementReactionType
 import xelagurd.socialdating.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.data.remote.repository.RemoteStatementsRepository
@@ -88,16 +88,25 @@ class StatementsViewModel @Inject constructor(
 
                 val remoteDefiningThemes = remoteDefiningThemesRepository
                     .getDefiningThemes(listOf(categoryId))
-                localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
 
-                val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
-                val remoteStatements = remoteStatementsRepository
-                    .getStatements(remoteDefiningThemeIds)
+                if (remoteDefiningThemes.isNotEmpty()) {
+                    localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
 
-                if (remoteStatements.isNotEmpty()) {
-                    localStatementsRepository.insertStatements(remoteStatements)
+                    val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
+                    val remoteStatements = remoteStatementsRepository
+                        .getStatements(remoteDefiningThemeIds)
 
-                    dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+                    if (remoteStatements.isNotEmpty()) {
+                        localStatementsRepository.insertStatements(remoteStatements)
+
+                        dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+                    } else {
+                        dataRequestStatusFlow.update {
+                            RequestStatus.FAILURE(
+                                failureText = context.getString(R.string.no_data)
+                            )
+                        }
+                    }
                 } else {
                     dataRequestStatusFlow.update {
                         RequestStatus.FAILURE(
@@ -132,8 +141,9 @@ class StatementsViewModel @Inject constructor(
         if (currentUserId != null) {
             viewModelScope.launch {
                 try {
-                    remoteStatementsRepository.postStatementReaction(
-                        StatementReaction(currentUserId!!, statementId, reactionType)
+                    remoteStatementsRepository.addStatementReaction(
+                        statementId,
+                        StatementReactionDetails(currentUserId!!, categoryId, reactionType)
                     )
                 } catch (e: Exception) {
                     when (e) {

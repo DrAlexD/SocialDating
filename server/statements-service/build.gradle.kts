@@ -20,6 +20,8 @@ dependencies {
 
     runtimeOnly(libs.h2database)
 
+    implementation(libs.spring.kafka)
+
     testImplementation(libs.kotlin.test.junit5)
     testImplementation(libs.spring.boot.test)
     testImplementation(libs.mockk)

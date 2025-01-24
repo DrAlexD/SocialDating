@@ -11,6 +11,6 @@ data class StatementDetails(
             text = text,
             isSupportDefiningTheme = isSupportDefiningTheme,
             definingThemeId = definingThemeId,
-            userId = userId
+            creatorUserId = userId
         )
 }

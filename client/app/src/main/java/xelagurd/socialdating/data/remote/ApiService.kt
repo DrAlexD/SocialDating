@@ -11,7 +11,7 @@ import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.UserCategory
 import xelagurd.socialdating.data.model.UserDefiningTheme
-import xelagurd.socialdating.data.model.additional.StatementReaction
+import xelagurd.socialdating.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.data.model.details.LoginDetails
 import xelagurd.socialdating.data.model.details.RegistrationDetails
 import xelagurd.socialdating.data.model.details.StatementDetails
@@ -44,6 +44,6 @@ interface ApiService {
     @POST("statements")
     suspend fun addStatement(@Body statementDetails: StatementDetails): Statement?
 
-    @POST("statements/reaction")
-    suspend fun postStatementReaction(@Body statementReaction: StatementReaction)
+    @POST("statements/{id}/reaction")
+    suspend fun addStatementReaction(@Path("id") statementId: Int, @Body statementReactionDetails: StatementReactionDetails)
 }

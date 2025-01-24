@@ -94,18 +94,28 @@ class ProfileStatisticsViewModel @Inject constructor(
 
                 val remoteUserCategories = remoteUserCategoriesRepository
                     .getUserCategories(userId)
-                localUserCategoriesRepository.insertUserCategories(remoteUserCategories)
 
-                val remoteUserCategoriesIds = remoteUserCategories.map { it.id }
-                val remoteUserDefiningThemes = remoteUserDefiningThemesRepository
-                    .getUserDefiningThemes(remoteUserCategoriesIds)
+                if (remoteUserCategories.isNotEmpty()) {
+                    localUserCategoriesRepository.insertUserCategories(remoteUserCategories)
 
-                if (remoteUserDefiningThemes.isNotEmpty()) {
-                    localUserDefiningThemesRepository.insertUserDefiningThemes(
-                        remoteUserDefiningThemes
-                    )
+                    val remoteUserCategoriesIds = remoteUserCategories.map { it.id }
 
-                    dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+                    val remoteUserDefiningThemes = remoteUserDefiningThemesRepository
+                        .getUserDefiningThemes(remoteUserCategoriesIds)
+
+                    if (remoteUserDefiningThemes.isNotEmpty()) {
+                        localUserDefiningThemesRepository.insertUserDefiningThemes(
+                            remoteUserDefiningThemes
+                        )
+
+                        dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+                    } else {
+                        dataRequestStatusFlow.update {
+                            RequestStatus.FAILURE(
+                                failureText = context.getString(R.string.no_data)
+                            )
+                        }
+                    }
                 } else {
                     dataRequestStatusFlow.update {
                         RequestStatus.FAILURE(

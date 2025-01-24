@@ -7,7 +7,7 @@ import xelagurd.socialdating.data.model.Statement
 import xelagurd.socialdating.data.model.User
 import xelagurd.socialdating.data.model.UserCategory
 import xelagurd.socialdating.data.model.UserDefiningTheme
-import xelagurd.socialdating.data.model.additional.StatementReaction
+import xelagurd.socialdating.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.data.model.details.LoginDetails
 import xelagurd.socialdating.data.model.details.RegistrationDetails
 import xelagurd.socialdating.data.model.details.StatementDetails
@@ -40,5 +40,5 @@ class FakeApiService : ApiService {
     override suspend fun addStatement(statementDetails: StatementDetails): Statement? =
         FakeDataSource.newStatement
 
-    override suspend fun postStatementReaction(statementReaction: StatementReaction) {}
+    override suspend fun addStatementReaction(statementId: Int, statementReactionDetails: StatementReactionDetails) {}
 }
