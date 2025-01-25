@@ -5,8 +5,10 @@ spring:
   application:
     name: categories-service
   datasource:
-    generate-unique-name: false
-    name: categories-service
+    url: jdbc:postgresql://localhost:5433/categories_db
+    username: categories_user
+    password: categories_password
+    driver-class-name: org.postgresql.Driver
   jpa:
     defer-datasource-initialization: true
     hibernate:

@@ -24,3 +24,53 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  postgres-users-service:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: users_db
+      POSTGRES_USER: users_user
+      POSTGRES_PASSWORD: users_password
+    volumes:
+      - postgres-users-data:/var/lib/postgresql/data
+
+  postgres-categories-service:
+    image: postgres:latest
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: categories_db
+      POSTGRES_USER: categories_user
+      POSTGRES_PASSWORD: categories_password
+    volumes:
+      - postgres-categories-data:/var/lib/postgresql/data
+
+  postgres-defining-themes-service:
+    image: postgres:latest
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: defining_themes_db
+      POSTGRES_USER: defining_themes_user
+      POSTGRES_PASSWORD: defining_themes_password
+    volumes:
+      - postgres-defining-themes-data:/var/lib/postgresql/data
+
+  postgres-statements-service:
+    image: postgres:latest
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: statements_db
+      POSTGRES_USER: statements_user
+      POSTGRES_PASSWORD: statements_password
+    volumes:
+      - postgres-statements-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-users-data:
+  postgres-categories-data:
+  postgres-defining-themes-data:
+  postgres-statements-data:

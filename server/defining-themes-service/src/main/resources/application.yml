@@ -5,8 +5,10 @@ spring:
   application:
     name: defining-themes-service
   datasource:
-    generate-unique-name: false
-    name: defining-themes-service
+    url: jdbc:postgresql://localhost:5434/defining_themes_db
+    username: defining_themes_user
+    password: defining_themes_password
+    driver-class-name: org.postgresql.Driver
   jpa:
     defer-datasource-initialization: true
     hibernate:

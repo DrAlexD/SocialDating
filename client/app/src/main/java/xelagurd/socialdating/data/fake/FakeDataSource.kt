@@ -80,8 +80,6 @@ object FakeDataSource {
         Statement(20, "Statement20", true, 5, 1),
     )
 
-    val newStatement = Statement(21, "NewStatement21", true, 1, 1)
-
     val users = listOf(
         User(
             1, "Alexander", Gender.MALE, "username1", "password1", "email1@gmail.com",
@@ -96,6 +94,8 @@ object FakeDataSource {
             "Moscow", Purpose.RELATIONSHIPS, 50
         ),
     )
+
+    val newStatement = Statement(21, "NewStatement21", true, 1, 1)
 
     val userCategories = listOf(
         UserCategory(1, 10, 1, 1),
