@@ -18,21 +18,47 @@ class DevelopmentConfig {
         usersRepository: UsersRepository
     ): CommandLineRunner {
         return CommandLineRunner {
-            val users = listOf(
-                User(
-                    name = "Alexander",
-                    gender = Gender.MALE,
-                    username = "username1",
-                    password = "password1",
-                    email = "email1@gmail.com",
-                    age = 25,
-                    city = "Moscow",
-                    purpose = Purpose.ALL_AT_ONCE,
-                    activity = 50
-                )
-            )
+            val existingUsers = usersRepository.findAll().toList()
 
-            usersRepository.saveAll(users)
+            if (existingUsers.isEmpty()) {
+                val users = listOf(
+                    User(
+                        name = "Alexander",
+                        gender = Gender.MALE,
+                        username = "username1",
+                        password = "password1",
+                        email = "email1@gmail.com",
+                        age = 25,
+                        city = "Moscow",
+                        purpose = Purpose.ALL_AT_ONCE,
+                        activity = 50
+                    ),
+                    User(
+                        name = "Denis",
+                        gender = Gender.MALE,
+                        username = "username2",
+                        password = "password2",
+                        email = "email2@gmail.com",
+                        age = 27,
+                        city = "St. Petersburg",
+                        purpose = Purpose.FRIENDS,
+                        activity = 50
+                    ),
+                    User(
+                        name = "Andrey",
+                        gender = Gender.MALE,
+                        username = "username3",
+                        password = "password3",
+                        email = "email3@gmail.com",
+                        age = 28,
+                        city = "Moscow",
+                        purpose = Purpose.RELATIONSHIPS,
+                        activity = 50
+                    ),
+                )
+
+                usersRepository.saveAll(users)
+            }
         }
     }
 }

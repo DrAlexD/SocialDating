@@ -5,8 +5,10 @@ spring:
   application:
     name: statements-service
   datasource:
-    generate-unique-name: false
-    name: statements-service
+    url: jdbc:postgresql://localhost:5435/statements_db
+    username: statements_user
+    password: statements_password
+    driver-class-name: org.postgresql.Driver
   jpa:
     defer-datasource-initialization: true
     hibernate:

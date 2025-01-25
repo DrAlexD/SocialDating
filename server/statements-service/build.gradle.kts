@@ -18,10 +18,11 @@ dependencies {
     developmentOnly(libs.spring.boot.devtools)
     implementation(libs.bundles.spring.ecosystem)
 
-    runtimeOnly(libs.h2database)
+    runtimeOnly(libs.postgresql)
 
     implementation(libs.spring.kafka)
 
+    testImplementation(libs.h2database)
     testImplementation(libs.kotlin.test.junit5)
     testImplementation(libs.spring.boot.test)
     testImplementation(libs.mockk)
