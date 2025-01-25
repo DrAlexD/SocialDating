@@ -16,6 +16,9 @@ class StatementsServiceUnitTest {
     @MockK
     private lateinit var statementsRepository: StatementsRepository
 
+    @MockK
+    private lateinit var kafkaProducer: KafkaStatementReactionProducer
+
     @InjectMockKs
     private lateinit var statementsService: StatementsService
 
