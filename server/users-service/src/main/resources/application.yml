@@ -5,9 +5,7 @@ spring:
   application:
     name: users-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/users_db
-    username: users_user
-    password: users_password
+    url: jdbc:postgresql://postgres-users-service:5432/users_db
     driver-class-name: org.postgresql.Driver
   jpa:
     defer-datasource-initialization: true

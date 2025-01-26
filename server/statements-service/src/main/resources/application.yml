@@ -5,9 +5,7 @@ spring:
   application:
     name: statements-service
   datasource:
-    url: jdbc:postgresql://localhost:5435/statements_db
-    username: statements_user
-    password: statements_password
+    url: jdbc:postgresql://postgres-statements-service:5432/statements_db
     driver-class-name: org.postgresql.Driver
   jpa:
     defer-datasource-initialization: true
@@ -17,7 +15,7 @@ spring:
     init:
       mode: always
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
