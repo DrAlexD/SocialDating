@@ -5,9 +5,7 @@ spring:
   application:
     name: categories-service
   datasource:
-    url: jdbc:postgresql://localhost:5433/categories_db
-    username: categories_user
-    password: categories_password
+    url: jdbc:postgresql://postgres-categories-service:5432/categories_db
     driver-class-name: org.postgresql.Driver
   jpa:
     defer-datasource-initialization: true
@@ -17,7 +15,7 @@ spring:
     init:
       mode: always
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     consumer:
       group-id: categories-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer

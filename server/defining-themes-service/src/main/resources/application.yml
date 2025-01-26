@@ -5,9 +5,7 @@ spring:
   application:
     name: defining-themes-service
   datasource:
-    url: jdbc:postgresql://localhost:5434/defining_themes_db
-    username: defining_themes_user
-    password: defining_themes_password
+    url: jdbc:postgresql://postgres-defining-themes-service:5432/defining_themes_db
     driver-class-name: org.postgresql.Driver
   jpa:
     defer-datasource-initialization: true
@@ -17,7 +15,7 @@ spring:
     init:
       mode: always
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     consumer:
       group-id: defining-themes-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer

@@ -17,7 +17,7 @@ import kotlin.test.assertEquals
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class MicroserviceTest(@Autowired val restTemplate: TestRestTemplate) {
+class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) {
 
     private val categoryId = 1
     private val categoryIds = listOf(1, 3)

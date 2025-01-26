@@ -4,8 +4,6 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
-    ports:
-      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
 
@@ -13,15 +11,12 @@ services:
     image: confluentinc/cp-kafka:7.4.4
     depends_on:
       - zookeeper
-    ports:
-      - "9092:9092"
-      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
@@ -31,8 +26,8 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_DB: users_db
-      POSTGRES_USER: users_user
-      POSTGRES_PASSWORD: users_password
+      POSTGRES_USER: ${POSTGRES_USERS_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_USERS_PASSWORD}
     volumes:
       - postgres-users-data:/var/lib/postgresql/data
 
@@ -42,8 +37,8 @@ services:
       - "5433:5432"
     environment:
       POSTGRES_DB: categories_db
-      POSTGRES_USER: categories_user
-      POSTGRES_PASSWORD: categories_password
+      POSTGRES_USER: ${POSTGRES_CATEGORIES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_CATEGORIES_PASSWORD}
     volumes:
       - postgres-categories-data:/var/lib/postgresql/data
 
@@ -53,8 +48,8 @@ services:
       - "5434:5432"
     environment:
       POSTGRES_DB: defining_themes_db
-      POSTGRES_USER: defining_themes_user
-      POSTGRES_PASSWORD: defining_themes_password
+      POSTGRES_USER: ${POSTGRES_DEFINING_THEMES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_DEFINING_THEMES_PASSWORD}
     volumes:
       - postgres-defining-themes-data:/var/lib/postgresql/data
 
@@ -64,10 +59,61 @@ services:
       - "5435:5432"
     environment:
       POSTGRES_DB: statements_db
-      POSTGRES_USER: statements_user
-      POSTGRES_PASSWORD: statements_password
+      POSTGRES_USER: ${POSTGRES_STATEMENTS_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_STATEMENTS_PASSWORD}
     volumes:
       - postgres-statements-data:/var/lib/postgresql/data
+
+  gateway-service:
+    depends_on:
+      - kafka
+    build:
+      context: ./gateway-service
+    ports:
+      - "8080:8080"
+
+  users-service:
+    depends_on:
+      - postgres-users-service
+      - gateway-service
+    environment:
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERS_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_USERS_PASSWORD}
+    build:
+      context: ./users-service
+
+  categories-service:
+    depends_on:
+      - kafka
+      - postgres-categories-service
+      - gateway-service
+    environment:
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_CATEGORIES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_CATEGORIES_PASSWORD}
+    build:
+      context: ./categories-service
+
+  defining-themes-service:
+    depends_on:
+      - kafka
+      - postgres-defining-themes-service
+      - gateway-service
+    environment:
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_DEFINING_THEMES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_DEFINING_THEMES_PASSWORD}
+    build:
+      context: ./defining-themes-service
+
+  statements-service:
+    depends_on:
+      - kafka
+      - postgres-statements-service
+      - gateway-service
+    environment:
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_STATEMENTS_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_STATEMENTS_PASSWORD}
+    build:
+      context: ./statements-service
 
 volumes:
   postgres-users-data:
