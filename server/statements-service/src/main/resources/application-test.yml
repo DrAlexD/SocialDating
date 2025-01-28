@@ -8,5 +8,3 @@ spring:
   sql:
     init:
       mode: never
-  kafka:
-    bootstrap-servers: localhost:9092 # TODO: remove after implementing tests in docker
