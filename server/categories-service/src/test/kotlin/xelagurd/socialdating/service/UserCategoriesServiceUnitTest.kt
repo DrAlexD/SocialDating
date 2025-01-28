@@ -20,6 +20,7 @@ class UserCategoriesServiceUnitTest {
     private lateinit var userCategoriesService: UserCategoriesService
 
     private val userId = 1
+    private val categoryId = 1
 
     private val userCategories = listOf(
         UserCategory(id = 1, interest = 10, userId = 1, categoryId = 1),
@@ -35,8 +36,21 @@ class UserCategoriesServiceUnitTest {
     }
 
     @Test
+    fun getUserCategory() {
+        val expected = userCategories.filter { it.userId == userId && it.categoryId == categoryId }
+
+        assertEquals(expected.size, 1)
+
+        every { userCategoriesRepository.findByUserIdAndCategoryId(userId, categoryId) } returns expected[0]
+
+        val result = userCategoriesService.getUserCategory(userId, categoryId)
+
+        assertEquals(expected[0], result)
+    }
+
+    @Test
     fun getUserCategories() {
-        val expected = userCategories.filter { it.id == userId }
+        val expected = userCategories.filter { it.userId == userId }
         every { userCategoriesRepository.findAllByUserId(userId) } returns expected
 
         val result = userCategoriesService.getUserCategories(userId)

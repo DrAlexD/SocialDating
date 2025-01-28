@@ -19,6 +19,8 @@ class UserDefiningThemesServiceUnitTest {
     @InjectMockKs
     private lateinit var userDefiningThemesService: UserDefiningThemesService
 
+    private val userCategoryId = 1
+    private val definingThemeId = 1
     private val userCategoryIds = listOf(1, 3)
 
     private val userDefiningThemes = listOf(
@@ -32,6 +34,25 @@ class UserDefiningThemesServiceUnitTest {
     @BeforeEach
     fun setup() {
         MockKAnnotations.init(this)
+    }
+
+    @Test
+    fun getUserDefiningTheme() {
+        val expected = userDefiningThemes
+            .filter { it.userCategoryId == userCategoryId && it.definingThemeId == definingThemeId }
+
+        assertEquals(expected.size, 1)
+
+        every {
+            userDefiningThemesRepository.findByUserCategoryIdAndDefiningThemeId(
+                userCategoryId,
+                definingThemeId
+            )
+        } returns expected[0]
+
+        val result = userDefiningThemesService.getUserDefiningTheme(userCategoryId, definingThemeId)
+
+        assertEquals(expected[0], result)
     }
 
     @Test

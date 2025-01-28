@@ -34,7 +34,7 @@ class UserCategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
 
     @Test
     fun getUserCategories() {
-        val expected = userCategories.filter { it.id == userId }
+        val expected = userCategories.filter { it.userId == userId }
         `when`(userCategoriesService.getUserCategories(userId)).thenReturn(expected)
 
         mockMvc.perform(

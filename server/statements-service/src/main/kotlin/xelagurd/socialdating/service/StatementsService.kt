@@ -10,7 +10,7 @@ import xelagurd.socialdating.repository.StatementsRepository
 @Service
 class StatementsService(
     private val statementsRepository: StatementsRepository,
-    private val kafkaProducer: KafkaStatementReactionProducer
+    private val kafkaProducer: StatementsKafkaProducer
 ) {
 
     fun getStatement(statementId: Int): Statement? {
@@ -25,16 +25,16 @@ class StatementsService(
         return statementsRepository.save(statementDetails.toStatement())
     }
 
-    fun addStatementReaction(statementId: Int, statementReactionfdsf: StatementReactionDetails) {
+    fun addStatementReaction(statementId: Int, statementReactionDetails: StatementReactionDetails) {
         val statement = this.getStatement(statementId)
 
         statement?.let {
-            val statementReactionDetails = statementReactionfdsf.toStatementReaction(
+            val statementReaction = statementReactionDetails.toStatementReaction(
                 it.definingThemeId!!,
                 it.isSupportDefiningTheme!!
             )
 
-            kafkaProducer.sendStatementReaction(statementReactionDetails)
+            kafkaProducer.sendStatementReaction(statementReaction)
         }
     }
 }

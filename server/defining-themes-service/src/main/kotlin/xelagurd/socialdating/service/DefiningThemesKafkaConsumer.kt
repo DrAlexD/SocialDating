@@ -1,18 +1,20 @@
 package xelagurd.socialdating.service
 
+import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import xelagurd.socialdating.dto.StatementReaction
 import xelagurd.socialdating.dto.StatementReactionType
 import xelagurd.socialdating.dto.UserDefiningTheme
 
+@Profile("!test")
 @Service
-class KafkaStatementReactionConsumer(
+class DefiningThemesKafkaConsumer(
     private val userDefiningThemesService: UserDefiningThemesService
 ) {
 
     @KafkaListener(topics = ["statement-reaction-to-user-defining-theme-topic"], groupId = "defining-themes-group")
-    fun consumeData(statementReaction: StatementReaction) {
+    fun consumeStatementReaction(statementReaction: StatementReaction) {
         var userDefiningTheme = userDefiningThemesService.getUserDefiningTheme(
             statementReaction.userOrUserCategoryId,
             statementReaction.definingThemeId
