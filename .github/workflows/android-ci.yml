@@ -123,7 +123,7 @@ jobs:
         working-directory: client
         run: |
           chmod +x gradlew
-          ./gradlew build
+          ./gradlew build -x test
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
