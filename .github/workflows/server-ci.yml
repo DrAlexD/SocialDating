@@ -10,6 +10,9 @@ jobs:
   unit-tests:
     name: Run Unit tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
 
     steps:
       - name: Checkout sources
@@ -25,17 +28,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run Unit tests
-        working-directory: server
         run: |
           chmod +x gradlew
           ./gradlew test
-
-      - name: Upload Unit tests report
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit_tests_report
-          path: server/buildSrc/build/reports/tests/testDebugUnitTest/
 
   integration-tests:
     name: Run Integration tests
@@ -67,7 +62,6 @@ jobs:
           echo "POSTGRES_STATEMENTS_PASSWORD=${{ secrets.POSTGRES_STATEMENTS_PASSWORD }}" >> .env
 
       - name: Build with Gradle
-        working-directory: server
         run: |
           chmod +x gradlew
           ./gradlew build -x test

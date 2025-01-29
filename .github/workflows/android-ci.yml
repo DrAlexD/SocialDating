@@ -10,6 +10,9 @@ jobs:
   unit-tests:
     name: Run Unit tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
 
     steps:
       - name: Checkout sources
@@ -25,7 +28,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run Unit tests
-        working-directory: client
         run: |
           chmod +x gradlew
           ./gradlew test
@@ -89,7 +91,6 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          working-directory: client
           script: |
             chmod +x gradlew
             ./gradlew connectedAndroidTest
@@ -120,7 +121,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle
-        working-directory: client
         run: |
           chmod +x gradlew
           ./gradlew build -x test
