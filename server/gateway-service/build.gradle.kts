@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.kotlin.logging)
 
     developmentOnly(libs.spring.boot.devtools)
+    implementation(libs.spring.boot.actuator)
 
     implementation(libs.spring.boot.webflux)
     implementation(libs.spring.cloud.gateway)

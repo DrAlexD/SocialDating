@@ -1,11 +1,15 @@
-version: '2'
-
 services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+    healthcheck:
+      test: nc -z 127.0.0.1 2181 || exit -1
+      retries: 5
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
@@ -19,6 +23,12 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: kafka-topics --bootstrap-server localhost:9092 --list
+      retries: 5
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
 
   postgres-users-service:
     image: postgres:latest
@@ -28,6 +38,12 @@ services:
       POSTGRES_DB: users_db
       POSTGRES_USER: ${POSTGRES_USERS_USER}
       POSTGRES_PASSWORD: ${POSTGRES_USERS_PASSWORD}
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_USERS_USER} -d users_db
+      retries: 5
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
     volumes:
       - postgres-users-data:/var/lib/postgresql/data
 
@@ -39,6 +55,12 @@ services:
       POSTGRES_DB: categories_db
       POSTGRES_USER: ${POSTGRES_CATEGORIES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_CATEGORIES_PASSWORD}
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_CATEGORIES_USER} -d categories_db
+      retries: 5
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
     volumes:
       - postgres-categories-data:/var/lib/postgresql/data
 
@@ -50,6 +72,12 @@ services:
       POSTGRES_DB: defining_themes_db
       POSTGRES_USER: ${POSTGRES_DEFINING_THEMES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_DEFINING_THEMES_PASSWORD}
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_DEFINING_THEMES_USER} -d defining_themes_db
+      retries: 5
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
     volumes:
       - postgres-defining-themes-data:/var/lib/postgresql/data
 
@@ -61,6 +89,12 @@ services:
       POSTGRES_DB: statements_db
       POSTGRES_USER: ${POSTGRES_STATEMENTS_USER}
       POSTGRES_PASSWORD: ${POSTGRES_STATEMENTS_PASSWORD}
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_STATEMENTS_USER} -d statements_db
+      retries: 5
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
     volumes:
       - postgres-statements-data:/var/lib/postgresql/data
 
@@ -71,6 +105,12 @@ services:
       context: ./gateway-service
     ports:
       - "8080:8080"
+    healthcheck:
+      test: curl -f http://localhost:8080/actuator/health
+      retries: 5
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
 
   users-service:
     depends_on:
@@ -81,6 +121,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_USERS_PASSWORD}
     build:
       context: ./users-service
+    healthcheck:
+      test: curl -f http://localhost:8010/actuator/health
+      retries: 5
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
 
   categories-service:
     depends_on:
@@ -92,6 +138,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_CATEGORIES_PASSWORD}
     build:
       context: ./categories-service
+    healthcheck:
+      test: curl -f http://localhost:8020/actuator/health
+      retries: 5
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
 
   defining-themes-service:
     depends_on:
@@ -103,6 +155,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_DEFINING_THEMES_PASSWORD}
     build:
       context: ./defining-themes-service
+    healthcheck:
+      test: curl -f http://localhost:8030/actuator/health
+      retries: 5
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
 
   statements-service:
     depends_on:
@@ -114,6 +172,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_STATEMENTS_PASSWORD}
     build:
       context: ./statements-service
+    healthcheck:
+      test: curl -f http://localhost:8040/actuator/health
+      retries: 5
+      interval: 10s
+      start_period: 30s
+      timeout: 5s
 
 volumes:
   postgres-users-data:
