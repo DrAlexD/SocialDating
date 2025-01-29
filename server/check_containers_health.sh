@@ -1,13 +1,17 @@
 #!/bin/bash
 
-MAX_WAIT_TIME=300
 INTERVAL=5
 
-ELAPSED_TIME=0
+while true; do
+  TOTAL_COUNT=$(docker ps -a --format "{{.Names}}" | wc -l)
+  HEALTHY_COUNT=$(docker ps -a --filter "health=healthy" --format "{{.Names}}" | wc -l)
+  UNHEALTHY_COUNT=$(docker ps -a --filter "health=unhealthy" --filter "status=exited" --filter "status=dead" --format "{{.Names}}" | wc -l)
 
-while [ "$ELAPSED_TIME" -lt "$MAX_WAIT_TIME" ]; do
-  HEALTHY_COUNT=$(docker ps --filter "health=healthy" --format "{{.Names}}" | wc -l)
-  TOTAL_COUNT=$(docker ps --format "{{.Names}}" | wc -l)
+  if [ "$UNHEALTHY_COUNT" -gt 0 ]; then
+    echo "Error: At least one service has failed! ($UNHEALTHY_COUNT unhealthy/exited/dead)"
+    docker ps -a --filter "health=unhealthy" --filter "status=exited" --filter "status=dead"
+    exit 1
+  fi
 
   if [ "$HEALTHY_COUNT" -eq "$TOTAL_COUNT" ]; then
     echo "All services are healthy!"
@@ -16,9 +20,5 @@ while [ "$ELAPSED_TIME" -lt "$MAX_WAIT_TIME" ]; do
     echo "Waiting for services to become healthy ($HEALTHY_COUNT/$TOTAL_COUNT)..."
   fi
 
-  ELAPSED_TIME=$((ELAPSED_TIME + INTERVAL))
-  sleep INTERVAL
+  sleep "$INTERVAL"
 done
-
-echo "Timeout reached: Services are not healthy after $MAX_WAIT_TIME seconds."
-exit 1
