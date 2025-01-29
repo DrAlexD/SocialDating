@@ -109,7 +109,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: ${{ github.event_name != 'pull_request' }}
-          context: ./${{ matrix.service }}
+          context: server/${{ matrix.service }}
           tags: xelagurd/${{ matrix.service }}:latest
           cache-from: type=registry,ref=xelagurd/${{ matrix.service }}:latest
           cache-to: type=inline
