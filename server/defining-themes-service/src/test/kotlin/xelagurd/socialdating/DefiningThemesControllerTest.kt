@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -14,8 +14,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import xelagurd.socialdating.controller.DefiningThemesController
 import xelagurd.socialdating.dto.DefiningTheme
 import xelagurd.socialdating.dto.DefiningThemeDetails
-import xelagurd.socialdating.service.TestUtils.convertObjectToJsonString
-import xelagurd.socialdating.service.TestUtils.toRequestParams
+import xelagurd.socialdating.TestUtils.convertObjectToJsonString
+import xelagurd.socialdating.TestUtils.toRequestParams
+import xelagurd.socialdating.service.DefiningThemesService
 
 @WebMvcTest(DefiningThemesController::class)
 class DefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) {

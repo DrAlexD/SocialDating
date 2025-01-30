@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -16,6 +16,8 @@ import xelagurd.socialdating.dto.StatementDetails
 import xelagurd.socialdating.dto.StatementReactionDetails
 import xelagurd.socialdating.dto.StatementReactionType
 import xelagurd.socialdating.repository.StatementsRepository
+import xelagurd.socialdating.service.StatementsKafkaProducer
+import xelagurd.socialdating.service.StatementsService
 
 class StatementsServiceUnitTest {
 

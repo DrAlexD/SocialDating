@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -13,13 +13,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import xelagurd.socialdating.TestUtils.toRequestParams
 import xelagurd.socialdating.controller.StatementsController
 import xelagurd.socialdating.dto.Statement
 import xelagurd.socialdating.dto.StatementDetails
 import xelagurd.socialdating.dto.StatementReactionDetails
 import xelagurd.socialdating.dto.StatementReactionType
-import xelagurd.socialdating.service.TestUtils.convertObjectToJsonString
-import xelagurd.socialdating.service.TestUtils.toRequestParams
+import xelagurd.socialdating.service.StatementsService
 
 @WebMvcTest(StatementsController::class)
 class StatementsControllerTest(@Autowired private val mockMvc: MockMvc) {
@@ -79,7 +79,7 @@ class StatementsControllerTest(@Autowired private val mockMvc: MockMvc) {
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
+            .andExpect(content().json(TestUtils.convertObjectToJsonString(expected)))
     }
 
     @Test
@@ -90,11 +90,11 @@ class StatementsControllerTest(@Autowired private val mockMvc: MockMvc) {
         mockMvc.perform(
             post("/api/v1/statements")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(statementDetails))
+                .content(TestUtils.convertObjectToJsonString(statementDetails))
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
+            .andExpect(content().json(TestUtils.convertObjectToJsonString(expected)))
     }
 
     @Test
@@ -106,7 +106,7 @@ class StatementsControllerTest(@Autowired private val mockMvc: MockMvc) {
         mockMvc.perform(
             post("/api/v1/statements/$statementId/reaction")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(statementReactionDetails))
+                .content(TestUtils.convertObjectToJsonString(statementReactionDetails))
         )
             .andExpect(status().isOk)
 

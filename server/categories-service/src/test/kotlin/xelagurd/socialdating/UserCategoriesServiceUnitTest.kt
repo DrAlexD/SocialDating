@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import xelagurd.socialdating.dto.UserCategory
 import xelagurd.socialdating.dto.UserCategoryDetails
 import xelagurd.socialdating.repository.UserCategoriesRepository
+import xelagurd.socialdating.service.UserCategoriesService
 
 class UserCategoriesServiceUnitTest {
 

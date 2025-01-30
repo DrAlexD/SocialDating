@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -7,9 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
+import xelagurd.socialdating.TestUtils.toRequestParams
 import xelagurd.socialdating.dto.Statement
 import xelagurd.socialdating.dto.StatementDetails
-import xelagurd.socialdating.service.TestUtils.toRequestParams
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 

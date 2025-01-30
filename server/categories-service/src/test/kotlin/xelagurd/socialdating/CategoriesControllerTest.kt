@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import xelagurd.socialdating.controller.CategoriesController
 import xelagurd.socialdating.dto.Category
 import xelagurd.socialdating.dto.CategoryDetails
-import xelagurd.socialdating.service.TestUtils.convertObjectToJsonString
+import xelagurd.socialdating.service.CategoriesService
 
 @WebMvcTest(CategoriesController::class)
 class CategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
@@ -39,7 +39,7 @@ class CategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
+            .andExpect(content().json(TestUtils.convertObjectToJsonString(expected)))
     }
 
     @Test
@@ -50,10 +50,10 @@ class CategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
         mockMvc.perform(
             post("/api/v1/categories")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(categoryDetails))
+                .content(TestUtils.convertObjectToJsonString(categoryDetails))
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
+            .andExpect(content().json(TestUtils.convertObjectToJsonString(expected)))
     }
 }

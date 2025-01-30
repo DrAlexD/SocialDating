@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
