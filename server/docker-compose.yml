@@ -8,17 +8,17 @@ services:
       test: nc -z 127.0.0.1 2181 || exit -1
       retries: 5
       interval: 10s
-      start_period: 30s
+      start_period: 10s
       timeout: 5s
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
@@ -27,7 +27,7 @@ services:
       test: kafka-topics --bootstrap-server localhost:9092 --list
       retries: 5
       interval: 10s
-      start_period: 30s
+      start_period: 10s
       timeout: 5s
 
   postgres-users-service:
@@ -42,7 +42,7 @@ services:
       test: pg_isready -U ${POSTGRES_USERS_USER} -d users_db
       retries: 5
       interval: 10s
-      start_period: 30s
+      start_period: 10s
       timeout: 5s
     volumes:
       - postgres-users-data:/var/lib/postgresql/data
@@ -59,7 +59,7 @@ services:
       test: pg_isready -U ${POSTGRES_CATEGORIES_USER} -d categories_db
       retries: 5
       interval: 10s
-      start_period: 30s
+      start_period: 10s
       timeout: 5s
     volumes:
       - postgres-categories-data:/var/lib/postgresql/data
@@ -76,7 +76,7 @@ services:
       test: pg_isready -U ${POSTGRES_DEFINING_THEMES_USER} -d defining_themes_db
       retries: 5
       interval: 10s
-      start_period: 30s
+      start_period: 10s
       timeout: 5s
     volumes:
       - postgres-defining-themes-data:/var/lib/postgresql/data
@@ -93,14 +93,15 @@ services:
       test: pg_isready -U ${POSTGRES_STATEMENTS_USER} -d statements_db
       retries: 5
       interval: 10s
-      start_period: 30s
+      start_period: 10s
       timeout: 5s
     volumes:
       - postgres-statements-data:/var/lib/postgresql/data
 
   gateway-service:
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
     build:
       context: ./gateway-service
     ports:
@@ -109,13 +110,15 @@ services:
       test: curl -f http://localhost:8080/actuator/health
       retries: 5
       interval: 10s
-      start_period: 30s
+      start_period: 10s
       timeout: 5s
 
   users-service:
     depends_on:
-      - postgres-users-service
-      - gateway-service
+      postgres-users-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERS_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_USERS_PASSWORD}
@@ -125,14 +128,17 @@ services:
       test: curl -f http://localhost:8010/actuator/health
       retries: 5
       interval: 10s
-      start_period: 30s
+      start_period: 10s
       timeout: 5s
 
   categories-service:
     depends_on:
-      - kafka
-      - postgres-categories-service
-      - gateway-service
+      kafka:
+        condition: service_healthy
+      postgres-categories-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_CATEGORIES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_CATEGORIES_PASSWORD}
@@ -142,14 +148,17 @@ services:
       test: curl -f http://localhost:8020/actuator/health
       retries: 5
       interval: 10s
-      start_period: 30s
+      start_period: 10s
       timeout: 5s
 
   defining-themes-service:
     depends_on:
-      - kafka
-      - postgres-defining-themes-service
-      - gateway-service
+      kafka:
+        condition: service_healthy
+      postgres-defining-themes-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_DEFINING_THEMES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_DEFINING_THEMES_PASSWORD}
@@ -159,14 +168,17 @@ services:
       test: curl -f http://localhost:8030/actuator/health
       retries: 5
       interval: 10s
-      start_period: 30s
+      start_period: 10s
       timeout: 5s
 
   statements-service:
     depends_on:
-      - kafka
-      - postgres-statements-service
-      - gateway-service
+      kafka:
+        condition: service_healthy
+      postgres-statements-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_STATEMENTS_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_STATEMENTS_PASSWORD}
@@ -176,7 +188,7 @@ services:
       test: curl -f http://localhost:8040/actuator/health
       retries: 5
       interval: 10s
-      start_period: 30s
+      start_period: 10s
       timeout: 5s
 
 volumes:
