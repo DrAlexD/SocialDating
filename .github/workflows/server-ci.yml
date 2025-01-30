@@ -86,6 +86,11 @@ jobs:
           chmod +x check_containers_health.sh
           ./check_containers_health.sh
 
+      - name: Run Integration tests
+        run: |
+          chmod +x gradlew
+          ./gradlew integrationTest
+
       - name: Tear Down
         if: always()
         run: docker compose down
