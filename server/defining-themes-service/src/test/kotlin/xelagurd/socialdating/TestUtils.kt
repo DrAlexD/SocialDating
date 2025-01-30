@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 

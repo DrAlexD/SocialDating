@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test
 import xelagurd.socialdating.dto.StatementReaction
 import xelagurd.socialdating.dto.StatementReactionType
 import xelagurd.socialdating.dto.UserDefiningTheme
+import xelagurd.socialdating.service.DefiningThemesKafkaConsumer
+import xelagurd.socialdating.service.UserDefiningThemesService
 
 class DefiningThemesKafkaConsumerUnitTest {
 

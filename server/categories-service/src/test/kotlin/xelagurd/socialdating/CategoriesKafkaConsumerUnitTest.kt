@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Test
 import xelagurd.socialdating.dto.StatementReaction
 import xelagurd.socialdating.dto.StatementReactionType
 import xelagurd.socialdating.dto.UserCategory
+import xelagurd.socialdating.service.CategoriesKafkaConsumer
+import xelagurd.socialdating.service.CategoriesKafkaProducer
+import xelagurd.socialdating.service.UserCategoriesService
 
 class CategoriesKafkaConsumerUnitTest {
 

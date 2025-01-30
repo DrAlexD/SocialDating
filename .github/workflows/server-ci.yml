@@ -86,6 +86,11 @@ jobs:
           chmod +x check_containers_health.sh
           ./check_containers_health.sh
 
+      - name: Run Integration tests
+        run: |
+          chmod +x gradlew
+          ./gradlew integrationTest
+
       - name: Tear Down
         if: always()
         run: docker compose down
@@ -133,8 +138,8 @@ jobs:
         with:
           push: ${{ github.event_name != 'pull_request' }}
           context: server/${{ matrix.service }}
-          tags: xelagurd/${{ matrix.service }}:latest
-          cache-from: type=registry,ref=xelagurd/${{ matrix.service }}:latest
+          tags: social-dating/${{ matrix.service }}:latest
+          cache-from: type=registry,ref=social-dating/${{ matrix.service }}:latest
           cache-to: type=inline
 
   completed-server-ci:

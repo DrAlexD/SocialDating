@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import xelagurd.socialdating.controller.UsersController
 import xelagurd.socialdating.dto.User
-import xelagurd.socialdating.service.TestUtils.convertObjectToJsonString
+import xelagurd.socialdating.service.UsersService
 import kotlin.test.assertEquals
 
 @WebMvcTest(UsersController::class)
@@ -42,6 +42,6 @@ class UsersControllerTest(@Autowired private val mockMvc: MockMvc) {
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected[0])))
+            .andExpect(content().json(TestUtils.convertObjectToJsonString(expected[0])))
     }
 }

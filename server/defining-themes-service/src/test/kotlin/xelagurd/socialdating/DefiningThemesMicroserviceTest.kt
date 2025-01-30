@@ -1,4 +1,4 @@
-package xelagurd.socialdating.service
+package xelagurd.socialdating
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -11,7 +11,7 @@ import xelagurd.socialdating.dto.DefiningTheme
 import xelagurd.socialdating.dto.DefiningThemeDetails
 import xelagurd.socialdating.dto.UserDefiningTheme
 import xelagurd.socialdating.dto.UserDefiningThemeDetails
-import xelagurd.socialdating.service.TestUtils.toRequestParams
+import xelagurd.socialdating.TestUtils.toRequestParams
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
