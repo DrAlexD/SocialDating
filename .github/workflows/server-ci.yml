@@ -10,6 +10,9 @@ jobs:
   unit-tests:
     name: Run Unit tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [ gateway-service, users-service, categories-service, defining-themes-service, statements-service ]
     defaults:
       run:
         working-directory: server
@@ -27,15 +30,21 @@ jobs:
       - name: Setup Gradle cache
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run Unit tests
+      - name: Run Unit tests for ${{ matrix.service }}
         run: |
           chmod +x gradlew
-          ./gradlew test
+          ./gradlew ${{ matrix.service }}:test
+
+      - name: Upload Unit tests report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit_tests_report
+          path: server/${{ matrix.service }}/build/reports/tests/test/
 
   integration-tests:
     name: Run Integration tests
     runs-on: ubuntu-latest
-    needs: unit-tests
     defaults:
       run:
         working-directory: server
@@ -82,9 +91,9 @@ jobs:
         run: docker compose down
 
   build-and-push-docker-image:
-    name: Build and push docker image for ${{ matrix.service }}
+    name: Build and push docker image
     runs-on: ubuntu-latest
-    needs: integration-tests
+    needs: [unit-tests, integration-tests]
     strategy:
       matrix:
         service: [ gateway-service, users-service, categories-service, defining-themes-service, statements-service ]
@@ -127,3 +136,12 @@ jobs:
           tags: xelagurd/${{ matrix.service }}:latest
           cache-from: type=registry,ref=xelagurd/${{ matrix.service }}:latest
           cache-to: type=inline
+
+  completed-server-ci:
+    name: Completed Server CI
+    runs-on: ubuntu-latest
+    needs: build-and-push-docker-image
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
