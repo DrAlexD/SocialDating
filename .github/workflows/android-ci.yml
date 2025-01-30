@@ -137,3 +137,12 @@ jobs:
         with:
           name: social-dating.apk
           path: client/app/build/outputs/apk/debug/app-debug.apk
+
+  completed-android-ci:
+    name: Completed Android CI
+    runs-on: ubuntu-latest
+    needs: build-apk
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
