@@ -1,3 +1,3 @@
-package xelagurd.socialdating.data.model.details
+package xelagurd.socialdating.client.data.model.details
 
 interface FormDetails
