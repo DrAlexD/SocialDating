@@ -19,6 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SocialDating"
+includeBuild("../common")
 include(":app")
- 
+
+rootProject.name = "client"
