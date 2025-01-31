@@ -1,4 +1,5 @@
 [versions]
+socialdating = "0.8.0"
 kotlin = "2.1.0"
 kotlinxDatetime = "0.6.1"
 kotlinxSerializationJson = "1.8.0"
@@ -14,6 +15,7 @@ springKafka = "3.3.2"
 mockk = "1.13.16"
 
 [libraries]
+xelagurd-socialdating-common = { module = "xelagurd.socialdating:common", version.ref = "socialdating" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }

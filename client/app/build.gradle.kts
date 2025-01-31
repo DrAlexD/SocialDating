@@ -8,17 +8,17 @@ plugins {
 }
 
 android {
-    namespace = "xelagurd.socialdating"
+    namespace = "xelagurd.socialdating.client"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "xelagurd.socialdating"
+        applicationId = "xelagurd.socialdating.client"
         minSdk = 34
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "xelagurd.socialdating.HiltTestRunner"
+        testInstrumentationRunner = "xelagurd.socialdating.client.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -59,6 +59,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.xelagurd.socialdating.common)
+
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)
 

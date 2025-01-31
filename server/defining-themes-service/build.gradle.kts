@@ -9,6 +9,8 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.xelagurd.socialdating.common)
+
     implementation(libs.bundles.kotlinx.ecosystem)
 
     implementation(libs.kotlin.reflect)

@@ -138,8 +138,8 @@ jobs:
         with:
           push: ${{ github.event_name != 'pull_request' }}
           context: server/${{ matrix.service }}
-          tags: social-dating/${{ matrix.service }}:latest
-          cache-from: type=registry,ref=social-dating/${{ matrix.service }}:latest
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest
+          cache-from: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest
           cache-to: type=inline
 
   completed-server-ci:
