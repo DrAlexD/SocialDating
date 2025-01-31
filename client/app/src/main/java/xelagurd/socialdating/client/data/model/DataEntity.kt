@@ -1,4 +1,4 @@
-package xelagurd.socialdating.client.data.model
+package xelagurd.socialdating.data.model
 
 interface DataEntity {
     val id: Int

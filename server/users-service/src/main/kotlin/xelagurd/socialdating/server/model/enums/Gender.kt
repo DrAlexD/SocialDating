@@ -1,4 +1,4 @@
-package xelagurd.socialdating.server.model.enums
+package xelagurd.socialdating.dto
 
 enum class Gender {
     MALE,
