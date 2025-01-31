@@ -1,21 +1,21 @@
-package xelagurd.socialdating.data.local
+package xelagurd.socialdating.client.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import xelagurd.socialdating.data.local.dao.CategoriesDao
-import xelagurd.socialdating.data.local.dao.DefiningThemesDao
-import xelagurd.socialdating.data.local.dao.StatementsDao
-import xelagurd.socialdating.data.local.dao.UserCategoriesDao
-import xelagurd.socialdating.data.local.dao.UserDefiningThemesDao
-import xelagurd.socialdating.data.local.dao.UsersDao
-import xelagurd.socialdating.data.model.Category
-import xelagurd.socialdating.data.model.DefiningTheme
-import xelagurd.socialdating.data.model.Statement
-import xelagurd.socialdating.data.model.User
-import xelagurd.socialdating.data.model.UserCategory
-import xelagurd.socialdating.data.model.UserDefiningTheme
-import xelagurd.socialdating.data.model.enums.EnumsConverter
+import xelagurd.socialdating.client.data.local.dao.CategoriesDao
+import xelagurd.socialdating.client.data.local.dao.DefiningThemesDao
+import xelagurd.socialdating.client.data.local.dao.StatementsDao
+import xelagurd.socialdating.client.data.local.dao.UserCategoriesDao
+import xelagurd.socialdating.client.data.local.dao.UserDefiningThemesDao
+import xelagurd.socialdating.client.data.local.dao.UsersDao
+import xelagurd.socialdating.client.data.model.Category
+import xelagurd.socialdating.client.data.model.DefiningTheme
+import xelagurd.socialdating.client.data.model.Statement
+import xelagurd.socialdating.client.data.model.User
+import xelagurd.socialdating.client.data.model.UserCategory
+import xelagurd.socialdating.client.data.model.UserDefiningTheme
+import xelagurd.socialdating.client.data.model.enums.EnumsConverter
 
 @Database(
     entities = [
