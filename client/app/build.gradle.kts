@@ -59,8 +59,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.xelagurd.socialdating.common)
-
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)
 

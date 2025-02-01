@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.xelagurd.socialdating.common)
+    implementation(project(":common"))
 
     implementation(libs.bundles.kotlinx.ecosystem)
 
