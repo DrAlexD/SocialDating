@@ -2,7 +2,6 @@ package xelagurd.socialdating.server.service
 
 import org.springframework.stereotype.Service
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
 
 @Service
@@ -16,10 +15,6 @@ class UserCategoriesService(
 
     fun getUserCategories(userId: Int): Iterable<UserCategory> {
         return userCategoriesRepository.findAllByUserId(userId)
-    }
-
-    fun addUserCategory(userCategoryDetails: UserCategoryDetails): UserCategory {
-        return userCategoriesRepository.save(userCategoryDetails.toUserCategory())
     }
 
     fun addUserCategory(userCategory: UserCategory): UserCategory {

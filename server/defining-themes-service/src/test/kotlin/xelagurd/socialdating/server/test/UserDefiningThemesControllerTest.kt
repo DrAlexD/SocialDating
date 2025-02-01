@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.UserDefiningThemesController
 import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.details.UserDefiningThemeDetails
 import xelagurd.socialdating.server.service.UserDefiningThemesService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
@@ -31,8 +30,8 @@ class UserDefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) 
         UserDefiningTheme(id = 2, value = 15, interest = 15, userCategoryId = 2, definingThemeId = 2),
         UserDefiningTheme(id = 3, value = 20, interest = 20, userCategoryId = 3, definingThemeId = 3)
     )
-    private val userDefiningThemeDetails =
-        UserDefiningThemeDetails(value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1)
+    private val newUserDefiningTheme =
+        UserDefiningTheme(value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1)
 
     @Test
     fun getUserDefiningThemesByUserCategoryIds() {
@@ -50,12 +49,12 @@ class UserDefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) 
     @Test
     fun addUserDefiningTheme() {
         val expected = userDefiningThemes[0]
-        `when`(userDefiningThemesService.addUserDefiningTheme(userDefiningThemeDetails)).thenReturn(expected)
+        `when`(userDefiningThemesService.addUserDefiningTheme(newUserDefiningTheme)).thenReturn(expected)
 
         mockMvc.perform(
             post("/api/v1/defining-themes/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(userDefiningThemeDetails))
+                .content(convertObjectToJsonString(newUserDefiningTheme))
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))

@@ -13,15 +13,15 @@ class User(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
     var id: Int? = null,
-    var name: String? = null,
-    var gender: Gender? = null,
-    var username: String? = null,
-    var password: String? = null,
-    var email: String? = null,
-    var age: Int? = null,
-    var city: String? = null,
-    var purpose: Purpose? = null,
-    var activity: Int? = null
+    var name: String,
+    var gender: Gender,
+    var username: String,
+    var password: String,
+    var email: String,
+    var age: Int,
+    var city: String,
+    var purpose: Purpose,
+    var activity: Int
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -45,15 +45,15 @@ class User(
 
     override fun hashCode(): Int {
         var result = id ?: 0
-        result = 31 * result + (age ?: 0)
-        result = 31 * result + (activity ?: 0)
-        result = 31 * result + (name?.hashCode() ?: 0)
-        result = 31 * result + (gender?.hashCode() ?: 0)
-        result = 31 * result + (username?.hashCode() ?: 0)
-        result = 31 * result + (password?.hashCode() ?: 0)
-        result = 31 * result + (email?.hashCode() ?: 0)
-        result = 31 * result + (city?.hashCode() ?: 0)
-        result = 31 * result + (purpose?.hashCode() ?: 0)
+        result = 31 * result + age
+        result = 31 * result + activity
+        result = 31 * result + name.hashCode()
+        result = 31 * result + gender.hashCode()
+        result = 31 * result + username.hashCode()
+        result = 31 * result + password.hashCode()
+        result = 31 * result + email.hashCode()
+        result = 31 * result + city.hashCode()
+        result = 31 * result + purpose.hashCode()
         return result
     }
 }

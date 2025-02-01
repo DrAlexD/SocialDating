@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.UsersController
 import xelagurd.socialdating.server.model.User
+import xelagurd.socialdating.server.model.enums.Gender
+import xelagurd.socialdating.server.model.enums.Purpose
 import xelagurd.socialdating.server.service.UsersService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 
@@ -23,9 +25,42 @@ class UsersControllerTest(@Autowired private val mockMvc: MockMvc) {
     private lateinit var usersService: UsersService
 
     private val users = listOf(
-        User(id = 1, name = "RemoteUser1"),
-        User(id = 2, name = "RemoteUser2"),
-        User(id = 3, name = "RemoteUser3")
+        User(
+            id = 1,
+            name = "RemoteUser1",
+            gender = Gender.MALE,
+            username = "",
+            password = "",
+            email = "",
+            age = 20,
+            city = "",
+            purpose = Purpose.RELATIONSHIPS,
+            activity = 50
+        ),
+        User(
+            id = 2,
+            name = "RemoteUser2",
+            gender = Gender.MALE,
+            username = "",
+            password = "",
+            email = "",
+            age = 20,
+            city = "",
+            purpose = Purpose.RELATIONSHIPS,
+            activity = 50
+        ),
+        User(
+            id = 3,
+            name = "RemoteUser3",
+            gender = Gender.MALE,
+            username = "",
+            password = "",
+            email = "",
+            age = 20,
+            city = "",
+            purpose = Purpose.RELATIONSHIPS,
+            activity = 50
+        )
     )
 
     private val userId = 1
