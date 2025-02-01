@@ -6,9 +6,9 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import xelagurd.socialdating.common.dto.StatementReaction
-import xelagurd.socialdating.common.dto.StatementReactionType
 import xelagurd.socialdating.server.model.UserDefiningTheme
+import xelagurd.socialdating.server.model.additional.StatementReaction
+import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.service.DefiningThemesKafkaConsumer
 import xelagurd.socialdating.server.service.UserDefiningThemesService
 

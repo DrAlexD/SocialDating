@@ -1,4 +1,4 @@
-package xelagurd.socialdating.common.dto
+package xelagurd.socialdating.server.model.enums
 
 enum class StatementReactionType {
     FULL_NO_MAINTAIN,

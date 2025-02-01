@@ -11,12 +11,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
-import xelagurd.socialdating.common.utils.TestUtils.convertObjectToJsonString
-import xelagurd.socialdating.common.utils.TestUtils.toRequestParams
 import xelagurd.socialdating.server.controller.UserDefiningThemesController
 import xelagurd.socialdating.server.model.UserDefiningTheme
 import xelagurd.socialdating.server.model.details.UserDefiningThemeDetails
 import xelagurd.socialdating.server.service.UserDefiningThemesService
+import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
+import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @WebMvcTest(UserDefiningThemesController::class)
 class UserDefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) {

@@ -8,9 +8,9 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import xelagurd.socialdating.common.dto.StatementReaction
-import xelagurd.socialdating.common.dto.StatementReactionType
 import xelagurd.socialdating.server.model.UserCategory
+import xelagurd.socialdating.server.model.additional.StatementReaction
+import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.service.CategoriesKafkaConsumer
 import xelagurd.socialdating.server.service.CategoriesKafkaProducer
 import xelagurd.socialdating.server.service.UserCategoriesService

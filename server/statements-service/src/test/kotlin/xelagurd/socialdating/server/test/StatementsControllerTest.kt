@@ -13,14 +13,14 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
-import xelagurd.socialdating.common.dto.StatementReactionType
-import xelagurd.socialdating.common.utils.TestUtils.convertObjectToJsonString
-import xelagurd.socialdating.common.utils.TestUtils.toRequestParams
 import xelagurd.socialdating.server.controller.StatementsController
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.details.StatementDetails
 import xelagurd.socialdating.server.model.details.StatementReactionDetails
+import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.service.StatementsService
+import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
+import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @WebMvcTest(StatementsController::class)
 class StatementsControllerTest(@Autowired private val mockMvc: MockMvc) {

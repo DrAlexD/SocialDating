@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.client.RestTemplate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import xelagurd.socialdating.common.utils.TestUtils.readArrayFromJsonString
-import xelagurd.socialdating.common.utils.TestUtils.readObjectFromJsonString
+import xelagurd.socialdating.server.utils.TestUtils.readArrayFromJsonString
+import xelagurd.socialdating.server.utils.TestUtils.readObjectFromJsonString
 
 class StatementsIntegrationTest {
     private val restTemplate = RestTemplate()

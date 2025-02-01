@@ -2,7 +2,7 @@ package xelagurd.socialdating.server.service
 
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
-import xelagurd.socialdating.common.dto.StatementReaction
+import xelagurd.socialdating.server.model.additional.StatementReaction
 
 @Service
 class CategoriesKafkaProducer(
