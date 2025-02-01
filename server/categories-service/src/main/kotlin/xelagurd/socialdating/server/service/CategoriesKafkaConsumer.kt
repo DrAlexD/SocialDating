@@ -21,7 +21,7 @@ class CategoriesKafkaConsumer(
         )
 
         if (userCategory != null) {
-            userCategory.interest = userCategory.interest!! + 5
+            userCategory.interest = userCategory.interest + 5
         } else {
             userCategory = UserCategory(
                 interest = 5,

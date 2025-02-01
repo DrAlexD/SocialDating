@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.CategoriesController
 import xelagurd.socialdating.server.model.Category
-import xelagurd.socialdating.server.model.details.CategoryDetails
 import xelagurd.socialdating.server.service.CategoriesService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 
@@ -28,7 +27,7 @@ class CategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
         Category(id = 2, name = "RemoteCategory2"),
         Category(id = 3, name = "RemoteCategory3")
     )
-    private val categoryDetails = CategoryDetails(name = "RemoteCategory1")
+    private val newCategory = Category(name = "RemoteCategory1")
 
     @Test
     fun getCategories() {
@@ -46,12 +45,12 @@ class CategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
     @Test
     fun addCategory() {
         val expected = categories[0]
-        `when`(categoriesService.addCategory(categoryDetails)).thenReturn(expected)
+        `when`(categoriesService.addCategory(newCategory)).thenReturn(expected)
 
         mockMvc.perform(
             post("/api/v1/categories")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(categoryDetails))
+                .content(convertObjectToJsonString(newCategory))
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))

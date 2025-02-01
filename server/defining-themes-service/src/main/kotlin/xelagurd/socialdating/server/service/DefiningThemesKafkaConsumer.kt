@@ -33,9 +33,9 @@ class DefiningThemesKafkaConsumer(
         }
 
         if (userDefiningTheme != null) {
-            userDefiningTheme.value = userDefiningTheme.value!! + diff
+            userDefiningTheme.value = userDefiningTheme.value + diff
 
-            userDefiningTheme.interest = userDefiningTheme.interest!! + 5
+            userDefiningTheme.interest = userDefiningTheme.interest + 5
         } else {
             userDefiningTheme = UserDefiningTheme(
                 value = 50 + diff,
