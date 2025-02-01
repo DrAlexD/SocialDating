@@ -11,11 +11,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
-import xelagurd.socialdating.common.utils.TestUtils.convertObjectToJsonString
 import xelagurd.socialdating.server.controller.UserCategoriesController
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.service.UserCategoriesService
+import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 
 @WebMvcTest(UserCategoriesController::class)
 class UserCategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {

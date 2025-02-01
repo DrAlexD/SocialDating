@@ -11,10 +11,10 @@ import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import xelagurd.socialdating.common.dto.StatementReactionType
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.details.StatementDetails
 import xelagurd.socialdating.server.model.details.StatementReactionDetails
+import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.repository.StatementsRepository
 import xelagurd.socialdating.server.service.StatementsKafkaProducer
 import xelagurd.socialdating.server.service.StatementsService

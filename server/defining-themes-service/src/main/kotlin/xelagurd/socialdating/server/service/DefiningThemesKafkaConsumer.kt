@@ -3,9 +3,9 @@ package xelagurd.socialdating.server.service
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
-import xelagurd.socialdating.common.dto.StatementReaction
-import xelagurd.socialdating.common.dto.StatementReactionType
 import xelagurd.socialdating.server.model.UserDefiningTheme
+import xelagurd.socialdating.server.model.additional.StatementReaction
+import xelagurd.socialdating.server.model.enums.StatementReactionType
 
 @Profile("!test")
 @Service

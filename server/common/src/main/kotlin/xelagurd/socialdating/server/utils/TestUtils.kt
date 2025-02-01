@@ -1,4 +1,4 @@
-package xelagurd.socialdating.common.utils
+package xelagurd.socialdating.server.utils
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

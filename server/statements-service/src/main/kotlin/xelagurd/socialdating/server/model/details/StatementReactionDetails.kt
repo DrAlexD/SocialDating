@@ -1,7 +1,7 @@
 package xelagurd.socialdating.server.model.details
 
-import xelagurd.socialdating.common.dto.StatementReaction
-import xelagurd.socialdating.common.dto.StatementReactionType
+import xelagurd.socialdating.server.model.additional.StatementReaction
+import xelagurd.socialdating.server.model.enums.StatementReactionType
 
 data class StatementReactionDetails(
     val userId: Int,

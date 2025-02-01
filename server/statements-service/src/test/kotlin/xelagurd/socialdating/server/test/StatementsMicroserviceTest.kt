@@ -9,9 +9,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import xelagurd.socialdating.common.utils.TestUtils.toRequestParams
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.details.StatementDetails
+import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
