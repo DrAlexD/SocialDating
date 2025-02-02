@@ -12,10 +12,10 @@ class UserDefiningTheme(
     @field:GeneratedValue(strategy = GenerationType.AUTO)
     var id: Int? = null,
     @Column(name = "udt_value")
-    var value: Int,
-    var interest: Int,
-    var userCategoryId: Int,
-    var definingThemeId: Int
+    var value: Int? = null,
+    var interest: Int? = null,
+    var userCategoryId: Int? = null,
+    var definingThemeId: Int? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -34,10 +34,10 @@ class UserDefiningTheme(
 
     override fun hashCode(): Int {
         var result = id ?: 0
-        result = 31 * result + value
-        result = 31 * result + interest
-        result = 31 * result + userCategoryId
-        result = 31 * result + definingThemeId
+        result = 31 * result + (value ?: 0)
+        result = 31 * result + (interest ?: 0)
+        result = 31 * result + (userCategoryId ?: 0)
+        result = 31 * result + (definingThemeId ?: 0)
         return result
     }
 }

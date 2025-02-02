@@ -10,8 +10,9 @@ class Category(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
     var id: Int? = null,
-    var name: String
+    var name: String? = null
 ) {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

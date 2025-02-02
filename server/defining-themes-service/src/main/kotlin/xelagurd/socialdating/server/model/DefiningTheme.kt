@@ -10,10 +10,10 @@ class DefiningTheme(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
     var id: Int? = null,
-    var name: String,
-    var fromOpinion: String,
-    var toOpinion: String,
-    var categoryId: Int
+    var name: String? = null,
+    var fromOpinion: String? = null,
+    var toOpinion: String? = null,
+    var categoryId: Int? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -32,7 +32,7 @@ class DefiningTheme(
 
     override fun hashCode(): Int {
         var result = id ?: 0
-        result = 31 * result + categoryId
+        result = 31 * result + (categoryId ?: 0)
         result = 31 * result + name.hashCode()
         result = 31 * result + fromOpinion.hashCode()
         result = 31 * result + toOpinion.hashCode()

@@ -10,9 +10,9 @@ class UserCategory(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
     var id: Int? = null,
-    var interest: Int,
-    var userId: Int,
-    var categoryId: Int
+    var interest: Int? = null,
+    var userId: Int? = null,
+    var categoryId: Int? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -30,9 +30,9 @@ class UserCategory(
 
     override fun hashCode(): Int {
         var result = id ?: 0
-        result = 31 * result + interest
-        result = 31 * result + userId
-        result = 31 * result + categoryId
+        result = 31 * result + (interest ?: 0)
+        result = 31 * result + (userId ?: 0)
+        result = 31 * result + (categoryId ?: 0)
         return result
     }
 }

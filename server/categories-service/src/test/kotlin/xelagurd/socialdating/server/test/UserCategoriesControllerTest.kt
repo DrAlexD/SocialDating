@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.UserCategoriesController
 import xelagurd.socialdating.server.model.UserCategory
+import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.service.UserCategoriesService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 
@@ -30,7 +31,7 @@ class UserCategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
         UserCategory(id = 3, interest = 20, userId = 2, categoryId = 3)
     )
 
-    private val newUserCategory = UserCategory(interest = 10, userId = 1, categoryId = 1)
+    private val userCategoryDetails = UserCategoryDetails(interest = 10, userId = 1, categoryId = 1)
 
     @Test
     fun getUserCategories() {
@@ -48,12 +49,12 @@ class UserCategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
     @Test
     fun addUserCategory() {
         val expected = userCategories[0]
-        `when`(userCategoriesService.addUserCategory(newUserCategory)).thenReturn(expected)
+        `when`(userCategoriesService.addUserCategory(userCategoryDetails)).thenReturn(expected)
 
         mockMvc.perform(
             post("/api/v1/categories/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(newUserCategory))
+                .content(convertObjectToJsonString(userCategoryDetails))
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
