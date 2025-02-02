@@ -54,8 +54,8 @@ fun StatementsScreen(
         onStatementAddingClick = onStatementAddingClick,
         onNavigateUp = onNavigateUp,
         refreshAction = statementsViewModel::getStatements,
-        onStatementReactionClick = { id, type ->
-            statementsViewModel.onStatementReactionClick(id, type)
+        onStatementReactionClick = { statement, reactionType ->
+            statementsViewModel.onStatementReactionClick(statement, reactionType)
         }
     )
 }
@@ -68,7 +68,7 @@ fun StatementsScreenComponent(
     onStatementAddingClick: (Int) -> Unit = {},
     onNavigateUp: () -> Unit = {},
     refreshAction: () -> Unit = {},
-    onStatementReactionClick: (Int, StatementReactionType) -> Unit = { _, _ -> null }
+    onStatementReactionClick: (Statement, StatementReactionType) -> Unit = { _, _ -> null }
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -121,12 +121,12 @@ fun StatementsScreenComponent(
 @Composable
 private inline fun StatementCardContent(
     statement: Statement,
-    crossinline onStatementReactionClick: (Int, StatementReactionType) -> Unit
+    crossinline onStatementReactionClick: (Statement, StatementReactionType) -> Unit
 ) {
     AppLargeTitleText(text = statement.text)
     HorizontalDivider()
     ReactionsRow(
-        onStatementReactionClick = { onStatementReactionClick(statement.id, it) }
+        onStatementReactionClick = { onStatementReactionClick(statement, it) }
     )
 }
 

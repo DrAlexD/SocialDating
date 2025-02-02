@@ -5,7 +5,9 @@ import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 
 @Serializable
 data class StatementReactionDetails(
-    val userId: Int,
+    val userOrUserCategoryId: Int,
     val categoryId: Int,
-    val reactionType: StatementReactionType
+    val definingThemeId: Int,
+    val reactionType: StatementReactionType,
+    val isSupportDefiningTheme: Boolean
 )

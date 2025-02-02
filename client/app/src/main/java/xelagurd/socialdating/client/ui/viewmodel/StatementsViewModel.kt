@@ -24,6 +24,7 @@ import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
+import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
@@ -135,13 +136,19 @@ class StatementsViewModel @Inject constructor(
         }
     }
 
-    fun onStatementReactionClick(statementId: Int, reactionType: StatementReactionType) {
+    fun onStatementReactionClick(statement: Statement, reactionType: StatementReactionType) {
         if (currentUserId != null) {
             viewModelScope.launch {
                 try {
                     remoteStatementsRepository.addStatementReaction(
-                        statementId,
-                        StatementReactionDetails(currentUserId!!, categoryId, reactionType)
+                        statement.id,
+                        StatementReactionDetails(
+                            userOrUserCategoryId = currentUserId!!,
+                            categoryId = categoryId,
+                            definingThemeId = statement.definingThemeId,
+                            reactionType = reactionType,
+                            isSupportDefiningTheme = statement.isSupportDefiningTheme
+                        )
                     )
                 } catch (e: Exception) {
                     when (e) {

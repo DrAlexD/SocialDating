@@ -15,8 +15,8 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.StatementsController
 import xelagurd.socialdating.server.model.Statement
+import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.details.StatementDetails
-import xelagurd.socialdating.server.model.details.StatementReactionDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.service.StatementsService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
@@ -65,9 +65,11 @@ class StatementsControllerTest(@Autowired private val mockMvc: MockMvc) {
     private val statementId = 1
 
     private val statementReactionDetails = StatementReactionDetails(
-        userId = userId,
+        userOrUserCategoryId = userId,
         categoryId = 1,
-        reactionType = StatementReactionType.FULL_MAINTAIN
+        definingThemeId = 1,
+        reactionType = StatementReactionType.FULL_MAINTAIN,
+        isSupportDefiningTheme = true
     )
 
     @Test

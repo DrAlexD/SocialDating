@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.additional.StatementReaction
+import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 
 @Profile("!test")
@@ -14,13 +14,13 @@ class DefiningThemesKafkaConsumer(
 ) {
 
     @KafkaListener(topics = ["statement-reaction-to-user-defining-theme-topic"], groupId = "defining-themes-group")
-    fun consumeStatementReaction(statementReaction: StatementReaction) {
+    fun consumeStatementReaction(statementReactionDetails: StatementReactionDetails) {
         var userDefiningTheme = userDefiningThemesService.getUserDefiningTheme(
-            statementReaction.userOrUserCategoryId,
-            statementReaction.definingThemeId
+            statementReactionDetails.userOrUserCategoryId,
+            statementReactionDetails.definingThemeId
         )
 
-        var diff = when (statementReaction.reactionType) {
+        var diff = when (statementReactionDetails.reactionType) {
             StatementReactionType.FULL_NO_MAINTAIN -> -10
             StatementReactionType.PART_NO_MAINTAIN -> -5
             StatementReactionType.NOT_SURE -> 0
@@ -28,7 +28,7 @@ class DefiningThemesKafkaConsumer(
             StatementReactionType.FULL_MAINTAIN -> 10
         }
 
-        if (!statementReaction.isSupportDefiningTheme) {
+        if (!statementReactionDetails.isSupportDefiningTheme) {
             diff = -diff
         }
 
@@ -40,8 +40,8 @@ class DefiningThemesKafkaConsumer(
             userDefiningTheme = UserDefiningTheme(
                 value = 50 + diff,
                 interest = 5,
-                userCategoryId = statementReaction.userOrUserCategoryId,
-                definingThemeId = statementReaction.definingThemeId
+                userCategoryId = statementReactionDetails.userOrUserCategoryId,
+                definingThemeId = statementReactionDetails.definingThemeId
             )
         }
 

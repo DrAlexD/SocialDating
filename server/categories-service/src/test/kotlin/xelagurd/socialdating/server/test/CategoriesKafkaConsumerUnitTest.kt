@@ -9,7 +9,7 @@ import io.mockk.just
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.additional.StatementReaction
+import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.service.CategoriesKafkaConsumer
 import xelagurd.socialdating.server.service.CategoriesKafkaProducer
@@ -29,7 +29,7 @@ class CategoriesKafkaConsumerUnitTest {
     val userId = 1
     val categoryId = 1
 
-    private val statementReaction = StatementReaction(
+    private val statementReactionDetails = StatementReactionDetails(
         userOrUserCategoryId = userId,
         categoryId = categoryId,
         definingThemeId = 1,
@@ -41,14 +41,14 @@ class CategoriesKafkaConsumerUnitTest {
     private val updatedUserCategory = UserCategory(id = 1, interest = 15, userId = userId, categoryId = categoryId)
     private val newUserCategory = UserCategory(
         interest = 5,
-        userId = statementReaction.userOrUserCategoryId,
-        categoryId = statementReaction.categoryId
+        userId = statementReactionDetails.userOrUserCategoryId,
+        categoryId = statementReactionDetails.categoryId
     )
     private val newAddedUserCategory = UserCategory(
         id = 1,
         interest = 5,
-        userId = statementReaction.userOrUserCategoryId,
-        categoryId = statementReaction.categoryId
+        userId = statementReactionDetails.userOrUserCategoryId,
+        categoryId = statementReactionDetails.categoryId
     )
 
     @BeforeEach
@@ -60,8 +60,8 @@ class CategoriesKafkaConsumerUnitTest {
     fun consumeStatementReactionWithExistUserCategory() {
         every {
             userCategoriesService.getUserCategory(
-                statementReaction.userOrUserCategoryId,
-                statementReaction.categoryId
+                statementReactionDetails.userOrUserCategoryId,
+                statementReactionDetails.categoryId
             )
         } returns userCategory
 
@@ -69,19 +69,19 @@ class CategoriesKafkaConsumerUnitTest {
 
         every {
             kafkaProducer.sendStatementReaction(
-                statementReaction.copy(userOrUserCategoryId = updatedUserCategory.id!!)
+                statementReactionDetails.copy(userOrUserCategoryId = updatedUserCategory.id!!)
             )
         } just Runs
 
-        categoriesKafkaConsumer.consumeStatementReaction(statementReaction)
+        categoriesKafkaConsumer.consumeStatementReaction(statementReactionDetails)
     }
 
     @Test
     fun consumeStatementReactionWithNotExistUserCategory() {
         every {
             userCategoriesService.getUserCategory(
-                statementReaction.userOrUserCategoryId,
-                statementReaction.categoryId
+                statementReactionDetails.userOrUserCategoryId,
+                statementReactionDetails.categoryId
             )
         } returns null
 
@@ -89,10 +89,10 @@ class CategoriesKafkaConsumerUnitTest {
 
         every {
             kafkaProducer.sendStatementReaction(
-                statementReaction.copy(userOrUserCategoryId = newAddedUserCategory.id!!)
+                statementReactionDetails.copy(userOrUserCategoryId = newAddedUserCategory.id!!)
             )
         } just Runs
 
-        categoriesKafkaConsumer.consumeStatementReaction(statementReaction)
+        categoriesKafkaConsumer.consumeStatementReaction(statementReactionDetails)
     }
 }

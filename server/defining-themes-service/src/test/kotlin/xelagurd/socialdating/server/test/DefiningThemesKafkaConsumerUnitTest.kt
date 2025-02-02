@@ -7,7 +7,7 @@ import io.mockk.impl.annotations.MockK
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.additional.StatementReaction
+import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.service.DefiningThemesKafkaConsumer
 import xelagurd.socialdating.server.service.UserDefiningThemesService
@@ -23,7 +23,7 @@ class DefiningThemesKafkaConsumerUnitTest {
     val userId = 1
     val definingThemeId = 1
 
-    private val statementReaction = StatementReaction(
+    private val statementReactionDetails = StatementReactionDetails(
         userOrUserCategoryId = userId,
         definingThemeId = definingThemeId,
         categoryId = 1,
@@ -57,27 +57,27 @@ class DefiningThemesKafkaConsumerUnitTest {
     fun consumeStatementReactionWithExistUserDefiningTheme() {
         every {
             userDefiningThemesService.getUserDefiningTheme(
-                statementReaction.userOrUserCategoryId,
-                statementReaction.definingThemeId
+                statementReactionDetails.userOrUserCategoryId,
+                statementReactionDetails.definingThemeId
             )
         } returns userDefiningTheme
 
         every { userDefiningThemesService.addUserDefiningTheme(userDefiningTheme) } returns updatedUserDefiningTheme
 
-        definingThemesKafkaConsumer.consumeStatementReaction(statementReaction)
+        definingThemesKafkaConsumer.consumeStatementReaction(statementReactionDetails)
     }
 
     @Test
     fun consumeStatementReactionWithNotExistUserDefiningTheme() {
         every {
             userDefiningThemesService.getUserDefiningTheme(
-                statementReaction.userOrUserCategoryId,
-                statementReaction.definingThemeId
+                statementReactionDetails.userOrUserCategoryId,
+                statementReactionDetails.definingThemeId
             )
         } returns null
 
         every { userDefiningThemesService.addUserDefiningTheme(newUserDefiningTheme) } returns newAddedUserDefiningTheme
 
-        definingThemesKafkaConsumer.consumeStatementReaction(statementReaction)
+        definingThemesKafkaConsumer.consumeStatementReaction(statementReactionDetails)
     }
 }

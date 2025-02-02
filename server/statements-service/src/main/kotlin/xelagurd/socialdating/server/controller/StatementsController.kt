@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import xelagurd.socialdating.server.model.Statement
+import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.details.StatementDetails
-import xelagurd.socialdating.server.model.details.StatementReactionDetails
 import xelagurd.socialdating.server.service.StatementsService
 
 @RestController
