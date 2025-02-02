@@ -11,6 +11,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.model.UserCategory
+import xelagurd.socialdating.server.model.details.CategoryDetails
+import xelagurd.socialdating.server.model.details.UserCategoryDetails
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -23,10 +25,10 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
         Category(id = 2, name = "RemoteCategory2"),
         Category(id = 3, name = "RemoteCategory3")
     )
-    private val newCategories = listOf(
-        Category(name = "RemoteCategory1"),
-        Category(name = "RemoteCategory2"),
-        Category(name = "RemoteCategory3")
+    private val categoriesDetails = listOf(
+        CategoryDetails(name = "RemoteCategory1"),
+        CategoryDetails(name = "RemoteCategory2"),
+        CategoryDetails(name = "RemoteCategory3")
     )
 
     private val userCategories = listOf(
@@ -34,23 +36,23 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
         UserCategory(id = 2, interest = 15, userId = 1, categoryId = 2),
         UserCategory(id = 3, interest = 20, userId = 2, categoryId = 3)
     )
-    private val newUserCategories = listOf(
-        UserCategory(interest = 10, userId = 1, categoryId = 1),
-        UserCategory(interest = 15, userId = 1, categoryId = 2),
-        UserCategory(interest = 20, userId = 2, categoryId = 3)
+    private val userCategoriesDetails = listOf(
+        UserCategoryDetails(interest = 10, userId = 1, categoryId = 1),
+        UserCategoryDetails(interest = 15, userId = 1, categoryId = 2),
+        UserCategoryDetails(interest = 20, userId = 2, categoryId = 3)
     )
 
     @Test
     fun addCategoriesAndGetThem() {
-        val postResponse1 = restTemplate.postForEntity("/api/v1/categories", newCategories[0], Category::class.java)
+        val postResponse1 = restTemplate.postForEntity("/api/v1/categories", categoriesDetails[0], Category::class.java)
         assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.OK)
         assertEquals(postResponse1.body!!, categories[0])
 
-        val postResponse2 = restTemplate.postForEntity("/api/v1/categories", newCategories[1], Category::class.java)
+        val postResponse2 = restTemplate.postForEntity("/api/v1/categories", categoriesDetails[1], Category::class.java)
         assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.OK)
         assertEquals(postResponse2.body!!, categories[1])
 
-        val postResponse3 = restTemplate.postForEntity("/api/v1/categories", newCategories[2], Category::class.java)
+        val postResponse3 = restTemplate.postForEntity("/api/v1/categories", categoriesDetails[2], Category::class.java)
         assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.OK)
         assertEquals(postResponse3.body!!, categories[2])
 
@@ -64,7 +66,7 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
     fun addUserCategoriesAndGetThem() {
         val postResponse1 = restTemplate.postForEntity(
             "/api/v1/categories/users",
-            newUserCategories[0],
+            userCategoriesDetails[0],
             UserCategory::class.java
         )
         assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.OK)
@@ -72,7 +74,7 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
 
         val postResponse2 = restTemplate.postForEntity(
             "/api/v1/categories/users",
-            newUserCategories[1],
+            userCategoriesDetails[1],
             UserCategory::class.java
         )
         assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.OK)
@@ -80,7 +82,7 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
 
         val postResponse3 = restTemplate.postForEntity(
             "/api/v1/categories/users",
-            newUserCategories[2],
+            userCategoriesDetails[2],
             UserCategory::class.java
         )
         assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.OK)

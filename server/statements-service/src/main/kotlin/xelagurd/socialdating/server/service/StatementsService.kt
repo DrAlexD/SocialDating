@@ -30,8 +30,8 @@ class StatementsService(
 
         statement?.let {
             val statementReaction = statementReactionDetails.toStatementReaction(
-                it.definingThemeId!!,
-                it.isSupportDefiningTheme!!
+                it.definingThemeId,
+                it.isSupportDefiningTheme
             )
 
             kafkaProducer.sendStatementReaction(statementReaction)

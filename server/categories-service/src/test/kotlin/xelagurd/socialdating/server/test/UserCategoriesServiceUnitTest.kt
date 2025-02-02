@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import xelagurd.socialdating.server.model.UserCategory
+import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
 import xelagurd.socialdating.server.service.UserCategoriesService
 
@@ -28,7 +29,7 @@ class UserCategoriesServiceUnitTest {
         UserCategory(id = 3, interest = 20, userId = 2, categoryId = 3)
     )
 
-    private val newUserCategory = UserCategory(interest = 10, userId = 1, categoryId = 1)
+    private val userCategoryDetails = UserCategoryDetails(interest = 10, userId = 1, categoryId = 1)
 
     @BeforeEach
     fun setup() {
@@ -61,9 +62,9 @@ class UserCategoriesServiceUnitTest {
     @Test
     fun addUserCategory() {
         val expected = userCategories[0]
-        every { userCategoriesRepository.save(newUserCategory) } returns expected
+        every { userCategoriesRepository.save(userCategoryDetails.toUserCategory()) } returns expected
 
-        val result = userCategoriesService.addUserCategory(newUserCategory)
+        val result = userCategoriesService.addUserCategory(userCategoryDetails)
 
         assertEquals(expected, result)
     }

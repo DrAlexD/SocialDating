@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import xelagurd.socialdating.server.model.UserDefiningTheme
+import xelagurd.socialdating.server.model.details.UserDefiningThemeDetails
 import xelagurd.socialdating.server.repository.UserDefiningThemesRepository
 import xelagurd.socialdating.server.service.UserDefiningThemesService
 
@@ -28,8 +29,8 @@ class UserDefiningThemesServiceUnitTest {
         UserDefiningTheme(id = 2, value = 15, interest = 15, userCategoryId = 2, definingThemeId = 2),
         UserDefiningTheme(id = 3, value = 20, interest = 20, userCategoryId = 3, definingThemeId = 3)
     )
-    private val newUserDefiningTheme =
-        UserDefiningTheme(value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1)
+    private val userDefiningThemeDetails =
+        UserDefiningThemeDetails(value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1)
 
     @BeforeEach
     fun setup() {
@@ -68,9 +69,9 @@ class UserDefiningThemesServiceUnitTest {
     @Test
     fun addUserDefiningTheme() {
         val expected = userDefiningThemes[0]
-        every { userDefiningThemesRepository.save(newUserDefiningTheme) } returns expected
+        every { userDefiningThemesRepository.save(userDefiningThemeDetails.toUserDefiningTheme()) } returns expected
 
-        val result = userDefiningThemesService.addUserDefiningTheme(newUserDefiningTheme)
+        val result = userDefiningThemesService.addUserDefiningTheme(userDefiningThemeDetails)
 
         assertEquals(expected, result)
     }
