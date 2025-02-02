@@ -50,7 +50,7 @@ class StatementAddingViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     formDetails = it.formDetails.copy(
-                        userId = preferencesRepository.currentUserId.first()
+                        creatorUserId = preferencesRepository.currentUserId.first()
                     )
                 )
             }

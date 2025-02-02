@@ -77,9 +77,11 @@ class StatementsIntegrationTest {
 
 
         val requestStatementReaction = mapOf(
-            "userId" to userId,
+            "userOrUserCategoryId" to userId,
             "categoryId" to responseCategory["id"],
-            "reactionType" to 4 // FULL_MAINTAIN
+            "definingThemeId" to responseDefiningTheme["id"],
+            "reactionType" to 4, // FULL_MAINTAIN
+            "isSupportDefiningTheme" to true
         )
         val postStatementReactionResponse = restTemplate.postForEntity(
             "$GATEWAY_URL/api/v1/statements/${responseStatement["id"]}/reaction",

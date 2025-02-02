@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import xelagurd.socialdating.server.model.Statement
+import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.details.StatementDetails
-import xelagurd.socialdating.server.model.details.StatementReactionDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.repository.StatementsRepository
 import xelagurd.socialdating.server.service.StatementsKafkaProducer
@@ -67,13 +67,10 @@ class StatementsServiceUnitTest {
     private val statementId = 1
 
     private val statementReactionDetails = StatementReactionDetails(
-        userId = userId,
+        userOrUserCategoryId = userId,
         categoryId = 1,
-        reactionType = StatementReactionType.FULL_MAINTAIN
-    )
-
-    private val statementReaction = statementReactionDetails.toStatementReaction(
         definingThemeId = 1,
+        reactionType = StatementReactionType.FULL_MAINTAIN,
         isSupportDefiningTheme = true
     )
 
@@ -109,10 +106,10 @@ class StatementsServiceUnitTest {
         assertEquals(expected.size, 1)
 
         every { statementsRepository.findByIdOrNull(statementId) } returns expected[0]
-        every { kafkaProducer.sendStatementReaction(statementReactionDetails.toStatementReaction(1, true)) } just Runs
+        every { kafkaProducer.sendStatementReaction(statementReactionDetails) } just Runs
 
         statementsService.addStatementReaction(statementId, statementReactionDetails)
 
-        verify { kafkaProducer.sendStatementReaction(statementReaction) }
+        verify { kafkaProducer.sendStatementReaction(statementReactionDetails) }
     }
 }

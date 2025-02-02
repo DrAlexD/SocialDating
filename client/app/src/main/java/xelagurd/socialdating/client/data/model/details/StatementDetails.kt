@@ -7,9 +7,9 @@ data class StatementDetails(
     val text: String = "",
     val isSupportDefiningTheme: Boolean? = null,
     val definingThemeId: Int? = null,
-    val userId: Int? = null
+    val creatorUserId: Int? = null
 ) : FormDetails {
     val isValid
         get() = text.isNotBlank() && isSupportDefiningTheme != null && definingThemeId != null
-                && userId != null
+                && creatorUserId != null
 }
