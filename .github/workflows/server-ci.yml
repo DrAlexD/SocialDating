@@ -79,7 +79,7 @@ jobs:
           ./gradlew build -x test
 
       - name: Set up Docker Compose
-        run: docker compose up -d --build
+        run: docker compose up --build
 
       - name: Check health of containers
         run: |
