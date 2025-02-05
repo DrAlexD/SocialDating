@@ -25,6 +25,7 @@
     <string name="failed_registration">Не удалось зарегистроваться</string>
     <string name="logout">Выйти из аккаунта</string>
     <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="server_error">Ошибка сервера</string>
     <string name="username">Логин</string>
     <string name="name">Имя</string>
     <string name="gender">Пол</string>

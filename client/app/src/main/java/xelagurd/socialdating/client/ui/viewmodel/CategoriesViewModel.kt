@@ -1,6 +1,5 @@
 package xelagurd.socialdating.client.ui.viewmodel
 
-import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,11 +14,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import retrofit2.HttpException
-import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
+import xelagurd.socialdating.client.data.safeApiCall
 import xelagurd.socialdating.client.ui.state.CategoriesUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
 
@@ -49,39 +47,21 @@ class CategoriesViewModel @Inject constructor(
 
     fun getCategories() {
         viewModelScope.launch {
-            try {
-                dataRequestStatusFlow.update { RequestStatus.LOADING }
+            dataRequestStatusFlow.update { RequestStatus.LOADING }
 
-                val remoteCategories = remoteRepository.getCategories()
+            val (remoteCategories, status) = safeApiCall(context) {
+                remoteRepository.getCategories()
+            }
 
-                if (remoteCategories.isNotEmpty()) {
-                    localRepository.insertCategories(remoteCategories)
-
-                    dataRequestStatusFlow.update { RequestStatus.SUCCESS }
-                } else {
-                    dataRequestStatusFlow.update {
-                        RequestStatus.FAILURE(
-                            failureText = context.getString(R.string.no_data)
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                when (e) {
-                    is IOException, is HttpException -> {
-                        if (localRepository.getCategories().first().isEmpty()) {
-                            localRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
-                        }
-
-                        dataRequestStatusFlow.update {
-                            RequestStatus.ERROR(
-                                errorText = context.getString(R.string.no_internet_connection)
-                            )
-                        }
-                    }
-
-                    else -> throw e
+            if (remoteCategories != null) {
+                localRepository.insertCategories(remoteCategories)
+            } else { // FixMe: remove after implementing server
+                if (localRepository.getCategories().first().isEmpty()) {
+                    localRepository.insertCategories(FakeDataSource.categories)
                 }
             }
+
+            dataRequestStatusFlow.update { status }
         }
     }
 

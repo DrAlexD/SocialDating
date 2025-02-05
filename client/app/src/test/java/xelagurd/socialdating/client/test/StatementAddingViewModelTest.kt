@@ -16,6 +16,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
@@ -136,13 +137,15 @@ class StatementAddingViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns statement
+        coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns
+                Response.success(statement)
         coEvery { localStatementsRepository.insertStatement(statement) } just Runs
     }
 
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns null
+        coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns
+                Response.success<Statement>(204, null)
     }
 
     private fun mockDataWithoutInternet() {

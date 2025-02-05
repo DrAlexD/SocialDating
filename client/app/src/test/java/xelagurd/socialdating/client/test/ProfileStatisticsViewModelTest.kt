@@ -20,6 +20,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.fake.toUserCategoriesWithData
 import xelagurd.socialdating.client.data.fake.toUserDefiningThemesWithData
@@ -314,10 +315,14 @@ class ProfileStatisticsViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteCategoriesRepository.getCategories() } returns remoteCategories
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(remoteCategories.toCategoryIds()) } returns remoteDefiningThemes
-        coEvery { remoteUserCategoriesRepository.getUserCategories(userId) } returns remoteUserCategories
-        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(remoteUserCategories.toUserCategoryIds()) } returns remoteUserDefiningThemes
+        coEvery { remoteCategoriesRepository.getCategories() } returns
+                Response.success(remoteCategories)
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(remoteCategories.toCategoryIds()) } returns
+                Response.success(remoteDefiningThemes)
+        coEvery { remoteUserCategoriesRepository.getUserCategories(userId) } returns
+                Response.success(remoteUserCategories)
+        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(remoteUserCategories.toUserCategoryIds()) } returns
+                Response.success(remoteUserDefiningThemes)
 
         coEvery { localCategoriesRepository.insertCategories(remoteCategories) } just Runs
         coEvery { localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes) } just Runs
@@ -343,10 +348,14 @@ class ProfileStatisticsViewModelTest {
 
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteCategoriesRepository.getCategories() } returns emptyList()
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(emptyList()) } returns emptyList()
-        coEvery { remoteUserCategoriesRepository.getUserCategories(userId) } returns emptyList()
-        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(emptyList()) } returns emptyList()
+        coEvery { remoteCategoriesRepository.getCategories() } returns
+                Response.success<List<Category>>(204, null)
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(emptyList()) } returns
+                Response.success<List<DefiningTheme>>(204, null)
+        coEvery { remoteUserCategoriesRepository.getUserCategories(userId) } returns
+                Response.success<List<UserCategory>>(204, null)
+        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(emptyList()) } returns
+                Response.success<List<UserDefiningTheme>>(204, null)
 
         coEvery { localCategoriesRepository.insertCategories(emptyList()) } just Runs
         coEvery { localDefiningThemesRepository.insertDefiningThemes(emptyList()) } just Runs

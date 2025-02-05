@@ -14,6 +14,7 @@ import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
@@ -122,7 +123,8 @@ class RegistrationViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns remoteUser
+        coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns
+                Response.success(remoteUser)
         coEvery { accountManager.saveCredentials(registrationDetails.toLoginDetails()) } just Runs
         coEvery { localRepository.insertUser(remoteUser) } just Runs
         coEvery { preferencesRepository.saveCurrentUserId(remoteUser.id) } just Runs
@@ -130,7 +132,8 @@ class RegistrationViewModelTest {
 
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns null
+        coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns
+                Response.success<User>(204, null)
     }
 
     private fun mockDataWithoutInternet() {

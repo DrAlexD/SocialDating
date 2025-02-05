@@ -27,6 +27,7 @@
     <string name="failed_registration">Failed to register</string>
     <string name="logout">Logout</string>
     <string name="unknown_error">Unknown error</string>
+    <string name="server_error">Server error</string>
     <string name="username">Username</string>
     <string name="name">Name</string>
     <string name="gender">Gender</string>
