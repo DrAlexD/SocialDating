@@ -17,6 +17,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -253,9 +254,9 @@ class StatementsViewModelTest {
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } returns
-                Response.success<List<DefiningTheme>>(204, null)
+                Response.error(404, "404".toResponseBody())
         coEvery { remoteStatementsRepository.getStatements(emptyList()) } returns
-                Response.success<List<Statement>>(204, null)
+                Response.error(404, "404".toResponseBody())
 
         coEvery { localDefiningThemesRepository.insertDefiningThemes(emptyList()) } just Runs
     }

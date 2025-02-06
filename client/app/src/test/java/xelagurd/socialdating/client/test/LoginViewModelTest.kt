@@ -96,7 +96,7 @@ class LoginViewModelTest {
         initViewModel()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILURE(), loginUiState.actionRequestStatus)
+        assertEquals(RequestStatus.FAILURE("400"), loginUiState.actionRequestStatus)
     }
 
     @Test
@@ -154,7 +154,7 @@ class LoginViewModelTest {
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
         coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } returns
-                Response.error(400, "".toResponseBody())
+                Response.error(400, "400".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

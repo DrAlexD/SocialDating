@@ -19,7 +19,7 @@ class StatementsController(
 ) {
 
     @GetMapping
-    fun getStatements(@RequestParam definingThemeIds: List<Int>): Iterable<Statement> {
+    fun getStatements(@RequestParam definingThemeIds: List<Int>): List<Statement> {
         return statementsService.getStatements(definingThemeIds)
     }
 

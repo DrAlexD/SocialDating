@@ -17,7 +17,7 @@ class UserCategoriesController(
 ) {
 
     @GetMapping("/{id}")
-    fun getUserCategories(@PathVariable("id") userId: Int): Iterable<UserCategory> {
+    fun getUserCategories(@PathVariable("id") userId: Int): List<UserCategory> {
         return userCategoriesService.getUserCategories(userId)
     }
 

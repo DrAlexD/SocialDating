@@ -13,6 +13,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -197,7 +198,7 @@ class CategoriesViewModelTest {
 
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.getCategories() } returns Response.success<List<Category>>(204, null)
+        coEvery { remoteRepository.getCategories() } returns Response.error(404, "404".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

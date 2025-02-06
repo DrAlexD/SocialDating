@@ -16,7 +16,7 @@ class CategoriesController(
 ) {
 
     @GetMapping
-    fun getCategories(): Iterable<Category> {
+    fun getCategories(): List<Category> {
         return categoriesService.getCategories()
     }
 

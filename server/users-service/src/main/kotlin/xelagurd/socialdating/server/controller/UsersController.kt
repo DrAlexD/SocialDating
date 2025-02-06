@@ -15,7 +15,7 @@ class UsersController(
 ) {
 
     @GetMapping("/{id}")
-    fun getUser(@PathVariable("id") userId: Int): User? {
+    fun getUser(@PathVariable("id") userId: Int): User {
         return usersService.getUser(userId)
     }
 }

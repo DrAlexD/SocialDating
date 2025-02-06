@@ -2,6 +2,7 @@ package xelagurd.socialdating.server.service
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.repository.UsersRepository
 
@@ -10,7 +11,7 @@ class UsersService(
     private val usersRepository: UsersRepository
 ) {
 
-    fun getUser(userId: Int): User? {
-        return usersRepository.findByIdOrNull(userId)
+    fun getUser(userId: Int): User {
+        return usersRepository.findByIdOrNull(userId) ?: throw NoDataFoundException("User didn't found by id: $userId")
     }
 }

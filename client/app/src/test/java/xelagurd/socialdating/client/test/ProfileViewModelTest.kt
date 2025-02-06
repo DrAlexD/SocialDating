@@ -14,6 +14,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -206,7 +207,7 @@ class ProfileViewModelTest {
 
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.getUser(userId) } returns Response.success<User>(204, null)
+        coEvery { remoteRepository.getUser(userId) } returns Response.error(404, "404".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

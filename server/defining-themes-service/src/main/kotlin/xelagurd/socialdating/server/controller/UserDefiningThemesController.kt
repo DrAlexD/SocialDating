@@ -17,7 +17,7 @@ class UserDefiningThemesController(
 ) {
 
     @GetMapping
-    fun getUserDefiningThemes(@RequestParam userCategoryIds: List<Int>): Iterable<UserDefiningTheme> {
+    fun getUserDefiningThemes(@RequestParam userCategoryIds: List<Int>): List<UserDefiningTheme> {
         return userDefiningThemesService.getUserDefiningThemes(userCategoryIds)
     }
 

@@ -17,6 +17,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -349,13 +350,13 @@ class ProfileStatisticsViewModelTest {
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
         coEvery { remoteCategoriesRepository.getCategories() } returns
-                Response.success<List<Category>>(204, null)
+                Response.error(404, "404".toResponseBody())
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(emptyList()) } returns
-                Response.success<List<DefiningTheme>>(204, null)
+                Response.error(404, "404".toResponseBody())
         coEvery { remoteUserCategoriesRepository.getUserCategories(userId) } returns
-                Response.success<List<UserCategory>>(204, null)
+                Response.error(404, "404".toResponseBody())
         coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(emptyList()) } returns
-                Response.success<List<UserDefiningTheme>>(204, null)
+                Response.error(404, "404".toResponseBody())
 
         coEvery { localCategoriesRepository.insertCategories(emptyList()) } just Runs
         coEvery { localDefiningThemesRepository.insertDefiningThemes(emptyList()) } just Runs
