@@ -59,9 +59,9 @@ class RegistrationViewModel @Inject constructor(
 
                 localRepository.insertUser(user)
                 preferencesRepository.saveCurrentUserId(user.id)
+            }
 
-                _uiState.update { it.copy(actionRequestStatus = status) } // TODO: Move outside after implementing server
-            } else { // TODO: remove after implementing server
+            if (status is RequestStatus.ERROR) { // FixMe: remove after implementing server
                 accountManager.saveCredentials(
                     LoginDetails(
                         FakeDataSource.users[0].username,
@@ -77,6 +77,8 @@ class RegistrationViewModel @Inject constructor(
                 preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id)
 
                 _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
+            } else {
+                _uiState.update { it.copy(actionRequestStatus = status) } // TODO: Move outside after implementing server
             }
         }
     }

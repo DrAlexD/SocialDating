@@ -99,15 +99,17 @@ class StatementAddingViewModel @Inject constructor(
 
             if (statement != null) {
                 localStatementsRepository.insertStatement(statement)
+            }
 
-                _uiState.update { it.copy(actionRequestStatus = status) } // TODO: Move outside after implementing server
-            } else { // TODO: remove after implementing server
+            if (status is RequestStatus.ERROR) { // FixMe: remove after implementing server
                 if (!localStatementsRepository.getStatements().first().map { it.id }
                         .contains(FakeDataSource.newStatement.id)) {
                     localStatementsRepository.insertStatement(FakeDataSource.newStatement)
                 }
 
                 _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
+            } else {
+                _uiState.update { it.copy(actionRequestStatus = status) } // TODO: Move outside after implementing server
             }
         }
     }

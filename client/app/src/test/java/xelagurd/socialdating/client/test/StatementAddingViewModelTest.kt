@@ -13,6 +13,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -145,7 +146,7 @@ class StatementAddingViewModelTest {
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
         coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns
-                Response.success<Statement>(204, null)
+                Response.error(400, "".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

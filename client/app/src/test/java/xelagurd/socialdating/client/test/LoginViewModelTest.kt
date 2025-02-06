@@ -14,6 +14,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -152,7 +153,8 @@ class LoginViewModelTest {
 
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } returns Response.success<User>(204, null)
+        coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } returns
+                Response.error(400, "".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

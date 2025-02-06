@@ -12,6 +12,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
@@ -133,7 +134,7 @@ class RegistrationViewModelTest {
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
         coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns
-                Response.success<User>(204, null)
+                Response.error(400, "".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

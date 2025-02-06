@@ -1,6 +1,5 @@
 package xelagurd.socialdating.client.ui.viewmodel
 
-import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +17,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import retrofit2.HttpException
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
@@ -107,7 +105,7 @@ class StatementsViewModel @Inject constructor(
                 globalStatus = statusDefiningThemes
             }
 
-            if (globalStatus != RequestStatus.SUCCESS) { // FixMe: remove after implementing server
+            if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after implementing server
                 if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
                     localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes)
                 }
@@ -123,7 +121,7 @@ class StatementsViewModel @Inject constructor(
     fun onStatementReactionClick(statement: Statement, reactionType: StatementReactionType) {
         if (currentUserId != null) {
             viewModelScope.launch {
-                try {
+                val (_, status) = safeApiCall(context) {
                     remoteStatementsRepository.addStatementReaction(
                         statement.id,
                         StatementReactionDetails(
@@ -134,15 +132,9 @@ class StatementsViewModel @Inject constructor(
                             isSupportDefiningTheme = statement.isSupportDefiningTheme
                         )
                     )
-                } catch (e: Exception) {
-                    when (e) {
-                        is IOException, is HttpException -> {
-                            // TODO: implement handler
-                        }
-
-                        else -> throw e
-                    }
                 }
+
+                // TODO: implement action on error
             }
         }
     }

@@ -128,7 +128,7 @@ class ProfileStatisticsViewModel @Inject constructor(
                 globalStatus = statusCategories
             }
 
-            if (globalStatus != RequestStatus.SUCCESS) { // FixMe: remove after implementing server
+            if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after implementing server
                 if (localCategoriesRepository.getCategories().first().isEmpty()) {
                     localCategoriesRepository.insertCategories(FakeDataSource.categories)
                 }
