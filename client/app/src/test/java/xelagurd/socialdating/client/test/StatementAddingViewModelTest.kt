@@ -99,7 +99,7 @@ class StatementAddingViewModelTest {
         initViewModel()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILURE(), statementAddingUiState.actionRequestStatus)
+        assertEquals(RequestStatus.FAILURE("400"), statementAddingUiState.actionRequestStatus)
     }
 
     @Test
@@ -146,7 +146,7 @@ class StatementAddingViewModelTest {
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
         coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns
-                Response.error(400, "".toResponseBody())
+                Response.error(400, "400".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

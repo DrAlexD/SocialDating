@@ -17,7 +17,7 @@ class DefiningThemesController(
 ) {
 
     @GetMapping
-    fun getDefiningThemes(@RequestParam categoryIds: List<Int>): Iterable<DefiningTheme> {
+    fun getDefiningThemes(@RequestParam categoryIds: List<Int>): List<DefiningTheme> {
         return definingThemesService.getDefiningThemes(categoryIds)
     }
 

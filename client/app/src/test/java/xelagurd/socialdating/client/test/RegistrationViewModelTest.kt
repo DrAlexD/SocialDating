@@ -90,7 +90,7 @@ class RegistrationViewModelTest {
         initViewModel()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILURE(), registrationUiState.actionRequestStatus)
+        assertEquals(RequestStatus.FAILURE("400"), registrationUiState.actionRequestStatus)
     }
 
     @Test
@@ -134,7 +134,7 @@ class RegistrationViewModelTest {
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
         coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns
-                Response.error(400, "".toResponseBody())
+                Response.error(400, "400".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {
