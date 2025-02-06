@@ -13,9 +13,11 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
@@ -136,13 +138,15 @@ class StatementAddingViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns statement
+        coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns
+                Response.success(statement)
         coEvery { localStatementsRepository.insertStatement(statement) } just Runs
     }
 
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns null
+        coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns
+                Response.error(400, "".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

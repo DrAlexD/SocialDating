@@ -16,6 +16,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.model.Category
@@ -188,7 +189,7 @@ class CategoriesViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteRepository.getCategories() } returns remoteCategories
+        coEvery { remoteRepository.getCategories() } returns Response.success(remoteCategories)
         coEvery { localRepository.insertCategories(remoteCategories) } answers {
             categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, remoteCategories)
         }
@@ -196,7 +197,7 @@ class CategoriesViewModelTest {
 
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.getCategories() } returns emptyList()
+        coEvery { remoteRepository.getCategories() } returns Response.success<List<Category>>(204, null)
     }
 
     private fun mockDataWithoutInternet() {

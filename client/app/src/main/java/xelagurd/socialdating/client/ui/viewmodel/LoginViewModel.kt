@@ -1,6 +1,5 @@
 package xelagurd.socialdating.client.ui.viewmodel
 
-import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,14 +15,13 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.mindrot.jbcrypt.BCrypt
-import retrofit2.HttpException
-import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.details.LoginDetails
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
+import xelagurd.socialdating.client.data.safeApiCall
 import xelagurd.socialdating.client.ui.state.LoginUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
 
@@ -83,55 +81,43 @@ class LoginViewModel @Inject constructor(
     }
 
     private suspend fun loginUser(loginDetails: LoginDetails, isLoginWithInput: Boolean) {
-        try {
-            _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
+        _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
-            val user = remoteRepository.loginUser(
-                loginDetails.copy(
-                    password = BCrypt.hashpw(loginDetails.password, BCrypt.gensalt())
+        val encodedLoginDetails = loginDetails.copy(
+            password = BCrypt.hashpw(loginDetails.password, BCrypt.gensalt())
+        )
+
+        val (user, status) = safeApiCall(context) {
+            remoteRepository.loginUser(encodedLoginDetails)
+        }
+
+        if (user != null) {
+            if (isLoginWithInput) {
+                accountManager.saveCredentials(loginDetails)
+            }
+
+            localRepository.insertUser(user)
+            preferencesRepository.saveCurrentUserId(user.id)
+        }
+
+        if (status is RequestStatus.ERROR) { // FixMe: remove after implementing server
+            accountManager.saveCredentials(
+                LoginDetails(
+                    FakeDataSource.users[0].username,
+                    FakeDataSource.users[0].password
                 )
             )
 
-            if (user != null) {
-                if (isLoginWithInput) {
-                    accountManager.saveCredentials(loginDetails)
-                }
-
-                localRepository.insertUser(user)
-                preferencesRepository.saveCurrentUserId(user.id)
-
-                _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
-            } else {
-                _uiState.update {
-                    it.copy(
-                        actionRequestStatus = RequestStatus.FAILURE(
-                            failureText = context.getString(R.string.failed_login)
-                        )
-                    )
-                }
+            if (!localRepository.getUsers().first().map { it.id }
+                    .contains(FakeDataSource.users[0].id)) {
+                localRepository.insertUser(FakeDataSource.users[0])
             }
-        } catch (e: Exception) {
-            when (e) {
-                is IOException, is HttpException -> {
-                    accountManager.saveCredentials(
-                        LoginDetails(
-                            FakeDataSource.users[0].username,
-                            FakeDataSource.users[0].password
-                        )
-                    ) // TODO: remove after implementing server
 
-                    if (!localRepository.getUsers().first().map { it.id }
-                            .contains(FakeDataSource.users[0].id)) {
-                        localRepository.insertUser(FakeDataSource.users[0]) // TODO: remove after implementing server
-                    }
+            preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id)
 
-                    preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) // TODO: remove after implementing server
-
-                    _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) } // TODO: Change to ERROR after implementing server
-                }
-
-                else -> throw e
-            }
+            _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
+        } else {
+            _uiState.update { it.copy(actionRequestStatus = status) } // TODO: Move outside after implementing server
         }
     }
 }

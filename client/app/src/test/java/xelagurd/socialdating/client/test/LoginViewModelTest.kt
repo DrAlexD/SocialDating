@@ -14,9 +14,11 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
@@ -143,14 +145,16 @@ class LoginViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } returns remoteUser
+        coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } returns
+                Response.success(remoteUser)
         coEvery { localRepository.insertUser(remoteUser) } just Runs
         coEvery { preferencesRepository.saveCurrentUserId(remoteUser.id) } just Runs
     }
 
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } returns null
+        coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } returns
+                Response.error(400, "".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

@@ -1,5 +1,6 @@
 package xelagurd.socialdating.client.data.remote
 
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -18,32 +19,32 @@ import xelagurd.socialdating.client.data.model.details.StatementDetails
 
 interface ApiService {
     @POST("users/auth/login")
-    suspend fun loginUser(@Body loginDetails: LoginDetails): User?
+    suspend fun loginUser(@Body loginDetails: LoginDetails): Response<User>
 
     @POST("users/auth/register")
-    suspend fun registerUser(@Body registrationDetails: RegistrationDetails): User?
+    suspend fun registerUser(@Body registrationDetails: RegistrationDetails): Response<User>
 
     @GET("users/{id}")
-    suspend fun getUser(@Path("id") userId: Int): User?
+    suspend fun getUser(@Path("id") userId: Int): Response<User>
 
     @GET("categories")
-    suspend fun getCategories(): List<Category>
+    suspend fun getCategories(): Response<List<Category>>
 
     @GET("categories/users/{id}")
-    suspend fun getUserCategories(@Path("id") userId: Int): List<UserCategory>
+    suspend fun getUserCategories(@Path("id") userId: Int): Response<List<UserCategory>>
 
     @GET("defining-themes")
-    suspend fun getDefiningThemes(@Query("categoryIds") categoryIds: List<Int>): List<DefiningTheme>
+    suspend fun getDefiningThemes(@Query("categoryIds") categoryIds: List<Int>): Response<List<DefiningTheme>>
 
     @GET("defining-themes/users")
-    suspend fun getUserDefiningThemes(@Query("userCategoryIds") userCategoryIds: List<Int>): List<UserDefiningTheme>
+    suspend fun getUserDefiningThemes(@Query("userCategoryIds") userCategoryIds: List<Int>): Response<List<UserDefiningTheme>>
 
     @GET("statements")
-    suspend fun getStatements(@Query("definingThemeIds") definingThemeIds: List<Int>): List<Statement>
+    suspend fun getStatements(@Query("definingThemeIds") definingThemeIds: List<Int>): Response<List<Statement>>
 
     @POST("statements")
-    suspend fun addStatement(@Body statementDetails: StatementDetails): Statement?
+    suspend fun addStatement(@Body statementDetails: StatementDetails): Response<Statement>
 
     @POST("statements/{id}/reaction")
-    suspend fun addStatementReaction(@Path("id") statementId: Int, @Body statementReactionDetails: StatementReactionDetails)
+    suspend fun addStatementReaction(@Path("id") statementId: Int, @Body statementReactionDetails: StatementReactionDetails): Response<Unit>
 }

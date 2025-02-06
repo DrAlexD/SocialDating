@@ -1,6 +1,5 @@
 package xelagurd.socialdating.client.ui.viewmodel
 
-import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,8 +17,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import retrofit2.HttpException
-import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
@@ -29,6 +26,7 @@ import xelagurd.socialdating.client.data.model.additional.StatementReactionDetai
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
+import xelagurd.socialdating.client.data.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.StatementsDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.StatementsUiState
@@ -82,64 +80,48 @@ class StatementsViewModel @Inject constructor(
 
     fun getStatements() {
         viewModelScope.launch {
-            try {
-                dataRequestStatusFlow.update { RequestStatus.LOADING }
+            var globalStatus: RequestStatus = RequestStatus.LOADING
 
-                val remoteDefiningThemes = remoteDefiningThemesRepository
-                    .getDefiningThemes(listOf(categoryId))
+            dataRequestStatusFlow.update { globalStatus }
 
-                if (remoteDefiningThemes.isNotEmpty()) {
-                    localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
+            val (remoteDefiningThemes, statusDefiningThemes) = safeApiCall(context) {
+                remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId))
+            }
 
-                    val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
-                    val remoteStatements = remoteStatementsRepository
-                        .getStatements(remoteDefiningThemeIds)
+            if (remoteDefiningThemes != null) {
+                localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
 
-                    if (remoteStatements.isNotEmpty()) {
-                        localStatementsRepository.insertStatements(remoteStatements)
-
-                        dataRequestStatusFlow.update { RequestStatus.SUCCESS }
-                    } else {
-                        dataRequestStatusFlow.update {
-                            RequestStatus.FAILURE(
-                                failureText = context.getString(R.string.no_data)
-                            )
-                        }
-                    }
-                } else {
-                    dataRequestStatusFlow.update {
-                        RequestStatus.FAILURE(
-                            failureText = context.getString(R.string.no_data)
-                        )
-                    }
+                val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
+                val (remoteStatements, statusStatements) = safeApiCall(context) {
+                    remoteStatementsRepository.getStatements(remoteDefiningThemeIds)
                 }
-            } catch (e: Exception) {
-                when (e) {
-                    is IOException, is HttpException -> {
-                        if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
-                            localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
-                        }
-                        if (localStatementsRepository.getStatements().first().isEmpty()) {
-                            localStatementsRepository.insertStatements(FakeDataSource.statements) // FixMe: remove after implementing server
-                        }
 
-                        dataRequestStatusFlow.update {
-                            RequestStatus.ERROR(
-                                errorText = context.getString(R.string.no_internet_connection)
-                            )
-                        }
-                    }
+                if (remoteStatements != null) {
+                    localStatementsRepository.insertStatements(remoteStatements)
+                }
 
-                    else -> throw e
+                globalStatus = statusStatements
+            } else {
+                globalStatus = statusDefiningThemes
+            }
+
+            if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after implementing server
+                if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
+                    localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes)
+                }
+                if (localStatementsRepository.getStatements().first().isEmpty()) {
+                    localStatementsRepository.insertStatements(FakeDataSource.statements)
                 }
             }
+
+            dataRequestStatusFlow.update { globalStatus }
         }
     }
 
     fun onStatementReactionClick(statement: Statement, reactionType: StatementReactionType) {
         if (currentUserId != null) {
             viewModelScope.launch {
-                try {
+                val (_, status) = safeApiCall(context) {
                     remoteStatementsRepository.addStatementReaction(
                         statement.id,
                         StatementReactionDetails(
@@ -150,15 +132,9 @@ class StatementsViewModel @Inject constructor(
                             isSupportDefiningTheme = statement.isSupportDefiningTheme
                         )
                     )
-                } catch (e: Exception) {
-                    when (e) {
-                        is IOException, is HttpException -> {
-                            // TODO: implement handler
-                        }
-
-                        else -> throw e
-                    }
                 }
+
+                // TODO: implement action on error
             }
         }
     }
