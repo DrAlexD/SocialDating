@@ -1,15 +1,22 @@
 package xelagurd.socialdating.server.model
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Table
+import jakarta.validation.constraints.NotBlank
 
 @Entity(name = "categories")
+@Table(name = "categories")
 class Category(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
     var id: Int? = null,
+
+    @field:Column(nullable = false, unique = true)
+    @field:NotBlank
     var name: String
 ) {
     override fun equals(other: Any?): Boolean {

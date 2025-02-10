@@ -1,18 +1,33 @@
 package xelagurd.socialdating.server.model
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Table
+import jakarta.validation.constraints.NotBlank
 
 @Entity(name = "defining_themes")
+@Table(name = "defining_themes")
 class DefiningTheme(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
     var id: Int? = null,
+
+    @field:Column(nullable = false, unique = true)
+    @field:NotBlank
     var name: String,
+
+    @field:Column(nullable = false)
+    @field:NotBlank
     var fromOpinion: String,
+
+    @field:Column(nullable = false)
+    @field:NotBlank
     var toOpinion: String,
+
+
     var categoryId: Int
 ) {
     override fun equals(other: Any?): Boolean {
