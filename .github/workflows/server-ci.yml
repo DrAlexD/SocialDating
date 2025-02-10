@@ -139,8 +139,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           context: server/${{ matrix.service }}
           tags: ${{ vars.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest
-          cache-from: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest
-          cache-to: type=inline
 
   completed-server-ci:
     name: Completed Server CI
