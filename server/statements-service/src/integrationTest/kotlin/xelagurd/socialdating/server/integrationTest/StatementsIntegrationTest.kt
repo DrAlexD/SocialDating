@@ -20,7 +20,7 @@ class StatementsIntegrationTest {
         var userCategoryId = -1
 
         val requestCategory = mapOf(
-            "name" to "RemoteCategory1"
+            "name" to "TestRemoteCategory1"
         )
         val postCategoryResponse = restTemplate.postForEntity(
             "$GATEWAY_URL/api/v1/categories",
@@ -35,7 +35,7 @@ class StatementsIntegrationTest {
 
 
         val requestDefiningTheme = mapOf(
-            "name" to "RemoteDefiningTheme1",
+            "name" to "TestRemoteDefiningTheme1",
             "fromOpinion" to "No",
             "toOpinion" to "Yes",
             "categoryId" to responseCategory["id"]
@@ -56,7 +56,7 @@ class StatementsIntegrationTest {
 
 
         val requestStatement = mapOf(
-            "text" to "RemoteStatement1",
+            "text" to "TestRemoteStatement1",
             "isSupportDefiningTheme" to true,
             "definingThemeId" to responseDefiningTheme["id"],
             "creatorUserId" to userId
