@@ -14,7 +14,7 @@ import jakarta.validation.constraints.NotBlank
 class Statement(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int? = null,
+    var id: Int = 0,
 
     @field:Column(nullable = false, unique = true)
     @field:NotBlank
@@ -23,7 +23,8 @@ class Statement(
     @field:Column(nullable = false)
     var isSupportDefiningTheme: Boolean,
 
-
+    @field:Column(nullable = false)
+    @field:Min(value = 1)
     var definingThemeId: Int,
 
     @field:Column(nullable = false)

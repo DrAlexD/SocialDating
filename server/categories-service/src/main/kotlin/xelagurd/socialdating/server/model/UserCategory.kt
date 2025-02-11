@@ -14,17 +14,19 @@ import jakarta.validation.constraints.Min
 class UserCategory(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int? = null,
+    var id: Int = 0,
 
     @field:Column(nullable = false)
     @field:Min(value = 0)
     @field:Max(value = 100)
     var interest: Int,
 
-
+    @field:Column(nullable = false)
+    @field:Min(value = 1)
     var userId: Int,
 
-
+    @field:Column(nullable = false)
+    @field:Min(value = 1)
     var categoryId: Int
 ) {
     override fun equals(other: Any?): Boolean {

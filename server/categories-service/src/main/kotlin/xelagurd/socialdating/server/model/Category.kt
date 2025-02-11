@@ -13,7 +13,7 @@ import jakarta.validation.constraints.NotBlank
 class Category(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int? = null,
+    var id: Int = 0,
 
     @field:Column(nullable = false, unique = true)
     @field:NotBlank

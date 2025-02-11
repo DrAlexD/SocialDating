@@ -14,7 +14,7 @@ import jakarta.validation.constraints.Min
 class UserDefiningTheme(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int? = null,
+    var id: Int = 0,
 
     @field:Column(name = "udt_value", nullable = false)
     @field:Min(value = 0)
@@ -26,10 +26,12 @@ class UserDefiningTheme(
     @field:Max(value = 100)
     var interest: Int,
 
-
+    @field:Column(nullable = false)
+    @field:Min(value = 1)
     var userCategoryId: Int,
 
-
+    @field:Column(nullable = false)
+    @field:Min(value = 1)
     var definingThemeId: Int
 ) {
     override fun equals(other: Any?): Boolean {

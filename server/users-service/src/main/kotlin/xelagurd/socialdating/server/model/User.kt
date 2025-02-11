@@ -19,7 +19,7 @@ import xelagurd.socialdating.server.model.enums.Purpose
 class User(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int? = null,
+    var id: Int = 0,
 
     @field:Column(nullable = false)
     @field:NotBlank
@@ -37,8 +37,9 @@ class User(
     @field:NotBlank
     var password: String,
 
-    @field:Column(nullable = false)
-    var email: String,
+    @field:Column(unique = true)
+    @field:NotBlank
+    var email: String? = null,
 
     @field:Column(nullable = false)
     @field:Min(value = 18)

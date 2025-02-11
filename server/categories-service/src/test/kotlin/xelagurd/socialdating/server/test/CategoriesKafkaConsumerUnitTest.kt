@@ -69,7 +69,7 @@ class CategoriesKafkaConsumerUnitTest {
 
         every {
             kafkaProducer.sendStatementReaction(
-                statementReactionDetails.copy(userOrUserCategoryId = updatedUserCategory.id!!)
+                statementReactionDetails.copy(userOrUserCategoryId = updatedUserCategory.id)
             )
         } just Runs
 
@@ -89,7 +89,7 @@ class CategoriesKafkaConsumerUnitTest {
 
         every {
             kafkaProducer.sendStatementReaction(
-                statementReactionDetails.copy(userOrUserCategoryId = newAddedUserCategory.id!!)
+                statementReactionDetails.copy(userOrUserCategoryId = newAddedUserCategory.id)
             )
         } just Runs
 

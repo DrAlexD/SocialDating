@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 
 @Entity(name = "defining_themes")
@@ -13,7 +14,7 @@ import jakarta.validation.constraints.NotBlank
 class DefiningTheme(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int? = null,
+    var id: Int = 0,
 
     @field:Column(nullable = false, unique = true)
     @field:NotBlank
@@ -27,7 +28,8 @@ class DefiningTheme(
     @field:NotBlank
     var toOpinion: String,
 
-
+    @field:Column(nullable = false)
+    @field:Min(value = 1)
     var categoryId: Int
 ) {
     override fun equals(other: Any?): Boolean {
