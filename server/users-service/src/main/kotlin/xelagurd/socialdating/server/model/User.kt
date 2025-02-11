@@ -39,7 +39,7 @@ class User(
 
     @field:Column(unique = true)
     @field:NotBlank
-    var email: String? = null,
+    var email: String?,
 
     @field:Column(nullable = false)
     @field:Min(value = 18)
