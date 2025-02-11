@@ -4,12 +4,14 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import org.springframework.http.HttpStatus
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.web.client.RestTemplate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import xelagurd.socialdating.server.utils.TestUtils.readArrayFromJsonString
 import xelagurd.socialdating.server.utils.TestUtils.readObjectFromJsonString
 
+@ActiveProfiles("integrationTest")
 class StatementsIntegrationTest {
     private val restTemplate = RestTemplate()
     private val GATEWAY_URL = "http://localhost:8080"

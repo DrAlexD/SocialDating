@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Profile
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.repository.StatementsRepository
 
-@Profile("!test")
+@Profile("!test & !integrationTest")
 @Configuration
 class DevelopmentConfig {
 
