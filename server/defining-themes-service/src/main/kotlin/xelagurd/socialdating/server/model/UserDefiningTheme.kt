@@ -5,16 +5,33 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Table
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
 
 @Entity(name = "user_defining_themes")
+@Table(name = "user_defining_themes")
 class UserDefiningTheme(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int? = null,
-    @Column(name = "udt_value")
+    var id: Int = 0,
+
+    @field:Column(name = "udt_value", nullable = false)
+    @field:Min(value = 0)
+    @field:Max(value = 100)
     var value: Int,
+
+    @field:Column(nullable = false)
+    @field:Min(value = 0)
+    @field:Max(value = 100)
     var interest: Int,
+
+    @field:Column(nullable = false)
+    @field:Min(value = 1)
     var userCategoryId: Int,
+
+    @field:Column(nullable = false)
+    @field:Min(value = 1)
     var definingThemeId: Int
 ) {
     override fun equals(other: Any?): Boolean {

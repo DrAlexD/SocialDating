@@ -1,17 +1,32 @@
 package xelagurd.socialdating.server.model
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Table
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
 
 @Entity(name = "user_categories")
+@Table(name = "user_categories")
 class UserCategory(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int? = null,
+    var id: Int = 0,
+
+    @field:Column(nullable = false)
+    @field:Min(value = 0)
+    @field:Max(value = 100)
     var interest: Int,
+
+    @field:Column(nullable = false)
+    @field:Min(value = 1)
     var userId: Int,
+
+    @field:Column(nullable = false)
+    @field:Min(value = 1)
     var categoryId: Int
 ) {
     override fun equals(other: Any?): Boolean {

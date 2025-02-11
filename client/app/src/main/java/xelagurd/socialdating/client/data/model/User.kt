@@ -15,7 +15,7 @@ data class User(
     val gender: Gender,
     val username: String,
     val password: String,
-    val email: String,
+    val email: String?,
     val age: Int,
     val city: String,
     val purpose: Purpose,
