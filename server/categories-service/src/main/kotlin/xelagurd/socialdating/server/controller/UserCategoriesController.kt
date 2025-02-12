@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.service.UserCategoriesService
@@ -23,7 +24,7 @@ class UserCategoriesController(
 
     // TODO: Add admin privileges
     @PostMapping
-    fun addUserCategory(@RequestBody userCategoryDetails: UserCategoryDetails): UserCategory {
+    fun addUserCategory(@RequestBody @Valid userCategoryDetails: UserCategoryDetails): UserCategory {
         return userCategoriesService.addUserCategory(userCategoryDetails)
     }
 }
