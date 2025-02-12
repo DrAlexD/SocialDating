@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.UserCategoriesController
+import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.service.UserCategoriesService
@@ -34,7 +35,7 @@ class UserCategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
     private val userCategoryDetails = UserCategoryDetails(interest = 10, userId = 1, categoryId = 1)
 
     @Test
-    fun getUserCategories() {
+    fun getUserCategories_allData_success() {
         val expected = userCategories.filter { it.userId == userId }
         `when`(userCategoriesService.getUserCategories(userId)).thenReturn(expected)
 
@@ -44,6 +45,18 @@ class UserCategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json(convertObjectToJsonString(expected)))
+    }
+
+    @Test
+    fun getUserCategories_emptyData_error() {
+        val message = "test"
+        `when`(userCategoriesService.getUserCategories(userId)).thenThrow(NoDataFoundException(message))
+
+        mockMvc.perform(
+            get("/api/v1/categories/users/$userId")
+        )
+            .andExpect(status().isNotFound)
+            .andExpect(content().string(message))
     }
 
     @Test

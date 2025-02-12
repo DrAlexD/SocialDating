@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.StatementsController
+import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.details.StatementDetails
@@ -73,7 +74,7 @@ class StatementsControllerTest(@Autowired private val mockMvc: MockMvc) {
     )
 
     @Test
-    fun getStatementsByDefiningThemeIds() {
+    fun getStatementsByDefiningThemeIds_allData_success() {
         val expected = statements.filter { it.definingThemeId in definingThemeIds }
         `when`(statementsService.getStatements(definingThemeIds)).thenReturn(expected)
 
@@ -83,6 +84,18 @@ class StatementsControllerTest(@Autowired private val mockMvc: MockMvc) {
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json(convertObjectToJsonString(expected)))
+    }
+
+    @Test
+    fun getStatementsByDefiningThemeIds_emptyData_error() {
+        val message = "test"
+        `when`(statementsService.getStatements(definingThemeIds)).thenThrow(NoDataFoundException(message))
+
+        mockMvc.perform(
+            get("/api/v1/statements?definingThemeIds=${definingThemeIds.toRequestParams()}")
+        )
+            .andExpect(status().isNotFound)
+            .andExpect(content().string(message))
     }
 
     @Test
