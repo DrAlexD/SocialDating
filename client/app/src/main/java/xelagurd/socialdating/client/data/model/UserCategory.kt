@@ -21,7 +21,9 @@ import androidx.room.PrimaryKey
             childColumns = ["userId"]
         )
     ],
-    indices = [Index(value = ["categoryId"]), Index(value = ["userId"])]
+    indices = [
+        Index(value = ["categoryId", "userId"], unique = true)
+    ]
 )
 data class UserCategory(
     @PrimaryKey

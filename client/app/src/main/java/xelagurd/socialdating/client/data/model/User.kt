@@ -2,12 +2,19 @@ package xelagurd.socialdating.client.data.model
 
 import kotlinx.serialization.Serializable
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
 
 @Serializable
-@Entity(tableName = "users")
+@Entity(
+    tableName = "users",
+    indices = [
+        Index(value = ["username"], unique = true),
+        Index(value = ["email"], unique = true)
+    ]
+)
 data class User(
     @PrimaryKey
     override val id: Int,
