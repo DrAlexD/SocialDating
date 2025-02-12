@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.service.DefiningThemesService
@@ -23,7 +24,7 @@ class DefiningThemesController(
 
     // TODO: Add admin privileges
     @PostMapping
-    fun addDefiningTheme(@RequestBody definingThemeDetails: DefiningThemeDetails): DefiningTheme {
+    fun addDefiningTheme(@RequestBody @Valid definingThemeDetails: DefiningThemeDetails): DefiningTheme {
         return definingThemesService.addDefiningTheme(definingThemeDetails)
     }
 }

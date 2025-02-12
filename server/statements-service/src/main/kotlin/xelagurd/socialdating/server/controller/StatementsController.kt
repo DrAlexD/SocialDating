@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.details.StatementDetails
@@ -24,7 +25,7 @@ class StatementsController(
     }
 
     @PostMapping
-    fun addStatement(@RequestBody statementDetails: StatementDetails): Statement {
+    fun addStatement(@RequestBody @Valid statementDetails: StatementDetails): Statement {
         return statementsService.addStatement(statementDetails)
     }
 
