@@ -8,6 +8,8 @@ import io.mockk.impl.annotations.MockK
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
@@ -69,7 +71,7 @@ class UsersServiceUnitTest {
     }
 
     @Test
-    fun getUsers() {
+    fun getUsers_allData_success() {
         val expected = users.filter { it.id == userId }
 
         assertEquals(expected.size, 1)
@@ -79,5 +81,12 @@ class UsersServiceUnitTest {
         val result = usersService.getUser(userId)
 
         assertEquals(expected[0], result)
+    }
+
+    @Test
+    fun getCategories_emptyData_error() {
+        every { usersRepository.findByIdOrNull(userId) } returns null
+
+        assertThrows<NoDataFoundException> { usersService.getUser(userId) }
     }
 }

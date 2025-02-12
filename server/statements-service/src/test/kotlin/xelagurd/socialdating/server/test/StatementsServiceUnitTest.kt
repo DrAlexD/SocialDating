@@ -11,6 +11,8 @@ import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.details.StatementDetails
@@ -80,13 +82,20 @@ class StatementsServiceUnitTest {
     }
 
     @Test
-    fun getStatementsByDefiningThemeIds() {
+    fun getStatementsByDefiningThemeIds_allData_success() {
         val expected = statements.filter { it.definingThemeId in definingThemeIds }
         every { statementsRepository.findAllByDefiningThemeIdIn(definingThemeIds) } returns expected
 
         val result = statementsService.getStatements(definingThemeIds)
 
         assertEquals(expected, result)
+    }
+
+    @Test
+    fun getStatementsByDefiningThemeIds_emptyData_error() {
+        every { statementsRepository.findAllByDefiningThemeIdIn(definingThemeIds) } returns emptyList()
+
+        assertThrows<NoDataFoundException> { statementsService.getStatements(definingThemeIds) }
     }
 
     @Test
