@@ -14,14 +14,12 @@ import androidx.room.PrimaryKey
             entity = DefiningTheme::class,
             parentColumns = ["id"],
             childColumns = ["definingThemeId"]
-        ),
-        ForeignKey(
-            entity = User::class,
-            parentColumns = ["id"],
-            childColumns = ["creatorUserId"]
         )
     ],
-    indices = [Index(value = ["definingThemeId"]), Index(value = ["creatorUserId"])]
+    indices = [
+        Index(value = ["text"], unique = true),
+        Index(value = ["definingThemeId"])
+    ]
 )
 data class Statement(
     @PrimaryKey
