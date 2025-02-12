@@ -63,7 +63,7 @@ class StatementsMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             statementsDetails[0],
             Statement::class.java
         )
-        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse1.body!!, statements[0])
 
         val postResponse2 = restTemplate.postForEntity(
@@ -71,7 +71,7 @@ class StatementsMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             statementsDetails[1],
             Statement::class.java
         )
-        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse2.body!!, statements[1])
 
         val postResponse3 = restTemplate.postForEntity(
@@ -79,7 +79,7 @@ class StatementsMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             statementsDetails[2],
             Statement::class.java
         )
-        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse3.body!!, statements[2])
 
         val getResponse2 = restTemplate.getForEntity(

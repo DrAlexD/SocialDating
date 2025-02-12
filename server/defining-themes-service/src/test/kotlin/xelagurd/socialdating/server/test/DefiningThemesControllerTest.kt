@@ -71,7 +71,7 @@ class DefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(definingThemeDetails))
         )
-            .andExpect(status().isOk)
+            .andExpect(status().isCreated)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json(convertObjectToJsonString(expected)))
     }
