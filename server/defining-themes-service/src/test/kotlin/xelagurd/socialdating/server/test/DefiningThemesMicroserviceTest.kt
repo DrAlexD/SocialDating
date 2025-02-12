@@ -53,7 +53,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             definingThemesDetails[0],
             DefiningTheme::class.java
         )
-        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse1.body!!, definingThemes[0])
 
         val postResponse2 = restTemplate.postForEntity(
@@ -61,7 +61,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             definingThemesDetails[1],
             DefiningTheme::class.java
         )
-        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse2.body!!, definingThemes[1])
 
         val postResponse3 = restTemplate.postForEntity(
@@ -69,7 +69,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             definingThemesDetails[2],
             DefiningTheme::class.java
         )
-        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse3.body!!, definingThemes[2])
 
         val getResponse1 = restTemplate.getForEntity(
@@ -96,7 +96,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             userDefiningThemesDetails[0],
             UserDefiningTheme::class.java
         )
-        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse1.body!!, userDefiningThemes[0])
 
         val postResponse2 = restTemplate.postForEntity(
@@ -104,7 +104,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             userDefiningThemesDetails[1],
             UserDefiningTheme::class.java
         )
-        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse2.body!!, userDefiningThemes[1])
 
         val postResponse3 = restTemplate.postForEntity(
@@ -112,7 +112,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             userDefiningThemesDetails[2],
             UserDefiningTheme::class.java
         )
-        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse3.body!!, userDefiningThemes[2])
 
         val getResponse2 = restTemplate.getForEntity(

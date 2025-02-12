@@ -45,15 +45,15 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
     @Test
     fun addCategoriesAndGetThem() {
         val postResponse1 = restTemplate.postForEntity("/api/v1/categories", categoriesDetails[0], Category::class.java)
-        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse1.body!!, categories[0])
 
         val postResponse2 = restTemplate.postForEntity("/api/v1/categories", categoriesDetails[1], Category::class.java)
-        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse2.body!!, categories[1])
 
         val postResponse3 = restTemplate.postForEntity("/api/v1/categories", categoriesDetails[2], Category::class.java)
-        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse3.body!!, categories[2])
 
         val getResponse = restTemplate.getForEntity("/api/v1/categories", Array<Category>::class.java)
@@ -69,7 +69,7 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             userCategoriesDetails[0],
             UserCategory::class.java
         )
-        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse1.body!!, userCategories[0])
 
         val postResponse2 = restTemplate.postForEntity(
@@ -77,7 +77,7 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             userCategoriesDetails[1],
             UserCategory::class.java
         )
-        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse2.body!!, userCategories[1])
 
         val postResponse3 = restTemplate.postForEntity(
@@ -85,7 +85,7 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             userCategoriesDetails[2],
             UserCategory::class.java
         )
-        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse3.body!!, userCategories[2])
 
         val getResponse = restTemplate.getForEntity("/api/v1/categories/users/$userId", Array<UserCategory>::class.java)

@@ -95,7 +95,7 @@ class StatementsControllerTest(@Autowired private val mockMvc: MockMvc) {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(statementDetails))
         )
-            .andExpect(status().isOk)
+            .andExpect(status().isCreated)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json(convertObjectToJsonString(expected)))
     }
@@ -111,7 +111,7 @@ class StatementsControllerTest(@Autowired private val mockMvc: MockMvc) {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(statementReactionDetails))
         )
-            .andExpect(status().isOk)
+            .andExpect(status().isNoContent)
 
         verify(statementsService).addStatementReaction(statementId, statementReactionDetails)
     }
