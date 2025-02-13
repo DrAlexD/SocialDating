@@ -13,6 +13,7 @@ import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
+import xelagurd.socialdating.server.model.enums.Role
 import xelagurd.socialdating.server.repository.UsersRepository
 import xelagurd.socialdating.server.service.UsersService
 
@@ -35,7 +36,8 @@ class UsersServiceUnitTest {
             age = 20,
             city = "",
             purpose = Purpose.RELATIONSHIPS,
-            activity = 50
+            activity = 50,
+            role = Role.USER
         ),
         User(
             id = 2,
@@ -47,7 +49,8 @@ class UsersServiceUnitTest {
             age = 20,
             city = "",
             purpose = Purpose.RELATIONSHIPS,
-            activity = 50
+            activity = 50,
+            role = Role.USER
         ),
         User(
             id = 3,
@@ -59,7 +62,8 @@ class UsersServiceUnitTest {
             age = 20,
             city = "",
             purpose = Purpose.RELATIONSHIPS,
-            activity = 50
+            activity = 50,
+            role = Role.USER
         )
     )
 
