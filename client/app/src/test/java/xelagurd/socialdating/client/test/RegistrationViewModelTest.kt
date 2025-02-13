@@ -22,10 +22,12 @@ import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.User
+import xelagurd.socialdating.client.data.model.additional.AuthResponse
 import xelagurd.socialdating.client.data.model.details.LoginDetails
 import xelagurd.socialdating.client.data.model.details.RegistrationDetails
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
+import xelagurd.socialdating.client.data.model.enums.Role
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.RegistrationViewModel
@@ -48,7 +50,8 @@ class RegistrationViewModelTest {
     private val registrationDetails =
         RegistrationDetails("", Gender.MALE, "", "", "", "", "", "", Purpose.ALL_AT_ONCE)
     private val remoteUser =
-        User(1, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20)
+        User(1, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20, Role.USER)
+    private val authResponse = AuthResponse(remoteUser, "", "")
 
     private fun initViewModel() {
         viewModel = RegistrationViewModel(
@@ -125,7 +128,7 @@ class RegistrationViewModelTest {
 
     private fun mockDataWithInternet() {
         coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns
-                Response.success(remoteUser)
+                Response.success(authResponse)
         coEvery { accountManager.saveCredentials(registrationDetails.toLoginDetails()) } just Runs
         coEvery { localRepository.insertUser(remoteUser) } just Runs
         coEvery { preferencesRepository.saveCurrentUserId(remoteUser.id) } just Runs
