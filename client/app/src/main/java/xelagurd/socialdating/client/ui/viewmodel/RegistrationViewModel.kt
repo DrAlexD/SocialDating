@@ -50,15 +50,17 @@ class RegistrationViewModel @Inject constructor(
                 password = BCrypt.hashpw(registrationDetails.password, BCrypt.gensalt())
             )
 
-            val (user, status) = safeApiCall(context) {
+            val (authResponse, status) = safeApiCall(context) {
                 remoteRepository.registerUser(encodedRegistrationDetails)
             }
 
-            if (user != null) {
+            if (authResponse != null) {
                 accountManager.saveCredentials(registrationDetails.toLoginDetails())
 
-                localRepository.insertUser(user)
-                preferencesRepository.saveCurrentUserId(user.id)
+                localRepository.insertUser(authResponse.user)
+                preferencesRepository.saveAccessToken(authResponse.accessToken)
+                preferencesRepository.saveRefreshToken(authResponse.refreshToken)
+                preferencesRepository.saveCurrentUserId(authResponse.user.id)
             }
 
             if (status is RequestStatus.ERROR) { // FixMe: remove after implementing server
