@@ -108,7 +108,8 @@ class StatementsMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             statementDetails,
             String::class.java
         )
-        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CONFLICT)
+        assertEquals(postResponse.body!!, "Statement with 'RemoteStatement1' text already exists")
     }
 
     @Test
@@ -125,6 +126,7 @@ class StatementsMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'Text' must not be blank")
     }
 
     @Test
@@ -141,6 +143,7 @@ class StatementsMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'DefiningThemeId' must be greater than or equal to 1")
     }
 
     @Test
@@ -157,5 +160,9 @@ class StatementsMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(
+            postResponse.body!!,
+            "'DefiningThemeId' must be greater than or equal to 1; 'Text' must not be blank"
+        )
     }
 }
