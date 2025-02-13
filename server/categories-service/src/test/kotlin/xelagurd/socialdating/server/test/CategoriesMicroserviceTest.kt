@@ -94,7 +94,8 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
     fun addCategory_notUniqueName_error() {
         val categoryDetails = CategoryDetails(name = "RemoteCategory1")
         val postResponse = restTemplate.postForEntity("/api/v1/categories", categoryDetails, String::class.java)
-        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CONFLICT)
+        assertEquals(postResponse.body!!, "Category with 'RemoteCategory1' name already exists")
     }
 
     @Test
@@ -102,6 +103,7 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
         val categoryDetails = CategoryDetails(name = "")
         val postResponse = restTemplate.postForEntity("/api/v1/categories", categoryDetails, String::class.java)
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'Name' must not be blank")
     }
 
     @Test
@@ -121,6 +123,7 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'Interest' must be greater than or equal to 0")
     }
 
     @Test
@@ -132,6 +135,7 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'CategoryId' must be greater than or equal to 1")
     }
 
     @Test
@@ -143,5 +147,9 @@ class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) 
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(
+            postResponse.body!!,
+            "'CategoryId' must be greater than or equal to 1; 'Interest' must be greater than or equal to 0"
+        )
     }
 }

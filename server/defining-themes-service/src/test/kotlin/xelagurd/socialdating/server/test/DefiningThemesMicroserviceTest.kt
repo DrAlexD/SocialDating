@@ -126,7 +126,8 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             definingThemeDetails,
             String::class.java
         )
-        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CONFLICT)
+        assertEquals(postResponse.body!!, "Defining theme with 'RemoteDefiningTheme1' name already exists")
     }
 
     @Test
@@ -139,6 +140,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'Name' must not be blank")
     }
 
     @Test
@@ -151,6 +153,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'CategoryId' must be greater than or equal to 1")
     }
 
     @Test
@@ -163,6 +166,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'CategoryId' must be greater than or equal to 1; 'Name' must not be blank")
     }
 
     @Test
@@ -186,6 +190,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'Value' must be greater than or equal to 0")
     }
 
     @Test
@@ -198,6 +203,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'DefiningThemeId' must be greater than or equal to 1")
     }
 
     @Test
@@ -210,5 +216,9 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(
+            postResponse.body!!,
+            "'DefiningThemeId' must be greater than or equal to 1; 'Value' must be greater than or equal to 0"
+        )
     }
 }

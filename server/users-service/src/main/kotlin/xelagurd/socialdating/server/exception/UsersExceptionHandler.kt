@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import io.github.oshai.kotlinlogging.KotlinLogging
+import xelagurd.socialdating.server.utils.ExceptionUtils.createWrongDataMessage
+import xelagurd.socialdating.server.utils.ExceptionUtils.transformNotUniqueDataMessage
 
 @RestControllerAdvice
 class UsersExceptionHandler {
@@ -16,7 +18,7 @@ class UsersExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): String {
-        val message = ex.message
+        val message = createWrongDataMessage(ex.bindingResult.fieldErrors.map { it.field to it.defaultMessage })
         logger.error { "Class: ${ex.javaClass.simpleName}, message: $message" }
         return message
     }
@@ -24,15 +26,15 @@ class UsersExceptionHandler {
     @ExceptionHandler(TransactionSystemException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleTransactionSystemException(ex: TransactionSystemException): String {
-        val message = ex.message ?: "Invalid data (empty, wrong values)"
+        val message = "Invalid data (empty or wrong values)"
         logger.error { "Class: ${ex.javaClass.simpleName}, message: $message" }
         return message
     }
 
     @ExceptionHandler(DataIntegrityViolationException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     fun handleDataIntegrityViolationException(ex: DataIntegrityViolationException): String {
-        val message = ex.message ?: "Invalid data (not unique values)"
+        val message = ex.message?.transformNotUniqueDataMessage() ?: "Invalid data (not unique values)"
         logger.error { "Class: ${ex.javaClass.simpleName}, message: $message" }
         return message
     }
