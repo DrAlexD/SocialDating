@@ -32,7 +32,7 @@ class Category(
     }
 
     override fun hashCode(): Int {
-        var result = id ?: 0
+        var result = id
         result = 31 * result + name.hashCode()
         return result
     }

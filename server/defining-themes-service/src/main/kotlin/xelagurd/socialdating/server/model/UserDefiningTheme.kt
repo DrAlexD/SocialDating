@@ -50,7 +50,7 @@ class UserDefiningTheme(
     }
 
     override fun hashCode(): Int {
-        var result = id ?: 0
+        var result = id
         result = 31 * result + value
         result = 31 * result + interest
         result = 31 * result + userCategoryId
