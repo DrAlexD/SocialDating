@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.DefiningThemesController
+import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.service.DefiningThemesService
@@ -49,7 +50,7 @@ class DefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) {
     }
 
     @Test
-    fun getDefiningThemesByCategoryIds() {
+    fun getDefiningThemesByCategoryIds_allData_success() {
         val expected = definingThemes.filter { it.categoryId in categoryIds }
         `when`(definingThemesService.getDefiningThemes(categoryIds)).thenReturn(expected)
 
@@ -62,6 +63,18 @@ class DefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) {
     }
 
     @Test
+    fun getDefiningThemesByCategoryIds_emptyData_error() {
+        val message = "test"
+        `when`(definingThemesService.getDefiningThemes(categoryIds)).thenThrow(NoDataFoundException(message))
+
+        mockMvc.perform(
+            get("/api/v1/defining-themes?categoryIds=${categoryIds.toRequestParams()}")
+        )
+            .andExpect(status().isNotFound)
+            .andExpect(content().string(message))
+    }
+
+    @Test
     fun addDefiningTheme() {
         val expected = definingThemes[0]
         `when`(definingThemesService.addDefiningTheme(definingThemeDetails)).thenReturn(expected)
@@ -71,7 +84,7 @@ class DefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(definingThemeDetails))
         )
-            .andExpect(status().isOk)
+            .andExpect(status().isCreated)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json(convertObjectToJsonString(expected)))
     }

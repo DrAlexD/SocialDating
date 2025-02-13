@@ -7,6 +7,8 @@ import io.mockk.impl.annotations.MockK
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
@@ -50,13 +52,20 @@ class UserCategoriesServiceUnitTest {
     }
 
     @Test
-    fun getUserCategories() {
+    fun getUserCategories_allData_success() {
         val expected = userCategories.filter { it.userId == userId }
         every { userCategoriesRepository.findAllByUserId(userId) } returns expected
 
         val result = userCategoriesService.getUserCategories(userId)
 
         assertEquals(expected, result)
+    }
+
+    @Test
+    fun getUserCategories_emptyData_error() {
+        every { userCategoriesRepository.findAllByUserId(userId) } returns emptyList()
+
+        assertThrows<NoDataFoundException> { userCategoriesService.getUserCategories(userId) }
     }
 
     @Test

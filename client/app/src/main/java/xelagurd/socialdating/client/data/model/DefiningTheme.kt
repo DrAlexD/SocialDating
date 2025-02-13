@@ -16,7 +16,10 @@ import androidx.room.PrimaryKey
             childColumns = ["categoryId"]
         )
     ],
-    indices = [Index(value = ["categoryId"])]
+    indices = [
+        Index(value = ["name"], unique = true),
+        Index(value = ["categoryId"])
+    ]
 )
 data class DefiningTheme(
     @PrimaryKey

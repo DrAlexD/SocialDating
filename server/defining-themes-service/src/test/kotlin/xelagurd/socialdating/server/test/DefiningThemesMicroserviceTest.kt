@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.UserDefiningTheme
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
@@ -17,6 +18,7 @@ import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) {
 
     private val categoryId = 1
@@ -46,14 +48,13 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
         UserDefiningThemeDetails(value = 20, interest = 20, userCategoryId = 3, definingThemeId = 3)
     )
 
-    @Test
-    fun addDefiningThemesAndGetThem() {
+    init {
         val postResponse1 = restTemplate.postForEntity(
             "/api/v1/defining-themes",
             definingThemesDetails[0],
             DefiningTheme::class.java
         )
-        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse1.body!!, definingThemes[0])
 
         val postResponse2 = restTemplate.postForEntity(
@@ -61,7 +62,7 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             definingThemesDetails[1],
             DefiningTheme::class.java
         )
-        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse2.body!!, definingThemes[1])
 
         val postResponse3 = restTemplate.postForEntity(
@@ -69,9 +70,36 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
             definingThemesDetails[2],
             DefiningTheme::class.java
         )
-        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse3.body!!, definingThemes[2])
 
+        val postResponse4 = restTemplate.postForEntity(
+            "/api/v1/defining-themes/users",
+            userDefiningThemesDetails[0],
+            UserDefiningTheme::class.java
+        )
+        assertThat(postResponse4.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertEquals(postResponse4.body!!, userDefiningThemes[0])
+
+        val postResponse5 = restTemplate.postForEntity(
+            "/api/v1/defining-themes/users",
+            userDefiningThemesDetails[1],
+            UserDefiningTheme::class.java
+        )
+        assertThat(postResponse5.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertEquals(postResponse5.body!!, userDefiningThemes[1])
+
+        val postResponse6 = restTemplate.postForEntity(
+            "/api/v1/defining-themes/users",
+            userDefiningThemesDetails[2],
+            UserDefiningTheme::class.java
+        )
+        assertThat(postResponse6.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertEquals(postResponse6.body!!, userDefiningThemes[2])
+    }
+
+    @Test
+    fun getDefiningThemes() {
         val getResponse1 = restTemplate.getForEntity(
             "/api/v1/defining-themes?categoryIds=$categoryId",
             Array<DefiningTheme>::class.java
@@ -90,31 +118,59 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
     }
 
     @Test
-    fun addUserDefiningThemesAndGetThem() {
-        val postResponse1 = restTemplate.postForEntity(
-            "/api/v1/defining-themes/users",
-            userDefiningThemesDetails[0],
-            UserDefiningTheme::class.java
+    fun addDefiningTheme_notUniqueName_error() {
+        val definingThemeDetails =
+            DefiningThemeDetails(name = "RemoteDefiningTheme1", fromOpinion = "No", toOpinion = "Yes", categoryId = 1)
+        val postResponse = restTemplate.postForEntity(
+            "/api/v1/defining-themes",
+            definingThemeDetails,
+            String::class.java
         )
-        assertThat(postResponse1.statusCode).isEqualTo(HttpStatus.OK)
-        assertEquals(postResponse1.body!!, userDefiningThemes[0])
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.CONFLICT)
+        assertEquals(postResponse.body!!, "Defining theme with 'RemoteDefiningTheme1' name already exists")
+    }
 
-        val postResponse2 = restTemplate.postForEntity(
-            "/api/v1/defining-themes/users",
-            userDefiningThemesDetails[1],
-            UserDefiningTheme::class.java
+    @Test
+    fun addDefiningTheme_emptyName_error() {
+        val definingThemeDetails =
+            DefiningThemeDetails(name = "", fromOpinion = "No", toOpinion = "Yes", categoryId = 1)
+        val postResponse = restTemplate.postForEntity(
+            "/api/v1/defining-themes",
+            definingThemeDetails,
+            String::class.java
         )
-        assertThat(postResponse2.statusCode).isEqualTo(HttpStatus.OK)
-        assertEquals(postResponse2.body!!, userDefiningThemes[1])
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'Name' must not be blank")
+    }
 
-        val postResponse3 = restTemplate.postForEntity(
-            "/api/v1/defining-themes/users",
-            userDefiningThemesDetails[2],
-            UserDefiningTheme::class.java
+    @Test
+    fun addDefiningTheme_wrongCategoryId_error() {
+        val definingThemeDetails =
+            DefiningThemeDetails(name = "RemoteDefiningTheme4", fromOpinion = "No", toOpinion = "Yes", categoryId = -5)
+        val postResponse = restTemplate.postForEntity(
+            "/api/v1/defining-themes",
+            definingThemeDetails,
+            String::class.java
         )
-        assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.OK)
-        assertEquals(postResponse3.body!!, userDefiningThemes[2])
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'CategoryId' must be greater than or equal to 1")
+    }
 
+    @Test
+    fun addDefiningTheme_emptyNameAndWrongCategoryId_error() {
+        val definingThemeDetails =
+            DefiningThemeDetails(name = "", fromOpinion = "No", toOpinion = "Yes", categoryId = -5)
+        val postResponse = restTemplate.postForEntity(
+            "/api/v1/defining-themes",
+            definingThemeDetails,
+            String::class.java
+        )
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'CategoryId' must be greater than or equal to 1; 'Name' must not be blank")
+    }
+
+    @Test
+    fun getUserDefiningThemes() {
         val getResponse2 = restTemplate.getForEntity(
             "/api/v1/defining-themes/users?userCategoryIds=${userCategoryIds.toRequestParams()}",
             Array<UserDefiningTheme>::class.java
@@ -122,5 +178,47 @@ class DefiningThemesMicroserviceTest(@Autowired val restTemplate: TestRestTempla
         assertThat(getResponse2.statusCode).isEqualTo(HttpStatus.OK)
         assertEquals(getResponse2.body!!.size, 2)
         assertContentEquals(getResponse2.body!!, arrayOf(userDefiningThemes[0], userDefiningThemes[2]))
+    }
+
+    @Test
+    fun addUserDefiningTheme_wrongValue_error() {
+        val userDefiningThemeDetails =
+            UserDefiningThemeDetails(value = -10, interest = 34, userCategoryId = 1, definingThemeId = 1)
+        val postResponse = restTemplate.postForEntity(
+            "/api/v1/defining-themes/users",
+            userDefiningThemeDetails,
+            String::class.java
+        )
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'Value' must be greater than or equal to 0")
+    }
+
+    @Test
+    fun addUserDefiningTheme_wrongDefiningThemeId_error() {
+        val userDefiningThemeDetails =
+            UserDefiningThemeDetails(value = 23, interest = 34, userCategoryId = 1, definingThemeId = -4)
+        val postResponse = restTemplate.postForEntity(
+            "/api/v1/defining-themes/users",
+            userDefiningThemeDetails,
+            String::class.java
+        )
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'DefiningThemeId' must be greater than or equal to 1")
+    }
+
+    @Test
+    fun addUserDefiningTheme_wrongValueAndDefiningThemeId_error() {
+        val userDefiningThemeDetails =
+            UserDefiningThemeDetails(value = -10, interest = 34, userCategoryId = 1, definingThemeId = -4)
+        val postResponse = restTemplate.postForEntity(
+            "/api/v1/defining-themes/users",
+            userDefiningThemeDetails,
+            String::class.java
+        )
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(
+            postResponse.body!!,
+            "'DefiningThemeId' must be greater than or equal to 1; 'Value' must be greater than or equal to 0"
+        )
     }
 }

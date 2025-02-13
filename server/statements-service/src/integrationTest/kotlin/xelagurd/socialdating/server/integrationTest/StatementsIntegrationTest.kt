@@ -20,14 +20,14 @@ class StatementsIntegrationTest {
         var userCategoryId = -1
 
         val requestCategory = mapOf(
-            "name" to "RemoteCategory1"
+            "name" to "TestRemoteCategory1"
         )
         val postCategoryResponse = restTemplate.postForEntity(
             "$GATEWAY_URL/api/v1/categories",
             requestCategory,
             String::class.java
         )
-        assertThat(postCategoryResponse.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postCategoryResponse.statusCode).isEqualTo(HttpStatus.CREATED)
 
         val responseCategory = readObjectFromJsonString(postCategoryResponse.body!!)
         assertNotNull(responseCategory["id"])
@@ -35,7 +35,7 @@ class StatementsIntegrationTest {
 
 
         val requestDefiningTheme = mapOf(
-            "name" to "RemoteDefiningTheme1",
+            "name" to "TestRemoteDefiningTheme1",
             "fromOpinion" to "No",
             "toOpinion" to "Yes",
             "categoryId" to responseCategory["id"]
@@ -45,7 +45,7 @@ class StatementsIntegrationTest {
             requestDefiningTheme,
             String::class.java
         )
-        assertThat(postDefiningThemeResponse.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postDefiningThemeResponse.statusCode).isEqualTo(HttpStatus.CREATED)
 
         val responseDefiningTheme = readObjectFromJsonString(postDefiningThemeResponse.body!!)
         assertNotNull(responseDefiningTheme["id"])
@@ -56,7 +56,7 @@ class StatementsIntegrationTest {
 
 
         val requestStatement = mapOf(
-            "text" to "RemoteStatement1",
+            "text" to "TestRemoteStatement1",
             "isSupportDefiningTheme" to true,
             "definingThemeId" to responseDefiningTheme["id"],
             "creatorUserId" to userId
@@ -66,7 +66,7 @@ class StatementsIntegrationTest {
             requestStatement,
             String::class.java
         )
-        assertThat(postStatementResponse.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postStatementResponse.statusCode).isEqualTo(HttpStatus.CREATED)
 
         val responseStatement = readObjectFromJsonString(postStatementResponse.body!!)
         assertNotNull(responseStatement["id"])
@@ -88,7 +88,7 @@ class StatementsIntegrationTest {
             requestStatementReaction,
             String::class.java
         )
-        assertThat(postStatementReactionResponse.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(postStatementReactionResponse.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
 
 
         Thread.sleep(3000)

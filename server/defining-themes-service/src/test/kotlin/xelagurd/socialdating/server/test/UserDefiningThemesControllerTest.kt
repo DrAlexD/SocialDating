@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.UserDefiningThemesController
+import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.UserDefiningTheme
 import xelagurd.socialdating.server.model.details.UserDefiningThemeDetails
 import xelagurd.socialdating.server.service.UserDefiningThemesService
@@ -35,7 +36,7 @@ class UserDefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) 
         UserDefiningThemeDetails(value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1)
 
     @Test
-    fun getUserDefiningThemesByUserCategoryIds() {
+    fun getUserDefiningThemesByUserCategoryIds_allData_success() {
         val expected = userDefiningThemes.filter { it.userCategoryId in userCategoryIds }
         `when`(userDefiningThemesService.getUserDefiningThemes(userCategoryIds)).thenReturn(expected)
 
@@ -48,6 +49,18 @@ class UserDefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) 
     }
 
     @Test
+    fun getUserDefiningThemesByUserCategoryIds_emptyData_error() {
+        val message = "test"
+        `when`(userDefiningThemesService.getUserDefiningThemes(userCategoryIds)).thenThrow(NoDataFoundException(message))
+
+        mockMvc.perform(
+            get("/api/v1/defining-themes/users?userCategoryIds=${userCategoryIds.toRequestParams()}")
+        )
+            .andExpect(status().isNotFound)
+            .andExpect(content().string(message))
+    }
+
+    @Test
     fun addUserDefiningTheme() {
         val expected = userDefiningThemes[0]
         `when`(userDefiningThemesService.addUserDefiningTheme(userDefiningThemeDetails)).thenReturn(expected)
@@ -57,7 +70,7 @@ class UserDefiningThemesControllerTest(@Autowired private val mockMvc: MockMvc) 
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(userDefiningThemeDetails))
         )
-            .andExpect(status().isOk)
+            .andExpect(status().isCreated)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json(convertObjectToJsonString(expected)))
     }

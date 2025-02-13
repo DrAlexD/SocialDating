@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.UsersController
+import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
@@ -66,7 +67,7 @@ class UsersControllerTest(@Autowired private val mockMvc: MockMvc) {
     private val userId = 1
 
     @Test
-    fun getUser() {
+    fun getUser_allData_success() {
         val expected = users.filter { it.id == userId }
 
         assertEquals(expected.size, 1)
@@ -79,5 +80,17 @@ class UsersControllerTest(@Autowired private val mockMvc: MockMvc) {
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json(convertObjectToJsonString(expected[0])))
+    }
+
+    @Test
+    fun getUser_emptyData_error() {
+        val message = "test"
+        `when`(usersService.getUser(userId)).thenThrow(NoDataFoundException(message))
+
+        mockMvc.perform(
+            get("/api/v1/users/$userId")
+        )
+            .andExpect(status().isNotFound)
+            .andExpect(content().string(message))
     }
 }
