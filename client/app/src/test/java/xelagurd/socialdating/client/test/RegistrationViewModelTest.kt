@@ -12,8 +12,10 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
@@ -88,7 +90,7 @@ class RegistrationViewModelTest {
         initViewModel()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILURE(), registrationUiState.actionRequestStatus)
+        assertEquals(RequestStatus.FAILURE("400"), registrationUiState.actionRequestStatus)
     }
 
     @Test
@@ -122,7 +124,8 @@ class RegistrationViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns remoteUser
+        coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns
+                Response.success(remoteUser)
         coEvery { accountManager.saveCredentials(registrationDetails.toLoginDetails()) } just Runs
         coEvery { localRepository.insertUser(remoteUser) } just Runs
         coEvery { preferencesRepository.saveCurrentUserId(remoteUser.id) } just Runs
@@ -130,7 +133,8 @@ class RegistrationViewModelTest {
 
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns null
+        coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns
+                Response.error(400, "400".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

@@ -14,9 +14,11 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.User
@@ -197,7 +199,7 @@ class ProfileViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteRepository.getUser(userId) } returns remoteUser
+        coEvery { remoteRepository.getUser(userId) } returns Response.success(remoteUser)
         coEvery { localRepository.insertUser(remoteUser) } answers {
             usersFlow.value = remoteUser
         }
@@ -205,7 +207,7 @@ class ProfileViewModelTest {
 
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.getUser(userId) } returns null
+        coEvery { remoteRepository.getUser(userId) } returns Response.error(404, "404".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

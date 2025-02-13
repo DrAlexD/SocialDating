@@ -7,6 +7,8 @@ import io.mockk.impl.annotations.MockK
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.repository.DefiningThemesRepository
@@ -47,13 +49,20 @@ class DefiningThemesServiceUnitTest {
     }
 
     @Test
-    fun getDefiningThemesByCategoryIds() {
+    fun getDefiningThemesByCategoryIds_allData_success() {
         val expected = definingThemes.filter { it.categoryId in categoryIds }
         every { definingThemesRepository.findAllByCategoryIdIn(categoryIds) } returns expected
 
         val result = definingThemesService.getDefiningThemes(categoryIds)
 
         assertEquals(expected, result)
+    }
+
+    @Test
+    fun getDefiningThemesByCategoryIds_emptyData_error() {
+        every { definingThemesRepository.findAllByCategoryIdIn(categoryIds) } returns emptyList()
+
+        assertThrows<NoDataFoundException> { definingThemesService.getDefiningThemes(categoryIds) }
     }
 
     @Test

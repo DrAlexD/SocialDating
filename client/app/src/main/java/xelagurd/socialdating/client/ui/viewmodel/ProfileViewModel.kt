@@ -1,6 +1,5 @@
 package xelagurd.socialdating.client.ui.viewmodel
 
-import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,10 +14,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import retrofit2.HttpException
-import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
+import xelagurd.socialdating.client.data.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
 import xelagurd.socialdating.client.ui.state.ProfileUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -52,35 +50,17 @@ class ProfileViewModel @Inject constructor(
 
     fun getUser() {
         viewModelScope.launch {
-            try {
-                dataRequestStatusFlow.update { RequestStatus.LOADING }
+            dataRequestStatusFlow.update { RequestStatus.LOADING }
 
-                val remoteUser = remoteRepository.getUser(userId)
-
-                if (remoteUser != null) {
-                    localRepository.insertUser(remoteUser)
-
-                    dataRequestStatusFlow.update { RequestStatus.SUCCESS }
-                } else {
-                    dataRequestStatusFlow.update {
-                        RequestStatus.FAILURE(
-                            failureText = context.getString(R.string.no_data)
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                when (e) {
-                    is IOException, is HttpException -> {
-                        dataRequestStatusFlow.update {
-                            RequestStatus.ERROR(
-                                errorText = context.getString(R.string.no_internet_connection)
-                            )
-                        }
-                    }
-
-                    else -> throw e
-                }
+            val (remoteUser, status) = safeApiCall(context) {
+                remoteRepository.getUser(userId)
             }
+
+            if (remoteUser != null) {
+                localRepository.insertUser(remoteUser)
+            }
+
+            dataRequestStatusFlow.update { status }
         }
     }
 

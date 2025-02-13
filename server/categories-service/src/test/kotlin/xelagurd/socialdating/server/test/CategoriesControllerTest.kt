@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.CategoriesController
+import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.model.details.CategoryDetails
 import xelagurd.socialdating.server.service.CategoriesService
@@ -31,7 +32,7 @@ class CategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
     private val categoryDetails = CategoryDetails(name = "RemoteCategory1")
 
     @Test
-    fun getCategories() {
+    fun getCategories_allData_success() {
         val expected = categories
         `when`(categoriesService.getCategories()).thenReturn(expected)
 
@@ -44,6 +45,18 @@ class CategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
     }
 
     @Test
+    fun getCategories_emptyData_error() {
+        val message = "test"
+        `when`(categoriesService.getCategories()).thenThrow(NoDataFoundException(message))
+
+        mockMvc.perform(
+            get("/api/v1/categories")
+        )
+            .andExpect(status().isNotFound)
+            .andExpect(content().string(message))
+    }
+
+    @Test
     fun addCategory() {
         val expected = categories[0]
         `when`(categoriesService.addCategory(categoryDetails)).thenReturn(expected)
@@ -53,7 +66,7 @@ class CategoriesControllerTest(@Autowired private val mockMvc: MockMvc) {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(categoryDetails))
         )
-            .andExpect(status().isOk)
+            .andExpect(status().isCreated)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json(convertObjectToJsonString(expected)))
     }

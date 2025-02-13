@@ -33,7 +33,7 @@ class CategoriesKafkaConsumer(
         val addedUserCategory = userCategoriesService.addUserCategory(userCategory)
 
         kafkaProducer.sendStatementReaction(
-            statementReactionDetails.copy(userOrUserCategoryId = addedUserCategory.id!!)
+            statementReactionDetails.copy(userOrUserCategoryId = addedUserCategory.id)
         )
     }
 }

@@ -1,8 +1,8 @@
 package xelagurd.socialdating.server.repository
 
-import org.springframework.data.repository.CrudRepository
+import org.springframework.data.jpa.repository.JpaRepository
 import xelagurd.socialdating.server.model.DefiningTheme
 
-interface DefiningThemesRepository : CrudRepository<DefiningTheme, Int> {
-    fun findAllByCategoryIdIn(categoryIds: Iterable<Int>): Iterable<DefiningTheme>
+interface DefiningThemesRepository : JpaRepository<DefiningTheme, Int> {
+    fun findAllByCategoryIdIn(categoryIds: Iterable<Int>): List<DefiningTheme>
 }

@@ -13,9 +13,11 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.model.Category
@@ -188,7 +190,7 @@ class CategoriesViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteRepository.getCategories() } returns remoteCategories
+        coEvery { remoteRepository.getCategories() } returns Response.success(remoteCategories)
         coEvery { localRepository.insertCategories(remoteCategories) } answers {
             categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, remoteCategories)
         }
@@ -196,7 +198,7 @@ class CategoriesViewModelTest {
 
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.getCategories() } returns emptyList()
+        coEvery { remoteRepository.getCategories() } returns Response.error(404, "404".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

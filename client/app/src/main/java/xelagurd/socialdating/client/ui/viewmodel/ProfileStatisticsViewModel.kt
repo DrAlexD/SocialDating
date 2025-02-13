@@ -1,6 +1,5 @@
 package xelagurd.socialdating.client.ui.viewmodel
 
-import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,8 +17,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import retrofit2.HttpException
-import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
@@ -29,6 +26,7 @@ import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepos
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserDefiningThemesRepository
+import xelagurd.socialdating.client.data.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.ProfileStatisticsDestination
 import xelagurd.socialdating.client.ui.state.ProfileStatisticsUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -78,78 +76,78 @@ class ProfileStatisticsViewModel @Inject constructor(
 
     fun getProfileStatistics() {
         viewModelScope.launch {
-            try {
-                dataRequestStatusFlow.update { RequestStatus.LOADING }
+            var globalStatus: RequestStatus = RequestStatus.LOADING
 
-                val remoteCategories = remoteCategoriesRepository.getCategories()
+            dataRequestStatusFlow.update { globalStatus }
+
+            val (remoteCategories, statusCategories) = safeApiCall(context) {
+                remoteCategoriesRepository.getCategories()
+            }
+
+            if (remoteCategories != null) {
                 localCategoriesRepository.insertCategories(remoteCategories)
 
                 val remoteCategoriesIds = remoteCategories.map { it.id }
-                val remoteDefiningThemes =
+                val (remoteDefiningThemes, statusDefiningThemes) = safeApiCall(context) {
                     remoteDefiningThemesRepository.getDefiningThemes(remoteCategoriesIds)
-                localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
+                }
 
-                val remoteUserCategories = remoteUserCategoriesRepository
-                    .getUserCategories(userId)
+                if (remoteDefiningThemes != null) {
+                    localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
 
-                if (remoteUserCategories.isNotEmpty()) {
-                    localUserCategoriesRepository.insertUserCategories(remoteUserCategories)
+                    val (remoteUserCategories, statusUserCategories) = safeApiCall(context) {
+                        remoteUserCategoriesRepository.getUserCategories(userId)
+                    }
 
-                    val remoteUserCategoriesIds = remoteUserCategories.map { it.id }
+                    if (remoteUserCategories != null) {
+                        localUserCategoriesRepository.insertUserCategories(remoteUserCategories)
 
-                    val remoteUserDefiningThemes = remoteUserDefiningThemesRepository
-                        .getUserDefiningThemes(remoteUserCategoriesIds)
-
-                    if (remoteUserDefiningThemes.isNotEmpty()) {
-                        localUserDefiningThemesRepository.insertUserDefiningThemes(
-                            remoteUserDefiningThemes
-                        )
-
-                        dataRequestStatusFlow.update { RequestStatus.SUCCESS }
-                    } else {
-                        dataRequestStatusFlow.update {
-                            RequestStatus.FAILURE(
-                                failureText = context.getString(R.string.no_data)
+                        val remoteUserCategoriesIds = remoteUserCategories.map { it.id }
+                        val (remoteUserDefiningThemes, statusUserDefiningThemes) = safeApiCall(
+                            context
+                        ) {
+                            remoteUserDefiningThemesRepository.getUserDefiningThemes(
+                                remoteUserCategoriesIds
                             )
                         }
+
+                        if (remoteUserDefiningThemes != null) {
+                            localUserDefiningThemesRepository.insertUserDefiningThemes(
+                                remoteUserDefiningThemes
+                            )
+                        }
+
+                        globalStatus = statusUserDefiningThemes
+                    } else {
+                        globalStatus = statusUserCategories
                     }
                 } else {
-                    dataRequestStatusFlow.update {
-                        RequestStatus.FAILURE(
-                            failureText = context.getString(R.string.no_data)
-                        )
-                    }
+                    globalStatus = statusDefiningThemes
                 }
-            } catch (e: Exception) {
-                when (e) {
-                    is IOException, is HttpException -> {
-                        if (localCategoriesRepository.getCategories().first().isEmpty()) {
-                            localCategoriesRepository.insertCategories(FakeDataSource.categories) // FixMe: remove after implementing server
-                        }
-                        if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
-                            localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes) // FixMe: remove after implementing server
-                        }
-                        if (localUserCategoriesRepository.getUserCategories().first().isEmpty()) {
-                            localUserCategoriesRepository.insertUserCategories(FakeDataSource.userCategories) // FixMe: remove after implementing server
-                        }
-                        if (localUserDefiningThemesRepository.getUserDefiningThemes().first()
-                                .isEmpty()
-                        ) {
-                            localUserDefiningThemesRepository.insertUserDefiningThemes(
-                                FakeDataSource.userDefiningThemes
-                            ) // FixMe: remove after implementing server
-                        }
+            } else {
+                globalStatus = statusCategories
+            }
 
-                        dataRequestStatusFlow.update {
-                            RequestStatus.ERROR(
-                                errorText = context.getString(R.string.no_internet_connection)
-                            )
-                        }
-                    }
-
-                    else -> throw e
+            if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after implementing server
+                if (localCategoriesRepository.getCategories().first().isEmpty()) {
+                    localCategoriesRepository.insertCategories(FakeDataSource.categories)
+                }
+                if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
+                    localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes)
+                }
+                if (localUserCategoriesRepository.getUserCategories().first().isEmpty()) {
+                    localUserCategoriesRepository.insertUserCategories(FakeDataSource.userCategories)
+                }
+                if (localUserDefiningThemesRepository.getUserDefiningThemes().first()
+                        .isEmpty()
+                ) {
+                    localUserDefiningThemesRepository.insertUserDefiningThemes(
+                        FakeDataSource.userDefiningThemes
+                    )
                 }
             }
+
+            dataRequestStatusFlow.update { globalStatus }
         }
     }
 

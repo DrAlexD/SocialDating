@@ -17,9 +17,11 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
@@ -235,8 +237,10 @@ class StatementsViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } returns remoteDefiningThemes
-        coEvery { remoteStatementsRepository.getStatements(remoteDefiningThemes.toIds()) } returns remoteStatements
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } returns
+                Response.success(remoteDefiningThemes)
+        coEvery { remoteStatementsRepository.getStatements(remoteDefiningThemes.toIds()) } returns
+                Response.success(remoteStatements)
 
         coEvery { localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes) } answers {
             definingThemesFlow.value =
@@ -249,8 +253,10 @@ class StatementsViewModelTest {
 
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } returns emptyList()
-        coEvery { remoteStatementsRepository.getStatements(emptyList()) } returns emptyList()
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } returns
+                Response.error(404, "404".toResponseBody())
+        coEvery { remoteStatementsRepository.getStatements(emptyList()) } returns
+                Response.error(404, "404".toResponseBody())
 
         coEvery { localDefiningThemesRepository.insertDefiningThemes(emptyList()) } just Runs
     }
