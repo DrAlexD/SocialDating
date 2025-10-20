@@ -9,7 +9,6 @@ while true; do
 
   if [ "$UNHEALTHY_COUNT" -gt 0 ]; then
     echo "Error: At least one service has failed! ($UNHEALTHY_COUNT unhealthy/exited/dead)"
-    docker ps -a --filter "health=unhealthy" --filter "status=exited" --filter "status=dead"
     exit 1
   fi
 

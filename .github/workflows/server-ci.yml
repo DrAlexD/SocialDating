@@ -86,6 +86,12 @@ jobs:
           chmod +x check_containers_health.sh
           ./check_containers_health.sh
 
+      - name: Log unhealthy containers
+        if: failure()
+        run: |
+          chmod +x log_unhealthy_containers.sh
+          ./log_unhealthy_containers.sh
+
       - name: Run Integration tests
         run: |
           chmod +x gradlew
