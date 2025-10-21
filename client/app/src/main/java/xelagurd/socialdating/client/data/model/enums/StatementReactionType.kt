@@ -5,8 +5,8 @@ import androidx.annotation.StringRes
 import xelagurd.socialdating.client.R
 
 enum class StatementReactionType(
-    @StringRes val descriptionRes: Int,
-    @DrawableRes val iconRes: Int
+    @param:StringRes val descriptionRes: Int,
+    @param:DrawableRes val iconRes: Int
 ) {
     FULL_NO_MAINTAIN(R.string.full_no_maintain, R.drawable.thumb_down),
     PART_NO_MAINTAIN(R.string.part_no_maintain, R.drawable.outline_thumb_down),
