@@ -87,17 +87,19 @@ class LoginViewModel @Inject constructor(
             password = BCrypt.hashpw(loginDetails.password, BCrypt.gensalt())
         )
 
-        val (user, status) = safeApiCall(context) {
+        val (authResponse, status) = safeApiCall(context) {
             remoteRepository.loginUser(encodedLoginDetails)
         }
 
-        if (user != null) {
+        if (authResponse != null) {
             if (isLoginWithInput) {
                 accountManager.saveCredentials(loginDetails)
             }
 
-            localRepository.insertUser(user)
-            preferencesRepository.saveCurrentUserId(user.id)
+            localRepository.insertUser(authResponse.user)
+            preferencesRepository.saveAccessToken(authResponse.accessToken)
+            preferencesRepository.saveRefreshToken(authResponse.refreshToken)
+            preferencesRepository.saveCurrentUserId(authResponse.user.id)
         }
 
         if (status is RequestStatus.ERROR) { // FixMe: remove after implementing server
