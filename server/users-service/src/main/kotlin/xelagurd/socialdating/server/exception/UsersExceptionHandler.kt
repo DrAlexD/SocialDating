@@ -2,6 +2,7 @@ package xelagurd.socialdating.server.exception
 
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.AuthenticationException
 import org.springframework.transaction.TransactionSystemException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -43,6 +44,14 @@ class UsersExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     fun handleNoDataFoundException(ex: NoDataFoundException): String {
         val message = ex.message ?: "No data found"
+        logger.error { "Class: ${ex.javaClass.simpleName}, message: $message" }
+        return message
+    }
+
+    @ExceptionHandler(AuthenticationException::class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    fun handleAuthenticationException(ex: AuthenticationException): String {
+        val message = ex.message ?: "Unauthorized"
         logger.error { "Class: ${ex.javaClass.simpleName}, message: $message" }
         return message
     }

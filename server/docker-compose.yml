@@ -122,6 +122,7 @@ services:
     environment:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERS_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_USERS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
     build:
       context: ./users-service
     healthcheck:
