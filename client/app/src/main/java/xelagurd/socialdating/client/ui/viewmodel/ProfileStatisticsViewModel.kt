@@ -34,7 +34,7 @@ import xelagurd.socialdating.client.ui.state.RequestStatus
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ProfileStatisticsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val remoteUserCategoriesRepository: RemoteUserCategoriesRepository,
     private val localUserCategoriesRepository: LocalUserCategoriesRepository,
