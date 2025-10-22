@@ -17,7 +17,7 @@ data class TopLevelDestination(
     val navigateTo: () -> Unit,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
-    @StringRes
+    @param:StringRes
     val contentDescription: Int
 )
 

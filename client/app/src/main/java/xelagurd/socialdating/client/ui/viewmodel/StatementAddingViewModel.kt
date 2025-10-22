@@ -26,7 +26,7 @@ import xelagurd.socialdating.client.ui.state.StatementAddingUiState
 
 @HiltViewModel
 class StatementAddingViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val localDefiningThemesRepository: LocalDefiningThemesRepository,
     private val remoteStatementsRepository: RemoteStatementsRepository,

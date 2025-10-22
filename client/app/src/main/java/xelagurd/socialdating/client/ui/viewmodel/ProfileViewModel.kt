@@ -23,7 +23,7 @@ import xelagurd.socialdating.client.ui.state.RequestStatus
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val remoteRepository: RemoteUsersRepository,
     private val localRepository: LocalUsersRepository

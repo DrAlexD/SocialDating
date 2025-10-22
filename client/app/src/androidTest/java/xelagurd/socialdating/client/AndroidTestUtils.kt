@@ -23,7 +23,7 @@ fun NavController.assertCurrentRouteName(expectedRouteName: String) {
 }
 
 fun NavController.assertBackStackDepth(expectedDepth: Int) {
-    assertEquals(expectedDepth, backQueue.size)
+    assertEquals(expectedDepth, currentBackStack.value.size)
 }
 
 fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithContentDescriptionId(

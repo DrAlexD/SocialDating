@@ -23,7 +23,7 @@ import xelagurd.socialdating.client.ui.state.RequestStatus
 
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val remoteRepository: RemoteCategoriesRepository,
     private val localRepository: LocalCategoriesRepository
 ) : ViewModel() {
