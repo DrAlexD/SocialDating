@@ -25,7 +25,7 @@ import xelagurd.socialdating.client.ui.state.RequestStatus
 
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val remoteRepository: RemoteUsersRepository,
     private val localRepository: LocalUsersRepository,
     private val preferencesRepository: PreferencesRepository,

@@ -66,7 +66,7 @@ class TopBarTest {
 
     @Test
     fun topBar_backButton() {
-        setContentToAppTopBar(RequestStatus.SUCCESS, {})
+        setContentToAppTopBar(RequestStatus.SUCCESS) {}
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsDisplayed()
     }

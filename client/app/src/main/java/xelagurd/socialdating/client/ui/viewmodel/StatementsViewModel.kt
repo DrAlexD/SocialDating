@@ -34,7 +34,7 @@ import xelagurd.socialdating.client.ui.state.StatementsUiState
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class StatementsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val remoteStatementsRepository: RemoteStatementsRepository,
     private val localStatementsRepository: LocalStatementsRepository,
