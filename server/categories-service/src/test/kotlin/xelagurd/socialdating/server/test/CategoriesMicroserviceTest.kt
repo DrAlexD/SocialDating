@@ -18,7 +18,7 @@ import xelagurd.socialdating.server.model.details.UserCategoryDetails
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CategoriesMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) {
+class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemplate) {
 
     private val userId = 1
 

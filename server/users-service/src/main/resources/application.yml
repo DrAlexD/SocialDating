@@ -13,6 +13,11 @@ management:
     db:
       enabled: true
 
+security:
+  whitelist:
+    - /api/v1/users/auth/**
+    - /actuator/**
+
 spring:
   application:
     name: users-service

@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository
 import xelagurd.socialdating.server.model.User
 
 @Repository
-interface UsersRepository : JpaRepository<User, Int>
+interface UsersRepository : JpaRepository<User, Int> {
+    fun findByUsername(username: String): User?
+}

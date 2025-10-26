@@ -1,5 +1,7 @@
 package xelagurd.socialdating.server.model
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -13,6 +15,7 @@ import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
+import xelagurd.socialdating.server.model.enums.Role
 
 @Entity(name = "users")
 @Table(name = "users")
@@ -31,10 +34,12 @@ class User(
 
     @field:Column(nullable = false, unique = true)
     @field:NotBlank
+    @JvmField
     var username: String,
 
     @field:Column(nullable = false)
     @field:NotBlank
+    @JvmField
     var password: String,
 
     @field:Column(unique = true)
@@ -57,8 +62,29 @@ class User(
     @field:Column(nullable = false)
     @field:Min(value = 0)
     @field:Max(value = 100)
-    var activity: Int
-) {
+    var activity: Int,
+
+    @field:Enumerated(EnumType.STRING)
+    @field:Column(nullable = false)
+    val role: Role
+) : UserDetails {
+    override fun getAuthorities() = listOf(SimpleGrantedAuthority("ROLE_$role"))
+
+    override fun getUsername() = username
+    fun setUsername(username: String) {
+        this.username = username
+    }
+
+    override fun getPassword() = password
+    fun setPassword(password: String) {
+        this.password = password
+    }
+
+    override fun isAccountNonExpired() = true
+    override fun isAccountNonLocked() = true
+    override fun isCredentialsNonExpired() = true
+    override fun isEnabled() = true
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -75,6 +101,7 @@ class User(
         if (email != other.email) return false
         if (city != other.city) return false
         if (purpose != other.purpose) return false
+        if (role != other.role) return false
 
         return true
     }
@@ -90,6 +117,7 @@ class User(
         result = 31 * result + email.hashCode()
         result = 31 * result + city.hashCode()
         result = 31 * result + purpose.hashCode()
+        result = 31 * result + role.hashCode()
         return result
     }
 }

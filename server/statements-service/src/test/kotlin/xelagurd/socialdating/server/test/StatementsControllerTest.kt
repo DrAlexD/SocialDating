@@ -2,6 +2,7 @@ package xelagurd.socialdating.server.test
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
@@ -24,7 +25,8 @@ import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @WebMvcTest(StatementsController::class)
-class StatementsControllerTest(@Autowired private val mockMvc: MockMvc) {
+@Import(NoSecurityConfig::class)
+class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     @MockitoBean
     private lateinit var statementsService: StatementsService

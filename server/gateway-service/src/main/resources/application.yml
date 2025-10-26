@@ -13,6 +13,11 @@ management:
     kafka:
       enabled: true
 
+security:
+  whitelist:
+    - /api/v1/users/auth/**
+    - /actuator/**
+
 spring:
   cloud:
     gateway:

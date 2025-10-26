@@ -17,7 +17,7 @@ import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class StatementsMicroserviceTest(@Autowired val restTemplate: TestRestTemplate) {
+class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemplate) {
 
     private val userId = 1
     private val definingThemeIds = listOf(1, 3)
