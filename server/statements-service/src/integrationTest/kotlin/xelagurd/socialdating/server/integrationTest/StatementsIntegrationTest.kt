@@ -1,11 +1,15 @@
 package xelagurd.socialdating.server.integrationTest
 
+import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import xelagurd.socialdating.server.utils.TestUtils.readArrayFromJsonString
 import xelagurd.socialdating.server.utils.TestUtils.readObjectFromJsonString
@@ -13,21 +17,53 @@ import xelagurd.socialdating.server.utils.TestUtils.readObjectFromJsonString
 class StatementsIntegrationTest {
     private val restTemplate = RestTemplate()
     private val GATEWAY_URL = "http://localhost:8080"
+    private lateinit var accessToken: String
+
+    private fun <T> getWithToken(url: String, responseType: Class<T>): ResponseEntity<T> {
+        val headers = HttpHeaders()
+        headers.setBearerAuth(accessToken)
+        val entity = HttpEntity<Void>(headers)
+        return restTemplate.exchange(url, HttpMethod.GET, entity, responseType)
+    }
+
+    private fun <T> postWithToken(url: String, body: Any, responseType: Class<T>): ResponseEntity<T> {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(accessToken)
+        val entity = HttpEntity(body, headers)
+        return restTemplate.exchange(url, HttpMethod.POST, entity, responseType)
+    }
 
     @Test
     fun addStatementReaction() {
-        val userId = 1
-        var userCategoryId = -1
+        val loginRequest = mapOf(
+            "username" to "username1",
+            "password" to "password1"
+        )
+        val loginResponse = restTemplate.postForEntity(
+            "$GATEWAY_URL/api/v1/users/auth/login",
+            loginRequest,
+            String::class.java
+        )
+        assertEquals(loginResponse.statusCode, HttpStatus.OK)
+
+        val responseAuth = readObjectFromJsonString(loginResponse.body!!)
+        assertNotNull(responseAuth["accessToken"])
+        accessToken = responseAuth["accessToken"] as String
+        assertNotNull(responseAuth["user"])
+        val user = responseAuth["user"] as HashMap<*, *>
+        assertNotNull(user["id"])
+        val userId = user["id"]
 
         val requestCategory = mapOf(
-            "name" to "TestRemoteCategory1"
+            "name" to ("TestRemoteCategory" + Random.nextLong())
         )
-        val postCategoryResponse = restTemplate.postForEntity(
+        val postCategoryResponse = postWithToken(
             "$GATEWAY_URL/api/v1/categories",
             requestCategory,
             String::class.java
         )
-        assertThat(postCategoryResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertEquals(postCategoryResponse.statusCode, HttpStatus.CREATED)
 
         val responseCategory = readObjectFromJsonString(postCategoryResponse.body!!)
         assertNotNull(responseCategory["id"])
@@ -35,17 +71,17 @@ class StatementsIntegrationTest {
 
 
         val requestDefiningTheme = mapOf(
-            "name" to "TestRemoteDefiningTheme1",
+            "name" to ("TestRemoteDefiningTheme" + Random.nextLong()),
             "fromOpinion" to "No",
             "toOpinion" to "Yes",
             "categoryId" to responseCategory["id"]
         )
-        val postDefiningThemeResponse = restTemplate.postForEntity(
+        val postDefiningThemeResponse = postWithToken(
             "$GATEWAY_URL/api/v1/defining-themes",
             requestDefiningTheme,
             String::class.java
         )
-        assertThat(postDefiningThemeResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertEquals(postDefiningThemeResponse.statusCode, HttpStatus.CREATED)
 
         val responseDefiningTheme = readObjectFromJsonString(postDefiningThemeResponse.body!!)
         assertNotNull(responseDefiningTheme["id"])
@@ -56,17 +92,17 @@ class StatementsIntegrationTest {
 
 
         val requestStatement = mapOf(
-            "text" to "TestRemoteStatement1",
+            "text" to ("TestRemoteStatemen1" + Random.nextLong()),
             "isSupportDefiningTheme" to true,
             "definingThemeId" to responseDefiningTheme["id"],
             "creatorUserId" to userId
         )
-        val postStatementResponse = restTemplate.postForEntity(
+        val postStatementResponse = postWithToken(
             "$GATEWAY_URL/api/v1/statements",
             requestStatement,
             String::class.java
         )
-        assertThat(postStatementResponse.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertEquals(postStatementResponse.statusCode, HttpStatus.CREATED)
 
         val responseStatement = readObjectFromJsonString(postStatementResponse.body!!)
         assertNotNull(responseStatement["id"])
@@ -83,49 +119,39 @@ class StatementsIntegrationTest {
             "reactionType" to 4, // FULL_MAINTAIN
             "isSupportDefiningTheme" to true
         )
-        val postStatementReactionResponse = restTemplate.postForEntity(
+        val postStatementReactionResponse = postWithToken(
             "$GATEWAY_URL/api/v1/statements/${responseStatement["id"]}/reaction",
             requestStatementReaction,
             String::class.java
         )
-        assertThat(postStatementReactionResponse.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
+        assertEquals(postStatementReactionResponse.statusCode, HttpStatus.NO_CONTENT)
 
 
         Thread.sleep(3000)
 
 
-        val getUserCategoriesResponse = restTemplate.getForEntity(
+        val getUserCategoriesResponse = getWithToken(
             "$GATEWAY_URL/api/v1/categories/users/$userId",
             String::class.java
         )
-        assertThat(getUserCategoriesResponse.statusCode).isEqualTo(HttpStatus.OK)
+        assertEquals(getUserCategoriesResponse.statusCode, HttpStatus.OK)
 
         val responseUserCategories = readArrayFromJsonString(getUserCategoriesResponse.body!!)
-        var containNewUserCategory = false
-        for (userCategory in responseUserCategories) {
-            if (userCategory["categoryId"] == responseCategory["id"]) {
-                containNewUserCategory = true
-                userCategoryId = userCategory["id"] as Int
-                break
-            }
-        }
-        assertTrue(containNewUserCategory)
+        val newUserCategory =
+            responseUserCategories.firstOrNull { it["categoryId"] == responseCategory["id"] }
+        assertNotNull(newUserCategory)
+        val userCategoryId = newUserCategory["id"] as Int
 
 
-        val getUserDefiningThemesResponse = restTemplate.getForEntity(
+        val getUserDefiningThemesResponse = getWithToken(
             "$GATEWAY_URL/api/v1/defining-themes/users?userCategoryIds=$userCategoryId",
             String::class.java
         )
-        assertThat(getUserDefiningThemesResponse.statusCode).isEqualTo(HttpStatus.OK)
+        assertEquals(getUserDefiningThemesResponse.statusCode, HttpStatus.OK)
 
         val responseUserDefiningThemes = readArrayFromJsonString(getUserDefiningThemesResponse.body!!)
-        var containNewUserDefiningTheme = false
-        for (userDefiningTheme in responseUserDefiningThemes) {
-            if (userDefiningTheme["definingThemeId"] == responseDefiningTheme["id"]) {
-                containNewUserDefiningTheme = true
-                break
-            }
-        }
-        assertTrue(containNewUserDefiningTheme)
+        val newUserDefiningTheme =
+            responseUserDefiningThemes.firstOrNull { it["definingThemeId"] == responseDefiningTheme["id"] }
+        assertNotNull(newUserDefiningTheme)
     }
 }

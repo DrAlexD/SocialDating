@@ -73,6 +73,9 @@ jobs:
           echo "POSTGRES_DEFINING_THEMES_PASSWORD=${{ secrets.POSTGRES_DEFINING_THEMES_PASSWORD }}" >> .env
           echo "POSTGRES_STATEMENTS_USER=${{ secrets.POSTGRES_STATEMENTS_USER }}" >> .env
           echo "POSTGRES_STATEMENTS_PASSWORD=${{ secrets.POSTGRES_STATEMENTS_PASSWORD }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "ACCESS_TOKEN_EXPIRATION=${{ secrets.ACCESS_TOKEN_EXPIRATION }}" >> .env
+          echo "REFRESH_TOKEN_EXPIRATION=${{ secrets.REFRESH_TOKEN_EXPIRATION }}" >> .env
 
       - name: Build with Gradle
         run: |

@@ -23,6 +23,10 @@ dependencies {
 
     implementation(libs.spring.kafka)
 
+    implementation(libs.jwt.api)
+    runtimeOnly(libs.jwt.impl)
+    runtimeOnly(libs.jwt.jackson)
+
     testImplementation(libs.kotlin.test.junit5)
     testImplementation(libs.spring.boot.test)
     testImplementation(libs.mockk)

@@ -3,6 +3,7 @@ package xelagurd.socialdating.server.test
 import kotlin.test.assertEquals
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
@@ -16,11 +17,13 @@ import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
+import xelagurd.socialdating.server.model.enums.Role
 import xelagurd.socialdating.server.service.UsersService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 
 @WebMvcTest(UsersController::class)
-class UsersControllerTest(@Autowired private val mockMvc: MockMvc) {
+@Import(NoSecurityConfig::class)
+class UsersControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     @MockitoBean
     private lateinit var usersService: UsersService
@@ -36,7 +39,8 @@ class UsersControllerTest(@Autowired private val mockMvc: MockMvc) {
             age = 20,
             city = "",
             purpose = Purpose.RELATIONSHIPS,
-            activity = 50
+            activity = 50,
+            role = Role.USER
         ),
         User(
             id = 2,
@@ -48,7 +52,8 @@ class UsersControllerTest(@Autowired private val mockMvc: MockMvc) {
             age = 20,
             city = "",
             purpose = Purpose.RELATIONSHIPS,
-            activity = 50
+            activity = 50,
+            role = Role.USER
         ),
         User(
             id = 3,
@@ -60,7 +65,8 @@ class UsersControllerTest(@Autowired private val mockMvc: MockMvc) {
             age = 20,
             city = "",
             purpose = Purpose.RELATIONSHIPS,
-            activity = 50
+            activity = 50,
+            role = Role.USER
         )
     )
 

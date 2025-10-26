@@ -1,3 +1,9 @@
+security:
+  whitelist:
+    - /actuator/**
+    - /api/v1/defining-themes/**
+    - /api/v1/defining-themes/users/**
+
 spring:
   web:
     locale: en

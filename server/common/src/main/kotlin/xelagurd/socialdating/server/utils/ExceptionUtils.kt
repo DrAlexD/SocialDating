@@ -2,6 +2,11 @@ package xelagurd.socialdating.server.utils
 
 object ExceptionUtils {
 
+    fun getErrorPositionFromStackTrace(stackTrace: Array<StackTraceElement>) =
+        stackTrace.firstOrNull()
+            ?.let { "${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})" }
+            ?: "Unknown location"
+
     fun createWrongDataMessage(errorList: List<Pair<String, String?>>) =
         errorList
             .map {
