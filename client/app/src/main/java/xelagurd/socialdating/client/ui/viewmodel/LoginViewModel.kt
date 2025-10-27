@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import org.mindrot.jbcrypt.BCrypt
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
@@ -83,21 +82,19 @@ class LoginViewModel @Inject constructor(
     private suspend fun loginUser(loginDetails: LoginDetails, isLoginWithInput: Boolean) {
         _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
-        val encodedLoginDetails = loginDetails.copy(
-            password = BCrypt.hashpw(loginDetails.password, BCrypt.gensalt())
-        )
-
-        val (user, status) = safeApiCall(context) {
-            remoteRepository.loginUser(encodedLoginDetails)
+        var (authResponse, status) = safeApiCall(context) {
+            remoteRepository.loginUser(loginDetails)
         }
 
-        if (user != null) {
+        if (authResponse != null) {
             if (isLoginWithInput) {
                 accountManager.saveCredentials(loginDetails)
             }
 
-            localRepository.insertUser(user)
-            preferencesRepository.saveCurrentUserId(user.id)
+            localRepository.insertUser(authResponse.user)
+            preferencesRepository.saveAccessToken(authResponse.accessToken)
+            preferencesRepository.saveRefreshToken(authResponse.refreshToken)
+            preferencesRepository.saveCurrentUserId(authResponse.user.id)
         }
 
         if (status is RequestStatus.ERROR) { // FixMe: remove after implementing server
@@ -115,9 +112,9 @@ class LoginViewModel @Inject constructor(
 
             preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id)
 
-            _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
-        } else {
-            _uiState.update { it.copy(actionRequestStatus = status) } // TODO: Move outside after implementing server
+            status = RequestStatus.SUCCESS
         }
+
+        _uiState.update { it.copy(actionRequestStatus = status) }
     }
 }

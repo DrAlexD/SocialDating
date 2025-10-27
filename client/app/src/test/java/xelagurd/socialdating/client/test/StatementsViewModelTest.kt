@@ -265,7 +265,7 @@ class StatementsViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } throws IOException()
 
-        // TODO: remove after implementing server
+        // FixMe: remove after implementing server
         every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(
             localDefiningThemes
         )

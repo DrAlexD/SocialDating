@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import xelagurd.socialdating.client.R
+import xelagurd.socialdating.client.data.PreferencesRepository.Defaults.CURRENT_USER_ID_DEFAULT
 import xelagurd.socialdating.client.ui.screen.CategoriesScreen
 import xelagurd.socialdating.client.ui.screen.LoginScreen
 import xelagurd.socialdating.client.ui.screen.ProfileScreen
@@ -44,7 +45,11 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = if (currentUserId == -1) LoginDestination.route else CategoriesDestination.route
+        startDestination =
+            if (currentUserId == CURRENT_USER_ID_DEFAULT)
+                LoginDestination.route
+            else
+                CategoriesDestination.route
     ) {
         composable(route = LoginDestination.route) {
             LoginScreen(

@@ -367,7 +367,7 @@ class ProfileStatisticsViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteCategoriesRepository.getCategories() } throws IOException()
 
-        // TODO: remove after implementing server
+        // FixMe: remove after implementing server
         every { localCategoriesRepository.getCategories() } returns flowOf(localCategories)
         every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(
             localDefiningThemes

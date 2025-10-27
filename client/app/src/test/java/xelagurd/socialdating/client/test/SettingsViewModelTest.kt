@@ -42,6 +42,6 @@ class SettingsViewModelTest {
     }
 
     private fun mockLogout() {
-        coEvery { preferencesRepository.saveCurrentUserId(-1) } just Runs
+        coEvery { preferencesRepository.clearPreferences() } just Runs
     }
 }
