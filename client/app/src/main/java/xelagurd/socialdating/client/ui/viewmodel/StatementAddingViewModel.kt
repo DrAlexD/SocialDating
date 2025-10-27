@@ -93,7 +93,7 @@ class StatementAddingViewModel @Inject constructor(
 
             val statementDetails = uiState.value.formDetails
 
-            val (statement, status) = safeApiCall(context) {
+            var (statement, status) = safeApiCall(context) {
                 remoteStatementsRepository.addStatement(statementDetails)
             }
 
@@ -107,10 +107,10 @@ class StatementAddingViewModel @Inject constructor(
                     localStatementsRepository.insertStatement(FakeDataSource.newStatement)
                 }
 
-                _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
-            } else {
-                _uiState.update { it.copy(actionRequestStatus = status) } // TODO: Move outside after implementing server
+                status = RequestStatus.SUCCESS
             }
+
+            _uiState.update { it.copy(actionRequestStatus = status) }
         }
     }
 }

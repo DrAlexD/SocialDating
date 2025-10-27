@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run gateway-service" type="JetRunConfigurationType">
+    <envs>
+      <env name="SPRING_PROFILES_ACTIVE" value="local" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="xelagurd.socialdating.server.GatewayServiceApplicationKt" />
+    <module name="server.gateway-service.main" />
+    <shortenClasspath name="NONE" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <method v="2">
+      <option name="Gradle.BeforeRunTask" enabled="true" tasks="build -x test" externalProjectPath="$PROJECT_DIR$/gateway-service" vmOptions="" scriptParameters="" />
+    </method>
+  </configuration>
+</component>

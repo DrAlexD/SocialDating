@@ -8,8 +8,8 @@ import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
+import xelagurd.socialdating.client.data.model.enums.Role
 
-// FixMe: remove after implementing server
 object FakeDataSource {
     val categories = listOf(
         Category(1, "Category1"),
@@ -82,16 +82,19 @@ object FakeDataSource {
 
     val users = listOf(
         User(
-            1, "Alexander", Gender.MALE, "username1", "password1", "email1@gmail.com",
-            25, "Moscow", Purpose.ALL_AT_ONCE, 50
+            1, "Alexander", Gender.MALE, "username1",
+            "\$2a\$10\$VlL1TDtoHSflx3dUMswP1eJ24xh5IgRVll5JHp9a24mpsArAZQjnm",
+            "email1@gmail.com", 25, "Moscow", Purpose.ALL_AT_ONCE, 50, Role.ADMIN
         ),
         User(
-            2, "Denis", Gender.MALE, "username2", "password2", "email2@gmail.com", 27,
-            "St. Petersburg", Purpose.FRIENDS, 50
+            2, "Denis", Gender.MALE, "username2",
+            "\$2a\$10\$pNja5Q6J680N2HYc2VC7wOza5WoFO6O8e65D9Qwom7OjZkNE3uLe6",
+            "email2@gmail.com", 27, "St. Petersburg", Purpose.FRIENDS, 50, Role.USER
         ),
         User(
-            3, "Andrey", Gender.MALE, "username3", "password3", "email3@gmail.com", 28,
-            "Moscow", Purpose.RELATIONSHIPS, 50
+            3, "Andrey", Gender.MALE, "username3",
+            "\$2a\$10\$wfn84flRD.QlmGV4.EGVeO9fXm8sDl9u8.0Cq0MwIq67lgTswjL.e",
+            "email3@gmail.com", 28, "Moscow", Purpose.RELATIONSHIPS, 50, Role.USER
         ),
     )
 

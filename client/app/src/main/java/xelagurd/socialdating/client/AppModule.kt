@@ -1,5 +1,6 @@
 package xelagurd.socialdating.client
 
+import javax.inject.Named
 import javax.inject.Singleton
 import kotlinx.serialization.json.Json
 import android.content.Context
@@ -14,9 +15,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import xelagurd.socialdating.client.data.local.AppDatabase
 import xelagurd.socialdating.client.data.remote.ApiService
+import xelagurd.socialdating.client.data.remote.AuthApiService
+import xelagurd.socialdating.client.data.remote.AuthInterceptor
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -35,14 +39,36 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit() = Retrofit.Builder()
+    @Named("auth")
+    fun provideAuthRetrofit(): Retrofit = Retrofit.Builder()
         .baseUrl("http://10.0.2.2:8080/api/v1/")
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .build()
 
     @Provides
     @Singleton
-    fun provideRetrofitService(retrofit: Retrofit) = retrofit.create(ApiService::class.java)
+    fun provideAuthRetrofitService(@Named("auth") retrofit: Retrofit): AuthApiService =
+        retrofit.create(AuthApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+        .baseUrl("http://10.0.2.2:8080/api/v1/")
+        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .client(okHttpClient)
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideRetrofitService(retrofit: Retrofit): ApiService =
+        retrofit.create(ApiService::class.java)
 
     @Provides
     @Singleton

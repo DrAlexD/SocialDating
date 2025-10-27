@@ -2,6 +2,7 @@ package xelagurd.socialdating.server.model
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -10,6 +11,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
@@ -42,8 +44,8 @@ class User(
     @JvmField
     var password: String,
 
-    @field:Column(unique = true)
-    @field:NotBlank
+    @field:Column
+    @field:Email
     var email: String?,
 
     @field:Column(nullable = false)
@@ -68,6 +70,7 @@ class User(
     @field:Column(nullable = false)
     val role: Role
 ) : UserDetails {
+    @JsonIgnore
     override fun getAuthorities() = listOf(SimpleGrantedAuthority("ROLE_$role"))
 
     override fun getUsername() = username
@@ -80,9 +83,13 @@ class User(
         this.password = password
     }
 
+    @JsonIgnore
     override fun isAccountNonExpired() = true
+    @JsonIgnore
     override fun isAccountNonLocked() = true
+    @JsonIgnore
     override fun isCredentialsNonExpired() = true
+    @JsonIgnore
     override fun isEnabled() = true
 
     override fun equals(other: Any?): Boolean {

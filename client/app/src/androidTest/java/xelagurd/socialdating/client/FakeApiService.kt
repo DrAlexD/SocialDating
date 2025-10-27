@@ -9,18 +9,10 @@ import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
-import xelagurd.socialdating.client.data.model.details.LoginDetails
-import xelagurd.socialdating.client.data.model.details.RegistrationDetails
 import xelagurd.socialdating.client.data.model.details.StatementDetails
 import xelagurd.socialdating.client.data.remote.ApiService
 
 class FakeApiService : ApiService {
-    override suspend fun loginUser(loginDetails: LoginDetails): Response<User> =
-        Response.success(FakeDataSource.users[0])
-
-    override suspend fun registerUser(registrationDetails: RegistrationDetails): Response<User> =
-        Response.success(FakeDataSource.users[0])
-
     override suspend fun getUser(userId: Int): Response<User> =
         Response.success(FakeDataSource.users[0])
 
