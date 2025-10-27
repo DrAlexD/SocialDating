@@ -88,7 +88,7 @@ class StatementAddingViewModelTest {
         initViewModel()
         advanceUntilIdle()
 
-        // TODO: Change to ERROR after implementing server
+        // FixMe: Change to ERROR after implementing server
         assertEquals(RequestStatus.SUCCESS, statementAddingUiState.actionRequestStatus)
     }
 
@@ -153,6 +153,7 @@ class StatementAddingViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteStatementsRepository.addStatement(statementDetails) } throws IOException()
 
-        every { localStatementsRepository.getStatements() } returns flowOf(listOf(FakeDataSource.newStatement)) // TODO: remove after implementing server
+        // FixMe: remove after implementing server
+        every { localStatementsRepository.getStatements() } returns flowOf(listOf(FakeDataSource.newStatement))
     }
 }

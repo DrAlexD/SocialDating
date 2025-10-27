@@ -5,17 +5,19 @@ import javax.inject.Singleton
 import xelagurd.socialdating.client.data.model.details.LoginDetails
 import xelagurd.socialdating.client.data.model.details.RegistrationDetails
 import xelagurd.socialdating.client.data.remote.ApiService
+import xelagurd.socialdating.client.data.remote.AuthApiService
 
 @Singleton
 class RemoteUsersRepository @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val authApiService: AuthApiService
 ) {
     suspend fun getUser(userId: Int) =
         apiService.getUser(userId)
 
     suspend fun loginUser(loginDetails: LoginDetails) =
-        apiService.loginUser(loginDetails)
+        authApiService.loginUser(loginDetails)
 
     suspend fun registerUser(registrationDetails: RegistrationDetails) =
-        apiService.registerUser(registrationDetails)
+        authApiService.registerUser(registrationDetails)
 }

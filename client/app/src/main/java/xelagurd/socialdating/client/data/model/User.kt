@@ -6,6 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
+import xelagurd.socialdating.client.data.model.enums.Role
 
 @Serializable
 @Entity(
@@ -26,5 +27,6 @@ data class User(
     val age: Int,
     val city: String,
     val purpose: Purpose,
-    val activity: Int
+    val activity: Int,
+    val role: Role
 ) : DataEntity
