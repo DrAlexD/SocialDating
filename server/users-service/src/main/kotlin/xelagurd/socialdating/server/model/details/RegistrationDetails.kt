@@ -12,7 +12,7 @@ data class RegistrationDetails(
     val username: String,
     val password: String,
     val repeatedPassword: String,
-    val email: String,
+    val email: String?,
     val age: String,
     val city: String,
     val purpose: Purpose

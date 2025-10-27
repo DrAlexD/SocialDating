@@ -7,18 +7,42 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 
 @Singleton
 class PreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
-    val currentUserId = dataStore.data.map { it[CURRENT_USER_ID] ?: -1 }
+    val currentUserId = dataStore.data.map { it[CURRENT_USER_ID] ?: CURRENT_USER_ID_DEFAULT }
+    val accessToken = dataStore.data.map { it[ACCESS_TOKEN] ?: ACCESS_TOKEN_DEFAULT }
+    val refreshToken = dataStore.data.map { it[REFRESH_TOKEN] ?: REFRESH_TOKEN_DEFAULT }
 
     suspend fun saveCurrentUserId(currentUserId: Int) {
         dataStore.edit { it[CURRENT_USER_ID] = currentUserId }
     }
 
-    private companion object {
-        val CURRENT_USER_ID = intPreferencesKey("current_user_id")
+    suspend fun saveAccessToken(accessToken: String) {
+        dataStore.edit { it[ACCESS_TOKEN] = accessToken }
+    }
+
+    suspend fun saveRefreshToken(refreshToken: String) {
+        dataStore.edit { it[REFRESH_TOKEN] = refreshToken }
+    }
+
+    suspend fun clearPreferences() {
+        dataStore.edit {
+            it[CURRENT_USER_ID] = CURRENT_USER_ID_DEFAULT
+            it[ACCESS_TOKEN] = ACCESS_TOKEN_DEFAULT
+            it[REFRESH_TOKEN] = REFRESH_TOKEN_DEFAULT
+        }
+    }
+
+    companion object Defaults {
+        private val CURRENT_USER_ID = intPreferencesKey("current_user_id")
+        private val ACCESS_TOKEN = stringPreferencesKey("access_token")
+        private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
+        const val CURRENT_USER_ID_DEFAULT = -1
+        const val ACCESS_TOKEN_DEFAULT = ""
+        const val REFRESH_TOKEN_DEFAULT = ""
     }
 }

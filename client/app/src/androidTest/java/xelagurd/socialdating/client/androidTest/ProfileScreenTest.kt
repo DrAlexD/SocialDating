@@ -15,6 +15,7 @@ import xelagurd.socialdating.client.checkEnabledButton
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
+import xelagurd.socialdating.client.data.model.enums.Role
 import xelagurd.socialdating.client.onNodeWithTagId
 import xelagurd.socialdating.client.onNodeWithTextId
 import xelagurd.socialdating.client.onNodeWithTextIdWithColon
@@ -72,7 +73,7 @@ class ProfileScreenTest {
         val profileUiState = ProfileUiState(
             entity = User(
                 1, "User1", Gender.MALE, "username1", "password1",
-                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
+                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50, Role.USER
             ),
             dataRequestStatus = RequestStatus.LOADING
         )
@@ -85,7 +86,7 @@ class ProfileScreenTest {
         val profileUiState = ProfileUiState(
             entity = User(
                 1, "User1", Gender.MALE, "username1", "password1",
-                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
+                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50, Role.USER
             ),
             dataRequestStatus = RequestStatus.ERROR()
         )
@@ -98,7 +99,7 @@ class ProfileScreenTest {
         val profileUiState = ProfileUiState(
             entity = User(
                 1, "User1", Gender.MALE, "username1", "password1",
-                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
+                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50, Role.USER
             ),
             dataRequestStatus = RequestStatus.FAILURE()
         )
@@ -111,7 +112,7 @@ class ProfileScreenTest {
         val profileUiState = ProfileUiState(
             entity = User(
                 1, "User1", Gender.MALE, "username1", "password1",
-                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50
+                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50, Role.USER
             ),
             dataRequestStatus = RequestStatus.SUCCESS
         )

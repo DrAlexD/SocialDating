@@ -14,6 +14,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import xelagurd.socialdating.client.data.local.AppDatabase
 import xelagurd.socialdating.client.data.remote.ApiService
+import xelagurd.socialdating.client.data.remote.AuthApiService
 
 @Module
 @TestInstallIn(
@@ -32,6 +33,10 @@ object TestAppModule {
     @Singleton
     fun provideCredentialManager(@ApplicationContext context: Context) =
         CredentialManager.create(context)
+
+    @Provides
+    @Singleton
+    fun provideAuthRetrofitService(): AuthApiService = FakeAuthApiService()
 
     @Provides
     @Singleton

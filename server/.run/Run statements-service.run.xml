@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run statements-service" type="JetRunConfigurationType">
+    <envs>
+      <env name="SPRING_PROFILES_ACTIVE" value="local" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="xelagurd.socialdating.server.StatementsServiceApplicationKt" />
+    <module name="server.statements-service.main" />
+    <shortenClasspath name="NONE" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <method v="2">
+      <option name="Gradle.BeforeRunTask" enabled="false" tasks="build -x test" externalProjectPath="$PROJECT_DIR$/statements-service" vmOptions="" scriptParameters="" />
+    </method>
+  </configuration>
+</component>

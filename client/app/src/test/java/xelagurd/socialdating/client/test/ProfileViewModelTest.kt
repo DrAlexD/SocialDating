@@ -24,6 +24,7 @@ import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
+import xelagurd.socialdating.client.data.model.enums.Role
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.ProfileViewModel
@@ -46,9 +47,9 @@ class ProfileViewModelTest {
     private val userId = 1
 
     private val localUser =
-        User(userId, "", Gender.MALE, "", "", "", 30, "", Purpose.ALL_AT_ONCE, 50)
+        User(userId, "", Gender.MALE, "", "", "", 30, "", Purpose.ALL_AT_ONCE, 50, Role.USER)
     private val remoteUser =
-        User(userId, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20)
+        User(userId, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20, Role.USER)
 
     @Before
     fun setup() {
