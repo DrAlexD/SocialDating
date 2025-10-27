@@ -3,6 +3,7 @@ package xelagurd.socialdating.client.ui.navigation
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import xelagurd.socialdating.client.R
+import xelagurd.socialdating.client.data.PreferencesRepository.Defaults.CURRENT_USER_ID_DEFAULT
 
 abstract class NavigationDestination {
     abstract val route: String
@@ -82,7 +83,7 @@ object StatementDetailsDestination : NavigationDestination() {
 object ProfileDestination : NavigationDestination() {
     override val route = AppScreen.Profile.name
 
-    var currentUserId = -1
+    var currentUserId = CURRENT_USER_ID_DEFAULT
     override val topLevelRoute
         get() = "$route/$currentUserId"
 
@@ -93,7 +94,7 @@ object ProfileDestination : NavigationDestination() {
 object ProfileStatisticsDestination : NavigationDestination() {
     override val route = AppScreen.ProfileStatistics.name
 
-    var currentUserId = -1
+    var currentUserId = CURRENT_USER_ID_DEFAULT
     override val topLevelRoute
         get() = "${ProfileDestination.route}/$currentUserId"
 

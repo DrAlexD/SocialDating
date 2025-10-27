@@ -25,9 +25,11 @@ import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.User
+import xelagurd.socialdating.client.data.model.additional.AuthResponse
 import xelagurd.socialdating.client.data.model.details.LoginDetails
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
+import xelagurd.socialdating.client.data.model.enums.Role
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.LoginViewModel
@@ -49,7 +51,8 @@ class LoginViewModelTest {
 
     private val loginDetails = LoginDetails("", "")
     private val remoteUser =
-        User(1, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20)
+        User(1, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20, Role.USER)
+    private val authResponse = AuthResponse(remoteUser, "", "")
 
     @Before
     fun setup() {
@@ -85,7 +88,7 @@ class LoginViewModelTest {
         initViewModel()
         advanceUntilIdle()
 
-        // TODO: Change to ERROR after implementing server
+        // FixMe: Change to ERROR after implementing server
         assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
     }
 
@@ -146,9 +149,11 @@ class LoginViewModelTest {
 
     private fun mockDataWithInternet() {
         coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } returns
-                Response.success(remoteUser)
-        coEvery { localRepository.insertUser(remoteUser) } just Runs
-        coEvery { preferencesRepository.saveCurrentUserId(remoteUser.id) } just Runs
+                Response.success(authResponse)
+        coEvery { localRepository.insertUser(authResponse.user) } just Runs
+        coEvery { preferencesRepository.saveAccessToken(authResponse.accessToken) } just Runs
+        coEvery { preferencesRepository.saveRefreshToken(authResponse.refreshToken) } just Runs
+        coEvery { preferencesRepository.saveCurrentUserId(authResponse.user.id) } just Runs
     }
 
     private fun mockWrongData() {
@@ -161,6 +166,7 @@ class LoginViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } throws IOException()
 
+        // FixMe: remove after implementing server
         coEvery {
             accountManager.saveCredentials(
                 LoginDetails(
@@ -168,8 +174,8 @@ class LoginViewModelTest {
                     FakeDataSource.users[0].password
                 )
             )
-        } just Runs // TODO: remove after implementing server
-        every { localRepository.getUsers() } returns flowOf(listOf(FakeDataSource.users[0])) // TODO: remove after implementing server
-        coEvery { preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) } just Runs // TODO: remove after implementing server
+        } just Runs
+        every { localRepository.getUsers() } returns flowOf(listOf(FakeDataSource.users[0]))
+        coEvery { preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) } just Runs
     }
 }

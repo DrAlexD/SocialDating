@@ -24,7 +24,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
-            preferencesRepository.saveCurrentUserId(-1)
+            preferencesRepository.clearPreferences()
 
             _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
         }
