@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run SocialDating locally" type="CompoundRunConfigurationType">
+    <toRun name="Run kafka and databases in docker" type="docker-deploy" />
+    <toRun name="Run categories-service" type="JetRunConfigurationType" />
+    <toRun name="Run defining-themes-service" type="JetRunConfigurationType" />
+    <toRun name="Run gateway-service" type="JetRunConfigurationType" />
+    <toRun name="Run statements-service" type="JetRunConfigurationType" />
+    <toRun name="Run users-service" type="JetRunConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

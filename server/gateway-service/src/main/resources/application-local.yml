@@ -1,0 +1,26 @@
+spring:
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:.env
+  cloud:
+    gateway:
+      routes:
+        - id: users-service
+          uri: http://localhost:8010
+          predicates:
+            - Path=/api/v1/users/**
+        - id: categories-service
+          uri: http://localhost:8020
+          predicates:
+            - Path=/api/v1/categories/**
+        - id: defining-themes-service
+          uri: http://localhost:8030
+          predicates:
+            - Path=/api/v1/defining-themes/**
+        - id: statements-service
+          uri: http://localhost:8040
+          predicates:
+            - Path=/api/v1/statements/**
+  kafka:
+    bootstrap-servers: localhost:9093
