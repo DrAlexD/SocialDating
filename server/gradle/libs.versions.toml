@@ -1,9 +1,9 @@
 [versions]
-kotlin = "2.2.20"
+kotlin = "2.2.21"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
 kotlinxSerializationJson = "1.9.0"
 kotlinxCoroutines = "1.10.2"
-springBoot = "3.5.6"
+springBoot = "3.5.7"
 springDependencyManagement = "1.1.7"
 springCloudGateway = "4.3.2"
 jacksonKotlin = "2.20.0"
