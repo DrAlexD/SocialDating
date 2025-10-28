@@ -5,6 +5,7 @@ import kotlin.test.assertEquals
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.assertj.core.api.Assertions.assertThat
@@ -18,6 +19,7 @@ import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(NoSecurityConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemplate) {
 

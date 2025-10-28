@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.details.UserCategoryDetails
+import xelagurd.socialdating.server.security.AdminAccess
 import xelagurd.socialdating.server.service.UserCategoriesService
 
 @RestController
@@ -24,7 +25,7 @@ class UserCategoriesController(
         return userCategoriesService.getUserCategories(userId)
     }
 
-    // TODO: Add admin privileges
+    @AdminAccess
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addUserCategory(@RequestBody @Valid userCategoryDetails: UserCategoryDetails): UserCategory {

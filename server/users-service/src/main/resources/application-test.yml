@@ -1,9 +1,3 @@
-security:
-  whitelist:
-    - /api/v1/users/auth/**
-    - /actuator/**
-    - /api/v1/users/**
-
 spring:
   web:
     locale: en

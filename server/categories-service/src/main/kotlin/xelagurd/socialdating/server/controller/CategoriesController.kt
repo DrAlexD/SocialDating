@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.model.details.CategoryDetails
+import xelagurd.socialdating.server.security.AdminAccess
 import xelagurd.socialdating.server.service.CategoriesService
 
 @RestController
@@ -23,7 +24,7 @@ class CategoriesController(
         return categoriesService.getCategories()
     }
 
-    // TODO: Add admin privileges
+    @AdminAccess
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addCategory(@RequestBody @Valid categoryDetails: CategoryDetails): Category {

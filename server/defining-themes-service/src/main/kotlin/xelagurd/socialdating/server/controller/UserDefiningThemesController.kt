@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.UserDefiningTheme
 import xelagurd.socialdating.server.model.details.UserDefiningThemeDetails
+import xelagurd.socialdating.server.security.AdminAccess
 import xelagurd.socialdating.server.service.UserDefiningThemesService
 
 @RestController
@@ -24,7 +25,7 @@ class UserDefiningThemesController(
         return userDefiningThemesService.getUserDefiningThemes(userCategoryIds)
     }
 
-    // TODO: Add admin privileges
+    @AdminAccess
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addUserDefiningTheme(@RequestBody @Valid userDefiningThemeDetails: UserDefiningThemeDetails): UserDefiningTheme {
