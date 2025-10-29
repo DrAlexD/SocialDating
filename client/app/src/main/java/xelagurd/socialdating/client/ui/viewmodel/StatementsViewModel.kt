@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -47,13 +46,8 @@ class StatementsViewModel @Inject constructor(
     private val categoryId: Int = checkNotNull(savedStateHandle[StatementsDestination.categoryId])
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
-    private val statementsFlow = localDefiningThemesRepository.getDefiningThemes(categoryId)
+    private val statementsFlow = localStatementsRepository.getStatements(categoryId)
         .distinctUntilChanged()
-        .flatMapLatest { definingThemes ->
-            val definingThemeIds = definingThemes.map { it.id }.distinct()
-            localStatementsRepository.getStatements(definingThemeIds)
-                .distinctUntilChanged()
-        }
 
     val uiState = combine(statementsFlow, dataRequestStatusFlow) { statements, dataRequestStatus ->
         StatementsUiState(
@@ -105,7 +99,7 @@ class StatementsViewModel @Inject constructor(
                 globalStatus = statusDefiningThemes
             }
 
-            if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after implementing server
+            if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
                 if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
                     localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes)
                 }

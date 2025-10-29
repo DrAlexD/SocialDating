@@ -9,10 +9,11 @@ import xelagurd.socialdating.client.data.model.User
 
 @Dao
 interface UsersDao {
-    @Query("SELECT * FROM users")
+    // FixMe: remove after adding server hosting
+    @Query("select * from users")
     fun getUsers(): Flow<List<User>>
 
-    @Query("SELECT * FROM users WHERE id = :userId")
+    @Query("select * from users where id = :userId")
     fun getUser(userId: Int): Flow<User>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

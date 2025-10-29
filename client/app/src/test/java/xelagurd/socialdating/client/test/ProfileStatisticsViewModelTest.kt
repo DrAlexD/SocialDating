@@ -304,15 +304,10 @@ class ProfileStatisticsViewModelTest {
         )
     }
 
-    private fun mockLocalUserDefiningThemes() {
-        every { localUserDefiningThemesRepository.getUserDefiningThemes(localUserCategories.toUserCategoryIds()) } returns userDefiningThemesFlow
-        every { localUserDefiningThemesRepository.getUserDefiningThemes(remoteUserCategories.toUserCategoryIds()) } returns userDefiningThemesFlow
-    }
-
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>("userId") } returns userId
         every { localUserCategoriesRepository.getUserCategories(userId) } returns userCategoriesFlow
-        mockLocalUserDefiningThemes()
+        every { localUserDefiningThemesRepository.getUserDefiningThemes(userId) } returns userDefiningThemesFlow
     }
 
     private fun mockDataWithInternet() {
@@ -367,7 +362,7 @@ class ProfileStatisticsViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteCategoriesRepository.getCategories() } throws IOException()
 
-        // FixMe: remove after implementing server
+        // FixMe: remove after adding server hosting
         every { localCategoriesRepository.getCategories() } returns flowOf(localCategories)
         every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(
             localDefiningThemes

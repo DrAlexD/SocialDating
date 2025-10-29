@@ -166,7 +166,7 @@ class LoginViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } throws IOException()
 
-        // FixMe: remove after implementing server
+        // FixMe: remove after adding server hosting
         coEvery {
             accountManager.saveCredentials(
                 LoginDetails(

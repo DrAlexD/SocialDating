@@ -10,26 +10,27 @@ import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeWithD
 
 @Dao
 interface UserDefiningThemesDao {
-    @Query("SELECT * FROM user_defining_themes")
+    // FixMe: remove after adding server hosting
+    @Query("select * from user_defining_themes")
     fun getUserDefiningThemes(): Flow<List<UserDefiningTheme>>
 
     @Query(
         """
-        SELECT 
-            udt.id AS id,
-            udt.value AS value,
-            udt.interest AS interest,
-            udt.userCategoryId AS userCategoryId,
-            udt.definingThemeId AS definingThemeId,
-            dt.name AS definingThemeName,
-            dt.fromOpinion AS definingThemeFromOpinion,
-            dt.toOpinion AS definingThemeToOpinion
-        FROM user_defining_themes AS udt
-        INNER JOIN defining_themes AS dt ON udt.definingThemeId = dt.id
-        WHERE udt.userCategoryId IN (:userCategoryIds)
+        select udt.id,
+               udt.value,
+               udt.interest,
+               udt.userCategoryId,
+               udt.definingThemeId,
+               dt.name as definingThemeName,
+               dt.fromOpinion as definingThemeFromOpinion,
+               dt.toOpinion as definingThemeToOpinion
+        from user_defining_themes udt
+        join user_categories uc on udt.userCategoryId = uc.id
+        join defining_themes dt on udt.definingThemeId = dt.id
+        where userId = :userId
         """
     )
-    fun getUserDefiningThemes(userCategoryIds: List<Int>): Flow<List<UserDefiningThemeWithData>>
+    fun getUserDefiningThemes(userId: Int): Flow<List<UserDefiningThemeWithData>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUserDefiningThemes(userDefiningThemes: List<UserDefiningTheme>)

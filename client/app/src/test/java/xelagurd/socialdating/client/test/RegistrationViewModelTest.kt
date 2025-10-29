@@ -146,7 +146,7 @@ class RegistrationViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } throws IOException()
 
-        // FixMe: remove after implementing server
+        // FixMe: remove after adding server hosting
         coEvery {
             accountManager.saveCredentials(
                 LoginDetails(
