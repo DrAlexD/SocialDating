@@ -153,7 +153,7 @@ class StatementAddingViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteStatementsRepository.addStatement(statementDetails) } throws IOException()
 
-        // FixMe: remove after implementing server
+        // FixMe: remove after adding server hosting
         every { localStatementsRepository.getStatements() } returns flowOf(listOf(FakeDataSource.newStatement))
     }
 }

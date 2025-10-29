@@ -57,7 +57,7 @@ class CategoriesViewModel @Inject constructor(
                 localRepository.insertCategories(remoteCategories)
             }
 
-            if (status is RequestStatus.ERROR) { // FixMe: remove after implementing server
+            if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
                 if (localRepository.getCategories().first().isEmpty()) {
                     localRepository.insertCategories(FakeDataSource.categories)
                 }

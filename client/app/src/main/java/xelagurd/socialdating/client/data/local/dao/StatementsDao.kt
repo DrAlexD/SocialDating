@@ -9,11 +9,19 @@ import xelagurd.socialdating.client.data.model.Statement
 
 @Dao
 interface StatementsDao {
-    @Query("SELECT * FROM statements")
+    // FixMe: remove after adding server hosting
+    @Query("select * from statements")
     fun getStatements(): Flow<List<Statement>>
 
-    @Query("SELECT * FROM statements WHERE definingThemeId IN (:definingThemeIds)")
-    fun getStatements(definingThemeIds: List<Int>): Flow<List<Statement>>
+    @Query(
+        """
+        select stm.*
+        from statements stm
+        join defining_themes dt on stm.definingThemeId = dt.id
+        where categoryId = :categoryId
+        """
+    )
+    fun getStatements(categoryId: Int): Flow<List<Statement>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStatements(statements: List<Statement>)

@@ -10,21 +10,21 @@ import xelagurd.socialdating.client.data.model.additional.UserCategoryWithData
 
 @Dao
 interface UserCategoriesDao {
-    @Query("SELECT * FROM user_categories")
+    // FixMe: remove after adding server hosting
+    @Query("select * from user_categories")
     fun getUserCategories(): Flow<List<UserCategory>>
 
     @Query(
         """
-        SELECT 
-            uc.id AS id,
-            uc.interest AS interest,
-            uc.userId AS userId,
-            uc.categoryId AS categoryId,
-            c.name AS categoryName
-        FROM user_categories AS uc
-        INNER JOIN categories AS c ON uc.categoryId = c.id
-        WHERE uc.userId = :userId
-    """
+        select uc.id,
+               uc.interest,
+               uc.userId,
+               uc.categoryId,
+               c.name as categoryName
+        from user_categories uc
+        join categories c on uc.categoryId = c.id
+        where userId = :userId
+        """
     )
     fun getUserCategories(userId: Int): Flow<List<UserCategoryWithData>>
 

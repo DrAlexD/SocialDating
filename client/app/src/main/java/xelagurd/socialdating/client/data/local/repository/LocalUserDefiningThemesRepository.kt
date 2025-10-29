@@ -12,8 +12,8 @@ class LocalUserDefiningThemesRepository @Inject constructor(
     fun getUserDefiningThemes() =
         userDefiningThemesDao.getUserDefiningThemes()
 
-    fun getUserDefiningThemes(userCategoryIds: List<Int>) =
-        userDefiningThemesDao.getUserDefiningThemes(userCategoryIds)
+    fun getUserDefiningThemes(userId: Int) =
+        userDefiningThemesDao.getUserDefiningThemes(userId)
 
     suspend fun insertUserDefiningThemes(userDefiningThemes: List<UserDefiningTheme>) =
         userDefiningThemesDao.insertUserDefiningThemes(userDefiningThemes)

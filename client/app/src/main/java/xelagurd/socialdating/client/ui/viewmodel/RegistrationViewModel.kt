@@ -59,7 +59,7 @@ class RegistrationViewModel @Inject constructor(
                 preferencesRepository.saveCurrentUserId(authResponse.user.id)
             }
 
-            if (status is RequestStatus.ERROR) { // FixMe: remove after implementing server
+            if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
                 accountManager.saveCredentials(
                     LoginDetails(
                         FakeDataSource.users[0].username,

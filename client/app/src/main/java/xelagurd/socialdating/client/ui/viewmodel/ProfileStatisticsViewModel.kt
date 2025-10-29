@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,13 +48,10 @@ class ProfileStatisticsViewModel @Inject constructor(
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val userCategoriesFlow = localUserCategoriesRepository.getUserCategories(userId)
-    private val userDefiningThemesFlow = userCategoriesFlow
         .distinctUntilChanged()
-        .flatMapLatest { userCategories ->
-            val userCategoryIds = userCategories.map { it.id }.distinct()
-            localUserDefiningThemesRepository.getUserDefiningThemes(userCategoryIds)
-                .distinctUntilChanged()
-        }
+    private val userDefiningThemesFlow = localUserDefiningThemesRepository
+        .getUserDefiningThemes(userId)
+        .distinctUntilChanged()
 
     val uiState = combine(userCategoriesFlow, userDefiningThemesFlow, dataRequestStatusFlow)
     { userCategories, userDefiningThemes, dataRequestStatus ->
@@ -128,7 +124,7 @@ class ProfileStatisticsViewModel @Inject constructor(
                 globalStatus = statusCategories
             }
 
-            if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after implementing server
+            if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
                 if (localCategoriesRepository.getCategories().first().isEmpty()) {
                     localCategoriesRepository.insertCategories(FakeDataSource.categories)
                 }

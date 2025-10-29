@@ -224,16 +224,10 @@ class StatementsViewModelTest {
         )
     }
 
-    private fun mockLocalStatements() {
-        every { localStatementsRepository.getStatements(localDefiningThemes.toIds()) } returns statementsFlow
-        every { localStatementsRepository.getStatements(remoteDefiningThemes.toIds()) } returns statementsFlow
-    }
-
     private fun mockGeneralMethods() {
         every { preferencesRepository.currentUserId } returns flowOf(FakeDataSource.users[0].id)
         every { savedStateHandle.get<Int>("categoryId") } returns categoryId
-        every { localDefiningThemesRepository.getDefiningThemes(categoryId) } returns definingThemesFlow
-        mockLocalStatements()
+        every { localStatementsRepository.getStatements(categoryId) } returns statementsFlow
     }
 
     private fun mockDataWithInternet() {
@@ -265,7 +259,7 @@ class StatementsViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } throws IOException()
 
-        // FixMe: remove after implementing server
+        // FixMe: remove after adding server hosting
         every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(
             localDefiningThemes
         )
