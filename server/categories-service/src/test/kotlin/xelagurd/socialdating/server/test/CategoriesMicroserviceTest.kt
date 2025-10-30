@@ -110,7 +110,7 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
 
     @Test
     fun getUserCategories() {
-        val getResponse = restTemplate.getForEntity("/api/v1/categories/users/$userId", Array<UserCategory>::class.java)
+        val getResponse = restTemplate.getForEntity("/api/v1/categories/users?userId=$userId", Array<UserCategory>::class.java)
         assertThat(getResponse.statusCode).isEqualTo(HttpStatus.OK)
         assertEquals(getResponse.body!!.size, 2)
         assertContentEquals(getResponse.body!!, arrayOf(userCategories[0], userCategories[1]))

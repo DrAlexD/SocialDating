@@ -12,6 +12,7 @@ import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
+import xelagurd.socialdating.client.data.model.UserStatement
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.details.StatementDetails
 
@@ -22,8 +23,8 @@ interface ApiService {
     @GET("categories")
     suspend fun getCategories(): Response<List<Category>>
 
-    @GET("categories/users/{id}")
-    suspend fun getUserCategories(@Path("id") userId: Int): Response<List<UserCategory>>
+    @GET("categories/users")
+    suspend fun getUserCategories(@Query("userId") userId: Int): Response<List<UserCategory>>
 
     @GET("defining-themes")
     suspend fun getDefiningThemes(@Query("categoryIds") categoryIds: List<Int>): Response<List<DefiningTheme>>
@@ -32,14 +33,20 @@ interface ApiService {
     suspend fun getUserDefiningThemes(@Query("userCategoryIds") userCategoryIds: List<Int>): Response<List<UserDefiningTheme>>
 
     @GET("statements")
-    suspend fun getStatements(@Query("definingThemeIds") definingThemeIds: List<Int>): Response<List<Statement>>
+    suspend fun getStatements(
+        @Query("userId") userId: Int,
+        @Query("definingThemeIds") definingThemeIds: List<Int>
+    ): Response<List<Statement>>
+
+    @GET("statements/users")
+    suspend fun getUserStatements(
+        @Query("userId") userId: Int,
+        @Query("definingThemeIds") definingThemeIds: List<Int>
+    ): Response<List<UserStatement>>
 
     @POST("statements")
     suspend fun addStatement(@Body statementDetails: StatementDetails): Response<Statement>
 
-    @POST("statements/{id}/reaction")
-    suspend fun addStatementReaction(
-        @Path("id") statementId: Int,
-        @Body statementReactionDetails: StatementReactionDetails
-    ): Response<Unit>
+    @POST("statements/users/reaction")
+    suspend fun addStatementReaction(@Body statementReactionDetails: StatementReactionDetails): Response<UserStatement>
 }

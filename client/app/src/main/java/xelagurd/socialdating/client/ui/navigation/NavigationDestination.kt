@@ -60,16 +60,18 @@ object StatementsDestination : NavigationDestination() {
     override val route = AppScreen.Statements.name
     override val topLevelRoute = CategoriesDestination.route
 
+    const val userId = "userId"
     const val categoryId = "categoryId"
-    val routeWithArgs = "$route/{$categoryId}"
+    val routeWithArgs = "$route/{$userId}/{$categoryId}"
 }
 
 object StatementAddingDestination : NavigationDestination() {
     override val route = AppScreen.StatementAdding.name
     override val topLevelRoute = CategoriesDestination.route
 
+    const val userId = "userId"
     const val categoryId = "categoryId"
-    val routeWithArgs = "$route/{$categoryId}"
+    val routeWithArgs = "$route/{$userId}/{$categoryId}"
 }
 
 object StatementDetailsDestination : NavigationDestination() {

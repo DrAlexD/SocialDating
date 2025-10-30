@@ -82,23 +82,28 @@ fun AppNavHost(
         composable(route = CategoriesDestination.route) {
             CategoriesScreen(
                 onCategoryClick = {
-                    navController.navigate("${StatementsDestination.route}/$it")
+                    navController.navigate("${StatementsDestination.route}/$currentUserId/$it")
                 }
             )
         }
 
         composable(
             route = StatementsDestination.routeWithArgs,
-            arguments = listOf(navArgument(StatementsDestination.categoryId) {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument(StatementsDestination.userId) {
+                    type = NavType.IntType
+                },
+                navArgument(StatementsDestination.categoryId) {
+                    type = NavType.IntType
+                }
+            )
         ) {
             StatementsScreen(
                 onStatementClick = {
                     navController.navigate("${StatementDetailsDestination.route}/$it")
                 },
                 onStatementAddingClick = {
-                    navController.navigate("${StatementAddingDestination.route}/$it")
+                    navController.navigate("${StatementAddingDestination.route}/$currentUserId/$it")
                 },
                 onNavigateUp = { navController.navigateUp() }
             )
@@ -106,9 +111,14 @@ fun AppNavHost(
 
         composable(
             route = StatementAddingDestination.routeWithArgs,
-            arguments = listOf(navArgument(StatementAddingDestination.categoryId) {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument(StatementAddingDestination.userId) {
+                    type = NavType.IntType
+                },
+                navArgument(StatementAddingDestination.categoryId) {
+                    type = NavType.IntType
+                }
+            )
         ) {
             StatementAddingScreen(
                 onSuccessStatementAdding = { navController.navigateUp() },
@@ -118,9 +128,11 @@ fun AppNavHost(
 
         composable(
             route = ProfileDestination.routeWithArgs,
-            arguments = listOf(navArgument(ProfileDestination.userId) {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument(ProfileDestination.userId) {
+                    type = NavType.IntType
+                }
+            )
         ) {
             ProfileScreen(
                 onProfileStatisticsClick = {
@@ -131,9 +143,11 @@ fun AppNavHost(
 
         composable(
             route = ProfileStatisticsDestination.routeWithArgs,
-            arguments = listOf(navArgument(ProfileStatisticsDestination.userId) {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument(ProfileStatisticsDestination.userId) {
+                    type = NavType.IntType
+                }
+            )
         ) {
             ProfileStatisticsScreen(
                 onNavigateUp = { navController.navigateUp() }
@@ -142,9 +156,11 @@ fun AppNavHost(
 
         composable(
             route = StatementDetailsDestination.routeWithArgs,
-            arguments = listOf(navArgument(StatementDetailsDestination.statementId) {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument(StatementDetailsDestination.statementId) {
+                    type = NavType.IntType
+                }
+            )
         ) {
             //
         }

@@ -27,6 +27,7 @@ class DefiningThemesKafkaConsumerUnitTest {
         userOrUserCategoryId = userId,
         definingThemeId = definingThemeId,
         categoryId = 1,
+        statementId = 1,
         reactionType = StatementReactionType.FULL_MAINTAIN,
         isSupportDefiningTheme = true
     )

@@ -116,22 +116,28 @@ class StatementsIntegrationTest {
             "userOrUserCategoryId" to userId,
             "categoryId" to responseCategory["id"],
             "definingThemeId" to responseDefiningTheme["id"],
+            "statementId" to responseStatement["id"],
             "reactionType" to 4, // FULL_MAINTAIN
             "isSupportDefiningTheme" to true
         )
         val postStatementReactionResponse = postWithToken(
-            "$GATEWAY_URL/api/v1/statements/${responseStatement["id"]}/reaction",
+            "$GATEWAY_URL/api/v1/statements/users/reaction",
             requestStatementReaction,
             String::class.java
         )
-        assertEquals(postStatementReactionResponse.statusCode, HttpStatus.NO_CONTENT)
+        assertEquals(postStatementReactionResponse.statusCode, HttpStatus.CREATED)
+
+        val responseUserStatement = readObjectFromJsonString(postStatementReactionResponse.body!!)
+        assertNotNull(responseUserStatement["id"])
+        assertEquals(requestStatementReaction["userOrUserCategoryId"], responseUserStatement["userId"])
+        assertEquals(requestStatementReaction["statementId"], responseUserStatement["statementId"])
 
 
         Thread.sleep(3000)
 
 
         val getUserCategoriesResponse = getWithToken(
-            "$GATEWAY_URL/api/v1/categories/users/$userId",
+            "$GATEWAY_URL/api/v1/categories/users?userId=$userId",
             String::class.java
         )
         assertEquals(getUserCategoriesResponse.statusCode, HttpStatus.OK)

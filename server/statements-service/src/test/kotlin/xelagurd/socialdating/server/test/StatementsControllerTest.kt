@@ -10,16 +10,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.StatementsController
 import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.Statement
-import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.details.StatementDetails
-import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.service.StatementsService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
@@ -65,23 +61,13 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
         creatorUserId = userId
     )
 
-    private val statementId = 1
-
-    private val statementReactionDetails = StatementReactionDetails(
-        userOrUserCategoryId = userId,
-        categoryId = 1,
-        definingThemeId = 1,
-        reactionType = StatementReactionType.FULL_MAINTAIN,
-        isSupportDefiningTheme = true
-    )
-
     @Test
     fun getStatementsByDefiningThemeIds_allData_success() {
         val expected = statements.filter { it.definingThemeId in definingThemeIds }
-        `when`(statementsService.getStatements(definingThemeIds)).thenReturn(expected)
+        `when`(statementsService.getStatements(userId, definingThemeIds)).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/statements?definingThemeIds=${definingThemeIds.toRequestParams()}")
+            get("/api/v1/statements?userId=${userId}&definingThemeIds=${definingThemeIds.toRequestParams()}")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -91,10 +77,10 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
     @Test
     fun getStatementsByDefiningThemeIds_emptyData_error() {
         val message = "test"
-        `when`(statementsService.getStatements(definingThemeIds)).thenThrow(NoDataFoundException(message))
+        `when`(statementsService.getStatements(userId, definingThemeIds)).thenThrow(NoDataFoundException(message))
 
         mockMvc.perform(
-            get("/api/v1/statements?definingThemeIds=${definingThemeIds.toRequestParams()}")
+            get("/api/v1/statements?userId=${userId}&definingThemeIds=${definingThemeIds.toRequestParams()}")
         )
             .andExpect(status().isNotFound)
             .andExpect(content().string(message))
@@ -113,21 +99,5 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
             .andExpect(status().isCreated)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json(convertObjectToJsonString(expected)))
-    }
-
-    @Test
-    fun addStatementReaction() {
-        val expected = statements.filter { it.id == statementId }
-
-        assertEquals(expected.size, 1)
-
-        mockMvc.perform(
-            post("/api/v1/statements/$statementId/reaction")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(statementReactionDetails))
-        )
-            .andExpect(status().isNoContent)
-
-        verify(statementsService).addStatementReaction(statementId, statementReactionDetails)
     }
 }

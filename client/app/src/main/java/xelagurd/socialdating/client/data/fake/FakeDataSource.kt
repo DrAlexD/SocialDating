@@ -6,9 +6,11 @@ import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
+import xelagurd.socialdating.client.data.model.UserStatement
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
 import xelagurd.socialdating.client.data.model.enums.Role
+import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_MAINTAIN
 
 object FakeDataSource {
     val categories = listOf(
@@ -113,4 +115,11 @@ object FakeDataSource {
         UserDefiningTheme(4, 57, 15, 2, 4),
         UserDefiningTheme(5, 15, 50, 3, 5),
     )
+
+    val userStatements = listOf(
+        UserStatement(1, FULL_MAINTAIN, 1, 1),
+        UserStatement(2, FULL_MAINTAIN, 1, 8)
+    )
+
+    val newUserStatement = UserStatement(21, FULL_MAINTAIN, 1, 5)
 }
