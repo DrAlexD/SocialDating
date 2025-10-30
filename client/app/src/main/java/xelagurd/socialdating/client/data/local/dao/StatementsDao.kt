@@ -18,10 +18,11 @@ interface StatementsDao {
         select stm.*
         from statements stm
         join defining_themes dt on stm.definingThemeId = dt.id
-        where categoryId = :categoryId
+        left join user_statements ustm on stm.id = ustm.statementId and ustm.userId = :userId
+        where categoryId = :categoryId and ustm.id is null
         """
     )
-    fun getStatements(categoryId: Int): Flow<List<Statement>>
+    fun getStatements(userId: Int, categoryId: Int): Flow<List<Statement>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStatements(statements: List<Statement>)

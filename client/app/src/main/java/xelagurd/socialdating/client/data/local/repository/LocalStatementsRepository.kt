@@ -12,8 +12,8 @@ class LocalStatementsRepository @Inject constructor(
     fun getStatements() =
         statementsDao.getStatements()
 
-    fun getStatements(categoryId: Int) =
-        statementsDao.getStatements(categoryId)
+    fun getStatements(userId: Int, categoryId: Int) =
+        statementsDao.getStatements(userId, categoryId)
 
     suspend fun insertStatements(statements: List<Statement>) =
         statementsDao.insertStatements(statements)

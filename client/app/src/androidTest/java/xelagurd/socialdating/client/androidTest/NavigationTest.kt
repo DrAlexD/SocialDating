@@ -324,7 +324,7 @@ class NavigationTest {
         navigateToStatements()
 
         composeTestRule.waitUntil(TIMEOUT_MILLIS) {
-            composeTestRule.onNodeWithText(FakeDataSource.statements[0].text).isDisplayed()
+            composeTestRule.onNodeWithText(FakeDataSource.statements[1].text).isDisplayed()
         }
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.add_statement).checkButtonAndClick()
@@ -349,10 +349,10 @@ class NavigationTest {
         navigateToStatements()
 
         composeTestRule.waitUntil(TIMEOUT_MILLIS) {
-            composeTestRule.onNodeWithText(FakeDataSource.statements[0].text).isDisplayed()
+            composeTestRule.onNodeWithText(FakeDataSource.statements[1].text).isDisplayed()
         }
 
-        composeTestRule.onNodeWithText(FakeDataSource.statements[0].text).checkButtonAndClick()
+        composeTestRule.onNodeWithText(FakeDataSource.statements[1].text).checkButtonAndClick()
         //checkBottomNavBarWithCategoriesTopLevel()
     }
 

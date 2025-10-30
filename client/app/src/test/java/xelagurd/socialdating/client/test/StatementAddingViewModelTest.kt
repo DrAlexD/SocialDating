@@ -19,7 +19,6 @@ import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
-import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
@@ -40,12 +39,12 @@ class StatementAddingViewModelTest {
     private val localDefiningThemesRepository: LocalDefiningThemesRepository = mockk()
     private val remoteStatementsRepository: RemoteStatementsRepository = mockk()
     private val localStatementsRepository: LocalStatementsRepository = mockk()
-    private val preferencesRepository: PreferencesRepository = mockk()
 
     private lateinit var viewModel: StatementAddingViewModel
     private val statementAddingUiState
         get() = viewModel.uiState.value
 
+    private val userId = 1
     private val categoryId = 1
 
     private val localDefiningThemes = listOf(DefiningTheme(1, "", "", "", categoryId))
@@ -64,8 +63,7 @@ class StatementAddingViewModelTest {
             savedStateHandle,
             localDefiningThemesRepository,
             remoteStatementsRepository,
-            localStatementsRepository,
-            preferencesRepository
+            localStatementsRepository
         )
         viewModel.updateUiState(statementDetails)
         viewModel.statementAdding()
@@ -131,7 +129,7 @@ class StatementAddingViewModelTest {
     }
 
     private fun mockGeneralMethods() {
-        every { preferencesRepository.currentUserId } returns flowOf(FakeDataSource.users[0].id)
+        every { savedStateHandle.get<Int>("userId") } returns userId
         every { savedStateHandle.get<Int>("categoryId") } returns categoryId
         every { localDefiningThemesRepository.getDefiningThemes(categoryId) } returns
                 flowOf(localDefiningThemes)

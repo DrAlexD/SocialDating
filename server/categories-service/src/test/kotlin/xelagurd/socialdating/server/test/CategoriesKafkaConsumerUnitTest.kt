@@ -33,6 +33,7 @@ class CategoriesKafkaConsumerUnitTest {
         userOrUserCategoryId = userId,
         categoryId = categoryId,
         definingThemeId = 1,
+        statementId = 1,
         reactionType = StatementReactionType.FULL_MAINTAIN,
         isSupportDefiningTheme = true
     )

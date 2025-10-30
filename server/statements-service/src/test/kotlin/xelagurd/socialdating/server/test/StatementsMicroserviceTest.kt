@@ -12,7 +12,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import xelagurd.socialdating.server.model.Statement
+import xelagurd.socialdating.server.model.UserStatement
 import xelagurd.socialdating.server.model.details.StatementDetails
+import xelagurd.socialdating.server.model.details.UserStatementDetails
+import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @ActiveProfiles("test")
@@ -60,6 +63,17 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
         )
     )
 
+    private val userStatements = listOf(
+        UserStatement(id = 1, reactionType = FULL_MAINTAIN, userId = 1, statementId = 1),
+        UserStatement(id = 2, reactionType = FULL_MAINTAIN, userId = 1, statementId = 2),
+        UserStatement(id = 3, reactionType = FULL_MAINTAIN, userId = 2, statementId = 3)
+    )
+    private val userStatementsDetails = listOf(
+        UserStatementDetails(reactionType = FULL_MAINTAIN, userId = 1, statementId = 1),
+        UserStatementDetails(reactionType = FULL_MAINTAIN, userId = 1, statementId = 2),
+        UserStatementDetails(reactionType = FULL_MAINTAIN, userId = 2, statementId = 3)
+    )
+
     init {
         val postResponse1 = restTemplate.postForEntity(
             "/api/v1/statements",
@@ -84,17 +98,41 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
         )
         assertThat(postResponse3.statusCode).isEqualTo(HttpStatus.CREATED)
         assertEquals(postResponse3.body!!, statements[2])
+
+        val postResponse4 = restTemplate.postForEntity(
+            "/api/v1/statements/users",
+            userStatementsDetails[0],
+            UserStatement::class.java
+        )
+        assertThat(postResponse4.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertEquals(postResponse4.body!!, userStatements[0])
+
+        val postResponse5 = restTemplate.postForEntity(
+            "/api/v1/statements/users",
+            userStatementsDetails[1],
+            UserStatement::class.java
+        )
+        assertThat(postResponse5.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertEquals(postResponse5.body!!, userStatements[1])
+
+        val postResponse6 = restTemplate.postForEntity(
+            "/api/v1/statements/users",
+            userStatementsDetails[2],
+            UserStatement::class.java
+        )
+        assertThat(postResponse6.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertEquals(postResponse6.body!!, userStatements[2])
     }
 
     @Test
     fun getStatements() {
         val getResponse2 = restTemplate.getForEntity(
-            "/api/v1/statements?definingThemeIds=${definingThemeIds.toRequestParams()}",
+            "/api/v1/statements?userId=${userId}&definingThemeIds=${definingThemeIds.toRequestParams()}",
             Array<Statement>::class.java
         )
         assertThat(getResponse2.statusCode).isEqualTo(HttpStatus.OK)
-        assertEquals(getResponse2.body!!.size, 2)
-        assertContentEquals(getResponse2.body!!, arrayOf(statements[0], statements[2]))
+        assertEquals(getResponse2.body!!.size, 1)
+        assertContentEquals(getResponse2.body!!, arrayOf(statements[2]))
     }
 
     @Test
@@ -166,5 +204,25 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
             postResponse.body!!,
             "'DefiningThemeId' must be greater than or equal to 1; 'Text' must not be blank"
         )
+    }
+
+    @Test
+    fun getUserStatements() {
+        val getResponse = restTemplate.getForEntity("/api/v1/statements/users?userId=$userId&definingThemeIds=${definingThemeIds.toRequestParams()}", Array<UserStatement>::class.java)
+        assertThat(getResponse.statusCode).isEqualTo(HttpStatus.OK)
+        assertEquals(getResponse.body!!.size, 1)
+        assertContentEquals(getResponse.body!!, arrayOf(userStatements[0]))
+    }
+
+    @Test
+    fun addUserStatement_wrongStatementId_error() {
+        val userStatementDetails = UserStatementDetails(reactionType = FULL_MAINTAIN, userId = 1, statementId = -5)
+        val postResponse = restTemplate.postForEntity(
+            "/api/v1/statements/users",
+            userStatementDetails,
+            String::class.java
+        )
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertEquals(postResponse.body!!, "'StatementId' must be greater than or equal to 1")
     }
 }

@@ -13,7 +13,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.R
-import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
@@ -30,30 +29,20 @@ class StatementAddingViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val localDefiningThemesRepository: LocalDefiningThemesRepository,
     private val remoteStatementsRepository: RemoteStatementsRepository,
-    private val localStatementsRepository: LocalStatementsRepository,
-    private val preferencesRepository: PreferencesRepository
+    private val localStatementsRepository: LocalStatementsRepository
 ) : ViewModel() {
+    private val userId: Int = checkNotNull(savedStateHandle[StatementAddingDestination.userId])
+
     private val categoryId: Int =
         checkNotNull(savedStateHandle[StatementAddingDestination.categoryId])
 
-    private val _uiState = MutableStateFlow(StatementAddingUiState())
+    private val _uiState = MutableStateFlow(
+        StatementAddingUiState(formDetails = StatementDetails(creatorUserId = userId))
+    )
     val uiState = _uiState.asStateFlow()
 
     init {
-        initCurrentUserId()
         initDefiningThemes()
-    }
-
-    private fun initCurrentUserId() {
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    formDetails = it.formDetails.copy(
-                        creatorUserId = preferencesRepository.currentUserId.first()
-                    )
-                )
-            }
-        }
     }
 
     private fun initDefiningThemes() {

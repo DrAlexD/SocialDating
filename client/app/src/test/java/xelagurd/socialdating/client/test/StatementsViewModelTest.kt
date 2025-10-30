@@ -23,14 +23,16 @@ import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
-import xelagurd.socialdating.client.data.PreferencesRepository
-import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
+import xelagurd.socialdating.client.data.local.repository.LocalUserStatementsRepository
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.Statement
+import xelagurd.socialdating.client.data.model.UserStatement
+import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
+import xelagurd.socialdating.client.data.remote.repository.RemoteUserStatementsRepository
 import xelagurd.socialdating.client.mergeListsAsSets
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.StatementsViewModel
@@ -42,18 +44,21 @@ class StatementsViewModelTest {
 
     private val context: Context = mockk()
     private val savedStateHandle: SavedStateHandle = mockk()
+    private val remoteUserStatementsRepository: RemoteUserStatementsRepository = mockk()
+    private val localUserStatementsRepository: LocalUserStatementsRepository = mockk()
     private val remoteStatementsRepository: RemoteStatementsRepository = mockk()
     private val localStatementsRepository: LocalStatementsRepository = mockk()
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository = mockk()
     private val localDefiningThemesRepository: LocalDefiningThemesRepository = mockk()
-    private val preferencesRepository: PreferencesRepository = mockk()
 
     private lateinit var viewModel: StatementsViewModel
     private lateinit var definingThemesFlow: MutableStateFlow<List<DefiningTheme>>
+    private lateinit var userStatementsFlow: MutableStateFlow<List<UserStatement>>
     private lateinit var statementsFlow: MutableStateFlow<List<Statement>>
     private val statementsUiState
         get() = viewModel.uiState.value
 
+    private val userId = 1
     private val categoryId = 1
 
     private val localDefiningThemes = listOf(
@@ -62,6 +67,13 @@ class StatementsViewModelTest {
     private val remoteDefiningThemes = listOf(
         DefiningTheme(1, "", "", "", categoryId),
         DefiningTheme(2, "", "", "", categoryId)
+    )
+    private val localUserStatements = listOf(
+        UserStatement(1, FULL_MAINTAIN, 1, 1)
+    )
+    private val remoteUserStatements = listOf(
+        UserStatement(1, FULL_MAINTAIN, 1, 1),
+        UserStatement(2, FULL_MAINTAIN, 1, 2)
     )
     private val localStatements = listOf(
         Statement(1, "", true, 1, 1),
@@ -74,13 +86,16 @@ class StatementsViewModelTest {
         Statement(4, "", true, 2, 1),
         Statement(5, "", true, 2, 1),
     )
+    private val chosenLocalStatements = localStatements.filter { it.id !in localUserStatements.map { it.statementId } }
+    private val chosenRemoteStatements = remoteStatements.filter { it.id !in remoteUserStatements.map { it.statementId } }
 
     private fun List<DefiningTheme>.toIds() = this.map { it.id }
 
     @Before
     fun setup() {
         definingThemesFlow = MutableStateFlow(localDefiningThemes)
-        statementsFlow = MutableStateFlow(localStatements)
+        userStatementsFlow = MutableStateFlow(localUserStatements)
+        statementsFlow = MutableStateFlow(chosenLocalStatements)
 
         mockGeneralMethods()
     }
@@ -89,11 +104,12 @@ class StatementsViewModelTest {
         viewModel = StatementsViewModel(
             context,
             savedStateHandle,
+            remoteUserStatementsRepository,
+            localUserStatementsRepository,
             remoteStatementsRepository,
             localStatementsRepository,
             remoteDefiningThemesRepository,
-            localDefiningThemesRepository,
-            preferencesRepository
+            localDefiningThemesRepository
         )
     }
 
@@ -113,7 +129,7 @@ class StatementsViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements),
+            mergeListsAsSets(chosenLocalStatements, chosenRemoteStatements),
             statementsUiState.entities
         )
     }
@@ -128,7 +144,7 @@ class StatementsViewModelTest {
 
         assertEquals(RequestStatus.FAILURE(), statementsUiState.dataRequestStatus)
         assertEquals(
-            localStatements,
+            chosenLocalStatements,
             statementsUiState.entities
         )
     }
@@ -143,7 +159,7 @@ class StatementsViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
         assertEquals(
-            localStatements,
+            chosenLocalStatements,
             statementsUiState.entities
         )
     }
@@ -163,7 +179,7 @@ class StatementsViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements),
+            mergeListsAsSets(chosenLocalStatements, chosenRemoteStatements),
             statementsUiState.entities
         )
     }
@@ -183,7 +199,7 @@ class StatementsViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements),
+            mergeListsAsSets(chosenLocalStatements, chosenRemoteStatements),
             statementsUiState.entities
         )
     }
@@ -201,7 +217,7 @@ class StatementsViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
         assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements),
+            mergeListsAsSets(chosenLocalStatements, chosenRemoteStatements),
             statementsUiState.entities
         )
     }
@@ -219,29 +235,34 @@ class StatementsViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
         assertEquals(
-            localStatements,
+            chosenLocalStatements,
             statementsUiState.entities
         )
     }
 
     private fun mockGeneralMethods() {
-        every { preferencesRepository.currentUserId } returns flowOf(FakeDataSource.users[0].id)
+        every { savedStateHandle.get<Int>("userId") } returns userId
         every { savedStateHandle.get<Int>("categoryId") } returns categoryId
-        every { localStatementsRepository.getStatements(categoryId) } returns statementsFlow
+        every { localStatementsRepository.getStatements(userId, categoryId) } returns statementsFlow
     }
 
     private fun mockDataWithInternet() {
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } returns
                 Response.success(remoteDefiningThemes)
-        coEvery { remoteStatementsRepository.getStatements(remoteDefiningThemes.toIds()) } returns
-                Response.success(remoteStatements)
+        coEvery { remoteStatementsRepository.getStatements(userId, remoteDefiningThemes.toIds()) } returns
+                Response.success(chosenRemoteStatements)
+        coEvery { remoteUserStatementsRepository.getUserStatements(userId, remoteDefiningThemes.toIds()) } returns
+                Response.success(remoteUserStatements)
 
         coEvery { localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes) } answers {
             definingThemesFlow.value =
                 mergeListsAsSets(definingThemesFlow.value, remoteDefiningThemes)
         }
-        coEvery { localStatementsRepository.insertStatements(remoteStatements) } answers {
-            statementsFlow.value = mergeListsAsSets(statementsFlow.value, remoteStatements)
+        coEvery { localStatementsRepository.insertStatements(chosenRemoteStatements) } answers {
+            statementsFlow.value = mergeListsAsSets(statementsFlow.value, chosenRemoteStatements)
+        }
+        coEvery { localUserStatementsRepository.insertUserStatements(remoteUserStatements) } answers {
+            userStatementsFlow.value = mergeListsAsSets(userStatementsFlow.value, remoteUserStatements)
         }
     }
 
@@ -249,7 +270,9 @@ class StatementsViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } returns
                 Response.error(404, "404".toResponseBody())
-        coEvery { remoteStatementsRepository.getStatements(emptyList()) } returns
+        coEvery { remoteStatementsRepository.getStatements(userId, emptyList()) } returns
+                Response.error(404, "404".toResponseBody())
+        coEvery { remoteUserStatementsRepository.getUserStatements(userId, emptyList()) } returns
                 Response.error(404, "404".toResponseBody())
 
         coEvery { localDefiningThemesRepository.insertDefiningThemes(emptyList()) } just Runs
@@ -263,6 +286,7 @@ class StatementsViewModelTest {
         every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(
             localDefiningThemes
         )
-        every { localStatementsRepository.getStatements() } returns flowOf(localStatements)
+        every { localStatementsRepository.getStatements() } returns flowOf(chosenLocalStatements)
+        every { localUserStatementsRepository.getUserStatements() } returns flowOf(localUserStatements)
     }
 }

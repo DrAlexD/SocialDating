@@ -8,6 +8,7 @@ data class StatementReactionDetails(
     val userOrUserCategoryId: Int,
     val categoryId: Int,
     val definingThemeId: Int,
+    val statementId: Int,
     val reactionType: StatementReactionType,
     val isSupportDefiningTheme: Boolean
 )

@@ -10,11 +10,11 @@ import xelagurd.socialdating.client.data.remote.ApiService
 class RemoteStatementsRepository @Inject constructor(
     private val apiService: ApiService
 ) {
-    suspend fun getStatements(definingThemeIds: List<Int>) =
-        apiService.getStatements(definingThemeIds)
+    suspend fun getStatements(userId: Int, definingThemeIds: List<Int>) =
+        apiService.getStatements(userId, definingThemeIds)
 
-    suspend fun addStatementReaction(statementId: Int, statementReactionDetails: StatementReactionDetails) =
-        apiService.addStatementReaction(statementId, statementReactionDetails)
+    suspend fun addStatementReaction(statementReactionDetails: StatementReactionDetails) =
+        apiService.addStatementReaction(statementReactionDetails)
 
     suspend fun addStatement(statementDetails: StatementDetails) =
         apiService.addStatement(statementDetails)

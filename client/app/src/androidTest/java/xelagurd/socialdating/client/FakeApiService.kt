@@ -8,6 +8,7 @@ import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
+import xelagurd.socialdating.client.data.model.UserStatement
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.details.StatementDetails
 import xelagurd.socialdating.client.data.remote.ApiService
@@ -28,15 +29,21 @@ class FakeApiService : ApiService {
     override suspend fun getUserDefiningThemes(userCategoryIds: List<Int>): Response<List<UserDefiningTheme>> =
         Response.success(FakeDataSource.userDefiningThemes)
 
-    override suspend fun getStatements(definingThemeIds: List<Int>): Response<List<Statement>> =
+    override suspend fun getStatements(
+        userId: Int,
+        definingThemeIds: List<Int>
+    ): Response<List<Statement>> =
         Response.success(FakeDataSource.statements)
+
+    override suspend fun getUserStatements(
+        userId: Int,
+        definingThemeIds: List<Int>
+    ): Response<List<UserStatement>> =
+        Response.success(FakeDataSource.userStatements)
 
     override suspend fun addStatement(statementDetails: StatementDetails): Response<Statement> =
         Response.success(FakeDataSource.newStatement)
 
-    override suspend fun addStatementReaction(
-        statementId: Int,
-        statementReactionDetails: StatementReactionDetails
-    ): Response<Unit> =
-        Response.success(null)
+    override suspend fun addStatementReaction(statementReactionDetails: StatementReactionDetails): Response<UserStatement> =
+        Response.success(FakeDataSource.newUserStatement)
 }

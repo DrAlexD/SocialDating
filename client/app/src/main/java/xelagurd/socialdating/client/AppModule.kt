@@ -94,4 +94,7 @@ object AppModule {
 
     @Provides
     fun provideUserDefiningThemesDao(database: AppDatabase) = database.userDefiningThemesDao()
+
+    @Provides
+    fun provideUserStatementsDao(database: AppDatabase) = database.userStatementsDao()
 }

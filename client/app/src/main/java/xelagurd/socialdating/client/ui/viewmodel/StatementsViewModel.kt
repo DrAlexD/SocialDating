@@ -16,15 +16,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeDataSource
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
+import xelagurd.socialdating.client.data.local.repository.LocalUserStatementsRepository
 import xelagurd.socialdating.client.data.model.Statement
+import xelagurd.socialdating.client.data.model.UserStatement
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
+import xelagurd.socialdating.client.data.remote.repository.RemoteUserStatementsRepository
 import xelagurd.socialdating.client.data.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.StatementsDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -35,18 +37,19 @@ import xelagurd.socialdating.client.ui.state.StatementsUiState
 class StatementsViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
+    private val remoteUserStatementsRepository: RemoteUserStatementsRepository,
+    private val localUserStatementsRepository: LocalUserStatementsRepository,
     private val remoteStatementsRepository: RemoteStatementsRepository,
     private val localStatementsRepository: LocalStatementsRepository,
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository,
-    private val localDefiningThemesRepository: LocalDefiningThemesRepository,
-    private val preferencesRepository: PreferencesRepository
+    private val localDefiningThemesRepository: LocalDefiningThemesRepository
 ) : ViewModel() {
-    private var currentUserId: Int? = null
+    private val userId: Int = checkNotNull(savedStateHandle[StatementsDestination.userId])
 
     private val categoryId: Int = checkNotNull(savedStateHandle[StatementsDestination.categoryId])
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
-    private val statementsFlow = localStatementsRepository.getStatements(categoryId)
+    private val statementsFlow = localStatementsRepository.getStatements(userId, categoryId)
         .distinctUntilChanged()
 
     val uiState = combine(statementsFlow, dataRequestStatusFlow) { statements, dataRequestStatus ->
@@ -62,14 +65,7 @@ class StatementsViewModel @Inject constructor(
     )
 
     init {
-        initCurrentUserId()
         getStatements()
-    }
-
-    private fun initCurrentUserId() {
-        viewModelScope.launch {
-            currentUserId = preferencesRepository.currentUserId.first()
-        }
     }
 
     fun getStatements() {
@@ -87,14 +83,30 @@ class StatementsViewModel @Inject constructor(
 
                 val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
                 val (remoteStatements, statusStatements) = safeApiCall(context) {
-                    remoteStatementsRepository.getStatements(remoteDefiningThemeIds)
+                    remoteStatementsRepository.getStatements(
+                        userId,
+                        remoteDefiningThemeIds
+                    )
                 }
 
                 if (remoteStatements != null) {
                     localStatementsRepository.insertStatements(remoteStatements)
-                }
 
-                globalStatus = statusStatements
+                    val (remoteUserStatements, statusUserStatements) = safeApiCall(context) {
+                        remoteUserStatementsRepository.getUserStatements(
+                            userId,
+                            remoteDefiningThemeIds
+                        )
+                    }
+
+                    if (remoteUserStatements != null) {
+                        localUserStatementsRepository.insertUserStatements(remoteUserStatements)
+                    }
+
+                    globalStatus = statusUserStatements
+                } else {
+                    globalStatus = statusStatements
+                }
             } else {
                 globalStatus = statusDefiningThemes
             }
@@ -106,6 +118,9 @@ class StatementsViewModel @Inject constructor(
                 if (localStatementsRepository.getStatements().first().isEmpty()) {
                     localStatementsRepository.insertStatements(FakeDataSource.statements)
                 }
+                if (localUserStatementsRepository.getUserStatements().first().isEmpty()) {
+                    localUserStatementsRepository.insertUserStatements(FakeDataSource.userStatements)
+                }
             }
 
             dataRequestStatusFlow.update { globalStatus }
@@ -113,23 +128,39 @@ class StatementsViewModel @Inject constructor(
     }
 
     fun onStatementReactionClick(statement: Statement, reactionType: StatementReactionType) {
-        if (currentUserId != null) {
-            viewModelScope.launch {
-                val (_, status) = safeApiCall(context) {
-                    remoteStatementsRepository.addStatementReaction(
-                        statement.id,
-                        StatementReactionDetails(
-                            userOrUserCategoryId = currentUserId!!,
-                            categoryId = categoryId,
-                            definingThemeId = statement.definingThemeId,
+        viewModelScope.launch {
+            val (userStatement, status) = safeApiCall(context) {
+                remoteStatementsRepository.addStatementReaction(
+                    StatementReactionDetails(
+                        userOrUserCategoryId = userId,
+                        categoryId = categoryId,
+                        definingThemeId = statement.definingThemeId,
+                        statementId = statement.id,
+                        reactionType = reactionType,
+                        isSupportDefiningTheme = statement.isSupportDefiningTheme
+                    )
+                )
+            }
+
+            if (userStatement != null) {
+                localUserStatementsRepository.insertUserStatements(listOf(userStatement))
+            }
+
+            if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
+                val userStatements = localUserStatementsRepository.getUserStatements().first()
+                localUserStatementsRepository.insertUserStatements(
+                    listOf(
+                        UserStatement(
+                            id = userStatements.last().id + 1,
                             reactionType = reactionType,
-                            isSupportDefiningTheme = statement.isSupportDefiningTheme
+                            userId = userId,
+                            statementId = statement.id
                         )
                     )
-                }
-
-                // TODO: implement action on error
+                )
             }
+
+            // TODO: implement action on error
         }
     }
 

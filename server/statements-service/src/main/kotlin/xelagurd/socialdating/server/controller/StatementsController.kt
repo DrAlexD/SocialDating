@@ -22,22 +22,16 @@ class StatementsController(
 ) {
 
     @GetMapping
-    fun getStatements(@RequestParam definingThemeIds: List<Int>): List<Statement> {
-        return statementsService.getStatements(definingThemeIds)
+    fun getStatements(
+        @RequestParam userId: Int,
+        @RequestParam definingThemeIds: List<Int>
+    ): List<Statement> {
+        return statementsService.getStatements(userId, definingThemeIds)
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addStatement(@RequestBody @Valid statementDetails: StatementDetails): Statement {
         return statementsService.addStatement(statementDetails)
-    }
-
-    @PostMapping("/{id}/reaction")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun addStatementReaction(
-        @PathVariable("id") statementId: Int,
-        @RequestBody statementReactionDetails: StatementReactionDetails
-    ) {
-        statementsService.addStatementReaction(statementId, statementReactionDetails)
     }
 }
