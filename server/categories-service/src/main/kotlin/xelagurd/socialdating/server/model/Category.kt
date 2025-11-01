@@ -6,17 +6,15 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import jakarta.validation.constraints.NotBlank
 
 @Entity(name = "categories")
 @Table(name = "categories")
 class Category(
     @field:Id
-    @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int = 0,
+    @field:GeneratedValue(GenerationType.IDENTITY)
+    var id: Int? = null,
 
-    @field:Column(nullable = false, unique = true)
-    @field:NotBlank
+    @field:Column(unique = true)
     var name: String
 ) {
     override fun equals(other: Any?): Boolean {
@@ -32,7 +30,7 @@ class Category(
     }
 
     override fun hashCode(): Int {
-        var result = id
+        var result = id ?: 0
         result = 31 * result + name.hashCode()
         return result
     }

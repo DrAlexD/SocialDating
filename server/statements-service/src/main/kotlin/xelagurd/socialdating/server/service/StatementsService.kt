@@ -13,7 +13,7 @@ class StatementsService(
 
     fun getStatements(userId: Int, definingThemeIds: List<Int>): List<Statement> {
         return statementsRepository.findUnreactedStatements(userId, definingThemeIds).takeIf { it.isNotEmpty() }
-            ?: throw NoDataFoundException("Statements didn't found for userId and definingThemeIds")
+            ?: throw NoDataFoundException("Statements didn't found for userId $userId and definingThemeIds $definingThemeIds")
     }
 
     fun addStatement(statementDetails: StatementDetails): Statement {

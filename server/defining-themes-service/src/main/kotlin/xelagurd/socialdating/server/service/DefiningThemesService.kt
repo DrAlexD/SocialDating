@@ -11,9 +11,12 @@ class DefiningThemesService(
     private val definingThemesRepository: DefiningThemesRepository
 ) {
 
-    fun getDefiningThemes(categoryIds: List<Int>): List<DefiningTheme> {
-        return definingThemesRepository.findAllByCategoryIdIn(categoryIds).takeIf { it.isNotEmpty() }
-            ?: throw NoDataFoundException("DefiningThemes didn't found for categoryIds")
+    fun getDefiningThemes(categoryId: Int?): List<DefiningTheme> {
+        val definingThemes = categoryId?.let { definingThemesRepository.findAllByCategoryId(it) }
+            ?: definingThemesRepository.findAll()
+
+        return definingThemes.takeIf { it.isNotEmpty() }
+            ?: throw NoDataFoundException("DefiningThemes didn't found for categoryId: $categoryId")
     }
 
     fun addDefiningTheme(definingThemeDetails: DefiningThemeDetails): DefiningTheme {

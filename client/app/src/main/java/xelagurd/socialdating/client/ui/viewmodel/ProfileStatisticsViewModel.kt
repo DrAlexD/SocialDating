@@ -83,9 +83,8 @@ class ProfileStatisticsViewModel @Inject constructor(
             if (remoteCategories != null) {
                 localCategoriesRepository.insertCategories(remoteCategories)
 
-                val remoteCategoriesIds = remoteCategories.map { it.id }
                 val (remoteDefiningThemes, statusDefiningThemes) = safeApiCall(context) {
-                    remoteDefiningThemesRepository.getDefiningThemes(remoteCategoriesIds)
+                    remoteDefiningThemesRepository.getDefiningThemes()
                 }
 
                 if (remoteDefiningThemes != null) {

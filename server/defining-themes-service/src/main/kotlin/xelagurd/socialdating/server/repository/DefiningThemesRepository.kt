@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import xelagurd.socialdating.server.model.DefiningTheme
 
 interface DefiningThemesRepository : JpaRepository<DefiningTheme, Int> {
-    fun findAllByCategoryIdIn(categoryIds: Iterable<Int>): List<DefiningTheme>
+    fun findAllByCategoryId(categoryId: Int): List<DefiningTheme>
 }

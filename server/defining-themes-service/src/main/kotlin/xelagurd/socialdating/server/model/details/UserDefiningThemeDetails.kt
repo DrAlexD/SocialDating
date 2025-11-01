@@ -1,25 +1,26 @@
 package xelagurd.socialdating.server.model.details
 
 import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.Positive
+import jakarta.validation.constraints.PositiveOrZero
 import xelagurd.socialdating.server.model.UserDefiningTheme
 
 data class UserDefiningThemeDetails(
-    @field:Min(value = 0)
-    @field:Max(value = 100)
+    @field:PositiveOrZero
+    @field:Max(100)
     val value: Int,
 
-    @field:Min(value = 0)
-    @field:Max(value = 100)
+    @field:PositiveOrZero
+    @field:Max(100)
     val interest: Int,
 
-    @field:Min(value = 1)
+    @field:Positive
     val userId: Int,
 
-    @field:Min(value = 1)
+    @field:Positive
     val definingThemeId: Int
 ) {
-    fun toUserDefiningTheme(): UserDefiningTheme =
+    fun toUserDefiningTheme() =
         UserDefiningTheme(
             value = value,
             interest = interest,

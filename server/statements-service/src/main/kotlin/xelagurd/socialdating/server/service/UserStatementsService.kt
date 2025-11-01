@@ -1,6 +1,7 @@
 package xelagurd.socialdating.server.service
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.UserStatement
 import xelagurd.socialdating.server.model.additional.StatementReactionDetails
@@ -15,14 +16,15 @@ class UserStatementsService(
 
     fun getUserStatements(userId: Int, definingThemeIds: List<Int>): List<UserStatement> {
         return userStatementsRepository.findAllByUserIdAndDefiningThemeIds(userId, definingThemeIds).takeIf { it.isNotEmpty() }
-            ?: throw NoDataFoundException("UserStatements didn't found for userId: $userId")
+            ?: throw NoDataFoundException("UserStatements didn't found for userId $userId and definingThemeIds $definingThemeIds")
     }
 
     fun addUserStatement(userStatementDetails: UserStatementDetails): UserStatement {
         return userStatementsRepository.save(userStatementDetails.toUserStatement())
     }
 
-    fun addStatementReaction(statementReactionDetails: StatementReactionDetails): UserStatement {
+    @Transactional
+    fun handleStatementReaction(statementReactionDetails: StatementReactionDetails): UserStatement {
         val userStatementDetails = UserStatementDetails(
             reactionType = statementReactionDetails.reactionType,
             userId = statementReactionDetails.userId,
@@ -30,7 +32,9 @@ class UserStatementsService(
         )
         val userStatement = userStatementsRepository.save(userStatementDetails.toUserStatement())
 
-        kafkaProducer.sendStatementReaction(statementReactionDetails.toUserCategoryUpdateDetails())
+        kafkaProducer.updateUserCategory(
+            statementReactionDetails.toUserCategoryUpdateDetails()
+        )
 
         return userStatement
     }

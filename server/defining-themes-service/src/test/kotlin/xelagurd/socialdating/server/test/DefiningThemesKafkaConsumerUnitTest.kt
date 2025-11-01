@@ -53,7 +53,7 @@ class DefiningThemesKafkaConsumerUnitTest {
     }
 
     @Test
-    fun consumeStatementReactionWithExistUserDefiningTheme() {
+    fun updateUserDefiningThemeWithExistUserDefiningTheme() {
         every {
             userDefiningThemesService.getUserDefiningTheme(
                 userDefiningThemeUpdateDetails.userId,
@@ -63,11 +63,11 @@ class DefiningThemesKafkaConsumerUnitTest {
 
         every { userDefiningThemesService.addUserDefiningTheme(userDefiningTheme) } returns updatedUserDefiningTheme
 
-        definingThemesKafkaConsumer.consumeStatementReaction(userDefiningThemeUpdateDetails)
+        definingThemesKafkaConsumer.updateUserDefiningTheme(userDefiningThemeUpdateDetails)
     }
 
     @Test
-    fun consumeStatementReactionWithNotExistUserDefiningTheme() {
+    fun updateUserDefiningThemeWithNotExistUserDefiningTheme() {
         every {
             userDefiningThemesService.getUserDefiningTheme(
                 userDefiningThemeUpdateDetails.userId,
@@ -77,6 +77,6 @@ class DefiningThemesKafkaConsumerUnitTest {
 
         every { userDefiningThemesService.addUserDefiningTheme(newUserDefiningTheme) } returns newAddedUserDefiningTheme
 
-        definingThemesKafkaConsumer.consumeStatementReaction(userDefiningThemeUpdateDetails)
+        definingThemesKafkaConsumer.updateUserDefiningTheme(userDefiningThemeUpdateDetails)
     }
 }

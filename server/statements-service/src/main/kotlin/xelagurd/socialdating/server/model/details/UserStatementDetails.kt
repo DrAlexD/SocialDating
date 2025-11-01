@@ -1,21 +1,19 @@
 package xelagurd.socialdating.server.model.details
 
-import jakarta.persistence.Column
-import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.Positive
 import xelagurd.socialdating.server.model.UserStatement
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 
 data class UserStatementDetails(
-    @field:Column(nullable = false)
     var reactionType: StatementReactionType,
 
-    @field:Min(value = 1)
+    @field:Positive
     var userId: Int,
 
-    @field:Min(value = 1)
+    @field:Positive
     var statementId: Int
 ) {
-    fun toUserStatement(): UserStatement =
+    fun toUserStatement() =
         UserStatement(
             reactionType = reactionType,
             userId = userId,

@@ -8,12 +8,12 @@ import org.apache.kafka.clients.admin.NewTopic
 class KafkaTopicConfig {
 
     @Bean
-    fun createStatementReactionToUserCategoryTopic(): NewTopic {
-        return NewTopic("statement-reaction-to-user-category-topic", 2, 1.toShort())
+    fun createUpdateUserCategoryOnStatementReactionTopic(): NewTopic {
+        return NewTopic("update-user-category-on-statement-reaction", 2, 1.toShort())
     }
 
     @Bean
-    fun createStatementReactionToUserDefiningThemeTopic(): NewTopic {
-        return NewTopic("statement-reaction-to-user-defining-theme-topic", 2, 1.toShort())
+    fun createUpdateUserDefiningThemeOnStatementReactionTopic(): NewTopic {
+        return NewTopic("update-user-defining-theme-on-statement-reaction", 2, 1.toShort())
     }
 }

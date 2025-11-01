@@ -46,10 +46,7 @@ class BaseExceptionHandler {
     @ExceptionHandler(NoDataFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     fun handleNoDataFoundException(ex: NoDataFoundException): String {
-        val message = ex.message ?: "No data found"
-        val origin = getErrorPositionFromStackTrace(ex.stackTrace)
-        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
-        return message
+        return ex.message ?: "No data found"
     }
 
     @ExceptionHandler(Exception::class)

@@ -15,8 +15,7 @@ class JwtGenerationUtils(
 ) {
 
     private val key by lazy {
-        val secret = env.getProperty("JWT_SECRET")
-            ?: throw IllegalStateException("JWT_SECRET is not set")
+        val secret = env.getProperty("JWT_SECRET") ?: throw IllegalStateException("JWT_SECRET is not set")
         Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))
     }
 

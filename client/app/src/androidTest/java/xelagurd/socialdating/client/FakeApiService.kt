@@ -23,7 +23,7 @@ class FakeApiService : ApiService {
     override suspend fun getUserCategories(userId: Int): Response<List<UserCategory>> =
         Response.success(FakeDataSource.userCategories)
 
-    override suspend fun getDefiningThemes(categoryIds: List<Int>): Response<List<DefiningTheme>> =
+    override suspend fun getDefiningThemes(categoryId: Int?): Response<List<DefiningTheme>> =
         Response.success(FakeDataSource.definingThemes)
 
     override suspend fun getUserDefiningThemes(userId: Int): Response<List<UserDefiningTheme>> =

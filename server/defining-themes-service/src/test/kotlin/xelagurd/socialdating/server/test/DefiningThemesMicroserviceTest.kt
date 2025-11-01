@@ -15,7 +15,6 @@ import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.UserDefiningTheme
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.model.details.UserDefiningThemeDetails
-import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @ActiveProfiles("dev", "test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -103,20 +102,20 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
     @Test
     fun getDefiningThemes() {
         val getResponse1 = restTemplate.getForEntity(
-            "/api/v1/defining-themes?categoryIds=$categoryId",
+            "/api/v1/defining-themes",
             Array<DefiningTheme>::class.java
         )
         assertThat(getResponse1.statusCode).isEqualTo(HttpStatus.OK)
-        assertEquals(getResponse1.body!!.size, 1)
-        assertContentEquals(getResponse1.body!!, arrayOf(definingThemes[0]))
+        assertEquals(getResponse1.body!!.size, 3)
+        assertContentEquals(getResponse1.body!!, arrayOf(definingThemes[0], definingThemes[1], definingThemes[2]))
 
         val getResponse2 = restTemplate.getForEntity(
-            "/api/v1/defining-themes?categoryIds=${categoryIds.toRequestParams()}",
+            "/api/v1/defining-themes?categoryId=$categoryId",
             Array<DefiningTheme>::class.java
         )
         assertThat(getResponse2.statusCode).isEqualTo(HttpStatus.OK)
-        assertEquals(getResponse2.body!!.size, 2)
-        assertContentEquals(getResponse2.body!!, arrayOf(definingThemes[0], definingThemes[2]))
+        assertEquals(getResponse2.body!!.size, 1)
+        assertContentEquals(getResponse2.body!!, arrayOf(definingThemes[0]))
     }
 
     @Test
@@ -155,7 +154,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertEquals(postResponse.body!!, "'CategoryId' must be greater than or equal to 1")
+        assertEquals(postResponse.body!!, "'CategoryId' must be greater than 0")
     }
 
     @Test
@@ -168,7 +167,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertEquals(postResponse.body!!, "'CategoryId' must be greater than or equal to 1; 'Name' must not be blank")
+        assertEquals(postResponse.body!!, "'CategoryId' must be greater than 0; 'Name' must not be blank")
     }
 
     @Test
@@ -205,7 +204,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertEquals(postResponse.body!!, "'DefiningThemeId' must be greater than or equal to 1")
+        assertEquals(postResponse.body!!, "'DefiningThemeId' must be greater than 0")
     }
 
     @Test
@@ -220,7 +219,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
         assertEquals(
             postResponse.body!!,
-            "'DefiningThemeId' must be greater than or equal to 1; 'Value' must be greater than or equal to 0"
+            "'DefiningThemeId' must be greater than 0; 'Value' must be greater than or equal to 0"
         )
     }
 }
