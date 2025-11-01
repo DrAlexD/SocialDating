@@ -75,7 +75,7 @@ class StatementsViewModel @Inject constructor(
             dataRequestStatusFlow.update { globalStatus }
 
             val (remoteDefiningThemes, statusDefiningThemes) = safeApiCall(context) {
-                remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId))
+                remoteDefiningThemesRepository.getDefiningThemes(categoryId)
             }
 
             if (remoteDefiningThemes != null) {

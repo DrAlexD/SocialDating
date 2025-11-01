@@ -22,7 +22,11 @@ class HeaderAuthFilter : OncePerRequestFilter() {
 
         if (username != null && role != null) {
             val authority = SimpleGrantedAuthority("ROLE_$role")
-            val authentication = UsernamePasswordAuthenticationToken(username, null, listOf(authority))
+            val authentication = UsernamePasswordAuthenticationToken(
+                username,
+                null,
+                listOf(authority)
+            )
             SecurityContextHolder.getContext().authentication = authentication
         }
 

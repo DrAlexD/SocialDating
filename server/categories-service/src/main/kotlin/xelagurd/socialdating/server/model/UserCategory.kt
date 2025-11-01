@@ -7,8 +7,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
+import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_INITIAL
 
 @Entity(name = "user_categories")
 @Table(
@@ -19,20 +18,14 @@ import jakarta.validation.constraints.Min
 )
 class UserCategory(
     @field:Id
-    @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int = 0,
+    @field:GeneratedValue(GenerationType.IDENTITY)
+    var id: Int? = null,
 
-    @field:Column(nullable = false)
-    @field:Min(value = 0)
-    @field:Max(value = 100)
-    var interest: Int,
+    @field:Column(columnDefinition = "integer check (interest between 0 and 100)")
+    var interest: Int = CATEGORY_INTEREST_INITIAL,
 
-    @field:Column(nullable = false)
-    @field:Min(value = 1)
     var userId: Int,
 
-    @field:Column(nullable = false)
-    @field:Min(value = 1)
     var categoryId: Int
 ) {
     override fun equals(other: Any?): Boolean {
@@ -50,7 +43,7 @@ class UserCategory(
     }
 
     override fun hashCode(): Int {
-        var result = id
+        var result = id ?: 0
         result = 31 * result + interest
         result = 31 * result + userId
         result = 31 * result + categoryId

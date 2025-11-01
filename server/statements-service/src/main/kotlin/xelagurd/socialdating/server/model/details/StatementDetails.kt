@@ -1,22 +1,24 @@
 package xelagurd.socialdating.server.model.details
 
-import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Positive
+import jakarta.validation.constraints.Size
 import xelagurd.socialdating.server.model.Statement
 
 data class StatementDetails(
     @field:NotBlank
+    @field:Size(max = 100)
     val text: String,
 
     val isSupportDefiningTheme: Boolean,
 
-    @field:Min(value = 1)
+    @field:Positive
     val definingThemeId: Int,
 
-    @field:Min(value = 1)
+    @field:Positive
     val creatorUserId: Int
 ) {
-    fun toStatement(): Statement =
+    fun toStatement() =
         Statement(
             text = text,
             isSupportDefiningTheme = isSupportDefiningTheme,

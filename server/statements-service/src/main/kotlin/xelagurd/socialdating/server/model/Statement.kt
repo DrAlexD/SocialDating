@@ -6,29 +6,21 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotBlank
 
 @Entity(name = "statements")
 @Table(name = "statements")
 class Statement(
     @field:Id
-    @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int = 0,
+    @field:GeneratedValue(GenerationType.IDENTITY)
+    var id: Int? = null,
 
-    @field:Column(nullable = false, unique = true)
-    @field:NotBlank
+    @field:Column(unique = true)
     var text: String,
 
-    @field:Column(nullable = false)
     var isSupportDefiningTheme: Boolean,
 
-    @field:Column(nullable = false)
-    @field:Min(value = 1)
     var definingThemeId: Int,
 
-    @field:Column(nullable = false)
-    @field:Min(value = 1)
     var creatorUserId: Int
 ) {
     override fun equals(other: Any?): Boolean {
@@ -47,7 +39,7 @@ class Statement(
     }
 
     override fun hashCode(): Int {
-        var result = id
+        var result = id ?: 0
         result = 31 * result + isSupportDefiningTheme.hashCode()
         result = 31 * result + definingThemeId
         result = 31 * result + creatorUserId

@@ -69,7 +69,9 @@ class JwtAuthFilter(
     private fun unauthorized(exchange: ServerWebExchange, message: String): Mono<Void> {
         val response = exchange.response
         response.statusCode = HttpStatus.UNAUTHORIZED
+
         val buffer = response.bufferFactory().wrap(message.toByteArray())
+
         return response.writeWith(Mono.just(buffer))
     }
 }

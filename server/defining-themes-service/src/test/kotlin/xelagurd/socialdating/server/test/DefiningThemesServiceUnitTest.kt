@@ -41,9 +41,9 @@ class DefiningThemesServiceUnitTest {
     @Test
     fun getDefiningThemesByCategoryId() {
         val expected = definingThemes.filter { it.categoryId == categoryId }
-        every { definingThemesRepository.findAllByCategoryIdIn(listOf(categoryId)) } returns expected
+        every { definingThemesRepository.findAllByCategoryId(categoryId) } returns expected
 
-        val result = definingThemesService.getDefiningThemes(listOf(categoryId))
+        val result = definingThemesService.getDefiningThemes(categoryId)
 
         assertEquals(expected, result)
     }
@@ -51,18 +51,18 @@ class DefiningThemesServiceUnitTest {
     @Test
     fun getDefiningThemesByCategoryIds_allData_success() {
         val expected = definingThemes.filter { it.categoryId in categoryIds }
-        every { definingThemesRepository.findAllByCategoryIdIn(categoryIds) } returns expected
+        every { definingThemesRepository.findAllByCategoryId(categoryId) } returns expected
 
-        val result = definingThemesService.getDefiningThemes(categoryIds)
+        val result = definingThemesService.getDefiningThemes(categoryId)
 
         assertEquals(expected, result)
     }
 
     @Test
     fun getDefiningThemesByCategoryIds_emptyData_error() {
-        every { definingThemesRepository.findAllByCategoryIdIn(categoryIds) } returns emptyList()
+        every { definingThemesRepository.findAllByCategoryId(categoryId) } returns emptyList()
 
-        assertThrows<NoDataFoundException> { definingThemesService.getDefiningThemes(categoryIds) }
+        assertThrows<NoDataFoundException> { definingThemesService.getDefiningThemes(categoryId) }
     }
 
     @Test

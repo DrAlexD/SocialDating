@@ -247,7 +247,7 @@ class StatementsViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } returns
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns
                 Response.success(remoteDefiningThemes)
         coEvery { remoteStatementsRepository.getStatements(userId, remoteDefiningThemes.toIds()) } returns
                 Response.success(chosenRemoteStatements)
@@ -268,7 +268,7 @@ class StatementsViewModelTest {
 
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } returns
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns
                 Response.error(404, "404".toResponseBody())
         coEvery { remoteStatementsRepository.getStatements(userId, emptyList()) } returns
                 Response.error(404, "404".toResponseBody())
@@ -280,7 +280,7 @@ class StatementsViewModelTest {
 
     private fun mockDataWithoutInternet() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(listOf(categoryId)) } throws IOException()
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } throws IOException()
 
         // FixMe: remove after adding server hosting
         every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(

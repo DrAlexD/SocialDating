@@ -312,7 +312,7 @@ class ProfileStatisticsViewModelTest {
     private fun mockDataWithInternet() {
         coEvery { remoteCategoriesRepository.getCategories() } returns
                 Response.success(remoteCategories)
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(remoteCategories.toCategoryIds()) } returns
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes() } returns
                 Response.success(remoteDefiningThemes)
         coEvery { remoteUserCategoriesRepository.getUserCategories(userId) } returns
                 Response.success(remoteUserCategories)
@@ -345,7 +345,7 @@ class ProfileStatisticsViewModelTest {
         every { context.getString(any()) } returns ""
         coEvery { remoteCategoriesRepository.getCategories() } returns
                 Response.error(404, "404".toResponseBody())
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(emptyList()) } returns
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes() } returns
                 Response.error(404, "404".toResponseBody())
         coEvery { remoteUserCategoriesRepository.getUserCategories(userId) } returns
                 Response.error(404, "404".toResponseBody())

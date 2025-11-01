@@ -90,9 +90,9 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
     }
 
     @Test
-    fun addStatementReaction() {
+    fun handleStatementReaction() {
         val expected = userStatements[0]
-        `when`(userStatementsService.addStatementReaction(statementReactionDetails)).thenReturn(expected)
+        `when`(userStatementsService.handleStatementReaction(statementReactionDetails)).thenReturn(expected)
 
         mockMvc.perform(
             post("/api/v1/statements/users/reaction")

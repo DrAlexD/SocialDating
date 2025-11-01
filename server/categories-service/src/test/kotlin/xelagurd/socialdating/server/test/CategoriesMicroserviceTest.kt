@@ -137,7 +137,7 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertEquals(postResponse.body!!, "'CategoryId' must be greater than or equal to 1")
+        assertEquals(postResponse.body!!, "'CategoryId' must be greater than 0")
     }
 
     @Test
@@ -151,7 +151,7 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
         assertEquals(
             postResponse.body!!,
-            "'CategoryId' must be greater than or equal to 1; 'Interest' must be greater than or equal to 0"
+            "'CategoryId' must be greater than 0; 'Interest' must be greater than or equal to 0"
         )
     }
 }

@@ -1,6 +1,5 @@
 package xelagurd.socialdating.server.model
 
-import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -9,7 +8,6 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
-import jakarta.validation.constraints.Min
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 
 @Entity(name = "user_statements")
@@ -21,19 +19,14 @@ import xelagurd.socialdating.server.model.enums.StatementReactionType
 )
 class UserStatement(
     @field:Id
-    @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int = 0,
+    @field:GeneratedValue(GenerationType.IDENTITY)
+    var id: Int? = null,
 
     @field:Enumerated(EnumType.STRING)
-    @field:Column(nullable = false)
     var reactionType: StatementReactionType,
 
-    @field:Column(nullable = false)
-    @field:Min(value = 1)
     var userId: Int,
 
-    @field:Column(nullable = false)
-    @field:Min(value = 1)
     var statementId: Int
 ) {
     override fun equals(other: Any?): Boolean {
@@ -51,7 +44,7 @@ class UserStatement(
     }
 
     override fun hashCode(): Int {
-        var result = id
+        var result = id ?: 0
         result = 31 * result + reactionType.hashCode()
         result = 31 * result + userId
         result = 31 * result + statementId

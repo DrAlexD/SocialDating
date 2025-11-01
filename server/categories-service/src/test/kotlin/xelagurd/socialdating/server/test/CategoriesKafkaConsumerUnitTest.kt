@@ -57,7 +57,7 @@ class CategoriesKafkaConsumerUnitTest {
     }
 
     @Test
-    fun consumeStatementReactionWithExistUserCategory() {
+    fun updateUserCategoryWithExistUserCategory() {
         every {
             userCategoriesService.getUserCategory(
                 userCategoryUpdateDetails.userId,
@@ -68,16 +68,16 @@ class CategoriesKafkaConsumerUnitTest {
         every { userCategoriesService.addUserCategory(userCategory) } returns updatedUserCategory
 
         every {
-            kafkaProducer.sendStatementReaction(
+            kafkaProducer.updateUserDefiningTheme(
                 userCategoryUpdateDetails.toUserDefiningThemeUpdateDetails()
             )
         } just Runs
 
-        categoriesKafkaConsumer.consumeStatementReaction(userCategoryUpdateDetails)
+        categoriesKafkaConsumer.updateUserCategory(userCategoryUpdateDetails)
     }
 
     @Test
-    fun consumeStatementReactionWithNotExistUserCategory() {
+    fun updateUserCategoryWithNotExistUserCategory() {
         every {
             userCategoriesService.getUserCategory(
                 userCategoryUpdateDetails.userId,
@@ -88,11 +88,11 @@ class CategoriesKafkaConsumerUnitTest {
         every { userCategoriesService.addUserCategory(newUserCategory) } returns newAddedUserCategory
 
         every {
-            kafkaProducer.sendStatementReaction(
+            kafkaProducer.updateUserDefiningTheme(
                 userCategoryUpdateDetails.toUserDefiningThemeUpdateDetails()
             )
         } just Runs
 
-        categoriesKafkaConsumer.consumeStatementReaction(userCategoryUpdateDetails)
+        categoriesKafkaConsumer.updateUserCategory(userCategoryUpdateDetails)
     }
 }

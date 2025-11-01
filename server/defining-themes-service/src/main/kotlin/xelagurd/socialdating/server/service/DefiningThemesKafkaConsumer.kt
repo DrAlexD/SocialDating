@@ -3,6 +3,10 @@ package xelagurd.socialdating.server.service
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
+import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_INTEREST_STEP
+import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_COEFFICIENT
+import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_INITIAL
+import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_STEP
 import xelagurd.socialdating.server.model.UserDefiningTheme
 import xelagurd.socialdating.server.model.additional.UserDefiningThemeUpdateDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType
@@ -13,19 +17,19 @@ class DefiningThemesKafkaConsumer(
     private val userDefiningThemesService: UserDefiningThemesService
 ) {
 
-    @KafkaListener(topics = ["statement-reaction-to-user-defining-theme-topic"], groupId = "defining-themes-group")
-    fun consumeStatementReaction(userDefiningThemeUpdateDetails: UserDefiningThemeUpdateDetails) {
+    @KafkaListener(topics = ["update-user-defining-theme-on-statement-reaction"], groupId = "defining-themes-group")
+    fun updateUserDefiningTheme(userDefiningThemeUpdateDetails: UserDefiningThemeUpdateDetails) {
         var userDefiningTheme = userDefiningThemesService.getUserDefiningTheme(
             userDefiningThemeUpdateDetails.userId,
             userDefiningThemeUpdateDetails.definingThemeId
         )
 
         var diff = when (userDefiningThemeUpdateDetails.reactionType) {
-            StatementReactionType.FULL_NO_MAINTAIN -> -10
-            StatementReactionType.PART_NO_MAINTAIN -> -5
+            StatementReactionType.FULL_NO_MAINTAIN -> -DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT
+            StatementReactionType.PART_NO_MAINTAIN -> -DEFINING_THEME_VALUE_STEP
             StatementReactionType.NOT_SURE -> 0
-            StatementReactionType.PART_MAINTAIN -> 5
-            StatementReactionType.FULL_MAINTAIN -> 10
+            StatementReactionType.PART_MAINTAIN -> DEFINING_THEME_VALUE_STEP
+            StatementReactionType.FULL_MAINTAIN -> DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT
         }
 
         if (!userDefiningThemeUpdateDetails.isSupportDefiningTheme) {
@@ -33,12 +37,11 @@ class DefiningThemesKafkaConsumer(
         }
 
         if (userDefiningTheme != null) {
-            userDefiningTheme.value = userDefiningTheme.value + diff
-            userDefiningTheme.interest = userDefiningTheme.interest + 5
+            userDefiningTheme.value += diff
+            userDefiningTheme.interest += DEFINING_THEME_INTEREST_STEP
         } else {
             userDefiningTheme = UserDefiningTheme(
-                value = 50 + diff,
-                interest = 5,
+                value = DEFINING_THEME_VALUE_INITIAL + diff,
                 userId = userDefiningThemeUpdateDetails.userId,
                 definingThemeId = userDefiningThemeUpdateDetails.definingThemeId
             )

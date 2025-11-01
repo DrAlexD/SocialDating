@@ -1,21 +1,22 @@
 package xelagurd.socialdating.server.model.details
 
 import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.Positive
+import jakarta.validation.constraints.PositiveOrZero
 import xelagurd.socialdating.server.model.UserCategory
 
 data class UserCategoryDetails(
-    @field:Min(value = 0)
-    @field:Max(value = 100)
+    @field:PositiveOrZero
+    @field:Max(100)
     var interest: Int,
 
-    @field:Min(value = 1)
+    @field:Positive
     var userId: Int,
 
-    @field:Min(value = 1)
+    @field:Positive
     var categoryId: Int
 ) {
-    fun toUserCategory(): UserCategory =
+    fun toUserCategory() =
         UserCategory(
             interest = interest,
             userId = userId,

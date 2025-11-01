@@ -23,7 +23,7 @@ class AuthSecurityConfig(
     @Bean
     fun userDetailsService(): UserDetailsService = UserDetailsService { username ->
         usersRepository.findByUsername(username)
-            ?: throw UsernameNotFoundException("User not found by username: $username")
+            ?: throw UsernameNotFoundException("User didn't found by username: $username")
     }
 
     @Bean

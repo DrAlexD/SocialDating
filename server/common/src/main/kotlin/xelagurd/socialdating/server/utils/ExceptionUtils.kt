@@ -9,9 +9,7 @@ object ExceptionUtils {
 
     fun createWrongDataMessage(errorList: List<Pair<String, String?>>) =
         errorList
-            .map {
-                "'${it.first.replaceFirstChar { it.titlecase() }}' ${it.second ?: "has wrong value"}"
-            }
+            .map { "'${it.first.replaceFirstChar { it.titlecase() }}' ${it.second ?: "has wrong value"}" }
             .sorted()
             .joinToString(separator = "; ")
 

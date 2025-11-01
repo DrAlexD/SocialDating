@@ -183,7 +183,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertEquals(postResponse.body!!, "'DefiningThemeId' must be greater than or equal to 1")
+        assertEquals(postResponse.body!!, "'DefiningThemeId' must be greater than 0")
     }
 
     @Test
@@ -202,7 +202,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
         assertEquals(
             postResponse.body!!,
-            "'DefiningThemeId' must be greater than or equal to 1; 'Text' must not be blank"
+            "'DefiningThemeId' must be greater than 0; 'Text' must not be blank"
         )
     }
 
@@ -223,6 +223,6 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
             String::class.java
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertEquals(postResponse.body!!, "'StatementId' must be greater than or equal to 1")
+        assertEquals(postResponse.body!!, "'StatementId' must be greater than 0")
     }
 }

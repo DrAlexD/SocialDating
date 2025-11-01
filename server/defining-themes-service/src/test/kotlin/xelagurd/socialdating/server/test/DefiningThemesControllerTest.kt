@@ -18,7 +18,6 @@ import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.service.DefiningThemesService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
-import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @WebMvcTest(DefiningThemesController::class)
 @Import(NoSecurityConfig::class)
@@ -41,10 +40,10 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
     @Test
     fun getDefiningThemesByCategoryId() {
         val expected = definingThemes.filter { it.categoryId == categoryId }
-        `when`(definingThemesService.getDefiningThemes(listOf(categoryId))).thenReturn(expected)
+        `when`(definingThemesService.getDefiningThemes(categoryId)).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/defining-themes?categoryIds=$categoryId")
+            get("/api/v1/defining-themes?categoryId=$categoryId")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -54,10 +53,10 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
     @Test
     fun getDefiningThemesByCategoryIds_allData_success() {
         val expected = definingThemes.filter { it.categoryId in categoryIds }
-        `when`(definingThemesService.getDefiningThemes(categoryIds)).thenReturn(expected)
+        `when`(definingThemesService.getDefiningThemes(categoryId)).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/defining-themes?categoryIds=${categoryIds.toRequestParams()}")
+            get("/api/v1/defining-themes?categoryId=$categoryId")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -67,10 +66,10 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
     @Test
     fun getDefiningThemesByCategoryIds_emptyData_error() {
         val message = "test"
-        `when`(definingThemesService.getDefiningThemes(categoryIds)).thenThrow(NoDataFoundException(message))
+        `when`(definingThemesService.getDefiningThemes(categoryId)).thenThrow(NoDataFoundException(message))
 
         mockMvc.perform(
-            get("/api/v1/defining-themes?categoryIds=${categoryIds.toRequestParams()}")
+            get("/api/v1/defining-themes?categoryId=$categoryId")
         )
             .andExpect(status().isNotFound)
             .andExpect(content().string(message))

@@ -7,8 +7,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
+import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_INTEREST_INITIAL
 
 @Entity(name = "user_defining_themes")
 @Table(
@@ -19,25 +18,17 @@ import jakarta.validation.constraints.Min
 )
 class UserDefiningTheme(
     @field:Id
-    @field:GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int = 0,
+    @field:GeneratedValue(GenerationType.IDENTITY)
+    var id: Int? = null,
 
-    @field:Column(name = "udt_value", nullable = false)
-    @field:Min(value = 0)
-    @field:Max(value = 100)
+    @field:Column(name = "udt_value", columnDefinition = "integer check (udt_value between 0 and 100)")
     var value: Int,
 
-    @field:Column(nullable = false)
-    @field:Min(value = 0)
-    @field:Max(value = 100)
-    var interest: Int,
+    @field:Column(columnDefinition = "integer check (interest between 0 and 100)")
+    var interest: Int = DEFINING_THEME_INTEREST_INITIAL,
 
-    @field:Column(nullable = false)
-    @field:Min(value = 1)
     var userId: Int,
 
-    @field:Column(nullable = false)
-    @field:Min(value = 1)
     var definingThemeId: Int
 ) {
     override fun equals(other: Any?): Boolean {
@@ -56,7 +47,7 @@ class UserDefiningTheme(
     }
 
     override fun hashCode(): Int {
-        var result = id
+        var result = id ?: 0
         result = 31 * result + value
         result = 31 * result + interest
         result = 31 * result + userId

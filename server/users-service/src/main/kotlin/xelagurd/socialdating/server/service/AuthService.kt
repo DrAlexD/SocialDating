@@ -26,7 +26,10 @@ class AuthService(
 
     fun loginUser(loginDetails: LoginDetails): AuthResponse {
         val auth = authenticationManager.authenticate(
-            UsernamePasswordAuthenticationToken(loginDetails.username, loginDetails.password)
+            UsernamePasswordAuthenticationToken(
+                loginDetails.username,
+                loginDetails.password
+            )
         )
         val user = auth.principal as User
 
@@ -42,7 +45,7 @@ class AuthService(
         }
 
         if (registrationDetails.password != registrationDetails.repeatedPassword) {
-            throw IllegalArgumentException("Passwords do not match")
+            throw IllegalArgumentException("Passwords don't match")
         }
 
         val user = usersRepository.save(registrationDetails.toUser(passwordEncoder))

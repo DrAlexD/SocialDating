@@ -2,7 +2,6 @@ package xelagurd.socialdating.server.controller
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -39,7 +38,7 @@ class UserStatementsController(
 
     @PostMapping("/reaction")
     @ResponseStatus(HttpStatus.CREATED)
-    fun addStatementReaction(@RequestBody statementReactionDetails: StatementReactionDetails): UserStatement {
-        return userStatementsService.addStatementReaction(statementReactionDetails)
+    fun handleStatementReaction(@RequestBody @Valid statementReactionDetails: StatementReactionDetails): UserStatement {
+        return userStatementsService.handleStatementReaction(statementReactionDetails)
     }
 }
