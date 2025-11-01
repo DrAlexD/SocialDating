@@ -43,10 +43,10 @@ class UserStatementsServiceUnitTest {
     private val userStatementDetails = UserStatementDetails(reactionType = FULL_MAINTAIN, userId = userId, statementId = 1)
 
     private val statementReactionDetails = StatementReactionDetails(
-        userOrUserCategoryId = userId,
+        userId = userId,
+        statementId = 1,
         categoryId = 1,
         definingThemeId = 1,
-        statementId = 1,
         reactionType = FULL_MAINTAIN,
         isSupportDefiningTheme = true
     )
@@ -87,11 +87,11 @@ class UserStatementsServiceUnitTest {
     fun addStatementReaction() {
         val expected = userStatements[0]
         every { userStatementsRepository.save(userStatementDetails.toUserStatement()) } returns expected
-        every { kafkaProducer.sendStatementReaction(statementReactionDetails) } just Runs
+        every { kafkaProducer.sendStatementReaction(statementReactionDetails.toUserCategoryUpdateDetails()) } just Runs
 
         userStatementsService.addStatementReaction(statementReactionDetails)
 
         verify { userStatementsRepository.save(userStatementDetails.toUserStatement()) }
-        verify { kafkaProducer.sendStatementReaction(statementReactionDetails) }
+        verify { kafkaProducer.sendStatementReaction(statementReactionDetails.toUserCategoryUpdateDetails()) }
     }
 }

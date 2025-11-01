@@ -132,10 +132,10 @@ class StatementsViewModel @Inject constructor(
             val (userStatement, status) = safeApiCall(context) {
                 remoteStatementsRepository.addStatementReaction(
                     StatementReactionDetails(
-                        userOrUserCategoryId = userId,
+                        userId = userId,
+                        statementId = statement.id,
                         categoryId = categoryId,
                         definingThemeId = statement.definingThemeId,
-                        statementId = statement.id,
                         reactionType = reactionType,
                         isSupportDefiningTheme = statement.isSupportDefiningTheme
                     )

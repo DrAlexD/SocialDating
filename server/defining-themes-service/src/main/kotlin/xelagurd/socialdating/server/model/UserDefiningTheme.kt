@@ -5,12 +5,18 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 
 @Entity(name = "user_defining_themes")
-@Table(name = "user_defining_themes")
+@Table(
+    name = "user_defining_themes",
+    indexes = [
+        Index(columnList = "defining_theme_id, user_id", unique = true)
+    ]
+)
 class UserDefiningTheme(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,7 +34,7 @@ class UserDefiningTheme(
 
     @field:Column(nullable = false)
     @field:Min(value = 1)
-    var userCategoryId: Int,
+    var userId: Int,
 
     @field:Column(nullable = false)
     @field:Min(value = 1)
@@ -43,7 +49,7 @@ class UserDefiningTheme(
         if (id != other.id) return false
         if (value != other.value) return false
         if (interest != other.interest) return false
-        if (userCategoryId != other.userCategoryId) return false
+        if (userId != other.userId) return false
         if (definingThemeId != other.definingThemeId) return false
 
         return true
@@ -53,7 +59,7 @@ class UserDefiningTheme(
         var result = id
         result = 31 * result + value
         result = 31 * result + interest
-        result = 31 * result + userCategoryId
+        result = 31 * result + userId
         result = 31 * result + definingThemeId
         return result
     }

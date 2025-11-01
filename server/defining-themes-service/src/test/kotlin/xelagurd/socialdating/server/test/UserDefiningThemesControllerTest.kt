@@ -18,7 +18,6 @@ import xelagurd.socialdating.server.model.UserDefiningTheme
 import xelagurd.socialdating.server.model.details.UserDefiningThemeDetails
 import xelagurd.socialdating.server.service.UserDefiningThemesService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
-import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @WebMvcTest(UserDefiningThemesController::class)
 @Import(NoSecurityConfig::class)
@@ -27,23 +26,23 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
     @MockitoBean
     private lateinit var userDefiningThemesService: UserDefiningThemesService
 
-    private val userCategoryIds = listOf(1, 3)
+    private val userId = 1
 
     private val userDefiningThemes = listOf(
-        UserDefiningTheme(id = 1, value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1),
-        UserDefiningTheme(id = 2, value = 15, interest = 15, userCategoryId = 2, definingThemeId = 2),
-        UserDefiningTheme(id = 3, value = 20, interest = 20, userCategoryId = 3, definingThemeId = 3)
+        UserDefiningTheme(id = 1, value = 10, interest = 10, userId = 1, definingThemeId = 1),
+        UserDefiningTheme(id = 2, value = 15, interest = 15, userId = 2, definingThemeId = 2),
+        UserDefiningTheme(id = 3, value = 20, interest = 20, userId = 3, definingThemeId = 3)
     )
     private val userDefiningThemeDetails =
-        UserDefiningThemeDetails(value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1)
+        UserDefiningThemeDetails(value = 10, interest = 10, userId = 1, definingThemeId = 1)
 
     @Test
     fun getUserDefiningThemesByUserCategoryIds_allData_success() {
-        val expected = userDefiningThemes.filter { it.userCategoryId in userCategoryIds }
-        `when`(userDefiningThemesService.getUserDefiningThemes(userCategoryIds)).thenReturn(expected)
+        val expected = userDefiningThemes.filter { it.userId == userId }
+        `when`(userDefiningThemesService.getUserDefiningThemes(userId)).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/defining-themes/users?userCategoryIds=${userCategoryIds.toRequestParams()}")
+            get("/api/v1/defining-themes/users?userId=$userId")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -53,10 +52,10 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
     @Test
     fun getUserDefiningThemesByUserCategoryIds_emptyData_error() {
         val message = "test"
-        `when`(userDefiningThemesService.getUserDefiningThemes(userCategoryIds)).thenThrow(NoDataFoundException(message))
+        `when`(userDefiningThemesService.getUserDefiningThemes(userId)).thenThrow(NoDataFoundException(message))
 
         mockMvc.perform(
-            get("/api/v1/defining-themes/users?userCategoryIds=${userCategoryIds.toRequestParams()}")
+            get("/api/v1/defining-themes/users?userId=$userId")
         )
             .andExpect(status().isNotFound)
             .andExpect(content().string(message))

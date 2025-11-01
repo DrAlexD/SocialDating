@@ -22,17 +22,16 @@ class UserDefiningThemesServiceUnitTest {
     @InjectMockKs
     private lateinit var userDefiningThemesService: UserDefiningThemesService
 
-    private val userCategoryId = 1
+    private val userId = 1
     private val definingThemeId = 1
-    private val userCategoryIds = listOf(1, 3)
 
     private val userDefiningThemes = listOf(
-        UserDefiningTheme(id = 1, value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1),
-        UserDefiningTheme(id = 2, value = 15, interest = 15, userCategoryId = 2, definingThemeId = 2),
-        UserDefiningTheme(id = 3, value = 20, interest = 20, userCategoryId = 3, definingThemeId = 3)
+        UserDefiningTheme(id = 1, value = 10, interest = 10, userId = 1, definingThemeId = 1),
+        UserDefiningTheme(id = 2, value = 15, interest = 15, userId = 2, definingThemeId = 2),
+        UserDefiningTheme(id = 3, value = 20, interest = 20, userId = 3, definingThemeId = 3)
     )
     private val userDefiningThemeDetails =
-        UserDefiningThemeDetails(value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1)
+        UserDefiningThemeDetails(value = 10, interest = 10, userId = 1, definingThemeId = 1)
 
     @BeforeEach
     fun setup() {
@@ -42,37 +41,37 @@ class UserDefiningThemesServiceUnitTest {
     @Test
     fun getUserDefiningTheme() {
         val expected = userDefiningThemes
-            .filter { it.userCategoryId == userCategoryId && it.definingThemeId == definingThemeId }
+            .filter { it.userId == userId && it.definingThemeId == definingThemeId }
 
         assertEquals(expected.size, 1)
 
         every {
-            userDefiningThemesRepository.findByUserCategoryIdAndDefiningThemeId(
-                userCategoryId,
+            userDefiningThemesRepository.findByUserIdAndDefiningThemeId(
+                userId,
                 definingThemeId
             )
         } returns expected[0]
 
-        val result = userDefiningThemesService.getUserDefiningTheme(userCategoryId, definingThemeId)
+        val result = userDefiningThemesService.getUserDefiningTheme(userId, definingThemeId)
 
         assertEquals(expected[0], result)
     }
 
     @Test
     fun getUserDefiningThemesByUserCategoryIds_allData_success() {
-        val expected = userDefiningThemes.filter { it.userCategoryId in userCategoryIds }
-        every { userDefiningThemesRepository.findAllByUserCategoryIdIn(userCategoryIds) } returns expected
+        val expected = userDefiningThemes.filter { it.userId == userId }
+        every { userDefiningThemesRepository.findAllByUserId(userId) } returns expected
 
-        val result = userDefiningThemesService.getUserDefiningThemes(userCategoryIds)
+        val result = userDefiningThemesService.getUserDefiningThemes(userId)
 
         assertEquals(expected, result)
     }
 
     @Test
     fun getUserDefiningThemesByUserCategoryIds_emptyData_error() {
-        every { userDefiningThemesRepository.findAllByUserCategoryIdIn(userCategoryIds) } returns emptyList()
+        every { userDefiningThemesRepository.findAllByUserId(userId) } returns emptyList()
 
-        assertThrows<NoDataFoundException> { userDefiningThemesService.getUserDefiningThemes(userCategoryIds) }
+        assertThrows<NoDataFoundException> { userDefiningThemesService.getUserDefiningThemes(userId) }
     }
 
     @Test

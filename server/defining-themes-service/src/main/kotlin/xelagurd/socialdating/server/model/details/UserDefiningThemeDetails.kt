@@ -14,7 +14,7 @@ data class UserDefiningThemeDetails(
     val interest: Int,
 
     @field:Min(value = 1)
-    val userCategoryId: Int,
+    val userId: Int,
 
     @field:Min(value = 1)
     val definingThemeId: Int
@@ -23,7 +23,7 @@ data class UserDefiningThemeDetails(
         UserDefiningTheme(
             value = value,
             interest = interest,
-            userCategoryId = userCategoryId,
+            userId = userId,
             definingThemeId = definingThemeId
         )
 }

@@ -11,9 +11,9 @@ class UserDefiningThemesService(
     private val userDefiningThemesRepository: UserDefiningThemesRepository
 ) {
 
-    fun getUserDefiningThemes(userCategoryIds: List<Int>): List<UserDefiningTheme> {
-        return userDefiningThemesRepository.findAllByUserCategoryIdIn(userCategoryIds).takeIf { it.isNotEmpty() }
-            ?: throw NoDataFoundException("UserDefiningThemes didn't found for userCategoryIds")
+    fun getUserDefiningThemes(userId: Int): List<UserDefiningTheme> {
+        return userDefiningThemesRepository.findAllByUserId(userId).takeIf { it.isNotEmpty() }
+            ?: throw NoDataFoundException("UserDefiningThemes didn't found for userId: $userId")
     }
 
     fun addUserDefiningTheme(userDefiningThemeDetails: UserDefiningThemeDetails): UserDefiningTheme {
@@ -24,7 +24,7 @@ class UserDefiningThemesService(
         return userDefiningThemesRepository.save(userDefiningTheme)
     }
 
-    fun getUserDefiningTheme(userCategoryId: Int, definingThemeId: Int): UserDefiningTheme? {
-        return userDefiningThemesRepository.findByUserCategoryIdAndDefiningThemeId(userCategoryId, definingThemeId)
+    fun getUserDefiningTheme(userId: Int, definingThemeId: Int): UserDefiningTheme? {
+        return userDefiningThemesRepository.findByUserIdAndDefiningThemeId(userId, definingThemeId)
     }
 }

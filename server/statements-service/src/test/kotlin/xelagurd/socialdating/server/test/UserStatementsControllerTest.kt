@@ -10,9 +10,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import xelagurd.socialdating.server.controller.UserStatementsController
 import xelagurd.socialdating.server.exception.NoDataFoundException
@@ -43,10 +41,10 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
     private val userStatementDetails = UserStatementDetails(reactionType = FULL_MAINTAIN, userId = 1, statementId = 1)
 
     private val statementReactionDetails = StatementReactionDetails(
-        userOrUserCategoryId = userId,
+        userId = userId,
+        statementId = 1,
         categoryId = 1,
         definingThemeId = 1,
-        statementId = 1,
         reactionType = FULL_MAINTAIN,
         isSupportDefiningTheme = true
     )

@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.additional.StatementReactionDetails
+import xelagurd.socialdating.server.model.additional.UserCategoryUpdateDetails
 
 @Profile("!test")
 @Service
@@ -14,10 +14,10 @@ class CategoriesKafkaConsumer(
 ) {
 
     @KafkaListener(topics = ["statement-reaction-to-user-category-topic"], groupId = "categories-group")
-    fun consumeStatementReaction(statementReactionDetails: StatementReactionDetails) {
+    fun consumeStatementReaction(userCategoryUpdateDetails: UserCategoryUpdateDetails) {
         var userCategory = userCategoriesService.getUserCategory(
-            statementReactionDetails.userOrUserCategoryId,
-            statementReactionDetails.categoryId
+            userCategoryUpdateDetails.userId,
+            userCategoryUpdateDetails.categoryId
         )
 
         if (userCategory != null) {
@@ -25,15 +25,13 @@ class CategoriesKafkaConsumer(
         } else {
             userCategory = UserCategory(
                 interest = 5,
-                userId = statementReactionDetails.userOrUserCategoryId,
-                categoryId = statementReactionDetails.categoryId
+                userId = userCategoryUpdateDetails.userId,
+                categoryId = userCategoryUpdateDetails.categoryId
             )
         }
 
-        val addedUserCategory = userCategoriesService.addUserCategory(userCategory)
+        userCategoriesService.addUserCategory(userCategory)
 
-        kafkaProducer.sendStatementReaction(
-            statementReactionDetails.copy(userOrUserCategoryId = addedUserCategory.id)
-        )
+        kafkaProducer.sendStatementReaction(userCategoryUpdateDetails.toUserDefiningThemeUpdateDetails())
     }
 }

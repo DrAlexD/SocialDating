@@ -57,7 +57,7 @@ class ProfileStatisticsViewModel @Inject constructor(
     { userCategories, userDefiningThemes, dataRequestStatus ->
         ProfileStatisticsUiState(
             entities = userCategories,
-            entityIdToData = userDefiningThemes.groupBy { it.userCategoryId },
+            entityIdToData = userDefiningThemes.groupBy { it.categoryId },
             dataRequestStatus = dataRequestStatus
         )
     }.stateIn(
@@ -98,14 +98,10 @@ class ProfileStatisticsViewModel @Inject constructor(
                     if (remoteUserCategories != null) {
                         localUserCategoriesRepository.insertUserCategories(remoteUserCategories)
 
-                        val remoteUserCategoriesIds = remoteUserCategories.map { it.id }
-                        val (remoteUserDefiningThemes, statusUserDefiningThemes) = safeApiCall(
-                            context
-                        ) {
-                            remoteUserDefiningThemesRepository.getUserDefiningThemes(
-                                remoteUserCategoriesIds
-                            )
-                        }
+                        val (remoteUserDefiningThemes, statusUserDefiningThemes) =
+                            safeApiCall(context) {
+                                remoteUserDefiningThemesRepository.getUserDefiningThemes(userId)
+                            }
 
                         if (remoteUserDefiningThemes != null) {
                             localUserDefiningThemesRepository.insertUserDefiningThemes(

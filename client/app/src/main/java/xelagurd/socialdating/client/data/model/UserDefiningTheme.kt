@@ -16,13 +16,13 @@ import androidx.room.PrimaryKey
             childColumns = ["definingThemeId"]
         ),
         ForeignKey(
-            entity = UserCategory::class,
+            entity = User::class,
             parentColumns = ["id"],
-            childColumns = ["userCategoryId"]
+            childColumns = ["userId"]
         )
     ],
     indices = [
-        Index(value = ["definingThemeId", "userCategoryId"], unique = true)
+        Index(value = ["definingThemeId", "userId"], unique = true)
     ]
 )
 data class UserDefiningTheme(
@@ -30,6 +30,6 @@ data class UserDefiningTheme(
     override val id: Int,
     val value: Int,
     val interest: Int,
-    val userCategoryId: Int,
+    val userId: Int,
     val definingThemeId: Int
 ) : DataEntity

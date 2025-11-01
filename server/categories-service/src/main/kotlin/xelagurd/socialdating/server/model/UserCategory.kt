@@ -5,12 +5,18 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 
 @Entity(name = "user_categories")
-@Table(name = "user_categories")
+@Table(
+    name = "user_categories",
+    indexes = [
+        Index(columnList = "category_id, user_id", unique = true)
+    ]
+)
 class UserCategory(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)

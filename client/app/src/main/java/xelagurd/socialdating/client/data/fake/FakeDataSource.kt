@@ -112,8 +112,8 @@ object FakeDataSource {
         UserDefiningTheme(1, 17, 10, 1, 1),
         UserDefiningTheme(2, 89, 5, 1, 2),
         UserDefiningTheme(3, 12, 30, 1, 3),
-        UserDefiningTheme(4, 57, 15, 2, 4),
-        UserDefiningTheme(5, 15, 50, 3, 5),
+        UserDefiningTheme(4, 57, 15, 1, 4),
+        UserDefiningTheme(5, 15, 50, 1, 5),
     )
 
     val userStatements = listOf(
