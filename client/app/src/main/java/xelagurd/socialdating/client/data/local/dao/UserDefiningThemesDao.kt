@@ -19,13 +19,12 @@ interface UserDefiningThemesDao {
         select udt.id,
                udt.value,
                udt.interest,
-               udt.userCategoryId,
+               dt.categoryId,
                udt.definingThemeId,
                dt.name as definingThemeName,
                dt.fromOpinion as definingThemeFromOpinion,
                dt.toOpinion as definingThemeToOpinion
         from user_defining_themes udt
-        join user_categories uc on udt.userCategoryId = uc.id
         join defining_themes dt on udt.definingThemeId = dt.id
         where userId = :userId
         """

@@ -37,17 +37,17 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
         DefiningThemeDetails(name = "RemoteDefiningTheme3", fromOpinion = "No", toOpinion = "Yes", categoryId = 3)
     )
 
-    private val userCategoryIds = listOf(1, 3)
+    private val userId = 1
 
     private val userDefiningThemes = listOf(
-        UserDefiningTheme(id = 1, value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1),
-        UserDefiningTheme(id = 2, value = 15, interest = 15, userCategoryId = 2, definingThemeId = 2),
-        UserDefiningTheme(id = 3, value = 20, interest = 20, userCategoryId = 3, definingThemeId = 3)
+        UserDefiningTheme(id = 1, value = 10, interest = 10, userId = 1, definingThemeId = 1),
+        UserDefiningTheme(id = 2, value = 15, interest = 15, userId = 2, definingThemeId = 2),
+        UserDefiningTheme(id = 3, value = 20, interest = 20, userId = 3, definingThemeId = 3)
     )
     private val userDefiningThemesDetails = listOf(
-        UserDefiningThemeDetails(value = 10, interest = 10, userCategoryId = 1, definingThemeId = 1),
-        UserDefiningThemeDetails(value = 15, interest = 15, userCategoryId = 2, definingThemeId = 2),
-        UserDefiningThemeDetails(value = 20, interest = 20, userCategoryId = 3, definingThemeId = 3)
+        UserDefiningThemeDetails(value = 10, interest = 10, userId = 1, definingThemeId = 1),
+        UserDefiningThemeDetails(value = 15, interest = 15, userId = 2, definingThemeId = 2),
+        UserDefiningThemeDetails(value = 20, interest = 20, userId = 3, definingThemeId = 3)
     )
 
     init {
@@ -174,18 +174,18 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
     @Test
     fun getUserDefiningThemes() {
         val getResponse2 = restTemplate.getForEntity(
-            "/api/v1/defining-themes/users?userCategoryIds=${userCategoryIds.toRequestParams()}",
+            "/api/v1/defining-themes/users?userId=$userId",
             Array<UserDefiningTheme>::class.java
         )
         assertThat(getResponse2.statusCode).isEqualTo(HttpStatus.OK)
-        assertEquals(getResponse2.body!!.size, 2)
-        assertContentEquals(getResponse2.body!!, arrayOf(userDefiningThemes[0], userDefiningThemes[2]))
+        assertEquals(getResponse2.body!!.size, 1)
+        assertContentEquals(getResponse2.body!!, arrayOf(userDefiningThemes[0]))
     }
 
     @Test
     fun addUserDefiningTheme_wrongValue_error() {
         val userDefiningThemeDetails =
-            UserDefiningThemeDetails(value = -10, interest = 34, userCategoryId = 1, definingThemeId = 1)
+            UserDefiningThemeDetails(value = -10, interest = 34, userId = 1, definingThemeId = 1)
         val postResponse = restTemplate.postForEntity(
             "/api/v1/defining-themes/users",
             userDefiningThemeDetails,
@@ -198,7 +198,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
     @Test
     fun addUserDefiningTheme_wrongDefiningThemeId_error() {
         val userDefiningThemeDetails =
-            UserDefiningThemeDetails(value = 23, interest = 34, userCategoryId = 1, definingThemeId = -4)
+            UserDefiningThemeDetails(value = 23, interest = 34, userId = 1, definingThemeId = -4)
         val postResponse = restTemplate.postForEntity(
             "/api/v1/defining-themes/users",
             userDefiningThemeDetails,
@@ -211,7 +211,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
     @Test
     fun addUserDefiningTheme_wrongValueAndDefiningThemeId_error() {
         val userDefiningThemeDetails =
-            UserDefiningThemeDetails(value = -10, interest = 34, userCategoryId = 1, definingThemeId = -4)
+            UserDefiningThemeDetails(value = -10, interest = 34, userId = 1, definingThemeId = -4)
         val postResponse = restTemplate.postForEntity(
             "/api/v1/defining-themes/users",
             userDefiningThemeDetails,

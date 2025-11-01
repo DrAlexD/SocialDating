@@ -101,7 +101,6 @@ class ProfileStatisticsViewModelTest {
     )
 
     private fun List<Category>.toCategoryIds() = this.map { it.id }
-    private fun List<UserCategory>.toUserCategoryIds() = this.map { it.id }
 
     @Before
     fun setup() {
@@ -149,7 +148,7 @@ class ProfileStatisticsViewModelTest {
         assertEquals(
             mergeListsAsSets(localUserDefiningThemes, remoteUserDefiningThemes)
                 .toUserDefiningThemesWithData()
-                .groupBy { it.userCategoryId },
+                .groupBy { it.categoryId },
             profileStatisticsUiState.entityIdToData
         )
     }
@@ -170,7 +169,7 @@ class ProfileStatisticsViewModelTest {
         assertEquals(
             localUserDefiningThemes
                 .toUserDefiningThemesWithData()
-                .groupBy { it.userCategoryId },
+                .groupBy { it.categoryId },
             profileStatisticsUiState.entityIdToData
         )
     }
@@ -189,7 +188,7 @@ class ProfileStatisticsViewModelTest {
             profileStatisticsUiState.entities
         )
         assertEquals(
-            localUserDefiningThemes.toUserDefiningThemesWithData().groupBy { it.userCategoryId },
+            localUserDefiningThemes.toUserDefiningThemesWithData().groupBy { it.categoryId },
             profileStatisticsUiState.entityIdToData
         )
     }
@@ -221,7 +220,7 @@ class ProfileStatisticsViewModelTest {
                 remoteUserDefiningThemes
             )
                 .toUserDefiningThemesWithData()
-                .groupBy { it.userCategoryId },
+                .groupBy { it.categoryId },
             profileStatisticsUiState.entityIdToData
         )
     }
@@ -253,7 +252,7 @@ class ProfileStatisticsViewModelTest {
                 remoteUserDefiningThemes
             )
                 .toUserDefiningThemesWithData()
-                .groupBy { it.userCategoryId },
+                .groupBy { it.categoryId },
             profileStatisticsUiState.entityIdToData
         )
     }
@@ -277,7 +276,7 @@ class ProfileStatisticsViewModelTest {
         assertEquals(
             mergeListsAsSets(localUserDefiningThemes, remoteUserDefiningThemes)
                 .toUserDefiningThemesWithData()
-                .groupBy { it.userCategoryId },
+                .groupBy { it.categoryId },
             profileStatisticsUiState.entityIdToData
         )
     }
@@ -299,7 +298,7 @@ class ProfileStatisticsViewModelTest {
             profileStatisticsUiState.entities
         )
         assertEquals(
-            localUserDefiningThemes.toUserDefiningThemesWithData().groupBy { it.userCategoryId },
+            localUserDefiningThemes.toUserDefiningThemesWithData().groupBy { it.categoryId },
             profileStatisticsUiState.entityIdToData
         )
     }
@@ -317,7 +316,7 @@ class ProfileStatisticsViewModelTest {
                 Response.success(remoteDefiningThemes)
         coEvery { remoteUserCategoriesRepository.getUserCategories(userId) } returns
                 Response.success(remoteUserCategories)
-        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(remoteUserCategories.toUserCategoryIds()) } returns
+        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(userId) } returns
                 Response.success(remoteUserDefiningThemes)
 
         coEvery { localCategoriesRepository.insertCategories(remoteCategories) } just Runs
@@ -350,7 +349,7 @@ class ProfileStatisticsViewModelTest {
                 Response.error(404, "404".toResponseBody())
         coEvery { remoteUserCategoriesRepository.getUserCategories(userId) } returns
                 Response.error(404, "404".toResponseBody())
-        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(emptyList()) } returns
+        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(userId) } returns
                 Response.error(404, "404".toResponseBody())
 
         coEvery { localCategoriesRepository.insertCategories(emptyList()) } just Runs

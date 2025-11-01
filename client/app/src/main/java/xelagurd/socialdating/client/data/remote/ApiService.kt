@@ -30,7 +30,7 @@ interface ApiService {
     suspend fun getDefiningThemes(@Query("categoryIds") categoryIds: List<Int>): Response<List<DefiningTheme>>
 
     @GET("defining-themes/users")
-    suspend fun getUserDefiningThemes(@Query("userCategoryIds") userCategoryIds: List<Int>): Response<List<UserDefiningTheme>>
+    suspend fun getUserDefiningThemes(@Query("userId") userId: Int): Response<List<UserDefiningTheme>>
 
     @GET("statements")
     suspend fun getStatements(

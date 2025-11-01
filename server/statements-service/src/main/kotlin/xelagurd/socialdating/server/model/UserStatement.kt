@@ -7,12 +7,18 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 import jakarta.validation.constraints.Min
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 
 @Entity(name = "user_statements")
-@Table(name = "user_statements")
+@Table(
+    name = "user_statements",
+    indexes = [
+        Index(columnList = "statement_id, user_id", unique = true)
+    ]
+)
 class UserStatement(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)

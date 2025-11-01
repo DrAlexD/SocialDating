@@ -96,7 +96,7 @@ fun ProfileStatisticsScreenComponent(
                 UserCategoryCardContent(
                     userCategory = entity as UserCategoryWithData,
                     userDefiningThemes = profileStatisticsUiState.entityIdToData
-                        .getOrDefault(entity.id, listOf()),
+                        .getOrDefault(entity.categoryId, listOf()),
                     isExpanded = isExpanded
                 )
             }
@@ -181,7 +181,7 @@ private fun ProfileStatisticsComponentFewDataPreview() {
                 entities = FakeDataSource.userCategories.toUserCategoriesWithData(),
                 entityIdToData = FakeDataSource.userDefiningThemes
                     .toUserDefiningThemesWithData()
-                    .groupBy { it.userCategoryId }
+                    .groupBy { it.categoryId }
             )
         )
     }

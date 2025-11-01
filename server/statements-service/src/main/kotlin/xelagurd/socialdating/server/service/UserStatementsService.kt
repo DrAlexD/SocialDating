@@ -25,12 +25,12 @@ class UserStatementsService(
     fun addStatementReaction(statementReactionDetails: StatementReactionDetails): UserStatement {
         val userStatementDetails = UserStatementDetails(
             reactionType = statementReactionDetails.reactionType,
-            userId = statementReactionDetails.userOrUserCategoryId,
+            userId = statementReactionDetails.userId,
             statementId = statementReactionDetails.statementId
         )
         val userStatement = userStatementsRepository.save(userStatementDetails.toUserStatement())
 
-        kafkaProducer.sendStatementReaction(statementReactionDetails)
+        kafkaProducer.sendStatementReaction(statementReactionDetails.toUserCategoryUpdateDetails())
 
         return userStatement
     }

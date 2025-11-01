@@ -16,7 +16,7 @@ import xelagurd.socialdating.server.utils.TestUtils.readObjectFromJsonString
 
 class StatementsIntegrationTest {
     private val restTemplate = RestTemplate()
-    private val GATEWAY_URL = "http://localhost:8080"
+    private val GATEWAY_URL = "http://localhost:8080/api/v1"
     private lateinit var accessToken: String
 
     private fun <T> getWithToken(url: String, responseType: Class<T>): ResponseEntity<T> {
@@ -41,7 +41,7 @@ class StatementsIntegrationTest {
             "password" to "password1"
         )
         val loginResponse = restTemplate.postForEntity(
-            "$GATEWAY_URL/api/v1/users/auth/login",
+            "$GATEWAY_URL/users/auth/login",
             loginRequest,
             String::class.java
         )
@@ -59,7 +59,7 @@ class StatementsIntegrationTest {
             "name" to ("TestRemoteCategory" + Random.nextLong())
         )
         val postCategoryResponse = postWithToken(
-            "$GATEWAY_URL/api/v1/categories",
+            "$GATEWAY_URL/categories",
             requestCategory,
             String::class.java
         )
@@ -77,7 +77,7 @@ class StatementsIntegrationTest {
             "categoryId" to responseCategory["id"]
         )
         val postDefiningThemeResponse = postWithToken(
-            "$GATEWAY_URL/api/v1/defining-themes",
+            "$GATEWAY_URL/defining-themes",
             requestDefiningTheme,
             String::class.java
         )
@@ -92,13 +92,13 @@ class StatementsIntegrationTest {
 
 
         val requestStatement = mapOf(
-            "text" to ("TestRemoteStatemen1" + Random.nextLong()),
+            "text" to ("TestRemoteStatement" + Random.nextLong()),
             "isSupportDefiningTheme" to true,
             "definingThemeId" to responseDefiningTheme["id"],
             "creatorUserId" to userId
         )
         val postStatementResponse = postWithToken(
-            "$GATEWAY_URL/api/v1/statements",
+            "$GATEWAY_URL/statements",
             requestStatement,
             String::class.java
         )
@@ -113,15 +113,15 @@ class StatementsIntegrationTest {
 
 
         val requestStatementReaction = mapOf(
-            "userOrUserCategoryId" to userId,
+            "userId" to userId,
+            "statementId" to responseStatement["id"],
             "categoryId" to responseCategory["id"],
             "definingThemeId" to responseDefiningTheme["id"],
-            "statementId" to responseStatement["id"],
             "reactionType" to 4, // FULL_MAINTAIN
             "isSupportDefiningTheme" to true
         )
         val postStatementReactionResponse = postWithToken(
-            "$GATEWAY_URL/api/v1/statements/users/reaction",
+            "$GATEWAY_URL/statements/users/reaction",
             requestStatementReaction,
             String::class.java
         )
@@ -129,7 +129,7 @@ class StatementsIntegrationTest {
 
         val responseUserStatement = readObjectFromJsonString(postStatementReactionResponse.body!!)
         assertNotNull(responseUserStatement["id"])
-        assertEquals(requestStatementReaction["userOrUserCategoryId"], responseUserStatement["userId"])
+        assertEquals(requestStatementReaction["userId"], responseUserStatement["userId"])
         assertEquals(requestStatementReaction["statementId"], responseUserStatement["statementId"])
 
 
@@ -137,7 +137,7 @@ class StatementsIntegrationTest {
 
 
         val getUserCategoriesResponse = getWithToken(
-            "$GATEWAY_URL/api/v1/categories/users?userId=$userId",
+            "$GATEWAY_URL/categories/users?userId=$userId",
             String::class.java
         )
         assertEquals(getUserCategoriesResponse.statusCode, HttpStatus.OK)
@@ -150,7 +150,7 @@ class StatementsIntegrationTest {
 
 
         val getUserDefiningThemesResponse = getWithToken(
-            "$GATEWAY_URL/api/v1/defining-themes/users?userCategoryIds=$userCategoryId",
+            "$GATEWAY_URL/defining-themes/users?userId=$userId",
             String::class.java
         )
         assertEquals(getUserDefiningThemesResponse.statusCode, HttpStatus.OK)

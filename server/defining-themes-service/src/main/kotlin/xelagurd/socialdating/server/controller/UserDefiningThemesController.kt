@@ -21,8 +21,8 @@ class UserDefiningThemesController(
 ) {
 
     @GetMapping
-    fun getUserDefiningThemes(@RequestParam userCategoryIds: List<Int>): List<UserDefiningTheme> {
-        return userDefiningThemesService.getUserDefiningThemes(userCategoryIds)
+    fun getUserDefiningThemes(@RequestParam userId: Int): List<UserDefiningTheme> {
+        return userDefiningThemesService.getUserDefiningThemes(userId)
     }
 
     @AdminAccess
