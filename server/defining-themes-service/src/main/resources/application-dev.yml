@@ -1,0 +1,21 @@
+server:
+  port: 8030
+
+management:
+  health:
+    kafka:
+      enabled: true
+
+spring:
+  application:
+    name: defining-themes-service
+  datasource:
+    url: jdbc:postgresql://postgres-defining-themes-service:5432/defining_themes_db
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: defining-themes-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"

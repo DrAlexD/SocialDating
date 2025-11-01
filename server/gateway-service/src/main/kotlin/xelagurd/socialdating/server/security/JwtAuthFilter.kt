@@ -13,8 +13,8 @@ import reactor.core.publisher.Mono
 
 @Component
 class JwtAuthFilter(
-    private val jwtUtils: JwtUtils,
-    private val securityProperties: SecurityProperties
+    private val jwtUtils: JwtValidationUtils,
+    private val securityProperties: GatewaySecurityProperties
 ) : GlobalFilter, Ordered {
 
     val logger = KotlinLogging.logger { }

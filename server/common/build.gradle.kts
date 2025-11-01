@@ -1,7 +1,12 @@
 plugins {
     id("buildsrc.convention.kotlin-jvm")
+
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.kotlin.plugin.spring)
+    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 dependencies {
-    implementation(libs.jackson.kotlin)
+    api(libs.bundles.kotlin.ecosystem)
+    api(libs.bundles.spring.ecosystem)
 }

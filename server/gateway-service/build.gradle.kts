@@ -9,13 +9,8 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.bundles.kotlinx.ecosystem)
+    implementation(libs.bundles.kotlin.ecosystem)
 
-    implementation(libs.kotlin.reflect)
-    implementation(libs.jackson.kotlin)
-    implementation(libs.kotlin.logging)
-
-    developmentOnly(libs.spring.boot.devtools)
     implementation(libs.spring.boot.actuator)
 
     implementation(libs.spring.boot.webflux)
@@ -26,6 +21,8 @@ dependencies {
     implementation(libs.jwt.api)
     runtimeOnly(libs.jwt.impl)
     runtimeOnly(libs.jwt.jackson)
+
+    developmentOnly(libs.spring.boot.devtools)
 
     testImplementation(libs.kotlin.test.junit5)
     testImplementation(libs.spring.boot.test)

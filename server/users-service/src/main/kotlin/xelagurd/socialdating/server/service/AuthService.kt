@@ -13,12 +13,12 @@ import xelagurd.socialdating.server.model.details.LoginDetails
 import xelagurd.socialdating.server.model.details.RefreshTokenDetails
 import xelagurd.socialdating.server.model.details.RegistrationDetails
 import xelagurd.socialdating.server.repository.UsersRepository
-import xelagurd.socialdating.server.security.JwtUtils
+import xelagurd.socialdating.server.security.JwtGenerationUtils
 
 @Service
 class AuthService(
     private val usersRepository: UsersRepository,
-    private val jwtUtils: JwtUtils,
+    private val jwtUtils: JwtGenerationUtils,
     private val passwordEncoder: PasswordEncoder,
     private val userDetailsService: UserDetailsService,
     private val authenticationManager: AuthenticationManager

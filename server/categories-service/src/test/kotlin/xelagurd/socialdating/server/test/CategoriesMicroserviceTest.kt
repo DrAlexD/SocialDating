@@ -16,7 +16,7 @@ import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.details.CategoryDetails
 import xelagurd.socialdating.server.model.details.UserCategoryDetails
 
-@ActiveProfiles("test")
+@ActiveProfiles("dev", "test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(NoSecurityConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

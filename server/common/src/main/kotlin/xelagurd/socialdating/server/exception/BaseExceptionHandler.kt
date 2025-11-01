@@ -13,7 +13,7 @@ import xelagurd.socialdating.server.utils.ExceptionUtils.getErrorPositionFromSta
 import xelagurd.socialdating.server.utils.ExceptionUtils.transformNotUniqueDataMessage
 
 @RestControllerAdvice
-class DefiningThemesExceptionHandler {
+class BaseExceptionHandler {
     val logger = KotlinLogging.logger { }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)

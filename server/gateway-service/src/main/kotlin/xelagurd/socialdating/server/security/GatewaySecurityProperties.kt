@@ -5,6 +5,6 @@ import org.springframework.stereotype.Component
 
 @Component
 @ConfigurationProperties(prefix = "security")
-data class SecurityProperties(
+data class GatewaySecurityProperties(
     var whitelist: List<String> = emptyList()
 )
