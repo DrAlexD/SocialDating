@@ -41,7 +41,7 @@ spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 [bundles]
-kotlinx-ecosystem = ["kotlinx-datetime", "kotlinx-serialization-json", "kotlinx-coroutines"]
+kotlin-ecosystem = ["kotlinx-datetime", "kotlinx-serialization-json", "kotlinx-coroutines", "kotlin-reflect", "jackson-kotlin", "kotlin-logging"]
 spring-ecosystem = ["spring-boot-web", "spring-boot-data-jpa", "spring-boot-actuator", "spring-boot-validation", "spring-boot-security"]
 
 [plugins]

@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run gateway-service" type="JetRunConfigurationType">
     <envs>
-      <env name="SPRING_PROFILES_ACTIVE" value="local" />
+      <env name="SPRING_PROFILES_ACTIVE" value="dev,local" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="xelagurd.socialdating.server.GatewayServiceApplicationKt" />
     <module name="server.gateway-service.main" />

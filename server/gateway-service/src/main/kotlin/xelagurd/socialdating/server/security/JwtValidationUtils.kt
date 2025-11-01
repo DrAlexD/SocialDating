@@ -9,7 +9,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 
 @Component
-class JwtUtils(
+class JwtValidationUtils(
     private val env: Environment
 ) {
 

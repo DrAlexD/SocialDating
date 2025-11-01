@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run defining-themes-service" type="JetRunConfigurationType">
     <envs>
-      <env name="SPRING_PROFILES_ACTIVE" value="local" />
+      <env name="SPRING_PROFILES_ACTIVE" value="dev,local" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="xelagurd.socialdating.server.DefiningThemesServiceApplicationKt" />
     <module name="server.defining-themes-service.main" />

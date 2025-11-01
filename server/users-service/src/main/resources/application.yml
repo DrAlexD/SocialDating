@@ -1,33 +1,3 @@
-server:
-  port: 8010
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health
-  endpoint:
-    health:
-      show-details: always
-  health:
-    db:
-      enabled: true
-
-security:
-  whitelist:
-    - /api/v1/users/auth/**
-    - /actuator/**
-
 spring:
-  application:
-    name: users-service
-  datasource:
-    url: jdbc:postgresql://postgres-users-service:5432/users_db
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    defer-datasource-initialization: true
-    hibernate:
-      ddl-auto: create-drop
-  sql:
-    init:
-      mode: always
+  config:
+    import: classpath:application-common.yml

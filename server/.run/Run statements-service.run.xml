@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run statements-service" type="JetRunConfigurationType">
     <envs>
-      <env name="SPRING_PROFILES_ACTIVE" value="local" />
+      <env name="SPRING_PROFILES_ACTIVE" value="dev,local" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="xelagurd.socialdating.server.StatementsServiceApplicationKt" />
     <module name="server.statements-service.main" />

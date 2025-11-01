@@ -1,5 +1,6 @@
-server:
-  port: 8080
+spring:
+  profiles:
+    active: dev
 
 management:
   endpoints:
@@ -9,34 +10,7 @@ management:
   endpoint:
     health:
       show-details: always
-  health:
-    kafka:
-      enabled: true
 
 security:
   whitelist:
-    - /api/v1/users/auth/**
     - /actuator/**
-
-spring:
-  cloud:
-    gateway:
-      routes:
-        - id: users-service
-          uri: http://users-service:8010
-          predicates:
-            - Path=/api/v1/users/**
-        - id: categories-service
-          uri: http://categories-service:8020
-          predicates:
-            - Path=/api/v1/categories/**
-        - id: defining-themes-service
-          uri: http://defining-themes-service:8030
-          predicates:
-            - Path=/api/v1/defining-themes/**
-        - id: statements-service
-          uri: http://statements-service:8040
-          predicates:
-            - Path=/api/v1/statements/**
-  kafka:
-    bootstrap-servers: kafka:9092

@@ -1,0 +1,24 @@
+server:
+  port: 8020
+
+management:
+  health:
+    kafka:
+      enabled: true
+
+spring:
+  application:
+    name: categories-service
+  datasource:
+    url: jdbc:postgresql://postgres-categories-service:5432/categories_db
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: categories-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

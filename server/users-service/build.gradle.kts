@@ -11,24 +11,16 @@ plugins {
 dependencies {
     implementation(project(":common"))
 
-    implementation(libs.bundles.kotlinx.ecosystem)
-
-    implementation(libs.kotlin.reflect)
-    implementation(libs.jackson.kotlin)
-    implementation(libs.kotlin.logging)
-
-    developmentOnly(libs.spring.boot.devtools)
-    implementation(libs.bundles.spring.ecosystem)
-
-    runtimeOnly(libs.postgresql)
-
-    implementation(libs.spring.kafka)
-
     implementation(libs.jwt.api)
     runtimeOnly(libs.jwt.impl)
     runtimeOnly(libs.jwt.jackson)
 
+    developmentOnly(libs.spring.boot.devtools)
+
+    runtimeOnly(libs.postgresql)
+
     testImplementation(libs.h2database)
+
     testImplementation(libs.kotlin.test.junit5)
     testImplementation(libs.spring.boot.test)
     testImplementation(libs.mockk)

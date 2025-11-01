@@ -17,7 +17,7 @@ import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.model.details.UserDefiningThemeDetails
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
-@ActiveProfiles("test")
+@ActiveProfiles("dev", "test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(NoSecurityConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

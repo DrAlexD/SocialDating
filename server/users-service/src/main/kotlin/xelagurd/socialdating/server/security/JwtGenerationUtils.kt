@@ -10,7 +10,7 @@ import io.jsonwebtoken.security.Keys
 import xelagurd.socialdating.server.model.enums.Role
 
 @Component
-class JwtUtils(
+class JwtGenerationUtils(
     private val env: Environment
 ) {
 

@@ -1,0 +1,13 @@
+server:
+  port: 8010
+
+security:
+  whitelist:
+    - /api/v1/users/auth/**
+    - /actuator/**
+
+spring:
+  application:
+    name: users-service
+  datasource:
+    url: jdbc:postgresql://postgres-users-service:5432/users_db
