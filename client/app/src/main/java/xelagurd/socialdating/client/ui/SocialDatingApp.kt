@@ -127,7 +127,7 @@ fun AppBottomNavigationBar(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 fun AppTopBarOfflinePreview() {
     AppTheme {
@@ -141,7 +141,7 @@ fun AppTopBarOfflinePreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true, locale = "ru")
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
 @Composable
 fun AppTopBarOfflineRuPreview() {
     AppTheme {
@@ -155,7 +155,7 @@ fun AppTopBarOfflineRuPreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 fun AppTopBarOnlinePreview() {
     AppTheme {
@@ -169,7 +169,7 @@ fun AppTopBarOnlinePreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true, locale = "ru")
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
 @Composable
 fun AppTopBarOnlineRuPreview() {
     AppTheme {

@@ -21,7 +21,7 @@ import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.assertCurrentRouteName
 import xelagurd.socialdating.client.checkButtonAndClick
 import xelagurd.socialdating.client.checkTextFieldAndInput
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.getCurrentRoute
 import xelagurd.socialdating.client.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.onNodeWithTagId
@@ -313,10 +313,10 @@ class NavigationTest {
         loginAndNavigateToCategories()
 
         composeTestRule.waitUntil(TIMEOUT_MILLIS) {
-            composeTestRule.onNodeWithText(FakeDataSource.categories[0].name).isDisplayed()
+            composeTestRule.onNodeWithText(FakeData.categories[0].name).isDisplayed()
         }
 
-        composeTestRule.onNodeWithText(FakeDataSource.categories[0].name).checkButtonAndClick()
+        composeTestRule.onNodeWithText(FakeData.categories[0].name).checkButtonAndClick()
         checkBottomNavBarWithCategoriesTopLevel()
     }
 
@@ -324,7 +324,7 @@ class NavigationTest {
         navigateToStatements()
 
         composeTestRule.waitUntil(TIMEOUT_MILLIS) {
-            composeTestRule.onNodeWithText(FakeDataSource.statements[1].text).isDisplayed()
+            composeTestRule.onNodeWithText(FakeData.statements[1].text).isDisplayed()
         }
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.add_statement).checkButtonAndClick()
@@ -334,7 +334,7 @@ class NavigationTest {
     private fun addStatementAndNavigateToStatementsScreen() {
         composeTestRule.onNodeWithTextId(R.string.statement_text)
             .checkTextFieldAndInput("StatementText")
-        composeTestRule.onNodeWithText(FakeDataSource.definingThemes[0].name).checkButtonAndClick()
+        composeTestRule.onNodeWithText(FakeData.definingThemes[0].name).checkButtonAndClick()
         composeTestRule.onNodeWithTagId(R.string.yes).checkButtonAndClick()
 
         composeTestRule.onNodeWithTextId(R.string.add_statement).checkButtonAndClick()
@@ -349,10 +349,10 @@ class NavigationTest {
         navigateToStatements()
 
         composeTestRule.waitUntil(TIMEOUT_MILLIS) {
-            composeTestRule.onNodeWithText(FakeDataSource.statements[1].text).isDisplayed()
+            composeTestRule.onNodeWithText(FakeData.statements[1].text).isDisplayed()
         }
 
-        composeTestRule.onNodeWithText(FakeDataSource.statements[1].text).checkButtonAndClick()
+        composeTestRule.onNodeWithText(FakeData.statements[1].text).checkButtonAndClick()
         //checkBottomNavBarWithCategoriesTopLevel()
     }
 

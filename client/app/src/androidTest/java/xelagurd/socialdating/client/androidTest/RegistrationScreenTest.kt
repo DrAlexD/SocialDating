@@ -14,12 +14,12 @@ import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.checkDisabledButton
 import xelagurd.socialdating.client.checkEnabledButton
 import xelagurd.socialdating.client.checkTextField
-import xelagurd.socialdating.client.data.model.details.RegistrationDetails
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
 import xelagurd.socialdating.client.onNodeWithTagId
 import xelagurd.socialdating.client.onNodeWithTextId
 import xelagurd.socialdating.client.onNodeWithTextIdWithColon
+import xelagurd.socialdating.client.ui.form.RegistrationFormData
 import xelagurd.socialdating.client.ui.screen.RegistrationScreenComponent
 import xelagurd.socialdating.client.ui.state.RegistrationUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -81,7 +81,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyData_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails("", null, "", "", "", "", "", "", null)
+            formData = RegistrationFormData("", null, "", "", "", "", "", "", null)
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)
@@ -90,7 +90,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_allData_enabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails(
+            formData = RegistrationFormData(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             )
         )
@@ -101,7 +101,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyEmail_enabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails(
+            formData = RegistrationFormData(
                 "Alex", Gender.MALE, "log", "123", "123", "", "20", "Mos", Purpose.ALL_AT_ONCE
             )
         )
@@ -112,7 +112,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyName_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails(
+            formData = RegistrationFormData(
                 "", Gender.MALE, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             )
         )
@@ -123,7 +123,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyGender_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails(
+            formData = RegistrationFormData(
                 "Alex", null, "log", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             )
         )
@@ -134,7 +134,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyUsername_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails(
+            formData = RegistrationFormData(
                 "Alex", Gender.MALE, "", "123", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             )
         )
@@ -145,7 +145,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyPassword_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails(
+            formData = RegistrationFormData(
                 "Alex", Gender.MALE, "log", "", "123", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             )
         )
@@ -156,7 +156,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyRepeatedPassword_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails(
+            formData = RegistrationFormData(
                 "Alex", Gender.MALE, "log", "123", "", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             )
         )
@@ -167,7 +167,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_passwordIsNotEqualToRepeatedPassword_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails(
+            formData = RegistrationFormData(
                 "Alex", Gender.MALE, "log", "123", "456", "email", "20", "Mos", Purpose.ALL_AT_ONCE
             )
         )
@@ -178,7 +178,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyAge_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails(
+            formData = RegistrationFormData(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "", "Mos", Purpose.ALL_AT_ONCE
             )
         )
@@ -189,7 +189,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyCity_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails(
+            formData = RegistrationFormData(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "", Purpose.ALL_AT_ONCE
             )
         )
@@ -200,7 +200,7 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyPurpose_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formDetails = RegistrationDetails(
+            formData = RegistrationFormData(
                 "Alex", Gender.MALE, "log", "123", "123", "email", "20", "Mos", null
             )
         )

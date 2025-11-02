@@ -38,7 +38,7 @@ data class RegistrationDetails(
 
     @field:Min(18)
     @field:Max(99)
-    val age: String,
+    val age: Int,
 
     @field:NotBlank
     @field:Size(max = 100)
@@ -53,7 +53,7 @@ data class RegistrationDetails(
             username = username,
             password = passwordEncoder.encode(password),
             email = email,
-            age = age.toInt(),
+            age = age,
             city = city,
             purpose = purpose,
             role = Role.USER

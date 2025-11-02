@@ -17,8 +17,7 @@ import androidx.room.PrimaryKey
         )
     ],
     indices = [
-        Index(value = ["name"], unique = true),
-        Index(value = ["categoryId"])
+        Index(value = ["name"], unique = true)
     ]
 )
 data class DefiningTheme(

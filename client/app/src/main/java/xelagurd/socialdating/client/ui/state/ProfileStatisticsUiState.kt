@@ -1,7 +1,7 @@
 package xelagurd.socialdating.client.ui.state
 
-import xelagurd.socialdating.client.data.model.additional.UserCategoryWithData
-import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
+import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 
 data class ProfileStatisticsUiState(
     override val entities: List<UserCategoryWithData> = listOf(),

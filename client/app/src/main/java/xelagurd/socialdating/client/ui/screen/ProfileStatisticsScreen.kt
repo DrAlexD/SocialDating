@@ -31,12 +31,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.fake.toUserCategoriesWithData
 import xelagurd.socialdating.client.data.fake.toUserDefiningThemeWithData
 import xelagurd.socialdating.client.data.fake.toUserDefiningThemesWithData
-import xelagurd.socialdating.client.data.model.additional.UserCategoryWithData
-import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
+import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
 import xelagurd.socialdating.client.ui.AppTopBar
 import xelagurd.socialdating.client.ui.navigation.ProfileStatisticsDestination
@@ -172,14 +172,14 @@ private fun UserDefiningThemeDetailsBody(
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun ProfileStatisticsComponentFewDataPreview() {
     AppTheme {
         ProfileStatisticsScreenComponent(
             profileStatisticsUiState = ProfileStatisticsUiState(
-                entities = FakeDataSource.userCategories.toUserCategoriesWithData(),
-                entityIdToData = FakeDataSource.userDefiningThemes
+                entities = FakeData.userCategories.toUserCategoriesWithData(),
+                entityIdToData = FakeData.userDefiningThemes
                     .toUserDefiningThemesWithData()
                     .groupBy { it.categoryId }
             )
@@ -187,7 +187,7 @@ private fun ProfileStatisticsComponentFewDataPreview() {
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun ProfileStatisticsComponentNoDataPreview() {
     AppTheme {
@@ -199,7 +199,7 @@ private fun ProfileStatisticsComponentNoDataPreview() {
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun UserDefiningThemeDetailsBodyPreview() {
     AppTheme {
@@ -210,7 +210,7 @@ private fun UserDefiningThemeDetailsBodyPreview() {
         ) {
             HorizontalDivider()
             UserDefiningThemeDetailsBody(
-                userDefiningTheme = FakeDataSource.userDefiningThemes[0].toUserDefiningThemeWithData()
+                userDefiningTheme = FakeData.userDefiningThemes[0].toUserDefiningThemeWithData()
             )
             HorizontalDivider()
         }

@@ -22,7 +22,7 @@ import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.additional.AuthResponse
@@ -31,6 +31,7 @@ import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
 import xelagurd.socialdating.client.data.model.enums.Role
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
+import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.LoginViewModel
 
@@ -49,7 +50,7 @@ class LoginViewModelTest {
     private val loginUiState
         get() = viewModel.uiState.value
 
-    private val loginDetails = LoginDetails("", "")
+    private val loginFormData = LoginFormData("", "")
     private val remoteUser =
         User(1, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20, Role.USER)
     private val authResponse = AuthResponse(remoteUser, "", "")
@@ -67,7 +68,7 @@ class LoginViewModelTest {
             preferencesRepository,
             accountManager
         )
-        viewModel.updateUiState(loginDetails)
+        viewModel.updateUiState(loginFormData)
         viewModel.loginWithInput()
     }
 
@@ -136,15 +137,15 @@ class LoginViewModelTest {
         // FixMe: Can't test due to `BaseBundle not mocked`
         coEvery { accountManager.findCredentials() } returns GetCredentialResponse(
             PasswordCredential(
-                id = loginDetails.username,
-                password = loginDetails.password
+                id = loginFormData.username,
+                password = loginFormData.password
             )
         )
     }
 
     private fun mockFindCredentialsWithError() {
         coEvery { accountManager.findCredentials() } returns null
-        coEvery { accountManager.saveCredentials(loginDetails) } just Runs
+        coEvery { accountManager.saveCredentials(loginFormData) } just Runs
     }
 
     private fun mockDataWithInternet() {
@@ -169,13 +170,13 @@ class LoginViewModelTest {
         // FixMe: remove after adding server hosting
         coEvery {
             accountManager.saveCredentials(
-                LoginDetails(
-                    FakeDataSource.users[0].username,
-                    FakeDataSource.users[0].password
+                LoginFormData(
+                    FakeData.users[0].username,
+                    FakeData.users[0].password
                 )
             )
         } just Runs
-        every { localRepository.getUsers() } returns flowOf(listOf(FakeDataSource.users[0]))
-        coEvery { preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) } just Runs
+        every { localRepository.getUsers() } returns flowOf(listOf(FakeData.users[0]))
+        coEvery { preferencesRepository.saveCurrentUserId(FakeData.users[0].id) } just Runs
     }
 }

@@ -15,11 +15,11 @@ import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.checkDisabledButton
 import xelagurd.socialdating.client.checkEnabledButton
 import xelagurd.socialdating.client.checkTextField
-import xelagurd.socialdating.client.data.fake.FakeDataSource
-import xelagurd.socialdating.client.data.model.details.StatementDetails
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.onNodeWithTagId
 import xelagurd.socialdating.client.onNodeWithTextId
 import xelagurd.socialdating.client.onNodeWithTextIdWithColon
+import xelagurd.socialdating.client.ui.form.StatementFormData
 import xelagurd.socialdating.client.ui.screen.StatementAddingScreenComponent
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.StatementAddingUiState
@@ -65,26 +65,26 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_allDefiningThemes_assertContentIsDisplayed() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeDataSource.definingThemes,
-            formDetails = StatementDetails("StatementText1", true, null, 1)
+            entities = FakeData.definingThemes,
+            formData = StatementFormData("StatementText1", true, null, 1)
         )
 
         assertContentIsDisplayed(statementAddingUiState)
-        composeTestRule.onNodeWithText(FakeDataSource.definingThemes[0].name).assertIsDisplayed()
-        composeTestRule.onNodeWithText(FakeDataSource.definingThemes[1].name).assertIsDisplayed()
+        composeTestRule.onNodeWithText(FakeData.definingThemes[0].name).assertIsDisplayed()
+        composeTestRule.onNodeWithText(FakeData.definingThemes[1].name).assertIsDisplayed()
     }
 
     @Test
     fun statementAddingScreen_chosenDefiningTheme_assertContentIsDisplayed() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeDataSource.definingThemes,
-            formDetails = StatementDetails("StatementText1", true, 1, 1)
+            entities = FakeData.definingThemes,
+            formData = StatementFormData("StatementText1", true, 1, 1)
         )
 
         assertContentIsDisplayed(statementAddingUiState)
-        composeTestRule.onNodeWithText(FakeDataSource.definingThemes[0].name).assertIsDisplayed()
-        composeTestRule.onNodeWithText(FakeDataSource.definingThemes[1].name).assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(FakeData.definingThemes[0].name).assertIsDisplayed()
+        composeTestRule.onNodeWithText(FakeData.definingThemes[1].name).assertIsNotDisplayed()
     }
 
     @Test
@@ -129,8 +129,8 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptyData_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeDataSource.definingThemes,
-            formDetails = StatementDetails("", null, null, 1)
+            entities = FakeData.definingThemes,
+            formData = StatementFormData("", null, null, 1)
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)
@@ -140,8 +140,8 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_allData_enabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeDataSource.definingThemes,
-            formDetails = StatementDetails("StatementText1", true, 1, 1)
+            entities = FakeData.definingThemes,
+            formData = StatementFormData("StatementText1", true, 1, 1)
         )
 
         assertAddStatementButtonIsEnabled(statementAddingUiState)
@@ -151,8 +151,8 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptyStatementText_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeDataSource.definingThemes,
-            formDetails = StatementDetails("", true, 1, 1)
+            entities = FakeData.definingThemes,
+            formData = StatementFormData("", true, 1, 1)
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)
@@ -162,8 +162,8 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptySupportDefiningTheme_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeDataSource.definingThemes,
-            formDetails = StatementDetails("StatementText1", null, 1, 1)
+            entities = FakeData.definingThemes,
+            formData = StatementFormData("StatementText1", null, 1, 1)
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)
@@ -173,8 +173,8 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptyDefiningTheme_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeDataSource.definingThemes,
-            formDetails = StatementDetails("StatementText1", true, null, 1)
+            entities = FakeData.definingThemes,
+            formData = StatementFormData("StatementText1", true, null, 1)
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)

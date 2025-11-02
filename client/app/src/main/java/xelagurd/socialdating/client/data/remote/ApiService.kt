@@ -48,5 +48,7 @@ interface ApiService {
     suspend fun addStatement(@Body statementDetails: StatementDetails): Response<Statement>
 
     @POST("statements/users/reaction")
-    suspend fun addStatementReaction(@Body statementReactionDetails: StatementReactionDetails): Response<UserStatement>
+    suspend fun processStatementReaction(
+        @Body statementReactionDetails: StatementReactionDetails
+    ): Response<UserStatement>
 }

@@ -19,13 +19,13 @@ import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.Statement
-import xelagurd.socialdating.client.data.model.details.StatementDetails
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
+import xelagurd.socialdating.client.ui.form.StatementFormData
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.StatementAddingViewModel
 
@@ -49,7 +49,7 @@ class StatementAddingViewModelTest {
 
     private val localDefiningThemes = listOf(DefiningTheme(1, "", "", "", categoryId))
 
-    private val statementDetails = StatementDetails("", false, 1, 1)
+    private val statementFormData = StatementFormData("", false, 1, 1)
     private val statement = Statement(22, "", false, 1, 1)
 
     @Before
@@ -65,7 +65,7 @@ class StatementAddingViewModelTest {
             remoteStatementsRepository,
             localStatementsRepository
         )
-        viewModel.updateUiState(statementDetails)
+        viewModel.updateUiState(statementFormData)
         viewModel.statementAdding()
     }
 
@@ -136,22 +136,22 @@ class StatementAddingViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns
+        coEvery { remoteStatementsRepository.addStatement(statementFormData.toStatementDetails()) } returns
                 Response.success(statement)
         coEvery { localStatementsRepository.insertStatement(statement) } just Runs
     }
 
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteStatementsRepository.addStatement(statementDetails) } returns
+        coEvery { remoteStatementsRepository.addStatement(statementFormData.toStatementDetails()) } returns
                 Response.error(400, "400".toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteStatementsRepository.addStatement(statementDetails) } throws IOException()
+        coEvery { remoteStatementsRepository.addStatement(statementFormData.toStatementDetails()) } throws IOException()
 
         // FixMe: remove after adding server hosting
-        every { localStatementsRepository.getStatements() } returns flowOf(listOf(FakeDataSource.newStatement))
+        every { localStatementsRepository.getStatements() } returns flowOf(listOf(FakeData.newStatement))
     }
 }

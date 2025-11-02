@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import xelagurd.socialdating.client.data.model.UserCategory
-import xelagurd.socialdating.client.data.model.additional.UserCategoryWithData
+import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
 
 @Dao
 interface UserCategoriesDao {

@@ -14,7 +14,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
 import xelagurd.socialdating.client.ui.AppTopBar
@@ -92,29 +92,29 @@ private fun CategoryCardContent(
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun CategoriesComponentAllDataPreview() {
     AppTheme {
         CategoriesScreenComponent(
-            categoriesUiState = CategoriesUiState(entities = FakeDataSource.categories)
+            categoriesUiState = CategoriesUiState(entities = FakeData.categories)
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun CategoriesComponentFewDataPreview() {
     AppTheme {
         CategoriesScreenComponent(
             categoriesUiState = CategoriesUiState(
-                entities = listOf(FakeDataSource.categories[0], FakeDataSource.categories[1])
+                entities = listOf(FakeData.categories[0], FakeData.categories[1])
             )
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun CategoriesComponentNoDataPreview() {
     AppTheme {

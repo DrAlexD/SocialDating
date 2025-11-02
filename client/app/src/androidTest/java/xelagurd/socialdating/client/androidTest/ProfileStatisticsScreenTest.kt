@@ -13,8 +13,8 @@ import org.junit.Test
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.checkButtonAndClick
-import xelagurd.socialdating.client.data.model.additional.UserCategoryWithData
-import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
+import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 import xelagurd.socialdating.client.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.onNodeWithTagId
 import xelagurd.socialdating.client.ui.screen.ProfileStatisticsScreenComponent

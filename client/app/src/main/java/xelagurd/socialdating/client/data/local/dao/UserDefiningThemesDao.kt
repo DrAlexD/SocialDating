@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 
 @Dao
 interface UserDefiningThemesDao {

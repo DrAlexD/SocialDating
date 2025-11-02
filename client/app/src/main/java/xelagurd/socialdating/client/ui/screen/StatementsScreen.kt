@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
@@ -157,29 +157,29 @@ private inline fun ReactionsRow(
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun StatementsComponentAllDataPreview() {
     AppTheme {
         StatementsScreenComponent(
-            statementsUiState = StatementsUiState(entities = FakeDataSource.statements)
+            statementsUiState = StatementsUiState(entities = FakeData.statements)
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun StatementsComponentFewDataPreview() {
     AppTheme {
         StatementsScreenComponent(
             statementsUiState = StatementsUiState(
-                entities = listOf(FakeDataSource.statements[0], FakeDataSource.statements[1])
+                entities = listOf(FakeData.statements[0], FakeData.statements[1])
             )
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun StatementsComponentNoDataPreview() {
     AppTheme {

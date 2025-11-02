@@ -22,4 +22,24 @@ class EnumsConverter {
     fun toPurpose(purpose: String): Purpose {
         return Purpose.valueOf(purpose)
     }
+
+    @TypeConverter
+    fun fromRole(role: Role): String {
+        return role.name
+    }
+
+    @TypeConverter
+    fun toRole(role: String): Role {
+        return Role.valueOf(role)
+    }
+
+    @TypeConverter
+    fun fromStatementReactionType(statementReactionType: StatementReactionType): String {
+        return statementReactionType.name
+    }
+
+    @TypeConverter
+    fun toStatementReactionType(statementReactionType: String): StatementReactionType {
+        return StatementReactionType.valueOf(statementReactionType)
+    }
 }

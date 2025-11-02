@@ -16,11 +16,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
-import xelagurd.socialdating.client.data.model.details.LoginDetails
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
-import xelagurd.socialdating.client.data.safeApiCall
+import xelagurd.socialdating.client.data.remote.safeApiCall
+import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.state.LoginUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
 
@@ -53,7 +53,7 @@ class LoginViewModel @Inject constructor(
                 val password = credential.password
 
                 loginUser(
-                    loginDetails = LoginDetails(username, password),
+                    loginFormData = LoginFormData(username, password),
                     isLoginWithInput = false
                 )
             }
@@ -64,31 +64,31 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun updateUiState(loginDetails: LoginDetails) {
+    fun updateUiState(loginFormData: LoginFormData) {
         _uiState.update {
-            it.copy(formDetails = loginDetails)
+            it.copy(formData = loginFormData)
         }
     }
 
     fun loginWithInput() {
         viewModelScope.launch {
             loginUser(
-                loginDetails = uiState.value.formDetails,
+                loginFormData = uiState.value.formData,
                 isLoginWithInput = true
             )
         }
     }
 
-    private suspend fun loginUser(loginDetails: LoginDetails, isLoginWithInput: Boolean) {
+    private suspend fun loginUser(loginFormData: LoginFormData, isLoginWithInput: Boolean) {
         _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
         var (authResponse, status) = safeApiCall(context) {
-            remoteRepository.loginUser(loginDetails)
+            remoteRepository.loginUser(loginFormData.toLoginDetails())
         }
 
         if (authResponse != null) {
             if (isLoginWithInput) {
-                accountManager.saveCredentials(loginDetails)
+                accountManager.saveCredentials(loginFormData)
             }
 
             localRepository.insertUser(authResponse.user)
@@ -99,18 +99,18 @@ class LoginViewModel @Inject constructor(
 
         if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
             accountManager.saveCredentials(
-                LoginDetails(
-                    FakeDataSource.users[0].username,
-                    FakeDataSource.users[0].password
+                LoginFormData(
+                    FakeData.users[0].username,
+                    FakeData.users[0].password
                 )
             )
 
             if (!localRepository.getUsers().first().map { it.id }
-                    .contains(FakeDataSource.users[0].id)) {
-                localRepository.insertUser(FakeDataSource.users[0])
+                    .contains(FakeData.users[0].id)) {
+                localRepository.insertUser(FakeData.users[0])
             }
 
-            preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id)
+            preferencesRepository.saveCurrentUserId(FakeData.users[0].id)
 
             status = RequestStatus.SUCCESS
         }

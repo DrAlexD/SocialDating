@@ -24,7 +24,7 @@ class UserStatementsService(
     }
 
     @Transactional
-    fun handleStatementReaction(statementReactionDetails: StatementReactionDetails): UserStatement {
+    fun processStatementReaction(statementReactionDetails: StatementReactionDetails): UserStatement {
         val userStatementDetails = UserStatementDetails(
             reactionType = statementReactionDetails.reactionType,
             userId = statementReactionDetails.userId,

@@ -4,12 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class StatementDetails(
-    val text: String = "",
-    val isSupportDefiningTheme: Boolean? = null,
-    val definingThemeId: Int? = null,
-    val creatorUserId: Int? = null
-) : FormDetails {
-    val isValid
-        get() = text.isNotBlank() && isSupportDefiningTheme != null && definingThemeId != null
-                && creatorUserId != null
-}
+    val text: String,
+    val isSupportDefiningTheme: Boolean,
+    val definingThemeId: Int,
+    val creatorUserId: Int
+)
