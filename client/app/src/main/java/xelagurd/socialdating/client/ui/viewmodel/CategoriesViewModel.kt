@@ -14,10 +14,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
-import xelagurd.socialdating.client.data.safeApiCall
+import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.state.CategoriesUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
 
@@ -59,7 +59,7 @@ class CategoriesViewModel @Inject constructor(
 
             if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
                 if (localRepository.getCategories().first().isEmpty()) {
-                    localRepository.insertCategories(FakeDataSource.categories)
+                    localRepository.insertCategories(FakeData.categories)
                 }
             }
 

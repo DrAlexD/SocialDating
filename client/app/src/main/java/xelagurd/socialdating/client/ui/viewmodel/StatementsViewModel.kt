@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserStatementsRepository
@@ -27,7 +27,7 @@ import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserStatementsRepository
-import xelagurd.socialdating.client.data.safeApiCall
+import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.StatementsDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.StatementsUiState
@@ -113,13 +113,13 @@ class StatementsViewModel @Inject constructor(
 
             if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
                 if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
-                    localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes)
+                    localDefiningThemesRepository.insertDefiningThemes(FakeData.definingThemes)
                 }
                 if (localStatementsRepository.getStatements().first().isEmpty()) {
-                    localStatementsRepository.insertStatements(FakeDataSource.statements)
+                    localStatementsRepository.insertStatements(FakeData.statements)
                 }
                 if (localUserStatementsRepository.getUserStatements().first().isEmpty()) {
-                    localUserStatementsRepository.insertUserStatements(FakeDataSource.userStatements)
+                    localUserStatementsRepository.insertUserStatements(FakeData.userStatements)
                 }
             }
 
@@ -130,7 +130,7 @@ class StatementsViewModel @Inject constructor(
     fun onStatementReactionClick(statement: Statement, reactionType: StatementReactionType) {
         viewModelScope.launch {
             val (userStatement, status) = safeApiCall(context) {
-                remoteStatementsRepository.addStatementReaction(
+                remoteStatementsRepository.processStatementReaction(
                     StatementReactionDetails(
                         userId = userId,
                         statementId = statement.id,

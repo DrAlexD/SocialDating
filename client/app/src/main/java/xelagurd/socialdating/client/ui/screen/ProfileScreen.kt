@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
@@ -162,27 +162,27 @@ private fun AvatarIcon(gender: Gender) {
     )
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun ProfileComponentAllDataPreview() {
     AppTheme {
         ProfileScreenComponent(
-            profileUiState = ProfileUiState(entity = FakeDataSource.users[0])
+            profileUiState = ProfileUiState(entity = FakeData.users[0])
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true, locale = "ru")
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
 @Composable
 private fun ProfileComponentAllDataRuPreview() {
     AppTheme {
         ProfileScreenComponent(
-            profileUiState = ProfileUiState(entity = FakeDataSource.users[0])
+            profileUiState = ProfileUiState(entity = FakeData.users[0])
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun ProfileComponentNoDataPreview() {
     AppTheme {

@@ -19,16 +19,17 @@ import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.additional.AuthResponse
-import xelagurd.socialdating.client.data.model.details.LoginDetails
 import xelagurd.socialdating.client.data.model.details.RegistrationDetails
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
 import xelagurd.socialdating.client.data.model.enums.Role
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
+import xelagurd.socialdating.client.ui.form.LoginFormData
+import xelagurd.socialdating.client.ui.form.RegistrationFormData
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.RegistrationViewModel
 
@@ -47,8 +48,8 @@ class RegistrationViewModelTest {
     private val registrationUiState
         get() = viewModel.uiState.value
 
-    private val registrationDetails =
-        RegistrationDetails("", Gender.MALE, "", "", "", "", "", "", Purpose.ALL_AT_ONCE)
+    private val registrationFormData =
+        RegistrationFormData("", Gender.MALE, "", "", "", "", "1", "", Purpose.ALL_AT_ONCE)
     private val remoteUser =
         User(1, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20, Role.USER)
     private val authResponse = AuthResponse(remoteUser, "", "")
@@ -61,7 +62,7 @@ class RegistrationViewModelTest {
             preferencesRepository,
             accountManager
         )
-        viewModel.updateUiState(registrationDetails)
+        viewModel.updateUiState(registrationFormData)
         viewModel.register()
     }
 
@@ -129,7 +130,7 @@ class RegistrationViewModelTest {
     private fun mockDataWithInternet() {
         coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns
                 Response.success(authResponse)
-        coEvery { accountManager.saveCredentials(registrationDetails.toLoginDetails()) } just Runs
+        coEvery { accountManager.saveCredentials(registrationFormData.toLoginFormData()) } just Runs
         coEvery { localRepository.insertUser(authResponse.user) } just Runs
         coEvery { preferencesRepository.saveAccessToken(authResponse.accessToken) } just Runs
         coEvery { preferencesRepository.saveRefreshToken(authResponse.refreshToken) } just Runs
@@ -149,13 +150,13 @@ class RegistrationViewModelTest {
         // FixMe: remove after adding server hosting
         coEvery {
             accountManager.saveCredentials(
-                LoginDetails(
-                    FakeDataSource.users[0].username,
-                    FakeDataSource.users[0].password
+                LoginFormData(
+                    FakeData.users[0].username,
+                    FakeData.users[0].password
                 )
             )
         } just Runs
-        every { localRepository.getUsers() } returns flowOf(listOf(FakeDataSource.users[0]))
-        coEvery { preferencesRepository.saveCurrentUserId(FakeDataSource.users[0].id) } just Runs
+        every { localRepository.getUsers() } returns flowOf(listOf(FakeData.users[0]))
+        coEvery { preferencesRepository.saveCurrentUserId(FakeData.users[0].id) } just Runs
     }
 }

@@ -16,8 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
-import xelagurd.socialdating.client.data.model.details.LoginDetails
 import xelagurd.socialdating.client.ui.AppTopBar
+import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.navigation.LoginDestination
 import xelagurd.socialdating.client.ui.state.LoginUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -48,7 +48,7 @@ fun LoginScreenComponent(
     loginUiState: LoginUiState = LoginUiState(),
     onSuccessLogin: () -> Unit = {},
     onRegistrationClick: () -> Unit = {},
-    onValueChange: (LoginDetails) -> Unit = {},
+    onValueChange: (LoginFormData) -> Unit = {},
     onLoginClick: () -> Unit = {}
 ) {
     Scaffold(
@@ -64,7 +64,7 @@ fun LoginScreenComponent(
             contentPadding = innerPadding
         ) {
             LoginDetailsBody(
-                loginDetails = loginUiState.formDetails,
+                loginFormData = loginUiState.formData,
                 onValueChange = onValueChange,
                 onLoginClick = onLoginClick,
                 onRegistrationClick = onRegistrationClick
@@ -75,8 +75,8 @@ fun LoginScreenComponent(
 
 @Composable
 private inline fun LoginDetailsBody(
-    loginDetails: LoginDetails,
-    crossinline onValueChange: (LoginDetails) -> Unit,
+    loginFormData: LoginFormData,
+    crossinline onValueChange: (LoginFormData) -> Unit,
     noinline onLoginClick: () -> Unit,
     noinline onRegistrationClick: () -> Unit
 ) {
@@ -86,17 +86,17 @@ private inline fun LoginDetailsBody(
         modifier = Modifier.fillMaxSize()
     ) {
         AppTextField(
-            value = loginDetails.username,
-            onValueChange = { onValueChange(loginDetails.copy(username = it)) },
+            value = loginFormData.username,
+            onValueChange = { onValueChange(loginFormData.copy(username = it)) },
             label = stringResource(R.string.username)
         )
         AppTextField(
-            value = loginDetails.password,
-            onValueChange = { onValueChange(loginDetails.copy(password = it)) },
+            value = loginFormData.password,
+            onValueChange = { onValueChange(loginFormData.copy(password = it)) },
             label = stringResource(R.string.password)
         )
         AppLargeTextCard(
-            isEnabled = loginDetails.isValid,
+            isEnabled = loginFormData.isValid,
             text = stringResource(R.string.login),
             onClick = onLoginClick
         )
@@ -112,7 +112,7 @@ private inline fun LoginDetailsBody(
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun LoginComponentEmptyFormPreview() {
     AppTheme {
@@ -120,37 +120,37 @@ private fun LoginComponentEmptyFormPreview() {
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun LoginComponentFullFormPreview() {
     AppTheme {
         LoginScreenComponent(
             loginUiState = LoginUiState(
-                formDetails = LoginDetails("username", "password")
+                formData = LoginFormData("username", "password")
             )
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true, locale = "ru")
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
 @Composable
 private fun LoginComponentFullFormRuPreview() {
     AppTheme {
         LoginScreenComponent(
             loginUiState = LoginUiState(
-                formDetails = LoginDetails("username", "password")
+                formData = LoginFormData("username", "password")
             )
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun LoginComponentWrongDataPreview() {
     AppTheme {
         LoginScreenComponent(
             loginUiState = LoginUiState(
-                formDetails = LoginDetails("username", "password"),
+                formData = LoginFormData("username", "password"),
                 actionRequestStatus = RequestStatus.ERROR("Text")
             )
         )

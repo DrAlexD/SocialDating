@@ -12,7 +12,7 @@ import xelagurd.socialdating.client.data.model.enums.Purpose
 import xelagurd.socialdating.client.data.model.enums.Role
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_MAINTAIN
 
-object FakeDataSource {
+object FakeData {
     val categories = listOf(
         Category(1, "Category1"),
         Category(2, "Category2"),

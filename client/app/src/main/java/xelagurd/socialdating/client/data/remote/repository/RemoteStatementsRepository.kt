@@ -13,8 +13,8 @@ class RemoteStatementsRepository @Inject constructor(
     suspend fun getStatements(userId: Int, definingThemeIds: List<Int>) =
         apiService.getStatements(userId, definingThemeIds)
 
-    suspend fun addStatementReaction(statementReactionDetails: StatementReactionDetails) =
-        apiService.addStatementReaction(statementReactionDetails)
+    suspend fun processStatementReaction(statementReactionDetails: StatementReactionDetails) =
+        apiService.processStatementReaction(statementReactionDetails)
 
     suspend fun addStatement(statementDetails: StatementDetails) =
         apiService.addStatement(statementDetails)

@@ -33,8 +33,8 @@ import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.additional.UserCategoryWithData
-import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
+import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository

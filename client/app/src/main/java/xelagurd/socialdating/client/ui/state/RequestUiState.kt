@@ -1,7 +1,7 @@
 package xelagurd.socialdating.client.ui.state
 
 import xelagurd.socialdating.client.data.model.DataEntity
-import xelagurd.socialdating.client.data.model.details.FormDetails
+import xelagurd.socialdating.client.ui.form.FormData
 
 sealed interface RequestUiState
 
@@ -32,5 +32,5 @@ sealed interface ActionRequestUiState : RequestUiState {
 }
 
 sealed interface FormUiState : ActionRequestUiState {
-    val formDetails: FormDetails
+    val formData: FormData
 }

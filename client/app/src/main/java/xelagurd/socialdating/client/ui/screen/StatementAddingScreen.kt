@@ -21,11 +21,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.DefiningTheme
-import xelagurd.socialdating.client.data.model.details.StatementDetails
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
 import xelagurd.socialdating.client.ui.AppTopBar
+import xelagurd.socialdating.client.ui.form.StatementFormData
 import xelagurd.socialdating.client.ui.navigation.StatementAddingDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.StatementAddingUiState
@@ -56,7 +56,7 @@ fun StatementAddingScreenComponent(
     statementAddingUiState: StatementAddingUiState = StatementAddingUiState(),
     onSuccessStatementAdding: () -> Unit = {},
     onNavigateUp: () -> Unit = {},
-    onValueChange: (StatementDetails) -> Unit = {},
+    onValueChange: (StatementFormData) -> Unit = {},
     onStatementAddingClick: () -> Unit = {}
 ) {
     Scaffold(
@@ -89,10 +89,10 @@ fun StatementAddingScreenComponent(
 @Composable
 private inline fun StatementDetailsBody(
     statementAddingUiState: StatementAddingUiState,
-    crossinline onValueChange: (StatementDetails) -> Unit,
+    crossinline onValueChange: (StatementFormData) -> Unit,
     noinline onStatementAddingClick: () -> Unit
 ) {
-    val statementDetails = statementAddingUiState.formDetails
+    val statementFormData = statementAddingUiState.formData
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -100,8 +100,8 @@ private inline fun StatementDetailsBody(
         modifier = Modifier.fillMaxSize()
     ) {
         AppTextField(
-            value = statementDetails.text,
-            onValueChange = { onValueChange(statementDetails.copy(text = it)) },
+            value = statementFormData.text,
+            onValueChange = { onValueChange(statementFormData.copy(text = it)) },
             label = stringResource(R.string.statement_text)
         )
         Row(
@@ -112,16 +112,16 @@ private inline fun StatementDetailsBody(
             AppMediumTitleText(text = stringResourceWithColon(R.string.defining_theme))
             DataChoosingListComponent(
                 dataListUiState = statementAddingUiState,
-                chosenEntityId = statementDetails.definingThemeId,
+                chosenEntityId = statementFormData.definingThemeId,
                 maxHeight = LocalConfiguration.current.screenHeightDp.dp / 4
             ) { entity, isHasBorder ->
                 AppMediumTextCard(
                     text = (entity as DefiningTheme).name,
                     onClick = {
                         onValueChange(
-                            statementDetails.copy(
+                            statementFormData.copy(
                                 definingThemeId = entity.id
-                                    .takeIf { statementDetails.definingThemeId == null }
+                                    .takeIf { statementFormData.definingThemeId == null }
                             )
                         )
                     },
@@ -135,8 +135,8 @@ private inline fun StatementDetailsBody(
             horizontalArrangement = Arrangement.Center
         ) {
             RadioButton(
-                selected = statementDetails.isSupportDefiningTheme == true,
-                onClick = { onValueChange(statementDetails.copy(isSupportDefiningTheme = true)) },
+                selected = statementFormData.isSupportDefiningTheme == true,
+                onClick = { onValueChange(statementFormData.copy(isSupportDefiningTheme = true)) },
                 modifier = Modifier.testTag(stringResource(R.string.yes))
             )
             AppMediumTitleText(
@@ -148,8 +148,8 @@ private inline fun StatementDetailsBody(
                 )
             )
             RadioButton(
-                selected = statementDetails.isSupportDefiningTheme == false,
-                onClick = { onValueChange(statementDetails.copy(isSupportDefiningTheme = false)) },
+                selected = statementFormData.isSupportDefiningTheme == false,
+                onClick = { onValueChange(statementFormData.copy(isSupportDefiningTheme = false)) },
                 modifier = Modifier.testTag(stringResource(R.string.no))
             )
             AppMediumTitleText(
@@ -162,69 +162,69 @@ private inline fun StatementDetailsBody(
             )
         }
         AppLargeTextCard(
-            isEnabled = statementDetails.isValid,
+            isEnabled = statementFormData.isValid,
             text = stringResource(R.string.add_statement),
             onClick = onStatementAddingClick
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun StatementAddingComponentAllDataFullFormPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
-                entities = FakeDataSource.definingThemes,
-                formDetails = StatementDetails("Text", true)
+                entities = FakeData.definingThemes,
+                formData = StatementFormData("Text", true)
             )
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true, locale = "ru")
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
 @Composable
 private fun StatementAddingComponentAllDataFullFormRuPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
-                entities = FakeDataSource.definingThemes,
-                formDetails = StatementDetails("Text", true)
+                entities = FakeData.definingThemes,
+                formData = StatementFormData("Text", true)
             )
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun StatementAddingComponentFewDataPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
                 entities = listOf(
-                    FakeDataSource.definingThemes[0],
-                    FakeDataSource.definingThemes[1]
+                    FakeData.definingThemes[0],
+                    FakeData.definingThemes[1]
                 )
             )
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun StatementAddingComponentChosenDataWrongFormPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
-                entities = FakeDataSource.definingThemes,
-                formDetails = StatementDetails(definingThemeId = 1),
+                entities = FakeData.definingThemes,
+                formData = StatementFormData(definingThemeId = 1),
                 actionRequestStatus = RequestStatus.ERROR("Text")
             )
         )
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun StatementAddingComponentEmptyDataPreview() {
     AppTheme {

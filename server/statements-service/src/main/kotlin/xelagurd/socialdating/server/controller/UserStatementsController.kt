@@ -38,7 +38,7 @@ class UserStatementsController(
 
     @PostMapping("/reaction")
     @ResponseStatus(HttpStatus.CREATED)
-    fun handleStatementReaction(@RequestBody @Valid statementReactionDetails: StatementReactionDetails): UserStatement {
-        return userStatementsService.handleStatementReaction(statementReactionDetails)
+    fun processStatementReaction(@RequestBody @Valid statementReactionDetails: StatementReactionDetails): UserStatement {
+        return userStatementsService.processStatementReaction(statementReactionDetails)
     }
 }

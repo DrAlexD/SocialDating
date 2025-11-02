@@ -15,7 +15,7 @@ import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
 import dagger.hilt.android.qualifiers.ApplicationContext
-import xelagurd.socialdating.client.data.model.details.LoginDetails
+import xelagurd.socialdating.client.ui.form.LoginFormData
 
 @Singleton
 class AccountManager @Inject constructor(
@@ -43,11 +43,11 @@ class AccountManager @Inject constructor(
         return null
     }
 
-    suspend fun saveCredentials(loginDetails: LoginDetails) {
+    suspend fun saveCredentials(loginFormData: LoginFormData) {
         try {
             val request = CreatePasswordRequest(
-                id = loginDetails.username,
-                password = loginDetails.password
+                id = loginFormData.username,
+                password = loginFormData.password
             )
 
             credentialManager.createCredential(context, request)

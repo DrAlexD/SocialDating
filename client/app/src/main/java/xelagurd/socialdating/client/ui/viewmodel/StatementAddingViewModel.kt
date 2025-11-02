@@ -13,12 +13,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.R
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
-import xelagurd.socialdating.client.data.model.details.StatementDetails
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
-import xelagurd.socialdating.client.data.safeApiCall
+import xelagurd.socialdating.client.data.remote.safeApiCall
+import xelagurd.socialdating.client.ui.form.StatementFormData
 import xelagurd.socialdating.client.ui.navigation.StatementAddingDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.StatementAddingUiState
@@ -37,7 +37,7 @@ class StatementAddingViewModel @Inject constructor(
         checkNotNull(savedStateHandle[StatementAddingDestination.categoryId])
 
     private val _uiState = MutableStateFlow(
-        StatementAddingUiState(formDetails = StatementDetails(creatorUserId = userId))
+        StatementAddingUiState(formData = StatementFormData(creatorUserId = userId))
     )
     val uiState = _uiState.asStateFlow()
 
@@ -70,9 +70,9 @@ class StatementAddingViewModel @Inject constructor(
         }
     }
 
-    fun updateUiState(statementDetails: StatementDetails) {
+    fun updateUiState(statementFormData: StatementFormData) {
         _uiState.update {
-            it.copy(formDetails = statementDetails)
+            it.copy(formData = statementFormData)
         }
     }
 
@@ -80,10 +80,10 @@ class StatementAddingViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
-            val statementDetails = uiState.value.formDetails
+            val statementFormDetails = uiState.value.formData
 
             var (statement, status) = safeApiCall(context) {
-                remoteStatementsRepository.addStatement(statementDetails)
+                remoteStatementsRepository.addStatement(statementFormDetails.toStatementDetails())
             }
 
             if (statement != null) {
@@ -92,8 +92,8 @@ class StatementAddingViewModel @Inject constructor(
 
             if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
                 if (!localStatementsRepository.getStatements().first().map { it.id }
-                        .contains(FakeDataSource.newStatement.id)) {
-                    localStatementsRepository.insertStatement(FakeDataSource.newStatement)
+                        .contains(FakeData.newStatement.id)) {
+                    localStatementsRepository.insertStatement(FakeData.newStatement)
                 }
 
                 status = RequestStatus.SUCCESS

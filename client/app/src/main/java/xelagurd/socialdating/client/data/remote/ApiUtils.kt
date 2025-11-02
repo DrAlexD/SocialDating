@@ -1,4 +1,4 @@
-package xelagurd.socialdating.client.data
+package xelagurd.socialdating.client.data.remote
 
 import java.io.IOException
 import android.content.Context
@@ -6,6 +6,10 @@ import retrofit2.HttpException
 import retrofit2.Response
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.ui.state.RequestStatus
+
+const val UNAUTHORIZED = 401
+const val NOT_FOUND = 404
+const val INTERNAL_SERVER_ERROR = 500
 
 suspend fun <T> safeApiCall(
     context: Context,
@@ -23,8 +27,8 @@ suspend fun <T> safeApiCall(
             } ?: RequestStatus.ERROR(context.getString(R.string.server_error))
         } else {
             when (response.code()) {
-                404 -> RequestStatus.FAILURE(context.getString(R.string.no_data))
-                500 -> RequestStatus.ERROR(context.getString(R.string.server_error))
+                NOT_FOUND -> RequestStatus.FAILURE(context.getString(R.string.no_data))
+                INTERNAL_SERVER_ERROR -> RequestStatus.ERROR(context.getString(R.string.server_error))
 
                 else -> response.errorBody()?.let {
                     RequestStatus.FAILURE(it.string())

@@ -16,7 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
-import xelagurd.socialdating.client.data.safeApiCall
+import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
 import xelagurd.socialdating.client.ui.state.ProfileUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus

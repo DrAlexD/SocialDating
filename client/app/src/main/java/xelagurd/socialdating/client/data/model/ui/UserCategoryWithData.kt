@@ -1,9 +1,7 @@
-package xelagurd.socialdating.client.data.model.additional
+package xelagurd.socialdating.client.data.model.ui
 
-import kotlinx.serialization.Serializable
 import xelagurd.socialdating.client.data.model.DataEntity
 
-@Serializable
 data class UserCategoryWithData(
     override val id: Int,
     val interest: Int,

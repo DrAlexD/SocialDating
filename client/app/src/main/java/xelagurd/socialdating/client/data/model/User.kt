@@ -12,8 +12,7 @@ import xelagurd.socialdating.client.data.model.enums.Role
 @Entity(
     tableName = "users",
     indices = [
-        Index(value = ["username"], unique = true),
-        Index(value = ["email"], unique = true)
+        Index(value = ["username"], unique = true)
     ]
 )
 data class User(

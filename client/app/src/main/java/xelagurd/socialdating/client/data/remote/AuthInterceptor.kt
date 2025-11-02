@@ -10,7 +10,6 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.model.details.RefreshTokenDetails
-import xelagurd.socialdating.client.data.safeApiCall
 
 @Singleton
 class AuthInterceptor @Inject constructor(
@@ -30,7 +29,7 @@ class AuthInterceptor @Inject constructor(
 
         val response = chain.proceed(request)
 
-        if (response.code == 401) {
+        if (response.code == UNAUTHORIZED) {
             val refreshToken = runBlocking { preferencesRepository.refreshToken.first() }
 
             val (refreshResponse, _) = runBlocking {

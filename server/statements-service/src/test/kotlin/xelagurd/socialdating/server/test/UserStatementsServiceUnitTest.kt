@@ -84,12 +84,12 @@ class UserStatementsServiceUnitTest {
     }
 
     @Test
-    fun handleStatementReaction() {
+    fun processStatementReaction() {
         val expected = userStatements[0]
         every { userStatementsRepository.save(userStatementDetails.toUserStatement()) } returns expected
         every { kafkaProducer.updateUserCategory(statementReactionDetails.toUserCategoryUpdateDetails()) } just Runs
 
-        userStatementsService.handleStatementReaction(statementReactionDetails)
+        userStatementsService.processStatementReaction(statementReactionDetails)
 
         verify { userStatementsRepository.save(userStatementDetails.toUserStatement()) }
         verify { kafkaProducer.updateUserCategory(statementReactionDetails.toUserCategoryUpdateDetails()) }

@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import xelagurd.socialdating.client.data.fake.FakeDataSource
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
@@ -25,7 +25,7 @@ import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepos
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserDefiningThemesRepository
-import xelagurd.socialdating.client.data.safeApiCall
+import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.ProfileStatisticsDestination
 import xelagurd.socialdating.client.ui.state.ProfileStatisticsUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -121,19 +121,19 @@ class ProfileStatisticsViewModel @Inject constructor(
 
             if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
                 if (localCategoriesRepository.getCategories().first().isEmpty()) {
-                    localCategoriesRepository.insertCategories(FakeDataSource.categories)
+                    localCategoriesRepository.insertCategories(FakeData.categories)
                 }
                 if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
-                    localDefiningThemesRepository.insertDefiningThemes(FakeDataSource.definingThemes)
+                    localDefiningThemesRepository.insertDefiningThemes(FakeData.definingThemes)
                 }
                 if (localUserCategoriesRepository.getUserCategories().first().isEmpty()) {
-                    localUserCategoriesRepository.insertUserCategories(FakeDataSource.userCategories)
+                    localUserCategoriesRepository.insertUserCategories(FakeData.userCategories)
                 }
                 if (localUserDefiningThemesRepository.getUserDefiningThemes().first()
                         .isEmpty()
                 ) {
                     localUserDefiningThemesRepository.insertUserDefiningThemes(
-                        FakeDataSource.userDefiningThemes
+                        FakeData.userDefiningThemes
                     )
                 }
             }

@@ -2,8 +2,8 @@ package xelagurd.socialdating.client.data.fake
 
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.additional.UserCategoryWithData
-import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
+import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 
 fun UserCategory.toUserCategoryWithData() =
     UserCategoryWithData(

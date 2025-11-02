@@ -83,7 +83,7 @@ private fun SettingsDetailsBody(
     }
 }
 
-@Preview(showBackground = true, device = "id:small_phone", showSystemUi = true)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
 private fun SettingsComponentPreview() {
     AppTheme {
