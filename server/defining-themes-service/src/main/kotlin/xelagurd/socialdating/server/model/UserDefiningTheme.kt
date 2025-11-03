@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
-import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_INTEREST_INITIAL
+import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_INTEREST_STEP
 
 @Entity(name = "user_defining_themes")
 @Table(
@@ -25,12 +25,28 @@ class UserDefiningTheme(
     var value: Int,
 
     @field:Column(columnDefinition = "integer check (interest between 0 and 100)")
-    var interest: Int = DEFINING_THEME_INTEREST_INITIAL,
+    var interest: Int = DEFINING_THEME_INTEREST_STEP,
 
     var userId: Int,
 
     var definingThemeId: Int
 ) {
+
+    fun copy(
+        id: Int? = null,
+        value: Int? = null,
+        interest: Int? = null,
+        userId: Int? = null,
+        definingThemeId: Int? = null
+    ) =
+        UserDefiningTheme(
+            id = id ?: this.id,
+            value = value ?: this.value,
+            interest = interest ?: this.interest,
+            userId = userId ?: this.userId,
+            definingThemeId = definingThemeId ?: this.definingThemeId
+        )
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

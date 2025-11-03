@@ -12,10 +12,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
+import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.controller.StatementsController
 import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.Statement
-import xelagurd.socialdating.server.model.details.StatementDetails
 import xelagurd.socialdating.server.service.StatementsService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
@@ -30,40 +29,14 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
     private val userId = 1
     private val definingThemeIds = listOf(1, 3)
 
-    private val statements = listOf(
-        Statement(
-            id = 1,
-            text = "RemoteStatement1",
-            isSupportDefiningTheme = true,
-            definingThemeId = 1,
-            creatorUserId = userId
-        ),
-        Statement(
-            id = 2,
-            text = "RemoteStatement2",
-            isSupportDefiningTheme = true,
-            definingThemeId = 2,
-            creatorUserId = userId
-        ),
-        Statement(
-            id = 3,
-            text = "RemoteStatement3",
-            isSupportDefiningTheme = true,
-            definingThemeId = 3,
-            creatorUserId = userId
-        )
-    )
+    private val statements = FakeStatementsData.statements
 
-    private val statementDetails = StatementDetails(
-        text = "RemoteStatement1",
-        isSupportDefiningTheme = true,
-        definingThemeId = 1,
-        creatorUserId = userId
-    )
+    private val statementDetails = FakeStatementsData.statementsDetails[0]
+    private val statement = statements[0]
 
     @Test
-    fun getStatementsByDefiningThemeIds_allData_success() {
-        val expected = statements.filter { it.definingThemeId in definingThemeIds }
+    fun getStatements_allData_success() {
+        val expected = statements
         `when`(statementsService.getStatements(userId, definingThemeIds)).thenReturn(expected)
 
         mockMvc.perform(
@@ -75,7 +48,7 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
     }
 
     @Test
-    fun getStatementsByDefiningThemeIds_emptyData_error() {
+    fun getStatements_emptyData_error() {
         val message = "test"
         `when`(statementsService.getStatements(userId, definingThemeIds)).thenThrow(NoDataFoundException(message))
 
@@ -88,7 +61,7 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     @Test
     fun addStatement() {
-        val expected = statements[0]
+        val expected = statement
         `when`(statementsService.addStatement(statementDetails)).thenReturn(expected)
 
         mockMvc.perform(

@@ -8,9 +8,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.DefiningTheme
-import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.repository.DefiningThemesRepository
 import xelagurd.socialdating.server.service.DefiningThemesService
 
@@ -23,15 +22,11 @@ class DefiningThemesServiceUnitTest {
     private lateinit var definingThemesService: DefiningThemesService
 
     private val categoryId = 1
-    private val categoryIds = listOf(1, 3)
 
-    private val definingThemes = listOf(
-        DefiningTheme(id = 1, name = "RemoteDefiningTheme1", fromOpinion = "No", toOpinion = "Yes", categoryId = 1),
-        DefiningTheme(id = 2, name = "RemoteDefiningTheme2", fromOpinion = "No", toOpinion = "Yes", categoryId = 2),
-        DefiningTheme(id = 3, name = "RemoteDefiningTheme3", fromOpinion = "No", toOpinion = "Yes", categoryId = 3)
-    )
-    private val definingThemeDetails =
-        DefiningThemeDetails(name = "RemoteDefiningTheme1", fromOpinion = "No", toOpinion = "Yes", categoryId = 1)
+    private val definingThemes = FakeDefiningThemesData.definingThemes
+
+    private val definingThemeDetails = FakeDefiningThemesData.definingThemesDetails[0]
+    private val definingTheme = definingThemes[0]
 
     @BeforeEach
     fun setup() {
@@ -40,7 +35,7 @@ class DefiningThemesServiceUnitTest {
 
     @Test
     fun getDefiningThemesByCategoryId() {
-        val expected = definingThemes.filter { it.categoryId == categoryId }
+        val expected = definingThemes
         every { definingThemesRepository.findAllByCategoryId(categoryId) } returns expected
 
         val result = definingThemesService.getDefiningThemes(categoryId)
@@ -49,25 +44,25 @@ class DefiningThemesServiceUnitTest {
     }
 
     @Test
-    fun getDefiningThemesByCategoryIds_allData_success() {
-        val expected = definingThemes.filter { it.categoryId in categoryIds }
-        every { definingThemesRepository.findAllByCategoryId(categoryId) } returns expected
+    fun getDefiningThemes_allData_success() {
+        val expected = definingThemes
+        every { definingThemesRepository.findAll() } returns expected
 
-        val result = definingThemesService.getDefiningThemes(categoryId)
+        val result = definingThemesService.getDefiningThemes()
 
         assertEquals(expected, result)
     }
 
     @Test
-    fun getDefiningThemesByCategoryIds_emptyData_error() {
-        every { definingThemesRepository.findAllByCategoryId(categoryId) } returns emptyList()
+    fun getDefiningThemes_emptyData_error() {
+        every { definingThemesRepository.findAll() } returns emptyList()
 
-        assertThrows<NoDataFoundException> { definingThemesService.getDefiningThemes(categoryId) }
+        assertThrows<NoDataFoundException> { definingThemesService.getDefiningThemes() }
     }
 
     @Test
     fun addDefiningTheme() {
-        val expected = definingThemes[0]
+        val expected = definingTheme
         every { definingThemesRepository.save(definingThemeDetails.toDefiningTheme()) } returns expected
 
         val result = definingThemesService.addDefiningTheme(definingThemeDetails)

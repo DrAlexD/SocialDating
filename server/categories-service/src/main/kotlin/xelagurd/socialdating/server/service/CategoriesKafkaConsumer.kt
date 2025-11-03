@@ -21,14 +21,13 @@ class CategoriesKafkaConsumer(
             userCategoryUpdateDetails.categoryId
         )
 
-        if (userCategory != null) {
-            userCategory.interest += CATEGORY_INTEREST_STEP
-        } else {
-            userCategory = UserCategory(
+        userCategory = userCategory?.copy(
+            interest = userCategory.interest + CATEGORY_INTEREST_STEP
+        )
+            ?: UserCategory(
                 userId = userCategoryUpdateDetails.userId,
                 categoryId = userCategoryUpdateDetails.categoryId
             )
-        }
 
         userCategoriesService.addUserCategory(userCategory)
 

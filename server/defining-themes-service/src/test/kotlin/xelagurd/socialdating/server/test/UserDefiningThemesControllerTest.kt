@@ -12,10 +12,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
+import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.controller.UserDefiningThemesController
 import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.details.UserDefiningThemeDetails
 import xelagurd.socialdating.server.service.UserDefiningThemesService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 
@@ -28,17 +27,14 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
 
     private val userId = 1
 
-    private val userDefiningThemes = listOf(
-        UserDefiningTheme(id = 1, value = 10, interest = 10, userId = 1, definingThemeId = 1),
-        UserDefiningTheme(id = 2, value = 15, interest = 15, userId = 2, definingThemeId = 2),
-        UserDefiningTheme(id = 3, value = 20, interest = 20, userId = 3, definingThemeId = 3)
-    )
-    private val userDefiningThemeDetails =
-        UserDefiningThemeDetails(value = 10, interest = 10, userId = 1, definingThemeId = 1)
+    private val userDefiningThemes = FakeDefiningThemesData.userDefiningThemes
+
+    private val userDefiningThemeDetails = FakeDefiningThemesData.userDefiningThemesDetails[0]
+    private val userDefiningTheme = userDefiningThemes[0]
 
     @Test
-    fun getUserDefiningThemesByUserCategoryIds_allData_success() {
-        val expected = userDefiningThemes.filter { it.userId == userId }
+    fun getUserDefiningThemes_allData_success() {
+        val expected = userDefiningThemes
         `when`(userDefiningThemesService.getUserDefiningThemes(userId)).thenReturn(expected)
 
         mockMvc.perform(
@@ -50,7 +46,7 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
     }
 
     @Test
-    fun getUserDefiningThemesByUserCategoryIds_emptyData_error() {
+    fun getUserDefiningThemes_emptyData_error() {
         val message = "test"
         `when`(userDefiningThemesService.getUserDefiningThemes(userId)).thenThrow(NoDataFoundException(message))
 
@@ -63,7 +59,7 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
 
     @Test
     fun addUserDefiningTheme() {
-        val expected = userDefiningThemes[0]
+        val expected = userDefiningTheme
         `when`(userDefiningThemesService.addUserDefiningTheme(userDefiningThemeDetails)).thenReturn(expected)
 
         mockMvc.perform(
