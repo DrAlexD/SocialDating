@@ -8,9 +8,9 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import xelagurd.socialdating.server.FakeCategoriesData
+import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_STEP
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.additional.UserCategoryUpdateDetails
-import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.service.CategoriesKafkaConsumer
 import xelagurd.socialdating.server.service.CategoriesKafkaProducer
 import xelagurd.socialdating.server.service.UserCategoriesService
@@ -26,30 +26,11 @@ class CategoriesKafkaConsumerUnitTest {
     @InjectMockKs
     private lateinit var categoriesKafkaConsumer: CategoriesKafkaConsumer
 
-    val userId = 1
-    val categoryId = 1
-
-    private val userCategoryUpdateDetails = UserCategoryUpdateDetails(
-        userId = userId,
-        categoryId = categoryId,
-        definingThemeId = 1,
-        reactionType = StatementReactionType.FULL_MAINTAIN,
-        isSupportDefiningTheme = true
-    )
-
-    private val userCategory = UserCategory(id = 1, interest = 10, userId = userId, categoryId = categoryId)
-    private val updatedUserCategory = UserCategory(id = 1, interest = 15, userId = userId, categoryId = categoryId)
-    private val newUserCategory = UserCategory(
-        interest = 5,
-        userId = userCategoryUpdateDetails.userId,
-        categoryId = userCategoryUpdateDetails.categoryId
-    )
-    private val newAddedUserCategory = UserCategory(
-        id = 1,
-        interest = 5,
-        userId = userCategoryUpdateDetails.userId,
-        categoryId = userCategoryUpdateDetails.categoryId
-    )
+    private val userCategoryUpdateDetails = FakeCategoriesData.userCategoryUpdateDetails
+    private val userCategory = FakeCategoriesData.userCategories[0]
+    private val updatedUserCategory = userCategory.copy(interest = userCategory.interest + CATEGORY_INTEREST_STEP)
+    private val newUserCategory = UserCategory(userId = userCategory.userId, categoryId = userCategory.categoryId)
+    private val newAddedUserCategory = newUserCategory.copy(id = 1)
 
     @BeforeEach
     fun setup() {
@@ -57,7 +38,7 @@ class CategoriesKafkaConsumerUnitTest {
     }
 
     @Test
-    fun updateUserCategoryWithExistUserCategory() {
+    fun updateUserCategory_existUserCategory() {
         every {
             userCategoriesService.getUserCategory(
                 userCategoryUpdateDetails.userId,
@@ -65,7 +46,7 @@ class CategoriesKafkaConsumerUnitTest {
             )
         } returns userCategory
 
-        every { userCategoriesService.addUserCategory(userCategory) } returns updatedUserCategory
+        every { userCategoriesService.addUserCategory(updatedUserCategory) } returns updatedUserCategory
 
         every {
             kafkaProducer.updateUserDefiningTheme(
@@ -77,7 +58,7 @@ class CategoriesKafkaConsumerUnitTest {
     }
 
     @Test
-    fun updateUserCategoryWithNotExistUserCategory() {
+    fun updateUserCategory_notExistUserCategory() {
         every {
             userCategoriesService.getUserCategory(
                 userCategoryUpdateDetails.userId,

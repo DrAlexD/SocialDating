@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
-import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_INITIAL
+import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_STEP
 
 @Entity(name = "user_categories")
 @Table(
@@ -22,12 +22,26 @@ class UserCategory(
     var id: Int? = null,
 
     @field:Column(columnDefinition = "integer check (interest between 0 and 100)")
-    var interest: Int = CATEGORY_INTEREST_INITIAL,
+    var interest: Int = CATEGORY_INTEREST_STEP,
 
     var userId: Int,
 
     var categoryId: Int
 ) {
+
+    fun copy(
+        id: Int? = null,
+        interest: Int? = null,
+        userId: Int? = null,
+        categoryId: Int? = null
+    ) =
+        UserCategory(
+            id = id ?: this.id,
+            interest = interest ?: this.interest,
+            userId = userId ?: this.userId,
+            categoryId = categoryId ?: this.categoryId
+        )
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

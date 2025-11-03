@@ -36,16 +36,15 @@ class DefiningThemesKafkaConsumer(
             diff = -diff
         }
 
-        if (userDefiningTheme != null) {
-            userDefiningTheme.value += diff
-            userDefiningTheme.interest += DEFINING_THEME_INTEREST_STEP
-        } else {
-            userDefiningTheme = UserDefiningTheme(
+        userDefiningTheme = userDefiningTheme?.copy(
+            value = userDefiningTheme.value + diff,
+            interest = userDefiningTheme.interest + DEFINING_THEME_INTEREST_STEP
+        )
+            ?: UserDefiningTheme(
                 value = DEFINING_THEME_VALUE_INITIAL + diff,
                 userId = userDefiningThemeUpdateDetails.userId,
                 definingThemeId = userDefiningThemeUpdateDetails.definingThemeId
             )
-        }
 
         userDefiningThemesService.addUserDefiningTheme(userDefiningTheme)
     }

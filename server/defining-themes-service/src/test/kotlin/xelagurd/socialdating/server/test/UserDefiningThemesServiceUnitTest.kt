@@ -8,9 +8,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.details.UserDefiningThemeDetails
 import xelagurd.socialdating.server.repository.UserDefiningThemesRepository
 import xelagurd.socialdating.server.service.UserDefiningThemesService
 
@@ -25,13 +24,10 @@ class UserDefiningThemesServiceUnitTest {
     private val userId = 1
     private val definingThemeId = 1
 
-    private val userDefiningThemes = listOf(
-        UserDefiningTheme(id = 1, value = 10, interest = 10, userId = 1, definingThemeId = 1),
-        UserDefiningTheme(id = 2, value = 15, interest = 15, userId = 2, definingThemeId = 2),
-        UserDefiningTheme(id = 3, value = 20, interest = 20, userId = 3, definingThemeId = 3)
-    )
-    private val userDefiningThemeDetails =
-        UserDefiningThemeDetails(value = 10, interest = 10, userId = 1, definingThemeId = 1)
+    private val userDefiningThemes = FakeDefiningThemesData.userDefiningThemes
+
+    private val userDefiningThemeDetails = FakeDefiningThemesData.userDefiningThemesDetails[0]
+    private val userDefiningTheme = userDefiningThemes[0]
 
     @BeforeEach
     fun setup() {
@@ -40,26 +36,19 @@ class UserDefiningThemesServiceUnitTest {
 
     @Test
     fun getUserDefiningTheme() {
-        val expected = userDefiningThemes
-            .filter { it.userId == userId && it.definingThemeId == definingThemeId }
-
-        assertEquals(expected.size, 1)
-
+        val expected = userDefiningTheme
         every {
-            userDefiningThemesRepository.findByUserIdAndDefiningThemeId(
-                userId,
-                definingThemeId
-            )
-        } returns expected[0]
+            userDefiningThemesRepository.findByUserIdAndDefiningThemeId(userId, definingThemeId)
+        } returns expected
 
         val result = userDefiningThemesService.getUserDefiningTheme(userId, definingThemeId)
 
-        assertEquals(expected[0], result)
+        assertEquals(expected, result)
     }
 
     @Test
-    fun getUserDefiningThemesByUserCategoryIds_allData_success() {
-        val expected = userDefiningThemes.filter { it.userId == userId }
+    fun getUserDefiningThemes_allData_success() {
+        val expected = userDefiningThemes
         every { userDefiningThemesRepository.findAllByUserId(userId) } returns expected
 
         val result = userDefiningThemesService.getUserDefiningThemes(userId)
@@ -68,7 +57,7 @@ class UserDefiningThemesServiceUnitTest {
     }
 
     @Test
-    fun getUserDefiningThemesByUserCategoryIds_emptyData_error() {
+    fun getUserDefiningThemes_emptyData_error() {
         every { userDefiningThemesRepository.findAllByUserId(userId) } returns emptyList()
 
         assertThrows<NoDataFoundException> { userDefiningThemesService.getUserDefiningThemes(userId) }
@@ -76,7 +65,7 @@ class UserDefiningThemesServiceUnitTest {
 
     @Test
     fun addUserDefiningTheme() {
-        val expected = userDefiningThemes[0]
+        val expected = userDefiningTheme
         every { userDefiningThemesRepository.save(userDefiningThemeDetails.toUserDefiningTheme()) } returns expected
 
         val result = userDefiningThemesService.addUserDefiningTheme(userDefiningThemeDetails)

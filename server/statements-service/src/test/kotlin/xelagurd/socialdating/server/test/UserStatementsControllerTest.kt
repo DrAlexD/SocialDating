@@ -12,12 +12,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
+import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.controller.UserStatementsController
 import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.UserStatement
-import xelagurd.socialdating.server.model.additional.StatementReactionDetails
-import xelagurd.socialdating.server.model.details.UserStatementDetails
-import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.server.service.UserStatementsService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
@@ -32,26 +29,16 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
     private val userId = 1
     private val definingThemeIds = listOf(1, 3)
 
-    private val userStatements = listOf(
-        UserStatement(id = 1, reactionType = FULL_MAINTAIN, userId = 1, statementId = 1),
-        UserStatement(id = 2, reactionType = FULL_MAINTAIN, userId = 1, statementId = 2),
-        UserStatement(id = 3, reactionType = FULL_MAINTAIN, userId = 2, statementId = 3)
-    )
+    private val userStatements = FakeStatementsData.userStatements
 
-    private val userStatementDetails = UserStatementDetails(reactionType = FULL_MAINTAIN, userId = 1, statementId = 1)
+    private val userStatementDetails = FakeStatementsData.userStatementsDetails[0]
+    private val userStatement = userStatements[0]
 
-    private val statementReactionDetails = StatementReactionDetails(
-        userId = userId,
-        statementId = 1,
-        categoryId = 1,
-        definingThemeId = 1,
-        reactionType = FULL_MAINTAIN,
-        isSupportDefiningTheme = true
-    )
+    private val statementReactionDetails = FakeStatementsData.statementReactionDetails
 
     @Test
     fun getUserStatements_allData_success() {
-        val expected = userStatements.filter { it.userId == userId }
+        val expected = userStatements
         `when`(userStatementsService.getUserStatements(userId, definingThemeIds)).thenReturn(expected)
 
         mockMvc.perform(
@@ -76,7 +63,7 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     @Test
     fun addUserStatement() {
-        val expected = userStatements[0]
+        val expected = userStatement
         `when`(userStatementsService.addUserStatement(userStatementDetails)).thenReturn(expected)
 
         mockMvc.perform(
@@ -91,7 +78,7 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     @Test
     fun processStatementReaction() {
-        val expected = userStatements[0]
+        val expected = userStatement
         `when`(userStatementsService.processStatementReaction(statementReactionDetails)).thenReturn(expected)
 
         mockMvc.perform(

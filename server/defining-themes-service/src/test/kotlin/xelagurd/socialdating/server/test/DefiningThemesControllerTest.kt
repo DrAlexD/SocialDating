@@ -12,10 +12,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
+import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.controller.DefiningThemesController
 import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.DefiningTheme
-import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.service.DefiningThemesService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 
@@ -27,19 +26,15 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
     private lateinit var definingThemesService: DefiningThemesService
 
     private val categoryId = 1
-    private val categoryIds = listOf(1, 3)
 
-    private val definingThemes = listOf(
-        DefiningTheme(id = 1, name = "RemoteDefiningTheme1", fromOpinion = "No", toOpinion = "Yes", categoryId = 1),
-        DefiningTheme(id = 2, name = "RemoteDefiningTheme2", fromOpinion = "No", toOpinion = "Yes", categoryId = 2),
-        DefiningTheme(id = 3, name = "RemoteDefiningTheme3", fromOpinion = "No", toOpinion = "Yes", categoryId = 3)
-    )
-    private val definingThemeDetails =
-        DefiningThemeDetails(name = "RemoteDefiningTheme1", fromOpinion = "No", toOpinion = "Yes", categoryId = 1)
+    private val definingThemes = FakeDefiningThemesData.definingThemes
+
+    private val definingThemeDetails = FakeDefiningThemesData.definingThemesDetails[0]
+    private val definingTheme = definingThemes[0]
 
     @Test
     fun getDefiningThemesByCategoryId() {
-        val expected = definingThemes.filter { it.categoryId == categoryId }
+        val expected = definingThemes
         `when`(definingThemesService.getDefiningThemes(categoryId)).thenReturn(expected)
 
         mockMvc.perform(
@@ -51,12 +46,12 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
     }
 
     @Test
-    fun getDefiningThemesByCategoryIds_allData_success() {
-        val expected = definingThemes.filter { it.categoryId in categoryIds }
-        `when`(definingThemesService.getDefiningThemes(categoryId)).thenReturn(expected)
+    fun getDefiningThemes_allData_success() {
+        val expected = definingThemes
+        `when`(definingThemesService.getDefiningThemes()).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/defining-themes?categoryId=$categoryId")
+            get("/api/v1/defining-themes")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -64,12 +59,12 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
     }
 
     @Test
-    fun getDefiningThemesByCategoryIds_emptyData_error() {
+    fun getDefiningThemes_emptyData_error() {
         val message = "test"
-        `when`(definingThemesService.getDefiningThemes(categoryId)).thenThrow(NoDataFoundException(message))
+        `when`(definingThemesService.getDefiningThemes()).thenThrow(NoDataFoundException(message))
 
         mockMvc.perform(
-            get("/api/v1/defining-themes?categoryId=$categoryId")
+            get("/api/v1/defining-themes")
         )
             .andExpect(status().isNotFound)
             .andExpect(content().string(message))
@@ -77,7 +72,7 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     @Test
     fun addDefiningTheme() {
-        val expected = definingThemes[0]
+        val expected = definingTheme
         `when`(definingThemesService.addDefiningTheme(definingThemeDetails)).thenReturn(expected)
 
         mockMvc.perform(

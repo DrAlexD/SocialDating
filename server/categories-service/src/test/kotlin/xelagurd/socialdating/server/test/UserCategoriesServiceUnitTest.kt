@@ -8,9 +8,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
 import xelagurd.socialdating.server.service.UserCategoriesService
 
@@ -25,13 +24,10 @@ class UserCategoriesServiceUnitTest {
     private val userId = 1
     private val categoryId = 1
 
-    private val userCategories = listOf(
-        UserCategory(id = 1, interest = 10, userId = 1, categoryId = 1),
-        UserCategory(id = 2, interest = 15, userId = 1, categoryId = 2),
-        UserCategory(id = 3, interest = 20, userId = 2, categoryId = 3)
-    )
+    private val userCategories = FakeCategoriesData.userCategories
 
-    private val userCategoryDetails = UserCategoryDetails(interest = 10, userId = 1, categoryId = 1)
+    private val userCategoryDetails = FakeCategoriesData.userCategoriesDetails[0]
+    private val userCategory = userCategories[0]
 
     @BeforeEach
     fun setup() {
@@ -40,20 +36,17 @@ class UserCategoriesServiceUnitTest {
 
     @Test
     fun getUserCategory() {
-        val expected = userCategories.filter { it.userId == userId && it.categoryId == categoryId }
-
-        assertEquals(expected.size, 1)
-
-        every { userCategoriesRepository.findByUserIdAndCategoryId(userId, categoryId) } returns expected[0]
+        val expected = userCategory
+        every { userCategoriesRepository.findByUserIdAndCategoryId(userId, categoryId) } returns expected
 
         val result = userCategoriesService.getUserCategory(userId, categoryId)
 
-        assertEquals(expected[0], result)
+        assertEquals(expected, result)
     }
 
     @Test
     fun getUserCategories_allData_success() {
-        val expected = userCategories.filter { it.userId == userId }
+        val expected = userCategories
         every { userCategoriesRepository.findAllByUserId(userId) } returns expected
 
         val result = userCategoriesService.getUserCategories(userId)
@@ -70,7 +63,7 @@ class UserCategoriesServiceUnitTest {
 
     @Test
     fun addUserCategory() {
-        val expected = userCategories[0]
+        val expected = userCategory
         every { userCategoriesRepository.save(userCategoryDetails.toUserCategory()) } returns expected
 
         val result = userCategoriesService.addUserCategory(userCategoryDetails)
