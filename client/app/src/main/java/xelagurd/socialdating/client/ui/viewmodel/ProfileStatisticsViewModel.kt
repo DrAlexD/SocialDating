@@ -17,6 +17,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.fake.FakeData.filterUserCategoriesByUserId
+import xelagurd.socialdating.client.data.fake.FakeData.filterUserDefiningThemesByUserId
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
@@ -27,6 +29,7 @@ import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesR
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.ProfileStatisticsDestination
+import xelagurd.socialdating.client.ui.navigation.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.ui.state.ProfileStatisticsUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
 
@@ -97,15 +100,12 @@ class ProfileStatisticsViewModel @Inject constructor(
                     if (remoteUserCategories != null) {
                         localUserCategoriesRepository.insertUserCategories(remoteUserCategories)
 
-                        val (remoteUserDefiningThemes, statusUserDefiningThemes) =
-                            safeApiCall(context) {
-                                remoteUserDefiningThemesRepository.getUserDefiningThemes(userId)
-                            }
+                        val (remoteUserDefiningThemes, statusUserDefiningThemes) = safeApiCall(context) {
+                            remoteUserDefiningThemesRepository.getUserDefiningThemes(userId)
+                        }
 
                         if (remoteUserDefiningThemes != null) {
-                            localUserDefiningThemesRepository.insertUserDefiningThemes(
-                                remoteUserDefiningThemes
-                            )
+                            localUserDefiningThemesRepository.insertUserDefiningThemes(remoteUserDefiningThemes)
                         }
 
                         globalStatus = statusUserDefiningThemes
@@ -127,22 +127,18 @@ class ProfileStatisticsViewModel @Inject constructor(
                     localDefiningThemesRepository.insertDefiningThemes(FakeData.definingThemes)
                 }
                 if (localUserCategoriesRepository.getUserCategories().first().isEmpty()) {
-                    localUserCategoriesRepository.insertUserCategories(FakeData.userCategories)
+                    localUserCategoriesRepository.insertUserCategories(
+                        FakeData.userCategories.filterUserCategoriesByUserId()
+                    )
                 }
-                if (localUserDefiningThemesRepository.getUserDefiningThemes().first()
-                        .isEmpty()
-                ) {
+                if (localUserDefiningThemesRepository.getUserDefiningThemes().first().isEmpty()) {
                     localUserDefiningThemesRepository.insertUserDefiningThemes(
-                        FakeData.userDefiningThemes
+                        FakeData.userDefiningThemes.filterUserDefiningThemesByUserId()
                     )
                 }
             }
 
             dataRequestStatusFlow.update { globalStatus }
         }
-    }
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
     }
 }

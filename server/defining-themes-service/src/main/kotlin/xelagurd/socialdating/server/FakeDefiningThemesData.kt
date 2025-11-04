@@ -62,7 +62,7 @@ object FakeDefiningThemesData {
             isSupportDefiningTheme = true
         )
 
-    fun List<DefiningTheme>.withNullIds(): List<DefiningTheme> =
+    fun List<DefiningTheme>.withNullIds() =
         this.map {
             DefiningTheme(
                 name = it.name,
@@ -71,4 +71,8 @@ object FakeDefiningThemesData {
                 categoryId = it.categoryId
             )
         }
+
+    fun List<DefiningTheme>.filterByCategoryId(categoryId: Int) = this.filter { it.categoryId == categoryId }
+
+    fun List<UserDefiningTheme>.filterByUserId(userId: Int) = this.filter { it.userId == userId }
 }

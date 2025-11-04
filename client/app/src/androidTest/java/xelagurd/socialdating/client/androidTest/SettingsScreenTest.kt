@@ -40,7 +40,9 @@ class SettingsScreenTest {
 
     @Test
     fun settingsScreen_loadingState_loadingIndicator() {
-        val settingsUiState = SettingsUiState(actionRequestStatus = RequestStatus.LOADING)
+        val settingsUiState = SettingsUiState(
+            actionRequestStatus = RequestStatus.LOADING
+        )
 
         setContentToSettingsBody(settingsUiState)
 
