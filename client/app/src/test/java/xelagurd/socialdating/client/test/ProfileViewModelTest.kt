@@ -20,11 +20,10 @@ import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.User
-import xelagurd.socialdating.client.data.model.enums.Gender
-import xelagurd.socialdating.client.data.model.enums.Purpose
-import xelagurd.socialdating.client.data.model.enums.Role
+import xelagurd.socialdating.client.data.remote.NOT_FOUND
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.ProfileViewModel
@@ -46,10 +45,8 @@ class ProfileViewModelTest {
 
     private val userId = 1
 
-    private val localUser =
-        User(userId, "", Gender.MALE, "", "", "", 30, "", Purpose.ALL_AT_ONCE, 50, Role.USER)
-    private val remoteUser =
-        User(userId, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20, Role.USER)
+    private val localUser = FakeData.users[0]
+    private val remoteUser = localUser.copy(activity = localUser.activity + 5)
 
     @Before
     fun setup() {
@@ -201,14 +198,13 @@ class ProfileViewModelTest {
 
     private fun mockDataWithInternet() {
         coEvery { remoteRepository.getUser(userId) } returns Response.success(remoteUser)
-        coEvery { localRepository.insertUser(remoteUser) } answers {
-            usersFlow.value = remoteUser
-        }
+        coEvery { localRepository.insertUser(remoteUser) } answers { usersFlow.value = remoteUser }
     }
 
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.getUser(userId) } returns Response.error(404, "404".toResponseBody())
+        coEvery { remoteRepository.getUser(userId) } returns
+                Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

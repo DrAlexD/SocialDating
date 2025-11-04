@@ -13,8 +13,7 @@ import org.junit.Test
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.checkButtonAndClick
-import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
-import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.onNodeWithTagId
 import xelagurd.socialdating.client.ui.screen.ProfileStatisticsScreenComponent
@@ -35,6 +34,9 @@ class ProfileStatisticsScreenTest {
         hiltRule.inject()
     }
 
+    private val userCategoryWithData = FakeData.userCategoryWithData
+    private val userDefiningThemeWithData = FakeData.userDefiningThemeWithData
+
     @Test
     fun profileStatisticsScreen_loadingStateAndEmptyData_loadingIndicator() {
         val profileStatisticsUiState = ProfileStatisticsUiState()
@@ -46,7 +48,7 @@ class ProfileStatisticsScreenTest {
 
     @Test
     fun profileStatisticsScreen_errorStateAndEmptyData_errorText() {
-        val errorText = "Error Text"
+        val errorText = FakeData.ERROR_TEXT
         val profileStatisticsUiState = ProfileStatisticsUiState(
             dataRequestStatus = RequestStatus.ERROR(errorText)
         )
@@ -58,7 +60,7 @@ class ProfileStatisticsScreenTest {
 
     @Test
     fun profileStatisticsScreen_failureStateAndEmptyData_failureText() {
-        val failureText = "Failure Text"
+        val failureText = FakeData.FAILURE_TEXT
         val profileStatisticsUiState = ProfileStatisticsUiState(
             dataRequestStatus = RequestStatus.FAILURE(failureText)
         )
@@ -71,10 +73,8 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_loadingStateAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
-            entityIdToData = mapOf(
-                1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
-            ),
+            entities = listOf(userCategoryWithData),
+            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf(userDefiningThemeWithData)),
             dataRequestStatus = RequestStatus.LOADING
         )
 
@@ -84,10 +84,8 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_errorStateAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
-            entityIdToData = mapOf(
-                1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
-            ),
+            entities = listOf(userCategoryWithData),
+            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf(userDefiningThemeWithData)),
             dataRequestStatus = RequestStatus.ERROR()
         )
 
@@ -97,10 +95,8 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_failureStateAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
-            entityIdToData = mapOf(
-                1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
-            ),
+            entities = listOf(userCategoryWithData),
+            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf(userDefiningThemeWithData)),
             dataRequestStatus = RequestStatus.FAILURE()
         )
 
@@ -110,10 +106,8 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_successStateAndData_displayedData() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = listOf(UserCategoryWithData(1, 50, 50, 1, "Category1")),
-            entityIdToData = mapOf(
-                1 to listOf(UserDefiningThemeWithData(1, 50, 50, 1, 1, "Theme1", "No", "Yes"))
-            ),
+            entities = listOf(userCategoryWithData),
+            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf(userDefiningThemeWithData)),
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
@@ -123,19 +117,18 @@ class ProfileStatisticsScreenTest {
     private fun assertDataIsDisplayed(profileStatisticsUiState: ProfileStatisticsUiState) {
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
-        composeTestRule.onNodeWithText("Category1").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Theme1").assertIsNotDisplayed()
-        composeTestRule.onNodeWithText("No").assertIsNotDisplayed()
-        composeTestRule.onNodeWithText("Yes").assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(userCategoryWithData.categoryName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeName).assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeFromOpinion).assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeToOpinion).assertIsNotDisplayed()
         composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsNotDisplayed()
 
-        composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list)
-            .checkButtonAndClick()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list).checkButtonAndClick()
 
-        composeTestRule.onNodeWithText("Category1").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Theme1").assertIsDisplayed()
-        composeTestRule.onNodeWithText("No").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Yes").assertIsDisplayed()
+        composeTestRule.onNodeWithText(userCategoryWithData.categoryName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeFromOpinion).assertIsDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeToOpinion).assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsDisplayed()
     }
 

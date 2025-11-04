@@ -18,6 +18,7 @@ import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
+import xelagurd.socialdating.client.ui.navigation.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.ui.state.ProfileUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
 
@@ -62,9 +63,5 @@ class ProfileViewModel @Inject constructor(
 
             dataRequestStatusFlow.update { status }
         }
-    }
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
     }
 }

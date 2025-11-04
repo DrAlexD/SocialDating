@@ -22,10 +22,8 @@ import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
-import xelagurd.socialdating.client.data.model.DefiningTheme
-import xelagurd.socialdating.client.data.model.Statement
+import xelagurd.socialdating.client.data.remote.BAD_REQUEST
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
-import xelagurd.socialdating.client.ui.form.StatementFormData
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.StatementAddingViewModel
 
@@ -47,10 +45,9 @@ class StatementAddingViewModelTest {
     private val userId = 1
     private val categoryId = 1
 
-    private val localDefiningThemes = listOf(DefiningTheme(1, "", "", "", categoryId))
-
-    private val statementFormData = StatementFormData("", false, 1, 1)
-    private val statement = Statement(22, "", false, 1, 1)
+    private val localDefiningThemes = FakeData.definingThemes.take(3)
+    private val statementFormData = FakeData.statementFormData
+    private val statement = FakeData.statements[0]
 
     @Before
     fun setup() {
@@ -97,7 +94,7 @@ class StatementAddingViewModelTest {
         initViewModel()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILURE("400"), statementAddingUiState.actionRequestStatus)
+        assertEquals(RequestStatus.FAILURE(BAD_REQUEST.toString()), statementAddingUiState.actionRequestStatus)
     }
 
     @Test
@@ -131,27 +128,31 @@ class StatementAddingViewModelTest {
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>("userId") } returns userId
         every { savedStateHandle.get<Int>("categoryId") } returns categoryId
-        every { localDefiningThemesRepository.getDefiningThemes(categoryId) } returns
-                flowOf(localDefiningThemes)
+        every { localDefiningThemesRepository.getDefiningThemes(categoryId) } returns flowOf(localDefiningThemes)
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteStatementsRepository.addStatement(statementFormData.toStatementDetails()) } returns
-                Response.success(statement)
+        coEvery {
+            remoteStatementsRepository.addStatement(statementFormData.toStatementDetails())
+        } returns Response.success(statement)
         coEvery { localStatementsRepository.insertStatement(statement) } just Runs
     }
 
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteStatementsRepository.addStatement(statementFormData.toStatementDetails()) } returns
-                Response.error(400, "400".toResponseBody())
+        coEvery {
+            remoteStatementsRepository.addStatement(statementFormData.toStatementDetails())
+        } returns Response.error(BAD_REQUEST, BAD_REQUEST.toString().toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteStatementsRepository.addStatement(statementFormData.toStatementDetails()) } throws IOException()
+        coEvery {
+            remoteStatementsRepository.addStatement(statementFormData.toStatementDetails())
+        } throws IOException()
 
         // FixMe: remove after adding server hosting
-        every { localStatementsRepository.getStatements() } returns flowOf(listOf(FakeData.newStatement))
+        every { localStatementsRepository.getStatements() } returns flowOf(FakeData.statements)
+        coEvery { localStatementsRepository.insertStatement(FakeData.newStatement) } just Runs
     }
 }

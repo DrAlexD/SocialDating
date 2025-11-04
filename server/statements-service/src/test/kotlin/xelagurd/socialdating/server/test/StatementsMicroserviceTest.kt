@@ -11,6 +11,8 @@ import org.springframework.test.context.ActiveProfiles
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import xelagurd.socialdating.server.FakeStatementsData
+import xelagurd.socialdating.server.FakeStatementsData.filterByUserIdAndDefiningThemeIds
+import xelagurd.socialdating.server.FakeStatementsData.findUnreacted
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.UserStatement
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
@@ -69,14 +71,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     }
 
     private fun getStatements() {
-        val expected = mutableListOf<Statement>()
-        statements.forEach { statement ->
-            if (statement.definingThemeId in (definingThemeIds) &&
-                userStatements.none { it.statementId == statement.id && it.userId == userId }
-            ) {
-                expected.add(statement)
-            }
-        }
+        val expected = statements.findUnreacted(userId, definingThemeIds, userStatements)
         val response = restTemplate.getForEntity(
             "/api/v1/statements?userId=${userId}&definingThemeIds=${definingThemeIds.toRequestParams()}",
             Array<Statement>::class.java
@@ -87,14 +82,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     }
 
     private fun getUserStatements() {
-        val expected = mutableListOf<UserStatement>()
-        userStatements.forEach { userStatement ->
-            if (userStatement.userId == userId &&
-                statements.first { it.id == userStatement.statementId }.definingThemeId in (definingThemeIds)
-            ) {
-                expected.add(userStatement)
-            }
-        }
+        val expected = userStatements.filterByUserIdAndDefiningThemeIds(userId, definingThemeIds, statements)
         val response = restTemplate.getForEntity(
             "/api/v1/statements/users?userId=$userId&definingThemeIds=${definingThemeIds.toRequestParams()}",
             Array<UserStatement>::class.java

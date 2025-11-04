@@ -11,6 +11,8 @@ import org.springframework.test.context.ActiveProfiles
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import xelagurd.socialdating.server.FakeDefiningThemesData
+import xelagurd.socialdating.server.FakeDefiningThemesData.filterByCategoryId
+import xelagurd.socialdating.server.FakeDefiningThemesData.filterByUserId
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.UserDefiningTheme
 
@@ -73,7 +75,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
     }
 
     private fun getDefiningThemesByCategoryId() {
-        val expected = definingThemes.filter { it.categoryId == categoryId }
+        val expected = definingThemes.filterByCategoryId(categoryId)
         val response = restTemplate.getForEntity(
             "/api/v1/defining-themes?categoryId=$categoryId",
             Array<DefiningTheme>::class.java
@@ -94,7 +96,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
     }
 
     private fun getUserDefiningThemes() {
-        val expected = userDefiningThemes.filter { it.userId == userId }
+        val expected = userDefiningThemes.filterByUserId(userId)
         val response = restTemplate.getForEntity(
             "/api/v1/defining-themes/users?userId=$userId",
             Array<UserDefiningTheme>::class.java

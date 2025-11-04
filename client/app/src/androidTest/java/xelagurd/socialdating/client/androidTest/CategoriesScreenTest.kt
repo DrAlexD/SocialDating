@@ -11,7 +11,7 @@ import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
-import xelagurd.socialdating.client.data.model.Category
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.onNodeWithTagId
 import xelagurd.socialdating.client.ui.screen.CategoriesScreenComponent
 import xelagurd.socialdating.client.ui.state.CategoriesUiState
@@ -31,6 +31,8 @@ class CategoriesScreenTest {
         hiltRule.inject()
     }
 
+    private val categories = FakeData.categories
+
     @Test
     fun categoriesScreen_loadingStateAndEmptyData_loadingIndicator() {
         val categoriesUiState = CategoriesUiState()
@@ -42,7 +44,7 @@ class CategoriesScreenTest {
 
     @Test
     fun categoriesScreen_errorStateAndEmptyData_errorText() {
-        val errorText = "Error Text"
+        val errorText = FakeData.ERROR_TEXT
         val categoriesUiState = CategoriesUiState(
             dataRequestStatus = RequestStatus.ERROR(errorText)
         )
@@ -54,7 +56,7 @@ class CategoriesScreenTest {
 
     @Test
     fun categoriesScreen_failureStateAndEmptyData_failureText() {
-        val failureText = "Failure Text"
+        val failureText = FakeData.FAILURE_TEXT
         val categoriesUiState = CategoriesUiState(
             dataRequestStatus = RequestStatus.FAILURE(failureText)
         )
@@ -67,7 +69,7 @@ class CategoriesScreenTest {
     @Test
     fun categoriesScreen_loadingStateAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
-            entities = listOf(Category(1, "Category1")),
+            entities = categories,
             dataRequestStatus = RequestStatus.LOADING
         )
 
@@ -77,7 +79,7 @@ class CategoriesScreenTest {
     @Test
     fun categoriesScreen_errorStateAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
-            entities = listOf(Category(1, "Category1")),
+            entities = categories,
             dataRequestStatus = RequestStatus.ERROR()
         )
 
@@ -87,7 +89,7 @@ class CategoriesScreenTest {
     @Test
     fun categoriesScreen_failureStateAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
-            entities = listOf(Category(1, "Category1")),
+            entities = categories,
             dataRequestStatus = RequestStatus.FAILURE()
         )
 
@@ -97,7 +99,7 @@ class CategoriesScreenTest {
     @Test
     fun categoriesScreen_successStateAndData_displayedData() {
         val categoriesUiState = CategoriesUiState(
-            entities = listOf(Category(1, "Category1")),
+            entities = categories,
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
@@ -107,7 +109,7 @@ class CategoriesScreenTest {
     private fun assertDataIsDisplayed(categoriesUiState: CategoriesUiState) {
         setContentToCategoriesBody(categoriesUiState)
 
-        composeTestRule.onNodeWithText("Category1").assertIsDisplayed()
+        composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
     }
 
     private fun setContentToCategoriesBody(categoriesUiState: CategoriesUiState) {

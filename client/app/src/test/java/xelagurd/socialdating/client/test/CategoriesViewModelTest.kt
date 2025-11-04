@@ -19,8 +19,10 @@ import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.model.Category
+import xelagurd.socialdating.client.data.remote.NOT_FOUND
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.mergeListsAsSets
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -40,8 +42,8 @@ class CategoriesViewModelTest {
     private val categoriesUiState
         get() = viewModel.uiState.value
 
-    private val localCategories = listOf(Category(1, ""))
-    private val remoteCategories = listOf(Category(1, ""), Category(2, ""))
+    private val localCategories = FakeData.categories.take(3)
+    private val remoteCategories = FakeData.categories.take(5)
 
     @Before
     fun setup() {
@@ -198,7 +200,8 @@ class CategoriesViewModelTest {
 
     private fun mockEmptyData() {
         every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.getCategories() } returns Response.error(404, "404".toResponseBody())
+        coEvery { remoteRepository.getCategories() } returns
+                Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {

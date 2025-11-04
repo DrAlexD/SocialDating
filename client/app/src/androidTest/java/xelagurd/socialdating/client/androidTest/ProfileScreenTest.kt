@@ -12,10 +12,7 @@ import org.junit.Test
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.checkEnabledButton
-import xelagurd.socialdating.client.data.model.User
-import xelagurd.socialdating.client.data.model.enums.Gender
-import xelagurd.socialdating.client.data.model.enums.Purpose
-import xelagurd.socialdating.client.data.model.enums.Role
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.onNodeWithTagId
 import xelagurd.socialdating.client.onNodeWithTextId
 import xelagurd.socialdating.client.onNodeWithTextIdWithColon
@@ -37,6 +34,8 @@ class ProfileScreenTest {
         hiltRule.inject()
     }
 
+    private val user = FakeData.users[0]
+
     @Test
     fun profileScreen_loadingStateAndEmptyData_loadingIndicator() {
         val profileUiState = ProfileUiState()
@@ -48,8 +47,10 @@ class ProfileScreenTest {
 
     @Test
     fun profileScreen_errorStateAndEmptyData_errorText() {
-        val errorText = "Error Text"
-        val profileUiState = ProfileUiState(dataRequestStatus = RequestStatus.ERROR(errorText))
+        val errorText = FakeData.ERROR_TEXT
+        val profileUiState = ProfileUiState(
+            dataRequestStatus = RequestStatus.ERROR(errorText)
+        )
 
         setContentToProfileBody(profileUiState)
 
@@ -58,7 +59,7 @@ class ProfileScreenTest {
 
     @Test
     fun profileScreen_failureStateAndEmptyData_failureText() {
-        val failureText = "Failure Text"
+        val failureText = FakeData.FAILURE_TEXT
         val profileUiState = ProfileUiState(
             dataRequestStatus = RequestStatus.FAILURE(failureText)
         )
@@ -71,10 +72,7 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_loadingStateAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            entity = User(
-                1, "User1", Gender.MALE, "username1", "password1",
-                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50, Role.USER
-            ),
+            entity = user,
             dataRequestStatus = RequestStatus.LOADING
         )
 
@@ -84,10 +82,7 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_errorStateAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            entity = User(
-                1, "User1", Gender.MALE, "username1", "password1",
-                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50, Role.USER
-            ),
+            entity = user,
             dataRequestStatus = RequestStatus.ERROR()
         )
 
@@ -97,10 +92,7 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_failureStateAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            entity = User(
-                1, "User1", Gender.MALE, "username1", "password1",
-                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50, Role.USER
-            ),
+            entity = user,
             dataRequestStatus = RequestStatus.FAILURE()
         )
 
@@ -110,10 +102,7 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_successStateAndData_displayedData() {
         val profileUiState = ProfileUiState(
-            entity = User(
-                1, "User1", Gender.MALE, "username1", "password1",
-                "email1@gmail.com", 30, "Moscow", Purpose.ALL_AT_ONCE, 50, Role.USER
-            ),
+            entity = user,
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
@@ -129,10 +118,10 @@ class ProfileScreenTest {
         composeTestRule.onNodeWithTextIdWithColon(R.string.city).assertIsDisplayed()
         composeTestRule.onNodeWithTextIdWithColon(R.string.purpose).assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("username1").assertIsDisplayed()
-        composeTestRule.onNodeWithText("User1").assertIsDisplayed()
-        composeTestRule.onNodeWithText("30").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Moscow").assertIsDisplayed()
+        composeTestRule.onNodeWithText(user.username).assertIsDisplayed()
+        composeTestRule.onNodeWithText(user.name).assertIsDisplayed()
+        composeTestRule.onNodeWithText(user.age.toString()).assertIsDisplayed()
+        composeTestRule.onNodeWithText(user.city).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.all_at_once).assertIsDisplayed()
 
         composeTestRule.onNodeWithTextId(R.string.open_profile_statistics).checkEnabledButton()
