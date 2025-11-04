@@ -19,7 +19,6 @@ import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.onNodeWithTagId
 import xelagurd.socialdating.client.onNodeWithTextId
 import xelagurd.socialdating.client.onNodeWithTextIdWithColon
-import xelagurd.socialdating.client.ui.form.StatementFormData
 import xelagurd.socialdating.client.ui.screen.StatementAddingScreenComponent
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.StatementAddingUiState
@@ -38,8 +37,11 @@ class StatementAddingScreenTest {
         hiltRule.inject()
     }
 
+    private val definingThemes = FakeData.definingThemes
+    private val statementFormData = FakeData.statementFormData
+
     @Test
-    fun statementAddingScree_loadingStateAndEmptyDefiningThemes_assertContentIsDisplayed() {
+    fun statementAddingScreen_loadingStateAndEmptyDefiningThemes_assertContentIsDisplayed() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.LOADING
         )
@@ -50,8 +52,8 @@ class StatementAddingScreenTest {
     }
 
     @Test
-    fun statementAddingScree_failureStateAndEmptyDefiningThemes_assertContentIsDisplayed() {
-        val failureText = "Failure Text"
+    fun statementAddingScreen_failureStateAndEmptyDefiningThemes_assertContentIsDisplayed() {
+        val failureText = FakeData.FAILURE_TEXT
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.FAILURE(failureText)
         )
@@ -65,26 +67,26 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_allDefiningThemes_assertContentIsDisplayed() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeData.definingThemes,
-            formData = StatementFormData("StatementText1", true, null, 1)
+            entities = definingThemes,
+            formData = statementFormData.copy(definingThemeId = null)
         )
 
         assertContentIsDisplayed(statementAddingUiState)
-        composeTestRule.onNodeWithText(FakeData.definingThemes[0].name).assertIsDisplayed()
-        composeTestRule.onNodeWithText(FakeData.definingThemes[1].name).assertIsDisplayed()
+        composeTestRule.onNodeWithText(definingThemes[0].name).assertIsDisplayed()
+        composeTestRule.onNodeWithText(definingThemes[1].name).assertIsDisplayed()
     }
 
     @Test
     fun statementAddingScreen_chosenDefiningTheme_assertContentIsDisplayed() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeData.definingThemes,
-            formData = StatementFormData("StatementText1", true, 1, 1)
+            entities = definingThemes,
+            formData = statementFormData
         )
 
         assertContentIsDisplayed(statementAddingUiState)
-        composeTestRule.onNodeWithText(FakeData.definingThemes[0].name).assertIsDisplayed()
-        composeTestRule.onNodeWithText(FakeData.definingThemes[1].name).assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(definingThemes[0].name).assertIsDisplayed()
+        composeTestRule.onNodeWithText(definingThemes[1].name).assertIsNotDisplayed()
     }
 
     @Test
@@ -101,7 +103,7 @@ class StatementAddingScreenTest {
 
     @Test
     fun statementAddingScreen_failureState_failureText() {
-        val failureText = "Failure Text"
+        val failureText = FakeData.FAILURE_TEXT
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
             actionRequestStatus = RequestStatus.FAILURE(failureText)
@@ -114,7 +116,7 @@ class StatementAddingScreenTest {
 
     @Test
     fun statementAddingScreen_errorState_errorText() {
-        val errorText = "Error Text"
+        val errorText = FakeData.ERROR_TEXT
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
             actionRequestStatus = RequestStatus.ERROR(errorText)
@@ -129,8 +131,9 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptyData_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeData.definingThemes,
-            formData = StatementFormData("", null, null, 1)
+            entities = definingThemes,
+            formData = statementFormData.copy(text = "", isSupportDefiningTheme = null, definingThemeId = null,
+                creatorUserId = null)
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)
@@ -140,8 +143,8 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_allData_enabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeData.definingThemes,
-            formData = StatementFormData("StatementText1", true, 1, 1)
+            entities = definingThemes,
+            formData = statementFormData
         )
 
         assertAddStatementButtonIsEnabled(statementAddingUiState)
@@ -151,8 +154,8 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptyStatementText_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeData.definingThemes,
-            formData = StatementFormData("", true, 1, 1)
+            entities = definingThemes,
+            formData = statementFormData.copy(text = "")
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)
@@ -162,8 +165,8 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptySupportDefiningTheme_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeData.definingThemes,
-            formData = StatementFormData("StatementText1", null, 1, 1)
+            entities = definingThemes,
+            formData = statementFormData.copy(isSupportDefiningTheme = null)
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)
@@ -173,8 +176,8 @@ class StatementAddingScreenTest {
     fun statementAddingScreen_emptyDefiningTheme_disabledButton() {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
-            entities = FakeData.definingThemes,
-            formData = StatementFormData("StatementText1", true, null, 1)
+            entities = definingThemes,
+            formData = statementFormData.copy(definingThemeId = null)
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)
@@ -199,8 +202,7 @@ class StatementAddingScreenTest {
 
         composeTestRule.onNodeWithTextIdWithColon(R.string.defining_theme).assertIsDisplayed()
 
-        composeTestRule.onNodeWithTextId(R.string.is_support_defining_theme)
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.is_support_defining_theme).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.yes).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.no).assertIsDisplayed()
     }

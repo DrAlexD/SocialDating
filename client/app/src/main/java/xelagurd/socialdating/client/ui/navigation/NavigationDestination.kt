@@ -5,6 +5,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.PreferencesRepository.Defaults.CURRENT_USER_ID_DEFAULT
 
+const val TIMEOUT_MILLIS = 5_000L
+
 abstract class NavigationDestination {
     abstract val route: String
     abstract val topLevelRoute: String

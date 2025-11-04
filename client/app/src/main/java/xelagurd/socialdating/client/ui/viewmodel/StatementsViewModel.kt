@@ -17,11 +17,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.fake.FakeData.filterUserStatementsByUserId
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserStatementsRepository
 import xelagurd.socialdating.client.data.model.Statement
-import xelagurd.socialdating.client.data.model.UserStatement
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
@@ -29,6 +29,7 @@ import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepos
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserStatementsRepository
 import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.StatementsDestination
+import xelagurd.socialdating.client.ui.navigation.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.StatementsUiState
 
@@ -83,20 +84,14 @@ class StatementsViewModel @Inject constructor(
 
                 val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
                 val (remoteStatements, statusStatements) = safeApiCall(context) {
-                    remoteStatementsRepository.getStatements(
-                        userId,
-                        remoteDefiningThemeIds
-                    )
+                    remoteStatementsRepository.getStatements(userId, remoteDefiningThemeIds)
                 }
 
                 if (remoteStatements != null) {
                     localStatementsRepository.insertStatements(remoteStatements)
 
                     val (remoteUserStatements, statusUserStatements) = safeApiCall(context) {
-                        remoteUserStatementsRepository.getUserStatements(
-                            userId,
-                            remoteDefiningThemeIds
-                        )
+                        remoteUserStatementsRepository.getUserStatements(userId, remoteDefiningThemeIds)
                     }
 
                     if (remoteUserStatements != null) {
@@ -119,7 +114,9 @@ class StatementsViewModel @Inject constructor(
                     localStatementsRepository.insertStatements(FakeData.statements)
                 }
                 if (localUserStatementsRepository.getUserStatements().first().isEmpty()) {
-                    localUserStatementsRepository.insertUserStatements(FakeData.userStatements)
+                    localUserStatementsRepository.insertUserStatements(
+                        FakeData.userStatements.filterUserStatementsByUserId()
+                    )
                 }
             }
 
@@ -147,24 +144,13 @@ class StatementsViewModel @Inject constructor(
             }
 
             if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
-                val userStatements = localUserStatementsRepository.getUserStatements().first()
-                localUserStatementsRepository.insertUserStatements(
-                    listOf(
-                        UserStatement(
-                            id = userStatements.last().id + 1,
-                            reactionType = reactionType,
-                            userId = userId,
-                            statementId = statement.id
-                        )
-                    )
-                )
+                if (!localUserStatementsRepository.getUserStatements().first().map { it.id }
+                        .contains(FakeData.newUserStatement.id)) {
+                    localUserStatementsRepository.insertUserStatements(listOf(FakeData.newUserStatement))
+                }
             }
 
             // TODO: implement action on error
         }
-    }
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
     }
 }

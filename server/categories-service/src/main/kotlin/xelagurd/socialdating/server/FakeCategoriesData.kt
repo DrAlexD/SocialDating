@@ -61,8 +61,10 @@ object FakeCategoriesData {
             isSupportDefiningTheme = true
         )
 
-    fun List<Category>.withNullIds(): List<Category> =
+    fun List<Category>.withNullIds() =
         this.map {
             Category(name = it.name)
         }
+
+    fun List<UserCategory>.filterByUserId(userId: Int) = this.filter { it.userId == userId }
 }

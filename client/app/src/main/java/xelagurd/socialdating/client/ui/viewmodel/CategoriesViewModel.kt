@@ -18,6 +18,7 @@ import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.data.remote.safeApiCall
+import xelagurd.socialdating.client.ui.navigation.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.ui.state.CategoriesUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
 
@@ -65,9 +66,5 @@ class CategoriesViewModel @Inject constructor(
 
             dataRequestStatusFlow.update { status }
         }
-    }
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
     }
 }

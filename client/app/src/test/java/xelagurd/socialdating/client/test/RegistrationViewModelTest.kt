@@ -21,15 +21,9 @@ import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
-import xelagurd.socialdating.client.data.model.User
-import xelagurd.socialdating.client.data.model.additional.AuthResponse
 import xelagurd.socialdating.client.data.model.details.RegistrationDetails
-import xelagurd.socialdating.client.data.model.enums.Gender
-import xelagurd.socialdating.client.data.model.enums.Purpose
-import xelagurd.socialdating.client.data.model.enums.Role
+import xelagurd.socialdating.client.data.remote.BAD_REQUEST
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
-import xelagurd.socialdating.client.ui.form.LoginFormData
-import xelagurd.socialdating.client.ui.form.RegistrationFormData
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.RegistrationViewModel
 
@@ -48,11 +42,8 @@ class RegistrationViewModelTest {
     private val registrationUiState
         get() = viewModel.uiState.value
 
-    private val registrationFormData =
-        RegistrationFormData("", Gender.MALE, "", "", "", "", "1", "", Purpose.ALL_AT_ONCE)
-    private val remoteUser =
-        User(1, "", Gender.FEMALE, "", "", "", 40, "", Purpose.RELATIONSHIPS, 20, Role.USER)
-    private val authResponse = AuthResponse(remoteUser, "", "")
+    private val registrationFormData = FakeData.registrationFormData
+    private val authResponse = FakeData.authResponse
 
     private fun initViewModel() {
         viewModel = RegistrationViewModel(
@@ -94,7 +85,7 @@ class RegistrationViewModelTest {
         initViewModel()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILURE("400"), registrationUiState.actionRequestStatus)
+        assertEquals(RequestStatus.FAILURE(BAD_REQUEST.toString()), registrationUiState.actionRequestStatus)
     }
 
     @Test
@@ -140,7 +131,7 @@ class RegistrationViewModelTest {
     private fun mockWrongData() {
         every { context.getString(any()) } returns ""
         coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns
-                Response.error(400, "400".toResponseBody())
+                Response.error(BAD_REQUEST, BAD_REQUEST.toString().toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {
@@ -148,14 +139,7 @@ class RegistrationViewModelTest {
         coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } throws IOException()
 
         // FixMe: remove after adding server hosting
-        coEvery {
-            accountManager.saveCredentials(
-                LoginFormData(
-                    FakeData.users[0].username,
-                    FakeData.users[0].password
-                )
-            )
-        } just Runs
+        coEvery { accountManager.saveCredentials(registrationFormData.toLoginFormData()) } just Runs
         every { localRepository.getUsers() } returns flowOf(listOf(FakeData.users[0]))
         coEvery { preferencesRepository.saveCurrentUserId(FakeData.users[0].id) } just Runs
     }

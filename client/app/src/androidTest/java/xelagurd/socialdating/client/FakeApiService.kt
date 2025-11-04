@@ -2,6 +2,9 @@ package xelagurd.socialdating.client
 
 import retrofit2.Response
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.fake.FakeData.filterUserCategoriesByUserId
+import xelagurd.socialdating.client.data.fake.FakeData.filterUserDefiningThemesByUserId
+import xelagurd.socialdating.client.data.fake.FakeData.filterUserStatementsByUserId
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.Statement
@@ -15,19 +18,19 @@ import xelagurd.socialdating.client.data.remote.ApiService
 
 class FakeApiService : ApiService {
     override suspend fun getUser(userId: Int): Response<User> =
-        Response.success(FakeData.users[0])
+        Response.success(FakeData.mainUser)
 
     override suspend fun getCategories(): Response<List<Category>> =
         Response.success(FakeData.categories)
 
     override suspend fun getUserCategories(userId: Int): Response<List<UserCategory>> =
-        Response.success(FakeData.userCategories)
+        Response.success(FakeData.userCategories.filterUserCategoriesByUserId())
 
     override suspend fun getDefiningThemes(categoryId: Int?): Response<List<DefiningTheme>> =
         Response.success(FakeData.definingThemes)
 
     override suspend fun getUserDefiningThemes(userId: Int): Response<List<UserDefiningTheme>> =
-        Response.success(FakeData.userDefiningThemes)
+        Response.success(FakeData.userDefiningThemes.filterUserDefiningThemesByUserId())
 
     override suspend fun getStatements(
         userId: Int,
@@ -39,7 +42,7 @@ class FakeApiService : ApiService {
         userId: Int,
         definingThemeIds: List<Int>
     ): Response<List<UserStatement>> =
-        Response.success(FakeData.userStatements)
+        Response.success(FakeData.userStatements.filterUserStatementsByUserId())
 
     override suspend fun addStatement(statementDetails: StatementDetails): Response<Statement> =
         Response.success(FakeData.newStatement)

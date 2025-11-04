@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import xelagurd.socialdating.server.FakeCategoriesData
+import xelagurd.socialdating.server.FakeCategoriesData.filterByUserId
 import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.model.UserCategory
 
@@ -77,7 +78,7 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     }
 
     private fun getUserCategories() {
-        val expected = userCategories.filter { it.userId == userId }
+        val expected = userCategories.filterByUserId(userId)
         val response = restTemplate.getForEntity(
             "/api/v1/categories/users?userId=$userId",
             Array<UserCategory>::class.java

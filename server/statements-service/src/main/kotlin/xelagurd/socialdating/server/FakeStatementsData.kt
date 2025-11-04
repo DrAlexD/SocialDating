@@ -114,7 +114,7 @@ object FakeStatementsData {
         isSupportDefiningTheme = true
     )
 
-    fun List<Statement>.withNullIds(): List<Statement> =
+    fun List<Statement>.withNullIds() =
         this.map {
             Statement(
                 text = it.text,
@@ -123,4 +123,36 @@ object FakeStatementsData {
                 creatorUserId = it.creatorUserId
             )
         }
+
+    fun List<Statement>.findUnreacted(
+        userId: Int,
+        definingThemeIds: List<Int>,
+        userStatements: List<UserStatement>
+    ): List<Statement> {
+        val expected = mutableListOf<Statement>()
+        forEach { statement ->
+            if (statement.definingThemeId in (definingThemeIds) &&
+                userStatements.none { it.statementId == statement.id && it.userId == userId }
+            ) {
+                expected.add(statement)
+            }
+        }
+        return expected.toList()
+    }
+
+    fun List<UserStatement>.filterByUserIdAndDefiningThemeIds(
+        userId: Int,
+        definingThemeIds: List<Int>,
+        statements: List<Statement>
+    ): List<UserStatement> {
+        val expected = mutableListOf<UserStatement>()
+        forEach { userStatement ->
+            if (userStatement.userId == userId &&
+                statements.first { it.id == userStatement.statementId }.definingThemeId in (definingThemeIds)
+            ) {
+                expected.add(userStatement)
+            }
+        }
+        return expected.toList()
+    }
 }
