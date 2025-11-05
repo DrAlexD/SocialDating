@@ -14,13 +14,11 @@ class DevelopmentConfig {
     @Bean
     fun dataLoader(
         definingThemesRepository: DefiningThemesRepository
-    ): CommandLineRunner {
-        return CommandLineRunner {
-            val existingDefiningThemes = definingThemesRepository.findAll().toList()
+    ) = CommandLineRunner {
+        val existingDefiningThemes = definingThemesRepository.findAll().toList()
 
-            if (existingDefiningThemes.isEmpty()) {
-                definingThemesRepository.saveAll(FakeDefiningThemesData.definingThemes.withNullIds())
-            }
+        if (existingDefiningThemes.isEmpty()) {
+            definingThemesRepository.saveAll(FakeDefiningThemesData.definingThemes.withNullIds())
         }
     }
 }

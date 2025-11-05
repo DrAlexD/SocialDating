@@ -3,15 +3,16 @@ package xelagurd.socialdating.server.model.details
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.PositiveOrZero
+import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.UserDefiningTheme
 
 data class UserDefiningThemeDetails(
     @field:PositiveOrZero
-    @field:Max(100)
+    @field:Max(PERCENT_MAX.toLong())
     val value: Int,
 
     @field:PositiveOrZero
-    @field:Max(100)
+    @field:Max(PERCENT_MAX.toLong())
     val interest: Int,
 
     @field:Positive

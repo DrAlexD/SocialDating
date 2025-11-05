@@ -3,11 +3,12 @@ package xelagurd.socialdating.server.model.details
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.PositiveOrZero
+import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.UserCategory
 
 data class UserCategoryDetails(
     @field:PositiveOrZero
-    @field:Max(100)
+    @field:Max(PERCENT_MAX.toLong())
     var interest: Int,
 
     @field:Positive

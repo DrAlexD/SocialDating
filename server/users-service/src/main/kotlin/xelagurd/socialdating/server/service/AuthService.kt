@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.additional.AuthResponse
 import xelagurd.socialdating.server.model.details.LoginDetails
@@ -39,6 +40,7 @@ class AuthService(
         return AuthResponse(user, accessToken, refreshToken)
     }
 
+    @Transactional
     fun registerUser(registrationDetails: RegistrationDetails): AuthResponse {
         if (usersRepository.findByUsername(registrationDetails.username) != null) {
             throw IllegalArgumentException("User with username ${registrationDetails.username} already exists")

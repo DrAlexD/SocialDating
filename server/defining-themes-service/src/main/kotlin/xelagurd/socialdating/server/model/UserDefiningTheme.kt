@@ -8,6 +8,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_INTEREST_STEP
+import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 
 @Entity(name = "user_defining_themes")
 @Table(
@@ -21,10 +23,13 @@ class UserDefiningTheme(
     @field:GeneratedValue(GenerationType.IDENTITY)
     var id: Int? = null,
 
-    @field:Column(name = "udt_value", columnDefinition = "integer check (udt_value between 0 and 100)")
+    @field:Column(
+        name = "udt_value",
+        columnDefinition = "integer check (udt_value between $PERCENT_MIN and $PERCENT_MAX)"
+    )
     var value: Int,
 
-    @field:Column(columnDefinition = "integer check (interest between 0 and 100)")
+    @field:Column(columnDefinition = "integer check (interest between $PERCENT_MIN and $PERCENT_MAX)")
     var interest: Int = DEFINING_THEME_INTEREST_STEP,
 
     var userId: Int,

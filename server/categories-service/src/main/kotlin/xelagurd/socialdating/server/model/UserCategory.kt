@@ -8,6 +8,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
 import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_STEP
+import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 
 @Entity(name = "user_categories")
 @Table(
@@ -21,7 +23,7 @@ class UserCategory(
     @field:GeneratedValue(GenerationType.IDENTITY)
     var id: Int? = null,
 
-    @field:Column(columnDefinition = "integer check (interest between 0 and 100)")
+    @field:Column(columnDefinition = "integer check (interest between $PERCENT_MIN and $PERCENT_MAX)")
     var interest: Int = CATEGORY_INTEREST_STEP,
 
     var userId: Int,
