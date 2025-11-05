@@ -8,9 +8,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.Statement
-import xelagurd.socialdating.server.model.details.StatementDetails
 import xelagurd.socialdating.server.repository.StatementsRepository
 import xelagurd.socialdating.server.service.StatementsService
 
@@ -25,36 +24,10 @@ class StatementsServiceUnitTest {
     private val userId = 1
     private val definingThemeIds = listOf(1, 3)
 
-    private val statements = listOf(
-        Statement(
-            id = 1,
-            text = "RemoteStatement1",
-            isSupportDefiningTheme = true,
-            definingThemeId = 1,
-            creatorUserId = userId
-        ),
-        Statement(
-            id = 2,
-            text = "RemoteStatement2",
-            isSupportDefiningTheme = true,
-            definingThemeId = 2,
-            creatorUserId = userId
-        ),
-        Statement(
-            id = 3,
-            text = "RemoteStatement3",
-            isSupportDefiningTheme = true,
-            definingThemeId = 3,
-            creatorUserId = userId
-        )
-    )
+    private val statements = FakeStatementsData.statements
 
-    private val statementDetails = StatementDetails(
-        text = "RemoteStatement1",
-        isSupportDefiningTheme = true,
-        definingThemeId = 1,
-        creatorUserId = userId
-    )
+    private val statementDetails = FakeStatementsData.statementsDetails[0]
+    private val statement = statements[0]
 
     @BeforeEach
     fun setup() {
@@ -62,8 +35,8 @@ class StatementsServiceUnitTest {
     }
 
     @Test
-    fun getStatementsByDefiningThemeIds_allData_success() {
-        val expected = statements.filter { it.definingThemeId in definingThemeIds }
+    fun getStatements_allData_success() {
+        val expected = statements
         every { statementsRepository.findUnreactedStatements(userId, definingThemeIds) } returns expected
 
         val result = statementsService.getStatements(userId, definingThemeIds)
@@ -72,7 +45,7 @@ class StatementsServiceUnitTest {
     }
 
     @Test
-    fun getStatementsByDefiningThemeIds_emptyData_error() {
+    fun getStatements_emptyData_error() {
         every { statementsRepository.findUnreactedStatements(userId, definingThemeIds) } returns emptyList()
 
         assertThrows<NoDataFoundException> { statementsService.getStatements(userId, definingThemeIds) }
@@ -80,7 +53,7 @@ class StatementsServiceUnitTest {
 
     @Test
     fun addStatement() {
-        val expected = statements[0]
+        val expected = statement
         every { statementsRepository.save(statementDetails.toStatement()) } returns expected
 
         val result = statementsService.addStatement(statementDetails)

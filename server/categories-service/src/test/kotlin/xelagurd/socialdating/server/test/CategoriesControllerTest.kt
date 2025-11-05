@@ -12,10 +12,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
+import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.controller.CategoriesController
 import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.Category
-import xelagurd.socialdating.server.model.details.CategoryDetails
 import xelagurd.socialdating.server.service.CategoriesService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 
@@ -26,12 +25,10 @@ class CategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc) {
     @MockitoBean
     private lateinit var categoriesService: CategoriesService
 
-    private val categories = listOf(
-        Category(id = 1, name = "RemoteCategory1"),
-        Category(id = 2, name = "RemoteCategory2"),
-        Category(id = 3, name = "RemoteCategory3")
-    )
-    private val categoryDetails = CategoryDetails(name = "RemoteCategory1")
+    private val categories = FakeCategoriesData.categories
+
+    private val categoryDetails = FakeCategoriesData.categoriesDetails[0]
+    private val category = categories[0]
 
     @Test
     fun getCategories_allData_success() {
@@ -60,7 +57,7 @@ class CategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     @Test
     fun addCategory() {
-        val expected = categories[0]
+        val expected = category
         `when`(categoriesService.addCategory(categoryDetails)).thenReturn(expected)
 
         mockMvc.perform(

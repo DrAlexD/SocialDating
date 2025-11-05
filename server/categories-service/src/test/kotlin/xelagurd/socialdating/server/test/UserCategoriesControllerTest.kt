@@ -12,10 +12,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
+import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.controller.UserCategoriesController
 import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.service.UserCategoriesService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 
@@ -28,17 +27,14 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     private val userId = 1
 
-    private val userCategories = listOf(
-        UserCategory(id = 1, interest = 10, userId = 1, categoryId = 1),
-        UserCategory(id = 2, interest = 15, userId = 1, categoryId = 2),
-        UserCategory(id = 3, interest = 20, userId = 2, categoryId = 3)
-    )
+    private val userCategories = FakeCategoriesData.userCategories
 
-    private val userCategoryDetails = UserCategoryDetails(interest = 10, userId = 1, categoryId = 1)
+    private val userCategoryDetails = FakeCategoriesData.userCategoriesDetails[0]
+    private val userCategory = userCategories[0]
 
     @Test
     fun getUserCategories_allData_success() {
-        val expected = userCategories.filter { it.userId == userId }
+        val expected = userCategories
         `when`(userCategoriesService.getUserCategories(userId)).thenReturn(expected)
 
         mockMvc.perform(
@@ -63,7 +59,7 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     @Test
     fun addUserCategory() {
-        val expected = userCategories[0]
+        val expected = userCategory
         `when`(userCategoriesService.addUserCategory(userCategoryDetails)).thenReturn(expected)
 
         mockMvc.perform(

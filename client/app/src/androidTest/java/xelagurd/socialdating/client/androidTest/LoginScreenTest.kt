@@ -14,9 +14,9 @@ import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.checkDisabledButton
 import xelagurd.socialdating.client.checkEnabledButton
 import xelagurd.socialdating.client.checkTextField
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.onNodeWithTagId
 import xelagurd.socialdating.client.onNodeWithTextId
-import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.screen.LoginScreenComponent
 import xelagurd.socialdating.client.ui.state.LoginUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -35,6 +35,8 @@ class LoginScreenTest {
         hiltRule.inject()
     }
 
+    private val loginFormData = FakeData.loginFormData
+
     @Test
     fun loginScreen_assertContentIsDisplayed() {
         val loginUiState = LoginUiState()
@@ -44,7 +46,9 @@ class LoginScreenTest {
 
     @Test
     fun loginScreen_loadingState_loadingIndicator() {
-        val loginUiState = LoginUiState(actionRequestStatus = RequestStatus.LOADING)
+        val loginUiState = LoginUiState(
+            actionRequestStatus = RequestStatus.LOADING
+        )
 
         setContentToLoginBody(loginUiState)
 
@@ -53,8 +57,10 @@ class LoginScreenTest {
 
     @Test
     fun loginScreen_failureState_failureText() {
-        val failureText = "Failure Text"
-        val loginUiState = LoginUiState(actionRequestStatus = RequestStatus.FAILURE(failureText))
+        val failureText = FakeData.FAILURE_TEXT
+        val loginUiState = LoginUiState(
+            actionRequestStatus = RequestStatus.FAILURE(failureText)
+        )
 
         setContentToLoginBody(loginUiState)
 
@@ -63,8 +69,10 @@ class LoginScreenTest {
 
     @Test
     fun loginScreen_errorState_errorText() {
-        val errorText = "Error Text"
-        val loginUiState = LoginUiState(actionRequestStatus = RequestStatus.ERROR(errorText))
+        val errorText = FakeData.ERROR_TEXT
+        val loginUiState = LoginUiState(
+            actionRequestStatus = RequestStatus.ERROR(errorText)
+        )
 
         setContentToLoginBody(loginUiState)
 
@@ -74,7 +82,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyData_disabledButton() {
         val loginUiState = LoginUiState(
-            formData = LoginFormData("", "")
+            formData = loginFormData.copy(username = "", password = "")
         )
 
         assertLoginButtonIsDisabled(loginUiState)
@@ -83,7 +91,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_allData_enabledButton() {
         val loginUiState = LoginUiState(
-            formData = LoginFormData("login", "password")
+            formData = loginFormData
         )
 
         assertLoginButtonIsEnabled(loginUiState)
@@ -92,7 +100,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyUsername_disabledButton() {
         val loginUiState = LoginUiState(
-            formData = LoginFormData("", "password")
+            formData = loginFormData.copy(username = "")
         )
 
         assertLoginButtonIsDisabled(loginUiState)
@@ -101,7 +109,7 @@ class LoginScreenTest {
     @Test
     fun loginScreen_emptyPassword_disabledButton() {
         val loginUiState = LoginUiState(
-            formData = LoginFormData("login", "")
+            formData = loginFormData.copy(password = "")
         )
 
         assertLoginButtonIsDisabled(loginUiState)

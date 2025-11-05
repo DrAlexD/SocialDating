@@ -10,11 +10,11 @@ import xelagurd.socialdating.client.data.remote.AuthApiService
 
 class FakeAuthApiService : AuthApiService {
     override suspend fun loginUser(loginDetails: LoginDetails): Response<AuthResponse> =
-        Response.success(AuthResponse(FakeData.users[0], "", ""))
+        Response.success(AuthResponse(FakeData.mainUser, "", ""))
 
     override suspend fun registerUser(registrationDetails: RegistrationDetails): Response<AuthResponse> =
-        Response.success(AuthResponse(FakeData.users[0], "", ""))
+        Response.success(AuthResponse(FakeData.mainUser, "", ""))
 
     override suspend fun refreshToken(refreshTokenDetails: RefreshTokenDetails): Response<AuthResponse> =
-        Response.success(AuthResponse(FakeData.users[0], "", ""))
+        Response.success(AuthResponse(FakeData.mainUser, "", ""))
 }

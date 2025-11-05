@@ -11,7 +11,7 @@ class DefiningThemesService(
     private val definingThemesRepository: DefiningThemesRepository
 ) {
 
-    fun getDefiningThemes(categoryId: Int?): List<DefiningTheme> {
+    fun getDefiningThemes(categoryId: Int? = null): List<DefiningTheme> {
         val definingThemes = categoryId?.let { definingThemesRepository.findAllByCategoryId(it) }
             ?: definingThemesRepository.findAll()
 

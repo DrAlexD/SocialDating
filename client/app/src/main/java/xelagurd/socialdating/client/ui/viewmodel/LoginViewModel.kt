@@ -98,19 +98,13 @@ class LoginViewModel @Inject constructor(
         }
 
         if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
-            accountManager.saveCredentials(
-                LoginFormData(
-                    FakeData.users[0].username,
-                    FakeData.users[0].password
-                )
-            )
+            accountManager.saveCredentials(LoginFormData(FakeData.mainUser.username, "password1"))
 
-            if (!localRepository.getUsers().first().map { it.id }
-                    .contains(FakeData.users[0].id)) {
-                localRepository.insertUser(FakeData.users[0])
+            if (!localRepository.getUsers().first().map { it.id }.contains(FakeData.mainUser.id)) {
+                localRepository.insertUser(FakeData.mainUser)
             }
 
-            preferencesRepository.saveCurrentUserId(FakeData.users[0].id)
+            preferencesRepository.saveCurrentUserId(FakeData.mainUser.id)
 
             status = RequestStatus.SUCCESS
         }

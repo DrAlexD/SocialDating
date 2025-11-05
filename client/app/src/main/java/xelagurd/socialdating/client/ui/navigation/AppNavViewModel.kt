@@ -20,8 +20,4 @@ class AppNavViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = runBlocking { preferencesRepository.currentUserId.first() }
         )
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
 }

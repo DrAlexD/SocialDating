@@ -9,4 +9,7 @@ plugins {
 dependencies {
     api(libs.bundles.kotlin.ecosystem)
     api(libs.bundles.spring.ecosystem)
+
+    testImplementation(libs.kotlin.test.junit5)
+    testImplementation(libs.spring.boot.test)
 }

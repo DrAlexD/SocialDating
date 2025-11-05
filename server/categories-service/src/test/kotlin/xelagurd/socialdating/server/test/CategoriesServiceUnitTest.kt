@@ -8,9 +8,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.Category
-import xelagurd.socialdating.server.model.details.CategoryDetails
 import xelagurd.socialdating.server.repository.CategoriesRepository
 import xelagurd.socialdating.server.service.CategoriesService
 
@@ -22,12 +21,10 @@ class CategoriesServiceUnitTest {
     @InjectMockKs
     private lateinit var categoriesService: CategoriesService
 
-    private val categories = listOf(
-        Category(id = 1, name = "RemoteCategory1"),
-        Category(id = 2, name = "RemoteCategory2"),
-        Category(id = 3, name = "RemoteCategory3")
-    )
-    private val categoryDetails = CategoryDetails(name = "RemoteCategory1")
+    private val categories = FakeCategoriesData.categories
+
+    private val categoryDetails = FakeCategoriesData.categoriesDetails[0]
+    private val category = categories[0]
 
     @BeforeEach
     fun setup() {
@@ -53,7 +50,7 @@ class CategoriesServiceUnitTest {
 
     @Test
     fun addCategory() {
-        val expected = categories[0]
+        val expected = category
         every { categoriesRepository.save(categoryDetails.toCategory()) } returns expected
 
         val result = categoriesService.addCategory(categoryDetails)
