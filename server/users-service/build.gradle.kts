@@ -19,9 +19,5 @@ dependencies {
 
     runtimeOnly(libs.postgresql)
 
-    testImplementation(libs.h2database)
-
-    testImplementation(libs.kotlin.test.junit5)
-    testImplementation(libs.spring.boot.test)
-    testImplementation(libs.mockk)
+    testImplementation(libs.bundles.testing.ecosystem)
 }

@@ -5,11 +5,13 @@ import kotlin.test.assertEquals
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.FakeDefiningThemesData.filterByCategoryId
 import xelagurd.socialdating.server.FakeDefiningThemesData.filterByUserId
@@ -104,5 +106,15 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(expected.size, response.body!!.size)
         assertContentEquals(expected.toTypedArray(), response.body!!)
+    }
+
+    companion object {
+        @ServiceConnection
+        val postgresContainer = PostgreSQLContainer("postgres:18")
+            .apply {
+                withDatabaseName("test_db")
+                withUsername("test_user")
+                withPassword("test_password")
+            }
     }
 }
