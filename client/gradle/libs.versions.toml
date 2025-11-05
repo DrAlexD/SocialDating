@@ -1,8 +1,8 @@
 [versions]
-activityCompose = "1.10.1"
+activityCompose = "1.10.1" # fixed due to API 35
 agp = "8.13.0"
-composeBomVersion = "2025.09.00"
-coreKtx = "1.16.0"
+composeBomVersion = "2025.09.00" # fixed due to using Icons class
+coreKtx = "1.16.0" # fixed due to API 35
 credentials = "1.6.0-beta03"
 datastorePreferences = "1.1.7"
 hilt = "2.57.2"
@@ -11,7 +11,7 @@ kotlin = "2.2.21"
 kotlinxSerializationJson = "1.9.0"
 ksp = "2.3.0"
 lifecycle = "2.9.4"
-okhttp = "5.2.1"
+okhttp = "5.3.0"
 retrofit = "3.0.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 roomKtx = "2.8.3"
