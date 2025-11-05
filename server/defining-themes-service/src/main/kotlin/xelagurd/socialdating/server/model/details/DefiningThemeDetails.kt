@@ -3,19 +3,20 @@ package xelagurd.socialdating.server.model.details
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
+import xelagurd.socialdating.server.model.DefaultDataProperties.LENGTH_MAX
 import xelagurd.socialdating.server.model.DefiningTheme
 
 data class DefiningThemeDetails(
     @field:NotBlank
-    @field:Size(max = 100)
+    @field:Size(max = LENGTH_MAX)
     val name: String,
 
     @field:NotBlank
-    @field:Size(max = 100)
+    @field:Size(max = LENGTH_MAX)
     val fromOpinion: String,
 
     @field:NotBlank
-    @field:Size(max = 100)
+    @field:Size(max = LENGTH_MAX)
     val toOpinion: String,
 
     @field:Positive

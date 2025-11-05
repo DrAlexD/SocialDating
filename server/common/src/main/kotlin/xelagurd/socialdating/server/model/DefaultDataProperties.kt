@@ -1,6 +1,14 @@
 package xelagurd.socialdating.server.model
 
 object DefaultDataProperties {
+    const val LENGTH_MAX = 100
+
+    const val PERCENT_MIN = 0
+    const val PERCENT_MAX = 100
+
+    const val AGE_MIN = 18
+    const val AGE_MAX = 99
+
     const val CATEGORY_INTEREST_STEP = 5
 
     const val DEFINING_THEME_INTEREST_STEP = 5

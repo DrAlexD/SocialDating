@@ -23,7 +23,7 @@ class DefiningThemesKafkaConsumerUnitTest {
     @InjectMockKs
     private lateinit var definingThemesKafkaConsumer: DefiningThemesKafkaConsumer
 
-    private val userDefiningThemeUpdateDetails = FakeDefiningThemesData.userDefiningThemeUpdateDetails
+    private val updateDetails = FakeDefiningThemesData.userDefiningThemeUpdateDetails
     private val userDefiningTheme = FakeDefiningThemesData.userDefiningThemes[0]
     private val updatedUserDefiningTheme = userDefiningTheme.copy(
         value = userDefiningTheme.value + DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
@@ -44,28 +44,22 @@ class DefiningThemesKafkaConsumerUnitTest {
     @Test
     fun updateUserDefiningTheme_existUserDefiningTheme() {
         every {
-            userDefiningThemesService.getUserDefiningTheme(
-                userDefiningThemeUpdateDetails.userId,
-                userDefiningThemeUpdateDetails.definingThemeId
-            )
+            userDefiningThemesService.getUserDefiningTheme(updateDetails.userId, updateDetails.definingThemeId)
         } returns userDefiningTheme
 
         every { userDefiningThemesService.addUserDefiningTheme(updatedUserDefiningTheme) } returns updatedUserDefiningTheme
 
-        definingThemesKafkaConsumer.updateUserDefiningTheme(userDefiningThemeUpdateDetails)
+        definingThemesKafkaConsumer.updateUserDefiningTheme(updateDetails)
     }
 
     @Test
     fun updateUserDefiningTheme_notExistUserDefiningTheme() {
         every {
-            userDefiningThemesService.getUserDefiningTheme(
-                userDefiningThemeUpdateDetails.userId,
-                userDefiningThemeUpdateDetails.definingThemeId
-            )
+            userDefiningThemesService.getUserDefiningTheme(updateDetails.userId, updateDetails.definingThemeId)
         } returns null
 
         every { userDefiningThemesService.addUserDefiningTheme(newUserDefiningTheme) } returns newAddedUserDefiningTheme
 
-        definingThemesKafkaConsumer.updateUserDefiningTheme(userDefiningThemeUpdateDetails)
+        definingThemesKafkaConsumer.updateUserDefiningTheme(updateDetails)
     }
 }

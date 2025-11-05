@@ -52,7 +52,8 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
     @Test
     fun getUserStatements_emptyData_error() {
         val message = "test"
-        `when`(userStatementsService.getUserStatements(userId, definingThemeIds)).thenThrow(NoDataFoundException(message))
+        `when`(userStatementsService.getUserStatements(userId, definingThemeIds))
+            .thenThrow(NoDataFoundException(message))
 
         mockMvc.perform(
             get("/api/v1/statements/users?userId=$userId&definingThemeIds=${definingThemeIds.toRequestParams()}")
