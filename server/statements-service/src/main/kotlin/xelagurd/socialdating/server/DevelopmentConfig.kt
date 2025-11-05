@@ -14,14 +14,12 @@ class DevelopmentConfig {
     @Bean
     fun dataLoader(
         statementsRepository: StatementsRepository
-    ): CommandLineRunner {
-        return CommandLineRunner {
-            val existingStatements = statementsRepository.findAll().toList()
+    ) = CommandLineRunner {
+        val existingStatements = statementsRepository.findAll().toList()
 
-            if (existingStatements.isEmpty()) {
-                statementsRepository.deleteAllInBatch()
-                statementsRepository.saveAll(FakeStatementsData.statements.withNullIds())
-            }
+        if (existingStatements.isEmpty()) {
+            statementsRepository.deleteAllInBatch()
+            statementsRepository.saveAll(FakeStatementsData.statements.withNullIds())
         }
     }
 }

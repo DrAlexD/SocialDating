@@ -14,13 +14,11 @@ class DevelopmentConfig {
     @Bean
     fun dataLoader(
         categoriesRepository: CategoriesRepository
-    ): CommandLineRunner {
-        return CommandLineRunner {
-            val existingCategories = categoriesRepository.findAll().toList()
+    ) = CommandLineRunner {
+        val existingCategories = categoriesRepository.findAll().toList()
 
-            if (existingCategories.isEmpty()) {
-                categoriesRepository.saveAll(FakeCategoriesData.categories.withNullIds())
-            }
+        if (existingCategories.isEmpty()) {
+            categoriesRepository.saveAll(FakeCategoriesData.categories.withNullIds())
         }
     }
 }

@@ -21,12 +21,12 @@ class CategoriesKafkaConsumerUnitTest {
     private lateinit var userCategoriesService: UserCategoriesService
 
     @MockK
-    private lateinit var kafkaProducer: CategoriesKafkaProducer
+    private lateinit var categoriesKafkaProducer: CategoriesKafkaProducer
 
     @InjectMockKs
     private lateinit var categoriesKafkaConsumer: CategoriesKafkaConsumer
 
-    private val userCategoryUpdateDetails = FakeCategoriesData.userCategoryUpdateDetails
+    private val updateDetails = FakeCategoriesData.userCategoryUpdateDetails
     private val userCategory = FakeCategoriesData.userCategories[0]
     private val updatedUserCategory = userCategory.copy(interest = userCategory.interest + CATEGORY_INTEREST_STEP)
     private val newUserCategory = UserCategory(userId = userCategory.userId, categoryId = userCategory.categoryId)
@@ -40,40 +40,34 @@ class CategoriesKafkaConsumerUnitTest {
     @Test
     fun updateUserCategory_existUserCategory() {
         every {
-            userCategoriesService.getUserCategory(
-                userCategoryUpdateDetails.userId,
-                userCategoryUpdateDetails.categoryId
-            )
+            userCategoriesService.getUserCategory(updateDetails.userId, updateDetails.categoryId)
         } returns userCategory
 
         every { userCategoriesService.addUserCategory(updatedUserCategory) } returns updatedUserCategory
 
         every {
-            kafkaProducer.updateUserDefiningTheme(
-                userCategoryUpdateDetails.toUserDefiningThemeUpdateDetails()
+            categoriesKafkaProducer.updateUserDefiningTheme(
+                updateDetails.toUserDefiningThemeUpdateDetails()
             )
         } just Runs
 
-        categoriesKafkaConsumer.updateUserCategory(userCategoryUpdateDetails)
+        categoriesKafkaConsumer.updateUserCategory(updateDetails)
     }
 
     @Test
     fun updateUserCategory_notExistUserCategory() {
         every {
-            userCategoriesService.getUserCategory(
-                userCategoryUpdateDetails.userId,
-                userCategoryUpdateDetails.categoryId
-            )
+            userCategoriesService.getUserCategory(updateDetails.userId, updateDetails.categoryId)
         } returns null
 
         every { userCategoriesService.addUserCategory(newUserCategory) } returns newAddedUserCategory
 
         every {
-            kafkaProducer.updateUserDefiningTheme(
-                userCategoryUpdateDetails.toUserDefiningThemeUpdateDetails()
+            categoriesKafkaProducer.updateUserDefiningTheme(
+                updateDetails.toUserDefiningThemeUpdateDetails()
             )
         } just Runs
 
-        categoriesKafkaConsumer.updateUserCategory(userCategoryUpdateDetails)
+        categoriesKafkaConsumer.updateUserCategory(updateDetails)
     }
 }

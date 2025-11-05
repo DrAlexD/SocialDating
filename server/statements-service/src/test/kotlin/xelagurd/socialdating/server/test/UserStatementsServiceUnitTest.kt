@@ -54,7 +54,9 @@ class UserStatementsServiceUnitTest {
 
     @Test
     fun getUserStatements_emptyData_error() {
-        every { userStatementsRepository.findAllByUserIdAndDefiningThemeIds(userId, definingThemeIds) } returns emptyList()
+        every {
+            userStatementsRepository.findAllByUserIdAndDefiningThemeIds(userId, definingThemeIds)
+        } returns emptyList()
 
         assertThrows<NoDataFoundException> { userStatementsService.getUserStatements(userId, definingThemeIds) }
     }

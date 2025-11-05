@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_STEP
+import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.additional.UserCategoryUpdateDetails
 
@@ -11,28 +13,25 @@ import xelagurd.socialdating.server.model.additional.UserCategoryUpdateDetails
 @Service
 class CategoriesKafkaConsumer(
     private val userCategoriesService: UserCategoriesService,
-    private val kafkaProducer: CategoriesKafkaProducer
+    private val categoriesKafkaProducer: CategoriesKafkaProducer
 ) {
 
     @KafkaListener(topics = ["update-user-category-on-statement-reaction"], groupId = "categories-group")
-    fun updateUserCategory(userCategoryUpdateDetails: UserCategoryUpdateDetails) {
-        var userCategory = userCategoriesService.getUserCategory(
-            userCategoryUpdateDetails.userId,
-            userCategoryUpdateDetails.categoryId
-        )
+    fun updateUserCategory(updateDetails: UserCategoryUpdateDetails) {
+        val userCategory = userCategoriesService.getUserCategory(updateDetails.userId, updateDetails.categoryId)
 
-        userCategory = userCategory?.copy(
-            interest = userCategory.interest + CATEGORY_INTEREST_STEP
+        val updatedUserCategory = userCategory?.copy(
+            interest = (userCategory.interest + CATEGORY_INTEREST_STEP).coerceIn(PERCENT_MIN, PERCENT_MAX)
         )
             ?: UserCategory(
-                userId = userCategoryUpdateDetails.userId,
-                categoryId = userCategoryUpdateDetails.categoryId
+                userId = updateDetails.userId,
+                categoryId = updateDetails.categoryId
             )
 
-        userCategoriesService.addUserCategory(userCategory)
+        userCategoriesService.addUserCategory(updatedUserCategory)
 
-        kafkaProducer.updateUserDefiningTheme(
-            userCategoryUpdateDetails.toUserDefiningThemeUpdateDetails()
+        categoriesKafkaProducer.updateUserDefiningTheme(
+            updateDetails.toUserDefiningThemeUpdateDetails()
         )
     }
 }

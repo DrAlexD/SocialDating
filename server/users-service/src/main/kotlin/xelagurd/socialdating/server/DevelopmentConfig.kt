@@ -14,13 +14,11 @@ class DevelopmentConfig {
     @Bean
     fun dataLoader(
         usersRepository: UsersRepository
-    ): CommandLineRunner {
-        return CommandLineRunner {
-            val existingUsers = usersRepository.findAll().toList()
+    ) = CommandLineRunner {
+        val existingUsers = usersRepository.findAll().toList()
 
-            if (existingUsers.isEmpty()) {
-                usersRepository.saveAll(FakeUsersData.users.withNullIds())
-            }
+        if (existingUsers.isEmpty()) {
+            usersRepository.saveAll(FakeUsersData.users.withNullIds())
         }
     }
 }

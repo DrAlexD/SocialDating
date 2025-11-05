@@ -11,6 +11,8 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USER_ACTIVITY_INITIAL
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
@@ -44,7 +46,7 @@ class User(
     @field:Enumerated(EnumType.STRING)
     var purpose: Purpose,
 
-    @field:Column(columnDefinition = "integer check (activity between 0 and 100)")
+    @field:Column(columnDefinition = "integer check (activity between $PERCENT_MIN and $PERCENT_MAX)")
     var activity: Int = USER_ACTIVITY_INITIAL,
 
     @field:Enumerated(EnumType.STRING)

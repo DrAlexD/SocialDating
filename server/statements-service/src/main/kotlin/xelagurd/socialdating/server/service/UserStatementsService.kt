@@ -1,7 +1,6 @@
 package xelagurd.socialdating.server.service
 
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.UserStatement
 import xelagurd.socialdating.server.model.additional.StatementReactionDetails
@@ -15,7 +14,8 @@ class UserStatementsService(
 ) {
 
     fun getUserStatements(userId: Int, definingThemeIds: List<Int>): List<UserStatement> {
-        return userStatementsRepository.findAllByUserIdAndDefiningThemeIds(userId, definingThemeIds).takeIf { it.isNotEmpty() }
+        return userStatementsRepository.findAllByUserIdAndDefiningThemeIds(userId, definingThemeIds)
+            .takeIf { it.isNotEmpty() }
             ?: throw NoDataFoundException("UserStatements didn't found for userId $userId and definingThemeIds $definingThemeIds")
     }
 
@@ -23,7 +23,6 @@ class UserStatementsService(
         return userStatementsRepository.save(userStatementDetails.toUserStatement())
     }
 
-    @Transactional
     fun processStatementReaction(statementReactionDetails: StatementReactionDetails): UserStatement {
         val userStatementDetails = UserStatementDetails(
             reactionType = statementReactionDetails.reactionType,
