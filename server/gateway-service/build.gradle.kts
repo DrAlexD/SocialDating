@@ -15,6 +15,7 @@ dependencies {
 
     implementation(libs.spring.boot.webflux)
     implementation(libs.spring.cloud.gateway)
+    implementation(platform(libs.spring.cloud.dependencies))
 
     implementation(libs.spring.kafka)
 
@@ -27,10 +28,4 @@ dependencies {
     testImplementation(libs.kotlin.test.junit5)
     testImplementation(libs.spring.boot.test)
     testImplementation(libs.mockk)
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2025.0.0")
-    }
 }

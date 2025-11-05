@@ -3,28 +3,12 @@ updates:
   - package-ecosystem: "gradle"
     directory: "/client"
     schedule:
-      interval: "weekly"
-    groups:
-      minor-client-version-updates:
-        applies-to: version-updates
-        update-types:
-          - "minor"
-          - "patch"
-      minor-client-security-updates:
-        applies-to: security-updates
-        update-types:
-          - "patch"
+      interval: "monthly"
+    ignore:
+      - dependency-name: "androidx.compose:compose-bom"          # fixed due to using Icons class
+      - dependency-name: "androidx.activity:activity-compose"    # fixed due to API 35
+      - dependency-name: "androidx.core:core-ktx"                # fixed due to API 35
   - package-ecosystem: "gradle"
     directory: "/server"
     schedule:
-      interval: "weekly"
-    groups:
-      minor-server-version-updates:
-        applies-to: version-updates
-        update-types:
-          - "minor"
-          - "patch"
-      minor-server-security-updates:
-        applies-to: security-updates
-        update-types:
-          - "patch"
+      interval: "monthly"
