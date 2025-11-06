@@ -28,8 +28,6 @@ object FakeData {
             name = "Alexander",
             gender = MALE,
             username = "username1",
-            password = $$"$2a$10$VlL1TDtoHSflx3dUMswP1eJ24xh5IgRVll5JHp9a24mpsArAZQjnm",
-            email = "email1@gmail.com",
             age = 26,
             city = "Moscow",
             purpose = ALL_AT_ONCE,
@@ -41,8 +39,6 @@ object FakeData {
             name = "Denis",
             gender = MALE,
             username = "username2",
-            password = $$"$2a$10$pNja5Q6J680N2HYc2VC7wOza5WoFO6O8e65D9Qwom7OjZkNE3uLe6",
-            email = "email2@gmail.com",
             age = 27,
             city = "Moscow",
             purpose = FRIENDS,
@@ -54,8 +50,6 @@ object FakeData {
             name = "Andrey",
             gender = MALE,
             username = "username3",
-            password = $$"$2a$10$wfn84flRD.QlmGV4.EGVeO9fXm8sDl9u8.0Cq0MwIq67lgTswjL.e",
-            email = "email3@gmail.com",
             age = 27,
             city = "Moscow",
             purpose = RELATIONSHIPS,
@@ -184,11 +178,11 @@ object FakeData {
     )
 
     val userStatements = listOf(
-        UserStatement(id = 1, reactionType = FULL_MAINTAIN, userId = 1, statementId = 1),
-        UserStatement(id = 2, reactionType = FULL_MAINTAIN, userId = 1, statementId = 4),
-        UserStatement(id = 3, reactionType = FULL_MAINTAIN, userId = 1, statementId = 5),
-        UserStatement(id = 4, reactionType = FULL_MAINTAIN, userId = 1, statementId = 6),
-        UserStatement(id = 5, reactionType = FULL_MAINTAIN, userId = 2, statementId = 5)
+        UserStatement(id = 1, userId = 1, statementId = 1),
+        UserStatement(id = 2, userId = 1, statementId = 4),
+        UserStatement(id = 3, userId = 1, statementId = 5),
+        UserStatement(id = 4, userId = 1, statementId = 6),
+        UserStatement(id = 5, userId = 2, statementId = 5)
     )
 
     val loginFormData = LoginFormData(users[0].username, "password1")
@@ -200,7 +194,7 @@ object FakeData {
             username = users[0].username,
             password = "password1",
             repeatedPassword = "password1",
-            email = users[0].email ?: "",
+            email = "email@gmail.com",
             age = users[0].age.toString(),
             city = users[0].city,
             purpose = users[0].purpose
@@ -219,7 +213,7 @@ object FakeData {
         id = 20, text = "NewStatement20", isSupportDefiningTheme = true, definingThemeId = 1, creatorUserId = 1
     )
 
-    val newUserStatement = UserStatement(id = 6, reactionType = FULL_MAINTAIN, userId = 1, statementId = 2)
+    val newUserStatement = UserStatement(id = 6, userId = 1, statementId = 2)
 
     val userCategoryWithData = UserCategoryWithData(
         id = userCategories[0].id,

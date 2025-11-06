@@ -16,4 +16,9 @@ class KafkaTopicConfig {
     fun createUpdateUserDefiningThemeOnStatementReactionTopic(): NewTopic {
         return NewTopic("update-user-defining-theme-on-statement-reaction", 2, 1.toShort())
     }
+
+    @Bean
+    fun createUpdateMaintainedListOnStatementReactionTopic(): NewTopic {
+        return NewTopic("update-maintained-list-on-statement-reaction", 2, 1.toShort())
+    }
 }

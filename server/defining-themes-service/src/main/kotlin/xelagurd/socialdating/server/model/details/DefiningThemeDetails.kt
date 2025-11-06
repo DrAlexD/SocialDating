@@ -22,11 +22,12 @@ data class DefiningThemeDetails(
     @field:Positive
     val categoryId: Int
 ) {
-    fun toDefiningTheme() =
+    fun toDefiningTheme(numberInCategory: Int?) =
         DefiningTheme(
             name = name,
             fromOpinion = fromOpinion,
             toOpinion = toOpinion,
-            categoryId = categoryId
+            categoryId = categoryId,
+            numberInCategory = numberInCategory ?: 1
         )
 }

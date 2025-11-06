@@ -29,7 +29,6 @@ import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 data class UserStatement(
     @PrimaryKey
     override val id: Int,
-    val reactionType: StatementReactionType,
     val userId: Int,
     val statementId: Int
 ) : DataEntity

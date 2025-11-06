@@ -17,7 +17,6 @@ import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
 import xelagurd.socialdating.client.data.model.UserStatement
-import xelagurd.socialdating.client.data.model.enums.EnumsConverter
 
 @Database(
     entities = [
@@ -32,7 +31,7 @@ import xelagurd.socialdating.client.data.model.enums.EnumsConverter
     version = 1,
     exportSchema = false
 )
-@TypeConverters(EnumsConverter::class)
+@TypeConverters(TypeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun categoriesDao(): CategoriesDao
 

@@ -15,6 +15,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.FakeDefiningThemesData.filterByCategoryId
 import xelagurd.socialdating.server.FakeDefiningThemesData.filterByUserId
+import xelagurd.socialdating.server.FakeDefiningThemesData.toServerAnswer
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.UserDefiningTheme
 
@@ -28,7 +29,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
     private val userId = 1
 
     private val definingThemesDetails = FakeDefiningThemesData.definingThemesDetails
-    private val definingThemes = FakeDefiningThemesData.definingThemes.take(definingThemesDetails.size)
+    private val definingThemes = FakeDefiningThemesData.definingThemes.take(definingThemesDetails.size).toServerAnswer()
     private val userDefiningThemesDetails = FakeDefiningThemesData.userDefiningThemesDetails
     private val userDefiningThemes = FakeDefiningThemesData.userDefiningThemes.take(userDefiningThemesDetails.size)
 

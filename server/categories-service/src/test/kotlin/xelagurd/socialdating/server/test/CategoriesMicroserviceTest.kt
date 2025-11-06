@@ -14,6 +14,7 @@ import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.FakeCategoriesData.filterByUserId
+import xelagurd.socialdating.server.FakeCategoriesData.toServerAnswer
 import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.model.UserCategory
 
@@ -28,7 +29,7 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     private val categoriesDetails = FakeCategoriesData.categoriesDetails
     private val categories = FakeCategoriesData.categories.take(categoriesDetails.size)
     private val userCategoriesDetails = FakeCategoriesData.userCategoriesDetails
-    private val userCategories = FakeCategoriesData.userCategories.take(userCategoriesDetails.size)
+    private val userCategories = FakeCategoriesData.userCategories.take(userCategoriesDetails.size).toServerAnswer()
 
     init {
         addCategories()

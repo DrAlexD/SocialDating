@@ -82,8 +82,6 @@ class IntegrationTest {
         assertNotNull(responseUser["name"])
         assertNotNull(responseUser["gender"])
         assertEquals(request["username"], responseUser["username"])
-        assertNotNull(responseUser["password"])
-        assertNotNull(responseUser["email"])
         assertNotNull(responseUser["age"])
         assertNotNull(responseUser["city"])
         assertNotNull(responseUser["purpose"])
@@ -191,8 +189,6 @@ class IntegrationTest {
         assertEquals(request["name"], responseUser["name"])
         assertNotNull(responseUser["gender"])
         assertEquals(request["username"], responseUser["username"])
-        assertNotNull(responseUser["password"])
-        assertEquals(request["email"], responseUser["email"])
         assertEquals(request["age"], responseUser["age"])
         assertEquals(request["city"], responseUser["city"])
         assertNotNull(responseUser["purpose"])
@@ -213,8 +209,6 @@ class IntegrationTest {
         assertNotNull(responseUser["name"])
         assertNotNull(responseUser["gender"])
         assertNotNull(responseUser["username"])
-        assertNotNull(responseUser["password"])
-        assertNotNull(responseUser["email"])
         assertNotNull(responseUser["age"])
         assertNotNull(responseUser["city"])
         assertNotNull(responseUser["purpose"])
@@ -243,7 +237,6 @@ class IntegrationTest {
         assertNotNull(responseUserStatement["id"])
         assertEquals(request["userId"], responseUserStatement["userId"])
         assertEquals(request["statementId"], responseUserStatement["statementId"])
-        assertNotNull(responseUserStatement["reactionType"])
     }
 
     private fun getUserStatements() {
@@ -258,7 +251,6 @@ class IntegrationTest {
         val newUserStatement = responseUserStatements
             .firstOrNull { it["userId"] == userId && it["statementId"] == statementId }
         assertNotNull(newUserStatement)
-        assertNotNull(newUserStatement["reactionType"])
     }
 
     private fun getUserCategories() {

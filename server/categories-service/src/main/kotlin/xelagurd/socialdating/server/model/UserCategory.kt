@@ -1,5 +1,6 @@
 package xelagurd.socialdating.server.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -7,6 +8,8 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_STEP
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
@@ -28,20 +31,34 @@ class UserCategory(
 
     var userId: Int,
 
-    var categoryId: Int
+    var categoryId: Int,
+
+    @field:JsonIgnore
+    @field:JdbcTypeCode(SqlTypes.ARRAY)
+    @field:Column(columnDefinition = "bigint[]")
+    var maintained: Array<Long>? = null,
+
+    @field:JsonIgnore
+    @field:JdbcTypeCode(SqlTypes.ARRAY)
+    @field:Column(columnDefinition = "bigint[]")
+    var notMaintained: Array<Long>? = null
 ) {
 
     fun copy(
         id: Int? = null,
         interest: Int? = null,
         userId: Int? = null,
-        categoryId: Int? = null
+        categoryId: Int? = null,
+        maintained: Array<Long>? = null,
+        notMaintained: Array<Long>? = null
     ) =
         UserCategory(
             id = id ?: this.id,
             interest = interest ?: this.interest,
             userId = userId ?: this.userId,
-            categoryId = categoryId ?: this.categoryId
+            categoryId = categoryId ?: this.categoryId,
+            maintained = maintained ?: this.maintained,
+            notMaintained = notMaintained ?: this.notMaintained
         )
 
     override fun equals(other: Any?): Boolean {
@@ -54,6 +71,8 @@ class UserCategory(
         if (interest != other.interest) return false
         if (userId != other.userId) return false
         if (categoryId != other.categoryId) return false
+        if (!maintained.contentEquals(other.maintained)) return false
+        if (!notMaintained.contentEquals(other.notMaintained)) return false
 
         return true
     }
@@ -63,6 +82,8 @@ class UserCategory(
         result = 31 * result + interest
         result = 31 * result + userId
         result = 31 * result + categoryId
+        result = 31 * result + maintained.hashCode()
+        result = 31 * result + notMaintained.hashCode()
         return result
     }
 }

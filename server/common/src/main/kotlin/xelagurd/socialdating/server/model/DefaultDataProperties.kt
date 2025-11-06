@@ -16,6 +16,8 @@ object DefaultDataProperties {
     const val DEFINING_THEME_VALUE_INITIAL = 50
     const val DEFINING_THEME_VALUE_STEP = 5
     const val DEFINING_THEME_VALUE_COEFFICIENT = 2
+    const val DEFINING_THEME_VALUE_LOW_BORDER = 20
+    const val DEFINING_THEME_VALUE_HIGH_BORDER = 80
 
     const val USER_ACTIVITY_INITIAL = 50
 }

@@ -7,12 +7,19 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_INTEREST_STEP
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_COEFFICIENT
+import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_HIGH_BORDER
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_INITIAL
+import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_LOW_BORDER
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_STEP
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 import xelagurd.socialdating.server.model.UserDefiningTheme
+import xelagurd.socialdating.server.model.additional.MaintainedListUpdateDetails
 import xelagurd.socialdating.server.model.additional.UserDefiningThemeUpdateDetails
+import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_MAINTAINED
+import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_NOT_MAINTAINED
+import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.INCREASE_MAINTAINED
+import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.INCREASE_NOT_MAINTAINED
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_NO_MAINTAIN
 import xelagurd.socialdating.server.model.enums.StatementReactionType.NOT_SURE
@@ -22,7 +29,9 @@ import xelagurd.socialdating.server.model.enums.StatementReactionType.PART_NO_MA
 @Profile("!test")
 @Service
 class DefiningThemesKafkaConsumer(
-    private val userDefiningThemesService: UserDefiningThemesService
+    private val definingThemesService: DefiningThemesService,
+    private val userDefiningThemesService: UserDefiningThemesService,
+    private val definingThemesKafkaProducer: DefiningThemesKafkaProducer
 ) {
 
     @KafkaListener(topics = ["update-user-defining-theme-on-statement-reaction"], groupId = "defining-themes-group")
@@ -43,6 +52,30 @@ class DefiningThemesKafkaConsumer(
             )
 
         userDefiningThemesService.addUserDefiningTheme(updatedUserDefiningTheme)
+
+        updateMaintainedListIfNeeded(userDefiningTheme, updateDetails, diff)
+    }
+
+    private fun updateMaintainedListIfNeeded(
+        userDefiningTheme: UserDefiningTheme?,
+        updateDetails: UserDefiningThemeUpdateDetails,
+        diff: Int
+    ) {
+        userDefiningTheme?.value?.let {
+            determineUpdateType(it, diff)?.let {
+                val definingTheme = definingThemesService.getDefiningTheme(updateDetails.definingThemeId)
+                    ?: return
+
+                definingThemesKafkaProducer.updateMaintainedList(
+                    MaintainedListUpdateDetails(
+                        userId = updateDetails.userId,
+                        categoryId = definingTheme.categoryId,
+                        updateType = it,
+                        numberInCategory = definingTheme.numberInCategory
+                    )
+                )
+            }
+        }
     }
 
     private fun calculateDiff(updateDetails: UserDefiningThemeUpdateDetails): Int {
@@ -55,5 +88,21 @@ class DefiningThemesKafkaConsumer(
         }
 
         return if (updateDetails.isSupportDefiningTheme) diff else -diff
+    }
+
+    private fun determineUpdateType(value: Int, diff: Int) = when {
+        value > DEFINING_THEME_VALUE_LOW_BORDER && value + diff <= DEFINING_THEME_VALUE_LOW_BORDER
+            -> INCREASE_NOT_MAINTAINED
+
+        value <= DEFINING_THEME_VALUE_LOW_BORDER && value + diff > DEFINING_THEME_VALUE_LOW_BORDER
+            -> DECREASE_NOT_MAINTAINED
+
+        value >= DEFINING_THEME_VALUE_HIGH_BORDER && value + diff < DEFINING_THEME_VALUE_HIGH_BORDER
+            -> DECREASE_MAINTAINED
+
+        value < DEFINING_THEME_VALUE_HIGH_BORDER && value + diff >= DEFINING_THEME_VALUE_HIGH_BORDER
+            -> INCREASE_MAINTAINED
+
+        else -> null
     }
 }

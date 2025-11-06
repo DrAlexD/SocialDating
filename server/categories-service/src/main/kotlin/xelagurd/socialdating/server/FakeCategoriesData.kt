@@ -66,5 +66,17 @@ object FakeCategoriesData {
             Category(name = it.name)
         }
 
+    fun List<UserCategory>.toServerAnswer() =
+        this.map {
+            UserCategory(
+                id = it.id,
+                interest = it.interest,
+                userId = it.userId,
+                categoryId = it.categoryId,
+                maintained = null,
+                notMaintained = null
+            )
+        }
+
     fun List<UserCategory>.filterByUserId(userId: Int) = this.filter { it.userId == userId }
 }
