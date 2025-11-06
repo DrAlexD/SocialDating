@@ -124,6 +124,16 @@ object FakeStatementsData {
             )
         }
 
+    fun List<UserStatement>.toServerAnswer() =
+        this.map {
+            UserStatement(
+                id = it.id,
+                reactionType = null,
+                userId = it.userId,
+                statementId = it.statementId
+            )
+        }
+
     fun List<Statement>.findUnreacted(
         userId: Int,
         definingThemeIds: List<Int>,

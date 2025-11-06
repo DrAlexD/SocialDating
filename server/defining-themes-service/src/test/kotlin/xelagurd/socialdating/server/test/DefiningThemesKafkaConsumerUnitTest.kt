@@ -1,9 +1,11 @@
 package xelagurd.socialdating.server.test
 
 import io.mockk.MockKAnnotations
+import io.mockk.Runs
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.just
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import xelagurd.socialdating.server.FakeDefiningThemesData
@@ -12,18 +14,29 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_V
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_INITIAL
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_STEP
 import xelagurd.socialdating.server.model.UserDefiningTheme
+import xelagurd.socialdating.server.model.additional.MaintainedListUpdateDetails
+import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.INCREASE_MAINTAINED
 import xelagurd.socialdating.server.service.DefiningThemesKafkaConsumer
+import xelagurd.socialdating.server.service.DefiningThemesKafkaProducer
+import xelagurd.socialdating.server.service.DefiningThemesService
 import xelagurd.socialdating.server.service.UserDefiningThemesService
 
 class DefiningThemesKafkaConsumerUnitTest {
 
     @MockK
+    private lateinit var definingThemesService: DefiningThemesService
+
+    @MockK
     private lateinit var userDefiningThemesService: UserDefiningThemesService
+
+    @MockK
+    private lateinit var definingThemesKafkaProducer: DefiningThemesKafkaProducer
 
     @InjectMockKs
     private lateinit var definingThemesKafkaConsumer: DefiningThemesKafkaConsumer
 
     private val updateDetails = FakeDefiningThemesData.userDefiningThemeUpdateDetails
+    private val definingTheme = FakeDefiningThemesData.definingThemes[0]
     private val userDefiningTheme = FakeDefiningThemesData.userDefiningThemes[0]
     private val updatedUserDefiningTheme = userDefiningTheme.copy(
         value = userDefiningTheme.value + DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
@@ -48,6 +61,21 @@ class DefiningThemesKafkaConsumerUnitTest {
         } returns userDefiningTheme
 
         every { userDefiningThemesService.addUserDefiningTheme(updatedUserDefiningTheme) } returns updatedUserDefiningTheme
+
+        every {
+            definingThemesService.getDefiningTheme(updateDetails.definingThemeId)
+        } returns definingTheme
+
+        every {
+            definingThemesKafkaProducer.updateMaintainedList(
+                MaintainedListUpdateDetails(
+                    userId = userDefiningTheme.userId,
+                    categoryId = definingTheme.categoryId,
+                    updateType = INCREASE_MAINTAINED,
+                    numberInCategory = definingTheme.numberInCategory
+                )
+            )
+        } just Runs
 
         definingThemesKafkaConsumer.updateUserDefiningTheme(updateDetails)
     }

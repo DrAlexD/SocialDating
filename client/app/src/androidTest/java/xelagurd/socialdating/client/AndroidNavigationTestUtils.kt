@@ -14,8 +14,8 @@ import xelagurd.socialdating.client.data.fake.FakeData.TEST_TIMEOUT_MILLIS
 typealias MainComposeTestRule = AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>
 
 fun MainComposeTestRule.loginAndNavigateToCategories() {
-    onNodeWithTextId(R.string.username).checkTextFieldAndInput(FakeData.mainUser.username)
-    onNodeWithTextId(R.string.password).checkTextFieldAndInput(FakeData.mainUser.password)
+    onNodeWithTextId(R.string.username).checkTextFieldAndInput(FakeData.loginFormData.username)
+    onNodeWithTextId(R.string.password).checkTextFieldAndInput(FakeData.loginFormData.password)
 
     onNodeWithTextId(R.string.login).checkButtonAndClick()
     waitUntil(TEST_TIMEOUT_MILLIS) {
@@ -36,8 +36,8 @@ fun MainComposeTestRule.registerAndNavigateToCategories() {
     onNodeWithTextId(R.string.age).checkTextFieldAndInput(FakeData.mainUser.age.toString())
     onNodeWithTextId(R.string.city).checkTextFieldAndInput(FakeData.mainUser.city)
     onNodeWithTagId(R.string.all_at_once).checkButtonAndClick()
-    onNodeWithTextId(R.string.password).checkTextFieldAndInput(FakeData.mainUser.password)
-    onNodeWithTextId(R.string.repeat_password).checkTextFieldAndInput(FakeData.mainUser.password)
+    onNodeWithTextId(R.string.password).checkTextFieldAndInput(FakeData.registrationFormData.password)
+    onNodeWithTextId(R.string.repeat_password).checkTextFieldAndInput(FakeData.registrationFormData.repeatedPassword)
 
     onNodeWithTextId(R.string.register).checkButtonAndClick()
     waitUntil(TEST_TIMEOUT_MILLIS) {

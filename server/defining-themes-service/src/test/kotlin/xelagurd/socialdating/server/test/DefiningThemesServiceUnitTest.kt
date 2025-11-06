@@ -63,7 +63,12 @@ class DefiningThemesServiceUnitTest {
     @Test
     fun addDefiningTheme() {
         val expected = definingTheme
-        every { definingThemesRepository.save(definingThemeDetails.toDefiningTheme()) } returns expected
+        every {
+            definingThemesRepository.findMaxNumberInCategory(definingThemeDetails.categoryId)
+        } returns expected.numberInCategory - 1
+        every {
+            definingThemesRepository.save(definingThemeDetails.toDefiningTheme(expected.numberInCategory))
+        } returns expected
 
         val result = definingThemesService.addDefiningTheme(definingThemeDetails)
 

@@ -34,9 +34,11 @@ class User(
     @JvmField
     var username: String,
 
+    @field:JsonIgnore
     @JvmField
     var password: String,
 
+    @field:JsonIgnore
     var email: String?,
 
     var age: Int,

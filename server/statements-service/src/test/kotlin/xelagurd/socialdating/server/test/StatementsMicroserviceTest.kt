@@ -15,6 +15,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.FakeStatementsData.filterByUserIdAndDefiningThemeIds
 import xelagurd.socialdating.server.FakeStatementsData.findUnreacted
+import xelagurd.socialdating.server.FakeStatementsData.toServerAnswer
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.UserStatement
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
@@ -31,7 +32,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     private val statementsDetails = FakeStatementsData.statementsDetails
     private val statements = FakeStatementsData.statements.take(statementsDetails.size)
     private val userStatementsDetails = FakeStatementsData.userStatementsDetails
-    private val userStatements = FakeStatementsData.userStatements.take(userStatementsDetails.size)
+    private val userStatements = FakeStatementsData.userStatements.take(userStatementsDetails.size).toServerAnswer()
 
     init {
         addStatements()
