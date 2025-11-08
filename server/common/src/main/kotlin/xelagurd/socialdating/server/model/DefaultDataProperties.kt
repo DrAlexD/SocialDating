@@ -20,4 +20,7 @@ object DefaultDataProperties {
     const val DEFINING_THEME_VALUE_HIGH_BORDER = 80
 
     const val USER_ACTIVITY_INITIAL = 50
+
+    const val SIMILAR_CATEGORIES_NUMBER = 3
+    const val OPPOSITE_CATEGORIES_NUMBER = 3
 }

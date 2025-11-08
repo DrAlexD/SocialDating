@@ -82,8 +82,8 @@ class UserCategory(
         result = 31 * result + interest
         result = 31 * result + userId
         result = 31 * result + categoryId
-        result = 31 * result + maintained.hashCode()
-        result = 31 * result + notMaintained.hashCode()
+        result = 31 * result + maintained.contentHashCode()
+        result = 31 * result + notMaintained.contentHashCode()
         return result
     }
 }
