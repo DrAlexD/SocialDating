@@ -47,38 +47,38 @@ class CategoriesKafkaConsumer(
 
         val updatedUserCategory = when (updateDetails.updateType) {
             INCREASE_NOT_MAINTAINED, DECREASE_NOT_MAINTAINED ->
-                userCategory.copy(notMaintained = updateArray(userCategory.notMaintained, updateDetails))
+                userCategory.copy(notMaintained = updateList(userCategory.notMaintained, updateDetails))
 
             INCREASE_MAINTAINED, DECREASE_MAINTAINED ->
-                userCategory.copy(maintained = updateArray(userCategory.maintained, updateDetails))
+                userCategory.copy(maintained = updateList(userCategory.maintained, updateDetails))
         }
 
         userCategoriesService.addUserCategory(updatedUserCategory)
     }
 
-    private fun updateArray(
-        array: Array<Long>?,
+    private fun updateList(
+        list: Array<Long>?,
         updateDetails: MaintainedListUpdateDetails
     ): Array<Long> {
-        val updatedArray = array?.toMutableList() ?: mutableListOf()
+        val updatedList = list?.toMutableList() ?: mutableListOf()
 
         val indexInCategory = updateDetails.numberInCategory - 1
-        val arrayIndex = indexInCategory / Long.SIZE_BITS
+        val listIndex = indexInCategory / Long.SIZE_BITS
         val bitIndex = indexInCategory % Long.SIZE_BITS
-        val ensureSize = arrayIndex + 1
+        val ensureSize = listIndex + 1
 
-        while (updatedArray.size < ensureSize) {
-            updatedArray.add(0L)
+        while (updatedList.size < ensureSize) {
+            updatedList.add(0L)
         }
 
-        val value = updatedArray[arrayIndex]
+        val value = updatedList[listIndex]
         val bitMask = 1L shl bitIndex
 
-        updatedArray[arrayIndex] = when (updateDetails.updateType) {
+        updatedList[listIndex] = when (updateDetails.updateType) {
             INCREASE_NOT_MAINTAINED, INCREASE_MAINTAINED -> value or bitMask
             DECREASE_NOT_MAINTAINED, DECREASE_MAINTAINED -> value and bitMask.inv()
         }
 
-        return updatedArray.toTypedArray()
+        return updatedList.toTypedArray()
     }
 }

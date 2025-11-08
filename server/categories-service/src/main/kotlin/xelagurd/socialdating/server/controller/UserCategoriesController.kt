@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.UserCategory
+import xelagurd.socialdating.server.model.additional.SimilarUser
+import xelagurd.socialdating.server.model.additional.UserWithSimilarity
 import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.security.AdminAccess
 import xelagurd.socialdating.server.service.UserCategoriesService
@@ -31,4 +33,21 @@ class UserCategoriesController(
     fun addUserCategory(@RequestBody @Valid userCategoryDetails: UserCategoryDetails): UserCategory {
         return userCategoriesService.addUserCategory(userCategoryDetails)
     }
+
+    @GetMapping("/users-similarity")
+    fun getUsersWithSimilarity(
+        @RequestParam userId: Int,
+        @RequestParam(required = false) categoryIds: List<Int>?
+    ): List<UserWithSimilarity> {
+        return userCategoriesService.getUsersWithSimilarity(userId, categoryIds)
+    }
+
+    @GetMapping("/similar-user")
+    fun getSimilarUser(
+        @RequestParam currentUserId: Int,
+        @RequestParam anotherUserId: Int
+    ): SimilarUser {
+        return userCategoriesService.getSimilarUser(currentUserId, anotherUserId)
+    }
+
 }
