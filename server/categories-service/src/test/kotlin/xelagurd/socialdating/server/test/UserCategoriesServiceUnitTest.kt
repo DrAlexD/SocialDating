@@ -25,8 +25,6 @@ class UserCategoriesServiceUnitTest {
     private val categoryId = 1
 
     private val userCategories = FakeCategoriesData.userCategories
-
-    private val userCategoryDetails = FakeCategoriesData.userCategoriesDetails[0]
     private val userCategory = userCategories[0]
 
     @BeforeEach
@@ -61,13 +59,4 @@ class UserCategoriesServiceUnitTest {
         assertThrows<NoDataFoundException> { userCategoriesService.getUserCategories(userId) }
     }
 
-    @Test
-    fun addUserCategory() {
-        val expected = userCategory
-        every { userCategoriesRepository.save(userCategoryDetails.toUserCategory()) } returns expected
-
-        val result = userCategoriesService.addUserCategory(userCategoryDetails)
-
-        assertEquals(expected, result)
-    }
 }

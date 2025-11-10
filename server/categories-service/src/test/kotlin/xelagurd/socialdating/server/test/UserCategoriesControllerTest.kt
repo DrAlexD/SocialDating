@@ -7,7 +7,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
@@ -28,9 +27,6 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
     private val userId = 1
 
     private val userCategories = FakeCategoriesData.userCategories
-
-    private val userCategoryDetails = FakeCategoriesData.userCategoriesDetails[0]
-    private val userCategory = userCategories[0]
 
     @Test
     fun getUserCategories_allData_success() {
@@ -57,18 +53,4 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
             .andExpect(content().string(message))
     }
 
-    @Test
-    fun addUserCategory() {
-        val expected = userCategory
-        `when`(userCategoriesService.addUserCategory(userCategoryDetails)).thenReturn(expected)
-
-        mockMvc.perform(
-            post("/categories/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(userCategoryDetails))
-        )
-            .andExpect(status().isCreated)
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
-    }
 }

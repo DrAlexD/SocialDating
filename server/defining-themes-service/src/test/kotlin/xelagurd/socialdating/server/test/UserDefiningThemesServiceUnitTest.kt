@@ -25,8 +25,6 @@ class UserDefiningThemesServiceUnitTest {
     private val definingThemeId = 1
 
     private val userDefiningThemes = FakeDefiningThemesData.userDefiningThemes
-
-    private val userDefiningThemeDetails = FakeDefiningThemesData.userDefiningThemesDetails[0]
     private val userDefiningTheme = userDefiningThemes[0]
 
     @BeforeEach
@@ -63,13 +61,4 @@ class UserDefiningThemesServiceUnitTest {
         assertThrows<NoDataFoundException> { userDefiningThemesService.getUserDefiningThemes(userId) }
     }
 
-    @Test
-    fun addUserDefiningTheme() {
-        val expected = userDefiningTheme
-        every { userDefiningThemesRepository.save(userDefiningThemeDetails.toUserDefiningTheme()) } returns expected
-
-        val result = userDefiningThemesService.addUserDefiningTheme(userDefiningThemeDetails)
-
-        assertEquals(expected, result)
-    }
 }

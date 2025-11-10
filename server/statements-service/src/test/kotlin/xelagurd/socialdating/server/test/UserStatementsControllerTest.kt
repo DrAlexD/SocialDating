@@ -31,9 +31,7 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     private val userStatements = FakeStatementsData.userStatements
 
-    private val userStatementDetails = FakeStatementsData.userStatementsDetails[0]
     private val userStatement = userStatements[0]
-
     private val statementReactionDetails = FakeStatementsData.statementReactionDetails
 
     @Test
@@ -60,21 +58,6 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
         )
             .andExpect(status().isNotFound)
             .andExpect(content().string(message))
-    }
-
-    @Test
-    fun addUserStatement() {
-        val expected = userStatement
-        `when`(userStatementsService.addUserStatement(userStatementDetails)).thenReturn(expected)
-
-        mockMvc.perform(
-            post("/statements/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(userStatementDetails))
-        )
-            .andExpect(status().isCreated)
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
     }
 
     @Test

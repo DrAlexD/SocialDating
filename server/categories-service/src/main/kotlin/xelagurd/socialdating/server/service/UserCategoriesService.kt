@@ -13,7 +13,6 @@ import xelagurd.socialdating.server.model.additional.CategoryWithSimilarityDiff
 import xelagurd.socialdating.server.model.additional.SimilarCategory
 import xelagurd.socialdating.server.model.additional.SimilarUser
 import xelagurd.socialdating.server.model.additional.UserWithSimilarity
-import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
 
 @Service
@@ -24,10 +23,6 @@ class UserCategoriesService(
     fun getUserCategories(userId: Int): List<UserCategory> {
         return userCategoriesRepository.findAllByUserId(userId).takeIf { it.isNotEmpty() }
             ?: throw NoDataFoundException("UserCategories didn't found for userId: $userId")
-    }
-
-    fun addUserCategory(userCategoryDetails: UserCategoryDetails): UserCategory {
-        return userCategoriesRepository.save(userCategoryDetails.toUserCategory())
     }
 
     fun addUserCategory(userCategory: UserCategory): UserCategory {

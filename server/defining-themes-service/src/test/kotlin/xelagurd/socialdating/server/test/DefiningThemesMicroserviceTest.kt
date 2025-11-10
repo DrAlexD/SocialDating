@@ -14,10 +14,8 @@ import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.FakeDefiningThemesData.filterByCategoryId
-import xelagurd.socialdating.server.FakeDefiningThemesData.filterByUserId
 import xelagurd.socialdating.server.FakeDefiningThemesData.toServerAnswer
 import xelagurd.socialdating.server.model.DefiningTheme
-import xelagurd.socialdating.server.model.UserDefiningTheme
 
 @ActiveProfiles("dev", "test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -26,16 +24,12 @@ import xelagurd.socialdating.server.model.UserDefiningTheme
 class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemplate) {
 
     private val categoryId = 1
-    private val userId = 1
 
     private val definingThemesDetails = FakeDefiningThemesData.definingThemesDetails
     private val definingThemes = FakeDefiningThemesData.definingThemes.take(definingThemesDetails.size).toServerAnswer()
-    private val userDefiningThemesDetails = FakeDefiningThemesData.userDefiningThemesDetails
-    private val userDefiningThemes = FakeDefiningThemesData.userDefiningThemes.take(userDefiningThemesDetails.size)
 
     init {
         addDefiningThemes()
-        addUserDefiningThemes()
     }
 
     @Test
@@ -48,11 +42,6 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
         getDefiningThemes()
     }
 
-    @Test
-    fun testGetUserDefiningThemes() {
-        getUserDefiningThemes()
-    }
-
     private fun addDefiningThemes() {
         definingThemesDetails.forEachIndexed { index, definingThemeDetails ->
             val response = restTemplate.postForEntity(
@@ -62,18 +51,6 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
             )
             assertEquals(HttpStatus.CREATED, response.statusCode)
             assertEquals(definingThemes[index], response.body!!)
-        }
-    }
-
-    private fun addUserDefiningThemes() {
-        userDefiningThemesDetails.forEachIndexed { index, userDefiningThemeDetails ->
-            val response = restTemplate.postForEntity(
-                "/defining-themes/users",
-                userDefiningThemeDetails,
-                UserDefiningTheme::class.java
-            )
-            assertEquals(HttpStatus.CREATED, response.statusCode)
-            assertEquals(userDefiningThemes[index], response.body!!)
         }
     }
 
@@ -96,17 +73,6 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(definingThemes.size, response.body!!.size)
         assertContentEquals(definingThemes.toTypedArray(), response.body!!)
-    }
-
-    private fun getUserDefiningThemes() {
-        val expected = userDefiningThemes.filterByUserId(userId)
-        val response = restTemplate.getForEntity(
-            "/defining-themes/users?userId=$userId",
-            Array<UserDefiningTheme>::class.java
-        )
-        assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(expected.size, response.body!!.size)
-        assertContentEquals(expected.toTypedArray(), response.body!!)
     }
 
     companion object {

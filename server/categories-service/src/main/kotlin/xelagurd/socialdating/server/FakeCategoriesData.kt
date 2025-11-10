@@ -4,7 +4,6 @@ import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.additional.UserCategoryUpdateDetails
 import xelagurd.socialdating.server.model.details.CategoryDetails
-import xelagurd.socialdating.server.model.details.UserCategoryDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 
 object FakeCategoriesData {
@@ -38,13 +37,6 @@ object FakeCategoriesData {
         Category(id = 19, name = "RemoteCategory19")
     )
 
-    val userCategoriesDetails = listOf(
-        UserCategoryDetails(interest = 75, userId = 1, categoryId = 1),
-        UserCategoryDetails(interest = 75, userId = 1, categoryId = 2),
-        UserCategoryDetails(interest = 75, userId = 1, categoryId = 3),
-        UserCategoryDetails(interest = 75, userId = 2, categoryId = 2)
-    )
-
     val userCategories = listOf(
         UserCategory(id = 1, interest = 75, userId = 1, categoryId = 1),
         UserCategory(id = 2, interest = 75, userId = 1, categoryId = 2),
@@ -66,17 +58,4 @@ object FakeCategoriesData {
             Category(name = it.name)
         }
 
-    fun List<UserCategory>.toServerAnswer() =
-        this.map {
-            UserCategory(
-                id = it.id,
-                interest = it.interest,
-                userId = it.userId,
-                categoryId = it.categoryId,
-                maintained = null,
-                notMaintained = null
-            )
-        }
-
-    fun List<UserCategory>.filterByUserId(userId: Int) = this.filter { it.userId == userId }
 }

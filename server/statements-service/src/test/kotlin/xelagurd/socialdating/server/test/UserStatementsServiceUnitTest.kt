@@ -32,9 +32,7 @@ class UserStatementsServiceUnitTest {
 
     private val userStatements = FakeStatementsData.userStatements
 
-    private val userStatementDetails = FakeStatementsData.userStatementsDetails[0]
     private val userStatement = userStatements[0]
-
     private val statementReactionDetails = FakeStatementsData.statementReactionDetails
 
     @BeforeEach
@@ -62,19 +60,9 @@ class UserStatementsServiceUnitTest {
     }
 
     @Test
-    fun addUserStatement() {
-        val expected = userStatement
-        every { userStatementsRepository.save(userStatementDetails.toUserStatement()) } returns expected
-
-        val result = userStatementsService.addUserStatement(userStatementDetails)
-
-        assertEquals(expected, result)
-    }
-
-    @Test
     fun processStatementReaction() {
         val expected = userStatement
-        every { userStatementsRepository.save(userStatementDetails.toUserStatement()) } returns expected
+        every { userStatementsRepository.save(statementReactionDetails.toUserStatement()) } returns expected
         every { kafkaProducer.updateUserCategory(statementReactionDetails.toUserCategoryUpdateDetails()) } just Runs
 
         val result = userStatementsService.processStatementReaction(statementReactionDetails)
