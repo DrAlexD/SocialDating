@@ -11,12 +11,12 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.junit.jupiter.api.Test
+import xelagurd.socialdating.server.model.DefaultDataProperties.GATEWAY_URL
 import xelagurd.socialdating.server.utils.TestUtils.readArrayFromJsonString
 import xelagurd.socialdating.server.utils.TestUtils.readObjectFromJsonString
 
 class IntegrationTest {
     private val restTemplate = TestRestTemplate()
-    private val GATEWAY_URL = "http://localhost:8080/api/v1"
 
     val randomNumber = Random.nextLong(100, 1000)
 

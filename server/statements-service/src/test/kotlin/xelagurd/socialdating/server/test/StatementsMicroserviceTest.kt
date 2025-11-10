@@ -52,7 +52,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     private fun addStatements() {
         statementsDetails.forEachIndexed { index, statementDetails ->
             val response = restTemplate.postForEntity(
-                "/api/v1/statements",
+                "/statements",
                 statementDetails,
                 Statement::class.java
             )
@@ -64,7 +64,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     private fun addUserStatements() {
         userStatementsDetails.forEachIndexed { index, userStatementDetails ->
             val response = restTemplate.postForEntity(
-                "/api/v1/statements/users",
+                "/statements/users",
                 userStatementDetails,
                 UserStatement::class.java
             )
@@ -76,7 +76,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     private fun getStatements() {
         val expected = statements.findUnreacted(userId, definingThemeIds, userStatements)
         val response = restTemplate.getForEntity(
-            "/api/v1/statements?userId=${userId}&definingThemeIds=${definingThemeIds.toRequestParams()}",
+            "/statements?userId=${userId}&definingThemeIds=${definingThemeIds.toRequestParams()}",
             Array<Statement>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -87,7 +87,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     private fun getUserStatements() {
         val expected = userStatements.filterByUserIdAndDefiningThemeIds(userId, definingThemeIds, statements)
         val response = restTemplate.getForEntity(
-            "/api/v1/statements/users?userId=$userId&definingThemeIds=${definingThemeIds.toRequestParams()}",
+            "/statements/users?userId=$userId&definingThemeIds=${definingThemeIds.toRequestParams()}",
             Array<UserStatement>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)

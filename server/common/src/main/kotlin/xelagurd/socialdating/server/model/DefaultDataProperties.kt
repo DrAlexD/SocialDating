@@ -1,6 +1,8 @@
 package xelagurd.socialdating.server.model
 
 object DefaultDataProperties {
+    const val GATEWAY_URL = "http://localhost:8080/api/v1"
+
     const val LENGTH_MAX = 100
 
     const val PERCENT_MIN = 0

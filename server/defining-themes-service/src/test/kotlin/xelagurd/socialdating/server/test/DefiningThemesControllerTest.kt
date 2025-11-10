@@ -38,7 +38,7 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
         `when`(definingThemesService.getDefiningThemes(categoryId)).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/defining-themes?categoryId=$categoryId")
+            get("/defining-themes?categoryId=$categoryId")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -51,7 +51,7 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
         `when`(definingThemesService.getDefiningThemes()).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/defining-themes")
+            get("/defining-themes")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -64,7 +64,7 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
         `when`(definingThemesService.getDefiningThemes()).thenThrow(NoDataFoundException(message))
 
         mockMvc.perform(
-            get("/api/v1/defining-themes")
+            get("/defining-themes")
         )
             .andExpect(status().isNotFound)
             .andExpect(content().string(message))
@@ -76,7 +76,7 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
         `when`(definingThemesService.addDefiningTheme(definingThemeDetails)).thenReturn(expected)
 
         mockMvc.perform(
-            post("/api/v1/defining-themes")
+            post("/defining-themes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(definingThemeDetails))
         )

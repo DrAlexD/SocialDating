@@ -35,7 +35,7 @@ class UsersControllerTest(@param:Autowired private val mockMvc: MockMvc) {
         `when`(usersService.getUser(userId)).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/users/$userId")
+            get("/users/$userId")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -48,7 +48,7 @@ class UsersControllerTest(@param:Autowired private val mockMvc: MockMvc) {
         `when`(usersService.getUser(userId)).thenThrow(NoDataFoundException(message))
 
         mockMvc.perform(
-            get("/api/v1/users/$userId")
+            get("/users/$userId")
         )
             .andExpect(status().isNotFound)
             .andExpect(content().string(message))

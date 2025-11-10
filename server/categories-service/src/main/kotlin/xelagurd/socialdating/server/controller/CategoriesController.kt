@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.model.details.CategoryDetails
@@ -14,16 +16,18 @@ import xelagurd.socialdating.server.security.AdminAccess
 import xelagurd.socialdating.server.service.CategoriesService
 
 @RestController
-@RequestMapping(path = ["/api/v1/categories"], produces = ["application/json"])
+@RequestMapping(path = ["/categories"], produces = ["application/json"])
 class CategoriesController(
     private val categoriesService: CategoriesService
 ) {
 
+    @Operation(security = [SecurityRequirement("bearerAuth")])
     @GetMapping
     fun getCategories(): List<Category> {
         return categoriesService.getCategories()
     }
 
+    @Operation(security = [SecurityRequirement("bearerAuth")])
     @AdminAccess
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

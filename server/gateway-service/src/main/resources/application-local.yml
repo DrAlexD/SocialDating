@@ -3,6 +3,8 @@ spring:
     import:
       - optional:file:.env[.properties]
       - optional:file:.env
+  kafka:
+    bootstrap-servers: localhost:9093
   cloud:
     gateway:
       routes:
@@ -10,17 +12,26 @@ spring:
           uri: http://localhost:8010
           predicates:
             - Path=/api/v1/users/**
+          filters:
+            - StripPrefix=2
+
         - id: categories-service
           uri: http://localhost:8020
           predicates:
             - Path=/api/v1/categories/**
+          filters:
+            - StripPrefix=2
+
         - id: defining-themes-service
           uri: http://localhost:8030
           predicates:
             - Path=/api/v1/defining-themes/**
+          filters:
+            - StripPrefix=2
+
         - id: statements-service
           uri: http://localhost:8040
           predicates:
             - Path=/api/v1/statements/**
-  kafka:
-    bootstrap-servers: localhost:9093
+          filters:
+            - StripPrefix=2

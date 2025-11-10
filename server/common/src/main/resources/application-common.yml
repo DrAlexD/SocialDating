@@ -10,10 +10,6 @@ management:
     db:
       enabled: true
 
-security:
-  whitelist:
-    - /actuator/**
-
 spring:
   profiles:
     active: dev

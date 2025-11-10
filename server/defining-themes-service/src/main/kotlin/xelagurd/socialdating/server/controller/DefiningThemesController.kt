@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
@@ -15,16 +17,18 @@ import xelagurd.socialdating.server.security.AdminAccess
 import xelagurd.socialdating.server.service.DefiningThemesService
 
 @RestController
-@RequestMapping(path = ["/api/v1/defining-themes"], produces = ["application/json"])
+@RequestMapping(path = ["/defining-themes"], produces = ["application/json"])
 class DefiningThemesController(
     private val definingThemesService: DefiningThemesService
 ) {
 
+    @Operation(security = [SecurityRequirement("bearerAuth")])
     @GetMapping
     fun getDefiningThemes(@RequestParam(required = false) categoryId: Int?): List<DefiningTheme> {
         return definingThemesService.getDefiningThemes(categoryId)
     }
 
+    @Operation(security = [SecurityRequirement("bearerAuth")])
     @AdminAccess
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

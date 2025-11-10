@@ -12,7 +12,7 @@ import xelagurd.socialdating.server.model.details.RegistrationDetails
 import xelagurd.socialdating.server.service.AuthService
 
 @RestController
-@RequestMapping(path = ["/api/v1/users/auth"], produces = ["application/json"])
+@RequestMapping(path = ["/users/auth"], produces = ["application/json"])
 class AuthController(
     private val authService: AuthService
 ) {

@@ -6,6 +6,15 @@ management:
     kafka:
       enabled: true
 
+security:
+  whitelist:
+    - /actuator/**
+    - /categories/v3/api-docs
+
+springdoc:
+  api-docs:
+    path: /categories/v3/api-docs
+
 spring:
   application:
     name: categories-service

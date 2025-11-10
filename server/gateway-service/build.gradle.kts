@@ -19,6 +19,8 @@ dependencies {
 
     implementation(libs.spring.kafka)
 
+    implementation(libs.springdoc.openapi.webflux)
+
     implementation(libs.jwt.api)
     runtimeOnly(libs.jwt.impl)
     runtimeOnly(libs.jwt.jackson)

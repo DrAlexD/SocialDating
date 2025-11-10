@@ -36,7 +36,7 @@ class CategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc) {
         `when`(categoriesService.getCategories()).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/categories")
+            get("/categories")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -49,7 +49,7 @@ class CategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc) {
         `when`(categoriesService.getCategories()).thenThrow(NoDataFoundException(message))
 
         mockMvc.perform(
-            get("/api/v1/categories")
+            get("/categories")
         )
             .andExpect(status().isNotFound)
             .andExpect(content().string(message))
@@ -61,7 +61,7 @@ class CategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc) {
         `when`(categoriesService.addCategory(categoryDetails)).thenReturn(expected)
 
         mockMvc.perform(
-            post("/api/v1/categories")
+            post("/categories")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(categoryDetails))
         )

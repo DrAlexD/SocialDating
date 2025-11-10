@@ -6,6 +6,15 @@ management:
     kafka:
       enabled: true
 
+security:
+  whitelist:
+    - /actuator/**
+    - /defining-themes/v3/api-docs
+
+springdoc:
+  api-docs:
+    path: /defining-themes/v3/api-docs
+
 spring:
   application:
     name: defining-themes-service
