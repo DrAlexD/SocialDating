@@ -4,7 +4,6 @@ import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.UserStatement
 import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.details.StatementDetails
-import xelagurd.socialdating.server.model.details.UserStatementDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 
 object FakeStatementsData {
@@ -89,14 +88,6 @@ object FakeStatementsData {
         )
     )
 
-    val userStatementsDetails = listOf(
-        UserStatementDetails(reactionType = FULL_MAINTAIN, userId = 1, statementId = 1),
-        UserStatementDetails(reactionType = FULL_MAINTAIN, userId = 1, statementId = 4),
-        UserStatementDetails(reactionType = FULL_MAINTAIN, userId = 1, statementId = 5),
-        UserStatementDetails(reactionType = FULL_MAINTAIN, userId = 1, statementId = 6),
-        UserStatementDetails(reactionType = FULL_MAINTAIN, userId = 2, statementId = 5)
-    )
-
     val userStatements = listOf(
         UserStatement(id = 1, reactionType = FULL_MAINTAIN, userId = 1, statementId = 1),
         UserStatement(id = 2, reactionType = FULL_MAINTAIN, userId = 1, statementId = 4),
@@ -124,45 +115,4 @@ object FakeStatementsData {
             )
         }
 
-    fun List<UserStatement>.toServerAnswer() =
-        this.map {
-            UserStatement(
-                id = it.id,
-                reactionType = null,
-                userId = it.userId,
-                statementId = it.statementId
-            )
-        }
-
-    fun List<Statement>.findUnreacted(
-        userId: Int,
-        definingThemeIds: List<Int>,
-        userStatements: List<UserStatement>
-    ): List<Statement> {
-        val expected = mutableListOf<Statement>()
-        forEach { statement ->
-            if (statement.definingThemeId in (definingThemeIds) &&
-                userStatements.none { it.statementId == statement.id && it.userId == userId }
-            ) {
-                expected.add(statement)
-            }
-        }
-        return expected.toList()
-    }
-
-    fun List<UserStatement>.filterByUserIdAndDefiningThemeIds(
-        userId: Int,
-        definingThemeIds: List<Int>,
-        statements: List<Statement>
-    ): List<UserStatement> {
-        val expected = mutableListOf<UserStatement>()
-        forEach { userStatement ->
-            if (userStatement.userId == userId &&
-                statements.first { it.id == userStatement.statementId }.definingThemeId in (definingThemeIds)
-            ) {
-                expected.add(userStatement)
-            }
-        }
-        return expected.toList()
-    }
 }

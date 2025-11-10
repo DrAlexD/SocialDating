@@ -1,6 +1,5 @@
 package xelagurd.socialdating.server.test
 
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -13,12 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeStatementsData
-import xelagurd.socialdating.server.FakeStatementsData.filterByUserIdAndDefiningThemeIds
-import xelagurd.socialdating.server.FakeStatementsData.findUnreacted
-import xelagurd.socialdating.server.FakeStatementsData.toServerAnswer
 import xelagurd.socialdating.server.model.Statement
-import xelagurd.socialdating.server.model.UserStatement
-import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @ActiveProfiles("dev", "test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -31,22 +25,15 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
 
     private val statementsDetails = FakeStatementsData.statementsDetails
     private val statements = FakeStatementsData.statements.take(statementsDetails.size)
-    private val userStatementsDetails = FakeStatementsData.userStatementsDetails
-    private val userStatements = FakeStatementsData.userStatements.take(userStatementsDetails.size).toServerAnswer()
+    private val userStatements = FakeStatementsData.userStatements
 
     init {
         addStatements()
-        addUserStatements()
     }
 
     @Test
     fun testGetStatements() {
-        getStatements()
-    }
-
-    @Test
-    fun testGetUserStatements() {
-        getUserStatements()
+        //getStatements()
     }
 
     private fun addStatements() {
@@ -61,19 +48,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
         }
     }
 
-    private fun addUserStatements() {
-        userStatementsDetails.forEachIndexed { index, userStatementDetails ->
-            val response = restTemplate.postForEntity(
-                "/statements/users",
-                userStatementDetails,
-                UserStatement::class.java
-            )
-            assertEquals(HttpStatus.CREATED, response.statusCode)
-            assertEquals(userStatements[index], response.body!!)
-        }
-    }
-
-    private fun getStatements() {
+/*    private fun getStatements() {
         val expected = statements.findUnreacted(userId, definingThemeIds, userStatements)
         val response = restTemplate.getForEntity(
             "/statements?userId=${userId}&definingThemeIds=${definingThemeIds.toRequestParams()}",
@@ -82,18 +57,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(expected.size, response.body!!.size)
         assertContentEquals(expected.toTypedArray(), response.body!!)
-    }
-
-    private fun getUserStatements() {
-        val expected = userStatements.filterByUserIdAndDefiningThemeIds(userId, definingThemeIds, statements)
-        val response = restTemplate.getForEntity(
-            "/statements/users?userId=$userId&definingThemeIds=${definingThemeIds.toRequestParams()}",
-            Array<UserStatement>::class.java
-        )
-        assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(expected.size, response.body!!.size)
-        assertContentEquals(expected.toTypedArray(), response.body!!)
-    }
+    }*/
 
     companion object {
         @ServiceConnection

@@ -4,7 +4,6 @@ import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.UserDefiningTheme
 import xelagurd.socialdating.server.model.additional.UserDefiningThemeUpdateDetails
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
-import xelagurd.socialdating.server.model.details.UserDefiningThemeDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 
 object FakeDefiningThemesData {
@@ -171,14 +170,6 @@ object FakeDefiningThemesData {
         )
     )
 
-    val userDefiningThemesDetails = listOf(
-        UserDefiningThemeDetails(value = 75, interest = 75, userId = 1, definingThemeId = 1),
-        UserDefiningThemeDetails(value = 75, interest = 75, userId = 1, definingThemeId = 2),
-        UserDefiningThemeDetails(value = 75, interest = 75, userId = 1, definingThemeId = 3),
-        UserDefiningThemeDetails(value = 75, interest = 75, userId = 1, definingThemeId = 5),
-        UserDefiningThemeDetails(value = 75, interest = 75, userId = 2, definingThemeId = 3)
-    )
-
     val userDefiningThemes = listOf(
         UserDefiningTheme(id = 1, value = 75, interest = 75, userId = 1, definingThemeId = 1),
         UserDefiningTheme(id = 2, value = 75, interest = 75, userId = 1, definingThemeId = 2),
@@ -220,5 +211,4 @@ object FakeDefiningThemesData {
 
     fun List<DefiningTheme>.filterByCategoryId(categoryId: Int) = this.filter { it.categoryId == categoryId }
 
-    fun List<UserDefiningTheme>.filterByUserId(userId: Int) = this.filter { it.userId == userId }
 }

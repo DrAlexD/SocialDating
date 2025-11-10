@@ -7,7 +7,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.junit.jupiter.api.Test
@@ -28,9 +27,6 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
     private val userId = 1
 
     private val userDefiningThemes = FakeDefiningThemesData.userDefiningThemes
-
-    private val userDefiningThemeDetails = FakeDefiningThemesData.userDefiningThemesDetails[0]
-    private val userDefiningTheme = userDefiningThemes[0]
 
     @Test
     fun getUserDefiningThemes_allData_success() {
@@ -57,18 +53,4 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
             .andExpect(content().string(message))
     }
 
-    @Test
-    fun addUserDefiningTheme() {
-        val expected = userDefiningTheme
-        `when`(userDefiningThemesService.addUserDefiningTheme(userDefiningThemeDetails)).thenReturn(expected)
-
-        mockMvc.perform(
-            post("/defining-themes/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(userDefiningThemeDetails))
-        )
-            .andExpect(status().isCreated)
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
-    }
 }

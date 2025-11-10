@@ -13,8 +13,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.UserStatement
 import xelagurd.socialdating.server.model.additional.StatementReactionDetails
-import xelagurd.socialdating.server.model.details.UserStatementDetails
-import xelagurd.socialdating.server.security.AdminAccess
 import xelagurd.socialdating.server.service.UserStatementsService
 
 @RestController
@@ -30,14 +28,6 @@ class UserStatementsController(
         @RequestParam definingThemeIds: List<Int>
     ): List<UserStatement> {
         return userStatementsService.getUserStatements(userId, definingThemeIds)
-    }
-
-    @Operation(security = [SecurityRequirement("bearerAuth")])
-    @AdminAccess
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    fun addUserStatement(@RequestBody @Valid userStatementDetails: UserStatementDetails): UserStatement {
-        return userStatementsService.addUserStatement(userStatementDetails)
     }
 
     @Operation(security = [SecurityRequirement("bearerAuth")])

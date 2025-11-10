@@ -1,6 +1,7 @@
 package xelagurd.socialdating.server.model.additional
 
 import jakarta.validation.constraints.Positive
+import xelagurd.socialdating.server.model.UserStatement
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 
 data class StatementReactionDetails(
@@ -20,6 +21,13 @@ data class StatementReactionDetails(
 
     val isSupportDefiningTheme: Boolean
 ) {
+    fun toUserStatement() =
+        UserStatement(
+            reactionType = reactionType,
+            userId = userId,
+            statementId = statementId
+        )
+
     fun toUserCategoryUpdateDetails() =
         UserCategoryUpdateDetails(
             userId = userId,
