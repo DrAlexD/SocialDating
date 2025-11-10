@@ -9,9 +9,14 @@ management:
 security:
   whitelist:
     - /api/v1/users/auth/**
-    - /actuator/**
+    - /api/v1/users/v3/api-docs
+    - /api/v1/categories/v3/api-docs
+    - /api/v1/defining-themes/v3/api-docs
+    - /api/v1/statements/v3/api-docs
 
 spring:
+  kafka:
+    bootstrap-servers: kafka:9092
   cloud:
     gateway:
       routes:
@@ -19,17 +24,38 @@ spring:
           uri: http://users-service:8010
           predicates:
             - Path=/api/v1/users/**
+          filters:
+            - StripPrefix=2
+
         - id: categories-service
           uri: http://categories-service:8020
           predicates:
             - Path=/api/v1/categories/**
+          filters:
+            - StripPrefix=2
+
         - id: defining-themes-service
           uri: http://defining-themes-service:8030
           predicates:
             - Path=/api/v1/defining-themes/**
+          filters:
+            - StripPrefix=2
+
         - id: statements-service
           uri: http://statements-service:8040
           predicates:
             - Path=/api/v1/statements/**
-  kafka:
-    bootstrap-servers: kafka:9092
+          filters:
+            - StripPrefix=2
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: users-service
+        url: /api/v1/users/v3/api-docs
+      - name: categories-service
+        url: /api/v1/categories/v3/api-docs
+      - name: defining-themes-service
+        url: /api/v1/defining-themes/v3/api-docs
+      - name: statements-service
+        url: /api/v1/statements/v3/api-docs

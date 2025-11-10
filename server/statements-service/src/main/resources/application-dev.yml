@@ -6,6 +6,15 @@ management:
     kafka:
       enabled: true
 
+security:
+  whitelist:
+    - /actuator/**
+    - /statements/v3/api-docs
+
+springdoc:
+  api-docs:
+    path: /statements/v3/api-docs
+
 spring:
   application:
     name: statements-service

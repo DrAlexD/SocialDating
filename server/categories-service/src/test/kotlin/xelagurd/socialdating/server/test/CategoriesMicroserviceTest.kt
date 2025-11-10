@@ -49,7 +49,7 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     private fun addCategories() {
         categoriesDetails.forEachIndexed { index, categoryDetails ->
             val response = restTemplate.postForEntity(
-                "/api/v1/categories",
+                "/categories",
                 categoryDetails,
                 Category::class.java
             )
@@ -61,7 +61,7 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     private fun addUserCategories() {
         userCategoriesDetails.forEachIndexed { index, userCategoryDetails ->
             val response = restTemplate.postForEntity(
-                "/api/v1/categories/users",
+                "/categories/users",
                 userCategoryDetails,
                 UserCategory::class.java
             )
@@ -72,7 +72,7 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
 
     private fun getCategories() {
         val response = restTemplate.getForEntity(
-            "/api/v1/categories",
+            "/categories",
             Array<Category>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -83,7 +83,7 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
     private fun getUserCategories() {
         val expected = userCategories.filterByUserId(userId)
         val response = restTemplate.getForEntity(
-            "/api/v1/categories/users?userId=$userId",
+            "/categories/users?userId=$userId",
             Array<UserCategory>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)

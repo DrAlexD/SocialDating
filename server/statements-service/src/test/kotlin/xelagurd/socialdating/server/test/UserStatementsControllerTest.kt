@@ -42,7 +42,7 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
         `when`(userStatementsService.getUserStatements(userId, definingThemeIds)).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/statements/users?userId=$userId&definingThemeIds=${definingThemeIds.toRequestParams()}")
+            get("/statements/users?userId=$userId&definingThemeIds=${definingThemeIds.toRequestParams()}")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -56,7 +56,7 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
             .thenThrow(NoDataFoundException(message))
 
         mockMvc.perform(
-            get("/api/v1/statements/users?userId=$userId&definingThemeIds=${definingThemeIds.toRequestParams()}")
+            get("/statements/users?userId=$userId&definingThemeIds=${definingThemeIds.toRequestParams()}")
         )
             .andExpect(status().isNotFound)
             .andExpect(content().string(message))
@@ -68,7 +68,7 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
         `when`(userStatementsService.addUserStatement(userStatementDetails)).thenReturn(expected)
 
         mockMvc.perform(
-            post("/api/v1/statements/users")
+            post("/statements/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(userStatementDetails))
         )
@@ -83,7 +83,7 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
         `when`(userStatementsService.processStatementReaction(statementReactionDetails)).thenReturn(expected)
 
         mockMvc.perform(
-            post("/api/v1/statements/users/reaction")
+            post("/statements/users/reaction")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(statementReactionDetails))
         )

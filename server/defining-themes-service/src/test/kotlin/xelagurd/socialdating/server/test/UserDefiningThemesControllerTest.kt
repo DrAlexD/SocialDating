@@ -38,7 +38,7 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
         `when`(userDefiningThemesService.getUserDefiningThemes(userId)).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/defining-themes/users?userId=$userId")
+            get("/defining-themes/users?userId=$userId")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -51,7 +51,7 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
         `when`(userDefiningThemesService.getUserDefiningThemes(userId)).thenThrow(NoDataFoundException(message))
 
         mockMvc.perform(
-            get("/api/v1/defining-themes/users?userId=$userId")
+            get("/defining-themes/users?userId=$userId")
         )
             .andExpect(status().isNotFound)
             .andExpect(content().string(message))
@@ -63,7 +63,7 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
         `when`(userDefiningThemesService.addUserDefiningTheme(userDefiningThemeDetails)).thenReturn(expected)
 
         mockMvc.perform(
-            post("/api/v1/defining-themes/users")
+            post("/defining-themes/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(userDefiningThemeDetails))
         )

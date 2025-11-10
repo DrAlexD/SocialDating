@@ -3,8 +3,13 @@ server:
 
 security:
   whitelist:
-    - /api/v1/users/auth/**
+    - /users/auth/**
     - /actuator/**
+    - /users/v3/api-docs
+
+springdoc:
+  api-docs:
+    path: /users/v3/api-docs
 
 spring:
   application:

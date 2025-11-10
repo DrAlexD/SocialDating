@@ -56,7 +56,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
     private fun addDefiningThemes() {
         definingThemesDetails.forEachIndexed { index, definingThemeDetails ->
             val response = restTemplate.postForEntity(
-                "/api/v1/defining-themes",
+                "/defining-themes",
                 definingThemeDetails,
                 DefiningTheme::class.java
             )
@@ -68,7 +68,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
     private fun addUserDefiningThemes() {
         userDefiningThemesDetails.forEachIndexed { index, userDefiningThemeDetails ->
             val response = restTemplate.postForEntity(
-                "/api/v1/defining-themes/users",
+                "/defining-themes/users",
                 userDefiningThemeDetails,
                 UserDefiningTheme::class.java
             )
@@ -80,7 +80,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
     private fun getDefiningThemesByCategoryId() {
         val expected = definingThemes.filterByCategoryId(categoryId)
         val response = restTemplate.getForEntity(
-            "/api/v1/defining-themes?categoryId=$categoryId",
+            "/defining-themes?categoryId=$categoryId",
             Array<DefiningTheme>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -90,7 +90,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
 
     private fun getDefiningThemes() {
         val response = restTemplate.getForEntity(
-            "/api/v1/defining-themes",
+            "/defining-themes",
             Array<DefiningTheme>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -101,7 +101,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
     private fun getUserDefiningThemes() {
         val expected = userDefiningThemes.filterByUserId(userId)
         val response = restTemplate.getForEntity(
-            "/api/v1/defining-themes/users?userId=$userId",
+            "/defining-themes/users?userId=$userId",
             Array<UserDefiningTheme>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)

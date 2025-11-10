@@ -38,7 +38,7 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
         `when`(userCategoriesService.getUserCategories(userId)).thenReturn(expected)
 
         mockMvc.perform(
-            get("/api/v1/categories/users?userId=$userId")
+            get("/categories/users?userId=$userId")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -51,7 +51,7 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
         `when`(userCategoriesService.getUserCategories(userId)).thenThrow(NoDataFoundException(message))
 
         mockMvc.perform(
-            get("/api/v1/categories/users?userId=$userId")
+            get("/categories/users?userId=$userId")
         )
             .andExpect(status().isNotFound)
             .andExpect(content().string(message))
@@ -63,7 +63,7 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
         `when`(userCategoriesService.addUserCategory(userCategoryDetails)).thenReturn(expected)
 
         mockMvc.perform(
-            post("/api/v1/categories/users")
+            post("/categories/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(convertObjectToJsonString(userCategoryDetails))
         )

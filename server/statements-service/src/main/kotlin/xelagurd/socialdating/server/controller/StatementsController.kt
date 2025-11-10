@@ -8,17 +8,20 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.details.StatementDetails
 import xelagurd.socialdating.server.service.StatementsService
 
 @RestController
-@RequestMapping(path = ["/api/v1/statements"], produces = ["application/json"])
+@RequestMapping(path = ["/statements"], produces = ["application/json"])
 class StatementsController(
     private val statementsService: StatementsService
 ) {
 
+    @Operation(security = [SecurityRequirement("bearerAuth")])
     @GetMapping
     fun getStatements(
         @RequestParam userId: Int,
@@ -27,6 +30,7 @@ class StatementsController(
         return statementsService.getStatements(userId, definingThemeIds)
     }
 
+    @Operation(security = [SecurityRequirement("bearerAuth")])
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addStatement(@RequestBody @Valid statementDetails: StatementDetails): Statement {

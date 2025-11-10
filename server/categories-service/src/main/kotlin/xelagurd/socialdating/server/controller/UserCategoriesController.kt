@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.additional.SimilarUser
@@ -17,16 +19,18 @@ import xelagurd.socialdating.server.security.AdminAccess
 import xelagurd.socialdating.server.service.UserCategoriesService
 
 @RestController
-@RequestMapping(path = ["/api/v1/categories/users"], produces = ["application/json"])
+@RequestMapping(path = ["/categories/users"], produces = ["application/json"])
 class UserCategoriesController(
     private val userCategoriesService: UserCategoriesService
 ) {
 
+    @Operation(security = [SecurityRequirement("bearerAuth")])
     @GetMapping
     fun getUserCategories(@RequestParam userId: Int): List<UserCategory> {
         return userCategoriesService.getUserCategories(userId)
     }
 
+    @Operation(security = [SecurityRequirement("bearerAuth")])
     @AdminAccess
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -34,6 +38,7 @@ class UserCategoriesController(
         return userCategoriesService.addUserCategory(userCategoryDetails)
     }
 
+    @Operation(security = [SecurityRequirement("bearerAuth")])
     @GetMapping("/users-similarity")
     fun getUsersWithSimilarity(
         @RequestParam userId: Int,
@@ -42,6 +47,7 @@ class UserCategoriesController(
         return userCategoriesService.getUsersWithSimilarity(userId, categoryIds)
     }
 
+    @Operation(security = [SecurityRequirement("bearerAuth")])
     @GetMapping("/similar-user")
     fun getSimilarUser(
         @RequestParam currentUserId: Int,
