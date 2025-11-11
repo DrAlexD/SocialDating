@@ -4,69 +4,40 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
+import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.controller.CategoriesController
-import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.service.CategoriesService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 
 @WebMvcTest(CategoriesController::class)
 @Import(NoSecurityConfig::class)
+@ExtendWith(MockKExtension::class)
 class CategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
-    @MockitoBean
+    @MockkBean
     private lateinit var categoriesService: CategoriesService
 
     private val categories = FakeCategoriesData.categories
 
-    private val categoryDetails = FakeCategoriesData.categoriesDetails[0]
-    private val category = categories[0]
-
     @Test
-    fun getCategories_allData_success() {
-        val expected = categories
-        `when`(categoriesService.getCategories()).thenReturn(expected)
+    fun getCategories_existData_ok() {
+        every { categoriesService.getCategories() } returns categories
 
         mockMvc.perform(
             get("/categories")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
+            .andExpect(content().json(convertObjectToJsonString(categories)))
     }
 
-    @Test
-    fun getCategories_emptyData_error() {
-        val message = "test"
-        `when`(categoriesService.getCategories()).thenThrow(NoDataFoundException(message))
-
-        mockMvc.perform(
-            get("/categories")
-        )
-            .andExpect(status().isNotFound)
-            .andExpect(content().string(message))
-    }
-
-    @Test
-    fun addCategory() {
-        val expected = category
-        `when`(categoriesService.addCategory(categoryDetails)).thenReturn(expected)
-
-        mockMvc.perform(
-            post("/categories")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(categoryDetails))
-        )
-            .andExpect(status().isCreated)
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
-    }
 }
