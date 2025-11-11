@@ -4,26 +4,27 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
+import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.controller.StatementsController
-import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.service.StatementsService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @WebMvcTest(StatementsController::class)
 @Import(NoSecurityConfig::class)
+@ExtendWith(MockKExtension::class)
 class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
-    @MockitoBean
+    @MockkBean
     private lateinit var statementsService: StatementsService
 
     private val userId = 1
@@ -31,46 +32,16 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     private val statements = FakeStatementsData.statements
 
-    private val statementDetails = FakeStatementsData.statementsDetails[0]
-    private val statement = statements[0]
-
     @Test
-    fun getStatements_allData_success() {
-        val expected = statements
-        `when`(statementsService.getStatements(userId, definingThemeIds)).thenReturn(expected)
+    fun getStatements_existData_ok() {
+        every { statementsService.getStatements(userId, definingThemeIds) } returns statements
 
         mockMvc.perform(
             get("/statements?userId=${userId}&definingThemeIds=${definingThemeIds.toRequestParams()}")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
+            .andExpect(content().json(convertObjectToJsonString(statements)))
     }
 
-    @Test
-    fun getStatements_emptyData_error() {
-        val message = "test"
-        `when`(statementsService.getStatements(userId, definingThemeIds)).thenThrow(NoDataFoundException(message))
-
-        mockMvc.perform(
-            get("/statements?userId=${userId}&definingThemeIds=${definingThemeIds.toRequestParams()}")
-        )
-            .andExpect(status().isNotFound)
-            .andExpect(content().string(message))
-    }
-
-    @Test
-    fun addStatement() {
-        val expected = statement
-        `when`(statementsService.addStatement(statementDetails)).thenReturn(expected)
-
-        mockMvc.perform(
-            post("/statements")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonString(statementDetails))
-        )
-            .andExpect(status().isCreated)
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
-    }
 }

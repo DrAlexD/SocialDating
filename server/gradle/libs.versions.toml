@@ -15,6 +15,7 @@ jwt = "0.13.0"
 postgresql = "42.7.8"
 testcontainers = "1.21.3"
 mockk = "1.14.6"
+springmockk = "4.0.2"
 
 [libraries]
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -45,6 +46,7 @@ spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers", version.ref = "springBoot" }
 testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }
 
 [bundles]
 kotlin-ecosystem = ["kotlin-reflect", "kotlinx-datetime", "kotlinx-serialization-json", "kotlinx-coroutines",
@@ -52,7 +54,7 @@ kotlin-ecosystem = ["kotlin-reflect", "kotlinx-datetime", "kotlinx-serialization
 spring-ecosystem = ["spring-boot-actuator", "spring-boot-webmvc", "spring-boot-data-jpa", "spring-boot-validation",
     "spring-boot-security", "springdoc-openapi-webmvc"]
 testing-ecosystem = ["kotlin-test-junit5", "spring-boot-test", "spring-boot-testcontainers", "testcontainers-postgresql",
-    "mockk"]
+    "mockk", "springmockk"]
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }

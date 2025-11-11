@@ -1,13 +1,13 @@
 package xelagurd.socialdating.server.test
 
-import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import io.mockk.just
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_STEP
 import xelagurd.socialdating.server.model.UserCategory
@@ -15,6 +15,7 @@ import xelagurd.socialdating.server.service.CategoriesKafkaConsumer
 import xelagurd.socialdating.server.service.CategoriesKafkaProducer
 import xelagurd.socialdating.server.service.UserCategoriesService
 
+@ExtendWith(MockKExtension::class)
 class CategoriesKafkaConsumerUnitTest {
 
     @MockK
@@ -32,13 +33,8 @@ class CategoriesKafkaConsumerUnitTest {
     private val newUserCategory = UserCategory(userId = userCategory.userId, categoryId = userCategory.categoryId)
     private val newAddedUserCategory = newUserCategory.copy(id = 1)
 
-    @BeforeEach
-    fun setup() {
-        MockKAnnotations.init(this)
-    }
-
     @Test
-    fun updateUserCategory_existUserCategory() {
+    fun updateUserCategory_existData() {
         every {
             userCategoriesService.getUserCategory(updateDetails.userId, updateDetails.categoryId)
         } returns userCategory
@@ -55,7 +51,7 @@ class CategoriesKafkaConsumerUnitTest {
     }
 
     @Test
-    fun updateUserCategory_notExistUserCategory() {
+    fun updateUserCategory_noData() {
         every {
             userCategoriesService.getUserCategory(updateDetails.userId, updateDetails.categoryId)
         } returns null
@@ -70,4 +66,10 @@ class CategoriesKafkaConsumerUnitTest {
 
         categoriesKafkaConsumer.updateUserCategory(updateDetails)
     }
+
+    @Test
+    fun updateMaintainedList() {
+        // TODO
+    }
+
 }

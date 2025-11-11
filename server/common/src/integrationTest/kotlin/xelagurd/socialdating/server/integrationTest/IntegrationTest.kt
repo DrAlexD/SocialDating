@@ -56,8 +56,20 @@ class IntegrationTest {
         Thread.sleep(3000)
 
         getUserStatements()
+        //TODO getStatements()
+
         getUserCategories()
         getUserDefiningThemes()
+    }
+
+    @Test
+    fun testGetUsersWithSimilarity() {
+        // TODO
+    }
+
+    @Test
+    fun testGetSimilarUser() {
+        // TODO
     }
 
     private fun loginUser(): Map<String, Any> {

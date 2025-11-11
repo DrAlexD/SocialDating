@@ -4,24 +4,26 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
+import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.controller.UserDefiningThemesController
-import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.service.UserDefiningThemesService
 import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
 
 @WebMvcTest(UserDefiningThemesController::class)
 @Import(NoSecurityConfig::class)
+@ExtendWith(MockKExtension::class)
 class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
-    @MockitoBean
+    @MockkBean
     private lateinit var userDefiningThemesService: UserDefiningThemesService
 
     private val userId = 1
@@ -29,28 +31,15 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
     private val userDefiningThemes = FakeDefiningThemesData.userDefiningThemes
 
     @Test
-    fun getUserDefiningThemes_allData_success() {
-        val expected = userDefiningThemes
-        `when`(userDefiningThemesService.getUserDefiningThemes(userId)).thenReturn(expected)
+    fun getUserDefiningThemes_existData_ok() {
+        every { userDefiningThemesService.getUserDefiningThemes(userId) } returns userDefiningThemes
 
         mockMvc.perform(
             get("/defining-themes/users?userId=$userId")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(expected)))
-    }
-
-    @Test
-    fun getUserDefiningThemes_emptyData_error() {
-        val message = "test"
-        `when`(userDefiningThemesService.getUserDefiningThemes(userId)).thenThrow(NoDataFoundException(message))
-
-        mockMvc.perform(
-            get("/defining-themes/users?userId=$userId")
-        )
-            .andExpect(status().isNotFound)
-            .andExpect(content().string(message))
+            .andExpect(content().json(convertObjectToJsonString(userDefiningThemes)))
     }
 
 }

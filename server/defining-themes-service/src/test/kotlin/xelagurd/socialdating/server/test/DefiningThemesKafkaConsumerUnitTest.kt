@@ -1,13 +1,13 @@
 package xelagurd.socialdating.server.test
 
-import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import io.mockk.just
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_INTEREST_STEP
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_COEFFICIENT
@@ -21,6 +21,7 @@ import xelagurd.socialdating.server.service.DefiningThemesKafkaProducer
 import xelagurd.socialdating.server.service.DefiningThemesService
 import xelagurd.socialdating.server.service.UserDefiningThemesService
 
+@ExtendWith(MockKExtension::class)
 class DefiningThemesKafkaConsumerUnitTest {
 
     @MockK
@@ -49,13 +50,8 @@ class DefiningThemesKafkaConsumerUnitTest {
     )
     private val newAddedUserDefiningTheme = newUserDefiningTheme.copy(id = 1)
 
-    @BeforeEach
-    fun setup() {
-        MockKAnnotations.init(this)
-    }
-
     @Test
-    fun updateUserDefiningTheme_existUserDefiningTheme() {
+    fun updateUserDefiningTheme_existData() {
         every {
             userDefiningThemesService.getUserDefiningTheme(updateDetails.userId, updateDetails.definingThemeId)
         } returns userDefiningTheme
@@ -81,7 +77,7 @@ class DefiningThemesKafkaConsumerUnitTest {
     }
 
     @Test
-    fun updateUserDefiningTheme_notExistUserDefiningTheme() {
+    fun updateUserDefiningTheme_noData() {
         every {
             userDefiningThemesService.getUserDefiningTheme(updateDetails.userId, updateDetails.definingThemeId)
         } returns null
@@ -90,4 +86,5 @@ class DefiningThemesKafkaConsumerUnitTest {
 
         definingThemesKafkaConsumer.updateUserDefiningTheme(updateDetails)
     }
+
 }
