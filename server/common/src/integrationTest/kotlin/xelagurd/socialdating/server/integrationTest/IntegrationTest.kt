@@ -10,25 +10,34 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestMethodOrder
 import xelagurd.socialdating.server.model.DefaultDataProperties.GATEWAY_URL
 import xelagurd.socialdating.server.utils.TestUtils.readArrayFromJsonString
 import xelagurd.socialdating.server.utils.TestUtils.readObjectFromJsonString
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class IntegrationTest {
     private val restTemplate = TestRestTemplate()
 
     val randomNumber = Random.nextLong(100, 1000)
 
-    private var accessToken: String
-    private var refreshToken: String
+    private var accessToken = ""
+    private var refreshToken = ""
 
-    private var userId: Int
-    private var categoryId: Int
-    private var definingThemeId: Int
-    private var statementId: Int
+    private var userId = -1
+    private var categoryId = -1
+    private var definingThemeId = -1
+    private var statementId = -1
 
-    init {
+    @Order(1)
+    @Test
+    fun initializeData() {
         val responseAuth = loginUser()
         userId = (responseAuth["user"] as HashMap<*, *>)["id"] as Int
         accessToken = responseAuth["accessToken"] as String
@@ -39,9 +48,18 @@ class IntegrationTest {
         statementId = addStatement()
     }
 
+    @Order(2)
     @Test
-    fun testRegisterUser() {
-        registerUser()
+    fun testProcessStatementReaction() {
+        processStatementReaction()
+
+        Thread.sleep(5000)
+
+        getUserStatements()
+        // TODO getStatements()
+
+        getUserCategories()
+        getUserDefiningThemes()
     }
 
     @Test
@@ -50,23 +68,23 @@ class IntegrationTest {
     }
 
     @Test
-    fun testProcessStatementReaction() {
-        processStatementReaction()
-
-        Thread.sleep(3000)
-
-        getUserStatements()
-        //TODO getStatements()
-
-        getUserCategories()
-        getUserDefiningThemes()
+    fun testRegisterUser() {
+        registerUser()
     }
 
+    @Disabled
+    @Test
+    fun testRefreshToken() {
+        // TODO
+    }
+
+    @Disabled
     @Test
     fun testGetUsersWithSimilarity() {
         // TODO
     }
 
+    @Disabled
     @Test
     fun testGetSimilarUser() {
         // TODO

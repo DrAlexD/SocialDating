@@ -32,7 +32,6 @@ data class RegistrationFormData(
             gender = gender!!,
             username = username,
             password = password,
-            repeatedPassword = repeatedPassword,
             email = email.takeIf { it.isNotBlank() },
             age = age.toInt(),
             city = city,

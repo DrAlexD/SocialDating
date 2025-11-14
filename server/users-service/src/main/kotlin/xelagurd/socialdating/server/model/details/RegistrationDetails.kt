@@ -31,10 +31,6 @@ data class RegistrationDetails(
     @field:Size(max = LENGTH_MAX)
     val password: String,
 
-    @field:NotBlank
-    @field:Size(max = LENGTH_MAX)
-    val repeatedPassword: String,
-
     @field:Size(max = LENGTH_MAX)
     @field:Email
     val email: String?,

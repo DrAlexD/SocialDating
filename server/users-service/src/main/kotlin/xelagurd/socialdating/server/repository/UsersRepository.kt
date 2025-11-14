@@ -6,5 +6,9 @@ import xelagurd.socialdating.server.model.User
 
 @Repository
 interface UsersRepository : JpaRepository<User, Int> {
+
     fun findByUsername(username: String): User?
+
+    fun findByEmail(email: String): User?
+
 }

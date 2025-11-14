@@ -10,6 +10,8 @@ dependencies {
     api(libs.bundles.kotlin.ecosystem)
     api(libs.bundles.spring.ecosystem)
 
+    implementation(libs.mockk)
+
     testImplementation(libs.kotlin.test.junit5)
     testImplementation(libs.spring.boot.test)
 }

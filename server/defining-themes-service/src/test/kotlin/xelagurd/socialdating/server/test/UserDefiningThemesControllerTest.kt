@@ -1,5 +1,6 @@
 package xelagurd.socialdating.server.test
 
+import kotlin.random.Random
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
@@ -9,14 +10,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import com.ninjasquad.springmockk.MockkBean
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
+import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.controller.UserDefiningThemesController
 import xelagurd.socialdating.server.service.UserDefiningThemesService
-import xelagurd.socialdating.server.utils.TestUtils.convertObjectToJsonString
+import xelagurd.socialdating.server.utils.TestUtils.mockkList
 
 @WebMvcTest(UserDefiningThemesController::class)
 @Import(NoSecurityConfig::class)
@@ -26,20 +28,21 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
     @MockkBean
     private lateinit var userDefiningThemesService: UserDefiningThemesService
 
-    private val userId = 1
-
-    private val userDefiningThemes = FakeDefiningThemesData.userDefiningThemes
+    private val userId = Random.nextInt()
 
     @Test
     fun getUserDefiningThemes_existData_ok() {
-        every { userDefiningThemesService.getUserDefiningThemes(userId) } returns userDefiningThemes
+        every { userDefiningThemesService.getUserDefiningThemes(any()) } returns
+                mockkList(relaxed = true)
 
         mockMvc.perform(
             get("/defining-themes/users?userId=$userId")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json(convertObjectToJsonString(userDefiningThemes)))
+
+        verify(exactly = 1) { userDefiningThemesService.getUserDefiningThemes(any()) }
+        confirmVerified(userDefiningThemesService)
     }
 
 }

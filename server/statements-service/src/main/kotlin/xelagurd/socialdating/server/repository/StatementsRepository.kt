@@ -14,5 +14,5 @@ interface StatementsRepository : JpaRepository<Statement, Int> {
         """,
         nativeQuery = true
     )
-    fun findUnreactedStatements(userId: Int, definingThemeIds: Iterable<Int>): List<Statement>
+    fun findUnreactedStatements(userId: Int, definingThemeIds: List<Int>): List<Statement>
 }

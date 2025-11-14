@@ -25,7 +25,7 @@ class UserStatement(
 
     @field:JsonIgnore
     @field:Enumerated(EnumType.STRING)
-    var reactionType: StatementReactionType?, // should be not null in database
+    var reactionType: StatementReactionType,
 
     var userId: Int,
 

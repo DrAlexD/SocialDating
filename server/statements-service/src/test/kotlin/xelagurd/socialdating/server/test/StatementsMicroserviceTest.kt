@@ -1,6 +1,5 @@
 package xelagurd.socialdating.server.test
 
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -15,50 +14,35 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
 import org.testcontainers.containers.PostgreSQLContainer
-import xelagurd.socialdating.server.FakeCategoriesData
-import xelagurd.socialdating.server.model.Category
+import xelagurd.socialdating.server.FakeStatementsData
+import xelagurd.socialdating.server.model.Statement
 
 @ActiveProfiles("dev", "test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(NoSecurityConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemplate) {
+class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemplate) {
 
-    private val categoriesDetails = FakeCategoriesData.categoriesDetails
-    private val categories = FakeCategoriesData.categories.take(categoriesDetails.size)
+    private val statementsDetails = FakeStatementsData.statementsDetails
+    private val statements = FakeStatementsData.statements.take(statementsDetails.size)
 
     @Order(1)
     @Test
-    fun testAddCategory() {
-        addCategories()
+    fun testAddStatement() {
+        addStatements()
     }
 
-    @Test
-    fun testGetCategories() {
-        getCategories()
-    }
-
-    private fun addCategories() {
-        categoriesDetails.forEachIndexed { index, categoryDetails ->
+    private fun addStatements() {
+        statementsDetails.forEachIndexed { index, statementDetails ->
             val response = restTemplate.postForEntity(
-                "/categories",
-                categoryDetails,
-                Category::class.java
+                "/statements",
+                statementDetails,
+                Statement::class.java
             )
             assertEquals(HttpStatus.CREATED, response.statusCode)
-            assertEquals(categories[index], response.body!!)
+            assertEquals(statements[index], response.body!!)
         }
-    }
-
-    private fun getCategories() {
-        val response = restTemplate.getForEntity(
-            "/categories",
-            Array<Category>::class.java
-        )
-        assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(categories.size, response.body!!.size)
-        assertContentEquals(categories.toTypedArray(), response.body!!)
     }
 
     companion object {
