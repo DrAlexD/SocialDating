@@ -10,7 +10,6 @@ data class RegistrationDetails(
     val gender: Gender,
     val username: String,
     val password: String,
-    val repeatedPassword: String,
     val email: String?,
     val age: Int,
     val city: String,

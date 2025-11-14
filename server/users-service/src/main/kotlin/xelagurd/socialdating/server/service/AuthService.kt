@@ -46,8 +46,8 @@ class AuthService(
             throw IllegalArgumentException("User with username ${registrationDetails.username} already exists")
         }
 
-        if (registrationDetails.password != registrationDetails.repeatedPassword) {
-            throw IllegalArgumentException("Passwords don't match")
+        if (registrationDetails.email != null && usersRepository.findByEmail(registrationDetails.email) != null) {
+            throw IllegalArgumentException("User with email ${registrationDetails.email} already exists")
         }
 
         val user = usersRepository.save(registrationDetails.toUser(passwordEncoder))

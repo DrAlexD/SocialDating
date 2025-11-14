@@ -1,11 +1,14 @@
 package xelagurd.socialdating.server.test
 
-import io.mockk.Runs
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.mockk.just
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeDefiningThemesData
@@ -14,8 +17,6 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_V
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_INITIAL
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_STEP
 import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.additional.MaintainedListUpdateDetails
-import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.INCREASE_MAINTAINED
 import xelagurd.socialdating.server.service.DefiningThemesKafkaConsumer
 import xelagurd.socialdating.server.service.DefiningThemesKafkaProducer
 import xelagurd.socialdating.server.service.DefiningThemesService
@@ -25,66 +26,103 @@ import xelagurd.socialdating.server.service.UserDefiningThemesService
 class DefiningThemesKafkaConsumerUnitTest {
 
     @MockK
-    private lateinit var definingThemesService: DefiningThemesService
-
-    @MockK
     private lateinit var userDefiningThemesService: UserDefiningThemesService
 
-    @MockK
+    @MockK(relaxed = true)
+    private lateinit var definingThemesService: DefiningThemesService
+
+    @MockK(relaxed = true)
     private lateinit var definingThemesKafkaProducer: DefiningThemesKafkaProducer
 
     @InjectMockKs
     private lateinit var definingThemesKafkaConsumer: DefiningThemesKafkaConsumer
 
+    private val userDefiningTheme = FakeDefiningThemesData.userDefiningTheme
+    private val userDefiningThemeSlot = slot<UserDefiningTheme>()
     private val updateDetails = FakeDefiningThemesData.userDefiningThemeUpdateDetails
-    private val definingTheme = FakeDefiningThemesData.definingThemes[0]
-    private val userDefiningTheme = FakeDefiningThemesData.userDefiningThemes[0]
-    private val updatedUserDefiningTheme = userDefiningTheme.copy(
-        value = userDefiningTheme.value + DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
-        interest = userDefiningTheme.interest + DEFINING_THEME_INTEREST_STEP
-    )
-    private val newUserDefiningTheme = UserDefiningTheme(
-        value = DEFINING_THEME_VALUE_INITIAL + DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
-        userId = userDefiningTheme.userId,
-        definingThemeId = userDefiningTheme.definingThemeId
-    )
-    private val newAddedUserDefiningTheme = newUserDefiningTheme.copy(id = 1)
 
     @Test
-    fun updateUserDefiningTheme_existData() {
+    fun updateUserDefiningTheme_existData_updateMaintained() {
         every {
-            userDefiningThemesService.getUserDefiningTheme(updateDetails.userId, updateDetails.definingThemeId)
+            userDefiningThemesService.getUserDefiningTheme(any(), any())
         } returns userDefiningTheme
 
-        every { userDefiningThemesService.addUserDefiningTheme(updatedUserDefiningTheme) } returns updatedUserDefiningTheme
-
         every {
-            definingThemesService.getDefiningTheme(updateDetails.definingThemeId)
-        } returns definingTheme
-
-        every {
-            definingThemesKafkaProducer.updateMaintainedList(
-                MaintainedListUpdateDetails(
-                    userId = userDefiningTheme.userId,
-                    categoryId = definingTheme.categoryId,
-                    updateType = INCREASE_MAINTAINED,
-                    numberInCategory = definingTheme.numberInCategory
-                )
-            )
-        } just Runs
+            userDefiningThemesService.addUserDefiningTheme(capture(userDefiningThemeSlot))
+        } returns mockk()
 
         definingThemesKafkaConsumer.updateUserDefiningTheme(updateDetails)
+
+        assertEquals(
+            userDefiningTheme.value + DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
+            userDefiningThemeSlot.captured.value
+        )
+
+        assertEquals(
+            userDefiningTheme.interest + DEFINING_THEME_INTEREST_STEP,
+            userDefiningThemeSlot.captured.interest
+        )
+
+        verify(exactly = 1) { userDefiningThemesService.getUserDefiningTheme(any(), any()) }
+        verify(exactly = 1) { userDefiningThemesService.addUserDefiningTheme(any()) }
+        verify(exactly = 1) { definingThemesService.getDefiningTheme(any()) }
+        verify(exactly = 1) { definingThemesKafkaProducer.updateMaintainedList(any()) }
+        confirmVerified(userDefiningThemesService, definingThemesService, definingThemesKafkaProducer)
+    }
+
+    @Test
+    fun updateUserDefiningTheme_existData_noUpdateMaintained() {
+        val initialUserDefiningTheme = userDefiningTheme.copy(value = DEFINING_THEME_VALUE_INITIAL)
+        every {
+            userDefiningThemesService.getUserDefiningTheme(any(), any())
+        } returns initialUserDefiningTheme
+
+        every {
+            userDefiningThemesService.addUserDefiningTheme(capture(userDefiningThemeSlot))
+        } returns mockk()
+
+        definingThemesKafkaConsumer.updateUserDefiningTheme(updateDetails)
+
+        assertEquals(
+            initialUserDefiningTheme.value + DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
+            userDefiningThemeSlot.captured.value
+        )
+
+        assertEquals(
+            initialUserDefiningTheme.interest + DEFINING_THEME_INTEREST_STEP,
+            userDefiningThemeSlot.captured.interest
+        )
+
+        verify(exactly = 1) { userDefiningThemesService.getUserDefiningTheme(any(), any()) }
+        verify(exactly = 1) { userDefiningThemesService.addUserDefiningTheme(any()) }
+        confirmVerified(userDefiningThemesService, definingThemesService, definingThemesKafkaProducer)
     }
 
     @Test
     fun updateUserDefiningTheme_noData() {
         every {
-            userDefiningThemesService.getUserDefiningTheme(updateDetails.userId, updateDetails.definingThemeId)
+            userDefiningThemesService.getUserDefiningTheme(any(), any())
         } returns null
 
-        every { userDefiningThemesService.addUserDefiningTheme(newUserDefiningTheme) } returns newAddedUserDefiningTheme
+        every {
+            userDefiningThemesService.addUserDefiningTheme(capture(userDefiningThemeSlot))
+        } returns mockk()
 
         definingThemesKafkaConsumer.updateUserDefiningTheme(updateDetails)
+
+        assertEquals(
+            DEFINING_THEME_VALUE_INITIAL + DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
+            userDefiningThemeSlot.captured.value
+        )
+
+        assertEquals(
+            DEFINING_THEME_INTEREST_STEP,
+            userDefiningThemeSlot.captured.interest
+        )
+
+        verify(exactly = 1) { userDefiningThemesService.getUserDefiningTheme(any(), any()) }
+        verify(exactly = 1) { userDefiningThemesService.addUserDefiningTheme(any()) }
+        confirmVerified(userDefiningThemesService, definingThemesService, definingThemesKafkaProducer)
     }
 
 }

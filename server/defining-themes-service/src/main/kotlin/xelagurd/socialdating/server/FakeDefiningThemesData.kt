@@ -170,13 +170,7 @@ object FakeDefiningThemesData {
         )
     )
 
-    val userDefiningThemes = listOf(
-        UserDefiningTheme(id = 1, value = 75, interest = 75, userId = 1, definingThemeId = 1),
-        UserDefiningTheme(id = 2, value = 75, interest = 75, userId = 1, definingThemeId = 2),
-        UserDefiningTheme(id = 3, value = 75, interest = 75, userId = 1, definingThemeId = 3),
-        UserDefiningTheme(id = 4, value = 75, interest = 75, userId = 1, definingThemeId = 5),
-        UserDefiningTheme(id = 5, value = 75, interest = 75, userId = 2, definingThemeId = 3)
-    )
+    val userDefiningTheme = UserDefiningTheme(id = 1, value = 75, interest = 75, userId = 1, definingThemeId = 1)
 
     val userDefiningThemeUpdateDetails =
         UserDefiningThemeUpdateDetails(
@@ -194,18 +188,6 @@ object FakeDefiningThemesData {
                 toOpinion = it.toOpinion,
                 categoryId = it.categoryId,
                 numberInCategory = it.numberInCategory
-            )
-        }
-
-    fun List<DefiningTheme>.toServerAnswer() =
-        this.map {
-            DefiningTheme(
-                id = it.id,
-                name = it.name,
-                fromOpinion = it.fromOpinion,
-                toOpinion = it.toOpinion,
-                categoryId = it.categoryId,
-                numberInCategory = 0
             )
         }
 

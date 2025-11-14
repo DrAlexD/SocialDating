@@ -1,10 +1,7 @@
 package xelagurd.socialdating.server
 
 import xelagurd.socialdating.server.model.Statement
-import xelagurd.socialdating.server.model.UserStatement
-import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.details.StatementDetails
-import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 
 object FakeStatementsData {
     val statementsDetails = listOf(
@@ -86,23 +83,6 @@ object FakeStatementsData {
         Statement(
             id = 19, text = "RemoteStatement19", isSupportDefiningTheme = true, definingThemeId = 5, creatorUserId = 1
         )
-    )
-
-    val userStatements = listOf(
-        UserStatement(id = 1, reactionType = FULL_MAINTAIN, userId = 1, statementId = 1),
-        UserStatement(id = 2, reactionType = FULL_MAINTAIN, userId = 1, statementId = 4),
-        UserStatement(id = 3, reactionType = FULL_MAINTAIN, userId = 1, statementId = 5),
-        UserStatement(id = 4, reactionType = FULL_MAINTAIN, userId = 1, statementId = 6),
-        UserStatement(id = 5, reactionType = FULL_MAINTAIN, userId = 2, statementId = 5)
-    )
-
-    val statementReactionDetails = StatementReactionDetails(
-        userId = 1,
-        statementId = 1,
-        categoryId = 1,
-        definingThemeId = 1,
-        reactionType = FULL_MAINTAIN,
-        isSupportDefiningTheme = true
     )
 
     fun List<Statement>.withNullIds() =

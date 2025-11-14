@@ -29,8 +29,8 @@ import xelagurd.socialdating.server.model.enums.StatementReactionType.PART_NO_MA
 @Profile("!test")
 @Service
 class DefiningThemesKafkaConsumer(
-    private val definingThemesService: DefiningThemesService,
     private val userDefiningThemesService: UserDefiningThemesService,
+    private val definingThemesService: DefiningThemesService,
     private val definingThemesKafkaProducer: DefiningThemesKafkaProducer
 ) {
 

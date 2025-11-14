@@ -18,7 +18,7 @@ interface UserCategoriesRepository : JpaRepository<UserCategory, Int> {
                 from user_categories
                 where user_id = :userId
                   and (maintained is not null or not_maintained is not null)
-                  and (:categoryIds is null or category_id = any(:categoryIds)))
+                  and (coalesce(:categoryIds) is null or category_id in (:categoryIds)))
         select uc.category_id as id,
                c.name,
                uc.maintained,
@@ -37,7 +37,7 @@ interface UserCategoriesRepository : JpaRepository<UserCategory, Int> {
         where user_id != :currentUserId
           and (:anotherUserId is null or user_id = :anotherUserId)
           and (maintained is not null or not_maintained is not null)
-          and category_id = any(:categoryIds)
+          and category_id in (:categoryIds)
         """,
         nativeQuery = true
     )

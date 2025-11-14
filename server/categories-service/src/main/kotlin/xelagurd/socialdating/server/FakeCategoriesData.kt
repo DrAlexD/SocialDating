@@ -2,9 +2,7 @@ package xelagurd.socialdating.server
 
 import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.additional.UserCategoryUpdateDetails
 import xelagurd.socialdating.server.model.details.CategoryDetails
-import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 
 object FakeCategoriesData {
     val categoriesDetails = listOf(
@@ -37,21 +35,7 @@ object FakeCategoriesData {
         Category(id = 19, name = "RemoteCategory19")
     )
 
-    val userCategories = listOf(
-        UserCategory(id = 1, interest = 75, userId = 1, categoryId = 1),
-        UserCategory(id = 2, interest = 75, userId = 1, categoryId = 2),
-        UserCategory(id = 3, interest = 75, userId = 1, categoryId = 3),
-        UserCategory(id = 4, interest = 75, userId = 2, categoryId = 2)
-    )
-
-    val userCategoryUpdateDetails =
-        UserCategoryUpdateDetails(
-            userId = 1,
-            categoryId = 1,
-            definingThemeId = 1,
-            reactionType = FULL_MAINTAIN,
-            isSupportDefiningTheme = true
-        )
+    val userCategory = UserCategory(id = 1, interest = 75, userId = 1, categoryId = 1)
 
     fun List<Category>.withNullIds() =
         this.map {
