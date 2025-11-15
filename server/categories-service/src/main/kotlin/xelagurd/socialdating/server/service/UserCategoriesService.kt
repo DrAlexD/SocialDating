@@ -49,18 +49,17 @@ class UserCategoriesService(
                     calculateUserSimilarity(currentCategoriesById, anotherCategories)
 
                 if (categoriesWithSimilarity.isNotEmpty() && similarityNumberUser > oppositeNumberUser) {
-                    val (similarCategories, oppositeCategories) = categoriesWithSimilarity
-                        .partition { it.differenceNumber > 0 }
-
                     UserWithSimilarity(
                         id = anotherUserId,
                         similarityNumber = similarityNumberUser,
                         oppositeNumber = oppositeNumberUser,
                         differenceNumber = similarityNumberUser - oppositeNumberUser,
-                        similarCategories = similarCategories
+                        similarCategories = categoriesWithSimilarity
+                            .filter { it.differenceNumber > 0 }
                             .sortedByDescending { it.differenceNumber }
                             .take(SIMILAR_CATEGORIES_NUMBER),
-                        oppositeCategories = oppositeCategories
+                        oppositeCategories = categoriesWithSimilarity
+                            .filter { it.differenceNumber < 0 }
                             .sortedBy { it.differenceNumber }
                             .take(OPPOSITE_CATEGORIES_NUMBER)
                     )
@@ -81,14 +80,17 @@ class UserCategoriesService(
         val (similarityNumberUser, oppositeNumberUser, categoriesWithSimilarity) =
             calculateDetailedUserSimilarity(currentUserCategories, anotherUserCategories)
 
-        val (similarCategories, oppositeCategories) = categoriesWithSimilarity
-            .partition { it.differenceNumber > 0 }
-
         return SimilarUser(
             similarityNumber = similarityNumberUser,
             oppositeNumber = oppositeNumberUser,
-            similarCategories = similarCategories.sortedByDescending { it.differenceNumber },
-            oppositeCategories = oppositeCategories.sortedBy { it.differenceNumber }
+            similarCategories = categoriesWithSimilarity
+                .filter { it.differenceNumber > 0 }
+                .sortedByDescending { it.differenceNumber },
+            equalCategories = categoriesWithSimilarity
+                .filter { it.differenceNumber == 0 },
+            oppositeCategories = categoriesWithSimilarity
+                .filter { it.differenceNumber < 0 }
+                .sortedBy { it.differenceNumber }
         )
     }
 
@@ -214,7 +216,7 @@ class UserCategoriesService(
 
         while (value != 0L) {
             val lowBit = value and -value
-            result.add(base + numberOfTrailingZeros(lowBit))
+            result.add(base + numberOfTrailingZeros(lowBit) + 1)
             value -= lowBit
         }
 

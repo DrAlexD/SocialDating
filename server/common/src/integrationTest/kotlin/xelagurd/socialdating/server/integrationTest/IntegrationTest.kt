@@ -161,6 +161,7 @@ class IntegrationTest {
         assertEquals(request["fromOpinion"], responseDefiningTheme["fromOpinion"])
         assertEquals(request["toOpinion"], responseDefiningTheme["toOpinion"])
         assertEquals(request["categoryId"], responseDefiningTheme["categoryId"])
+        assertNotNull(responseDefiningTheme["numberInCategory"])
 
         return responseDefiningTheme["id"] as Int
     }

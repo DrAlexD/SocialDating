@@ -37,7 +37,7 @@ class DefiningThemesKafkaConsumerUnitTest {
     @InjectMockKs
     private lateinit var definingThemesKafkaConsumer: DefiningThemesKafkaConsumer
 
-    private val userDefiningTheme = FakeDefiningThemesData.userDefiningTheme
+    private val userDefiningTheme = FakeDefiningThemesData.userDefiningThemes[0]
     private val userDefiningThemeSlot = slot<UserDefiningTheme>()
     private val updateDetails = FakeDefiningThemesData.userDefiningThemeUpdateDetails
 
@@ -54,7 +54,7 @@ class DefiningThemesKafkaConsumerUnitTest {
         definingThemesKafkaConsumer.updateUserDefiningTheme(updateDetails)
 
         assertEquals(
-            userDefiningTheme.value + DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
+            userDefiningTheme.value - DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
             userDefiningThemeSlot.captured.value
         )
 
@@ -84,7 +84,7 @@ class DefiningThemesKafkaConsumerUnitTest {
         definingThemesKafkaConsumer.updateUserDefiningTheme(updateDetails)
 
         assertEquals(
-            initialUserDefiningTheme.value + DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
+            initialUserDefiningTheme.value - DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
             userDefiningThemeSlot.captured.value
         )
 
@@ -111,7 +111,7 @@ class DefiningThemesKafkaConsumerUnitTest {
         definingThemesKafkaConsumer.updateUserDefiningTheme(updateDetails)
 
         assertEquals(
-            DEFINING_THEME_VALUE_INITIAL + DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
+            DEFINING_THEME_VALUE_INITIAL - DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT,
             userDefiningThemeSlot.captured.value
         )
 

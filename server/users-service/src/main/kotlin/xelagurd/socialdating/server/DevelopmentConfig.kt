@@ -4,7 +4,7 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
-import xelagurd.socialdating.server.FakeUsersData.withNullIds
+import xelagurd.socialdating.server.FakeUsersData.toUsersWithNullIds
 import xelagurd.socialdating.server.repository.UsersRepository
 
 @Profile("!test")
@@ -18,7 +18,7 @@ class DevelopmentConfig {
         val existingUsers = usersRepository.findAll().toList()
 
         if (existingUsers.isEmpty()) {
-            usersRepository.saveAll(FakeUsersData.users.withNullIds())
+            usersRepository.saveAll(FakeUsersData.users.toUsersWithNullIds())
         }
     }
 }

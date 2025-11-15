@@ -51,7 +51,7 @@ object FakeUsersData {
         ),
     )
 
-    fun List<User>.withNullIds() =
+    fun List<User>.toUsersWithNullIds() =
         this.map {
             User(
                 name = it.name,

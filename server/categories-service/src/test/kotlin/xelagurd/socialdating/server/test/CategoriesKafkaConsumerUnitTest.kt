@@ -32,7 +32,7 @@ class CategoriesKafkaConsumerUnitTest {
     @InjectMockKs
     private lateinit var categoriesKafkaConsumer: CategoriesKafkaConsumer
 
-    private val userCategory = FakeCategoriesData.userCategory
+    private val userCategory = FakeCategoriesData.userCategories[0]
     private val userCategorySlot = slot<UserCategory>()
     private val updateDetails = mockk<UserCategoryUpdateDetails>(relaxed = true)
 

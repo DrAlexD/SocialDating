@@ -28,18 +28,52 @@ object FakeCategoriesData {
         Category(id = 12, name = "RemoteCategory12"),
         Category(id = 13, name = "RemoteCategory13"),
         Category(id = 14, name = "RemoteCategory14"),
-        Category(id = 15, name = "RemoteCategory15"),
-        Category(id = 16, name = "RemoteCategory16"),
-        Category(id = 17, name = "RemoteCategory17"),
-        Category(id = 18, name = "RemoteCategory18"),
-        Category(id = 19, name = "RemoteCategory19")
+        Category(id = 15, name = "RemoteCategory15")
     )
 
-    val userCategory = UserCategory(id = 1, interest = 75, userId = 1, categoryId = 1)
+    val userCategories = listOf(
+        UserCategory(
+            id = 1, interest = 50, userId = 1, categoryId = 1, maintained = arrayOf(3)
+        ),
+        UserCategory(
+            id = 2, interest = 25, userId = 1, categoryId = 2, notMaintained = arrayOf(4)
+        ),
+        UserCategory(
+            id = 3, interest = 25, userId = 1, categoryId = 3, notMaintained = arrayOf(1)
+        ),
+        UserCategory(
+            id = 4, interest = 50, userId = 2, categoryId = 1, maintained = arrayOf(3)
+        ),
+        UserCategory(
+            id = 5, interest = 25, userId = 2, categoryId = 2, maintained = arrayOf(4)
+        ),
+        UserCategory(
+            id = 6, interest = 25, userId = 2, categoryId = 3, notMaintained = arrayOf(1)
+        ),
+        UserCategory(
+            id = 7, interest = 50, userId = 3, categoryId = 1, maintained = arrayOf(1), notMaintained = arrayOf(2)
+        ),
+        UserCategory(
+            id = 8, interest = 25, userId = 3, categoryId = 2, notMaintained = arrayOf(4)
+        ),
+        UserCategory(
+            id = 9, interest = 25, userId = 3, categoryId = 3, maintained = arrayOf(1)
+        ),
+    )
 
-    fun List<Category>.withNullIds() =
+    fun List<Category>.toCategoriesWithNullIds() =
         this.map {
             Category(name = it.name)
         }
 
+    fun List<UserCategory>.toUserCategoriesWithNullIds() =
+        this.map {
+            UserCategory(
+                interest = it.interest,
+                userId = it.userId,
+                categoryId = it.categoryId,
+                maintained = it.maintained,
+                notMaintained = it.notMaintained
+            )
+        }
 }
