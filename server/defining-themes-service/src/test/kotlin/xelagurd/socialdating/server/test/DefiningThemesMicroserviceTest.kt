@@ -1,5 +1,6 @@
 package xelagurd.socialdating.server.test
 
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -54,11 +55,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
                 DefiningTheme::class.java
             )
             assertEquals(HttpStatus.CREATED, response.statusCode)
-            assertEquals(definingThemes[index].id, response.body!!.id)
-            assertEquals(definingThemes[index].name, response.body!!.name)
-            assertEquals(definingThemes[index].fromOpinion, response.body!!.fromOpinion)
-            assertEquals(definingThemes[index].toOpinion, response.body!!.toOpinion)
-            assertEquals(definingThemes[index].categoryId, response.body!!.categoryId)
+            assertEquals(definingThemes[index], response.body!!)
         }
     }
 
@@ -70,11 +67,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(expected.size, response.body!!.size)
-        assertEquals(expected.map { it.id }, response.body!!.map { it.id })
-        assertEquals(expected.map { it.name }, response.body!!.map { it.name })
-        assertEquals(expected.map { it.fromOpinion }, response.body!!.map { it.fromOpinion })
-        assertEquals(expected.map { it.toOpinion }, response.body!!.map { it.toOpinion })
-        assertEquals(expected.map { it.categoryId }, response.body!!.map { it.categoryId })
+        assertContentEquals(expected.toTypedArray(), response.body!!)
     }
 
     private fun getDefiningThemes() {
@@ -84,11 +77,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(definingThemes.size, response.body!!.size)
-        assertEquals(definingThemes.map { it.id }, response.body!!.map { it.id })
-        assertEquals(definingThemes.map { it.name }, response.body!!.map { it.name })
-        assertEquals(definingThemes.map { it.fromOpinion }, response.body!!.map { it.fromOpinion })
-        assertEquals(definingThemes.map { it.toOpinion }, response.body!!.map { it.toOpinion })
-        assertEquals(definingThemes.map { it.categoryId }, response.body!!.map { it.categoryId })
+        assertContentEquals(definingThemes.toTypedArray(), response.body!!)
     }
 
     companion object {
