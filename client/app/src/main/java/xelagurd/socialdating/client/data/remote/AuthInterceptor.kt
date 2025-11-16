@@ -9,12 +9,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.Interceptor
 import okhttp3.Response
 import xelagurd.socialdating.client.data.PreferencesRepository
+import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.model.details.RefreshTokenDetails
 
 @Singleton
 class AuthInterceptor @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val preferencesRepository: PreferencesRepository,
+    private val commonLocalRepository: CommonLocalRepository,
     private val authApiService: AuthApiService
 ) : Interceptor {
 
@@ -52,7 +54,10 @@ class AuthInterceptor @Inject constructor(
 
                 return chain.proceed(newRequest)
             } else {
-                runBlocking { preferencesRepository.clearPreferences() }
+                runBlocking {
+                    preferencesRepository.clearPreferences()
+                    commonLocalRepository.clearData()
+                }
             }
         }
 

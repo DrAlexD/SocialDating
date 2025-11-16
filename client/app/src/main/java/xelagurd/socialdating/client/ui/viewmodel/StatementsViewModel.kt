@@ -17,16 +17,13 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.fake.FakeData.filterUserStatementsByUserId
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
-import xelagurd.socialdating.client.data.local.repository.LocalUserStatementsRepository
 import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
-import xelagurd.socialdating.client.data.remote.repository.RemoteUserStatementsRepository
 import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.StatementsDestination
 import xelagurd.socialdating.client.ui.navigation.TIMEOUT_MILLIS
@@ -38,8 +35,6 @@ import xelagurd.socialdating.client.ui.state.StatementsUiState
 class StatementsViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
-    private val remoteUserStatementsRepository: RemoteUserStatementsRepository,
-    private val localUserStatementsRepository: LocalUserStatementsRepository,
     private val remoteStatementsRepository: RemoteStatementsRepository,
     private val localStatementsRepository: LocalStatementsRepository,
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository,
@@ -50,7 +45,7 @@ class StatementsViewModel @Inject constructor(
     private val categoryId: Int = checkNotNull(savedStateHandle[StatementsDestination.categoryId])
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
-    private val statementsFlow = localStatementsRepository.getStatements(userId, categoryId)
+    private val statementsFlow = localStatementsRepository.getStatements(categoryId)
         .distinctUntilChanged()
 
     val uiState = combine(statementsFlow, dataRequestStatusFlow) { statements, dataRequestStatus ->
@@ -88,20 +83,10 @@ class StatementsViewModel @Inject constructor(
                 }
 
                 if (remoteStatements != null) {
-                    localStatementsRepository.insertStatements(remoteStatements)
-
-                    val (remoteUserStatements, statusUserStatements) = safeApiCall(context) {
-                        remoteUserStatementsRepository.getUserStatements(userId, remoteDefiningThemeIds)
-                    }
-
-                    if (remoteUserStatements != null) {
-                        localUserStatementsRepository.insertUserStatements(remoteUserStatements)
-                    }
-
-                    globalStatus = statusUserStatements
-                } else {
-                    globalStatus = statusStatements
+                    localStatementsRepository.replaceStatements(categoryId, remoteStatements)
                 }
+
+                globalStatus = statusStatements
             } else {
                 globalStatus = statusDefiningThemes
             }
@@ -113,11 +98,6 @@ class StatementsViewModel @Inject constructor(
                 if (localStatementsRepository.getStatements().first().isEmpty()) {
                     localStatementsRepository.insertStatements(FakeData.statements)
                 }
-                if (localUserStatementsRepository.getUserStatements().first().isEmpty()) {
-                    localUserStatementsRepository.insertUserStatements(
-                        FakeData.userStatements.filterUserStatementsByUserId()
-                    )
-                }
             }
 
             dataRequestStatusFlow.update { globalStatus }
@@ -126,7 +106,7 @@ class StatementsViewModel @Inject constructor(
 
     fun onStatementReactionClick(statement: Statement, reactionType: StatementReactionType) {
         viewModelScope.launch {
-            val (userStatement, status) = safeApiCall(context) {
+            val (_, status) = safeApiCall(context) {
                 remoteStatementsRepository.processStatementReaction(
                     StatementReactionDetails(
                         userId = userId,
@@ -139,15 +119,12 @@ class StatementsViewModel @Inject constructor(
                 )
             }
 
-            if (userStatement != null) {
-                localUserStatementsRepository.insertUserStatements(listOf(userStatement))
+            if (status is RequestStatus.SUCCESS) {
+                localStatementsRepository.deleteStatement(statement)
             }
 
             if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
-                if (!localUserStatementsRepository.getUserStatements().first().map { it.id }
-                        .contains(FakeData.newUserStatement.id)) {
-                    localUserStatementsRepository.insertUserStatements(listOf(FakeData.newUserStatement))
-                }
+                localStatementsRepository.deleteStatement(statement)
             }
 
             // TODO: implement action on error

@@ -8,7 +8,6 @@ import xelagurd.socialdating.client.data.local.dao.DefiningThemesDao
 import xelagurd.socialdating.client.data.local.dao.StatementsDao
 import xelagurd.socialdating.client.data.local.dao.UserCategoriesDao
 import xelagurd.socialdating.client.data.local.dao.UserDefiningThemesDao
-import xelagurd.socialdating.client.data.local.dao.UserStatementsDao
 import xelagurd.socialdating.client.data.local.dao.UsersDao
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefiningTheme
@@ -16,7 +15,6 @@ import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.UserStatement
 
 @Database(
     entities = [
@@ -25,14 +23,14 @@ import xelagurd.socialdating.client.data.model.UserStatement
         Statement::class,
         User::class,
         UserCategory::class,
-        UserDefiningTheme::class,
-        UserStatement::class
+        UserDefiningTheme::class
     ],
     version = 1,
     exportSchema = false
 )
 @TypeConverters(TypeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
+
     abstract fun categoriesDao(): CategoriesDao
 
     abstract fun definingThemesDao(): DefiningThemesDao
@@ -45,5 +43,4 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDefiningThemesDao(): UserDefiningThemesDao
 
-    abstract fun userStatementsDao(): UserStatementsDao
 }

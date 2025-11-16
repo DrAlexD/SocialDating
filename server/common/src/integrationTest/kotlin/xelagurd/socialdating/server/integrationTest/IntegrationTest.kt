@@ -55,7 +55,6 @@ class IntegrationTest {
 
         Thread.sleep(5000)
 
-        getUserStatements()
         // TODO getStatements()
 
         getUserCategories()
@@ -262,26 +261,7 @@ class IntegrationTest {
             request,
             String::class.java
         )
-        assertEquals(HttpStatus.CREATED, response.statusCode)
-
-        val responseUserStatement = readObjectFromJsonString(response.body!!)
-        assertNotNull(responseUserStatement["id"])
-        assertEquals(request["userId"], responseUserStatement["userId"])
-        assertEquals(request["statementId"], responseUserStatement["statementId"])
-    }
-
-    private fun getUserStatements() {
-        val response = restTemplate.getWithToken(
-            accessToken,
-            "$GATEWAY_URL/statements/users?userId=$userId&definingThemeIds=$definingThemeId",
-            String::class.java
-        )
-        assertEquals(HttpStatus.OK, response.statusCode)
-
-        val responseUserStatements = readArrayFromJsonString(response.body!!)
-        val newUserStatement = responseUserStatements
-            .firstOrNull { it["userId"] == userId && it["statementId"] == statementId }
-        assertNotNull(newUserStatement)
+        assertEquals(HttpStatus.NO_CONTENT, response.statusCode)
     }
 
     private fun getUserCategories() {

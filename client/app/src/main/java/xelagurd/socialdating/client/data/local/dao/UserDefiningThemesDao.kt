@@ -33,4 +33,7 @@ interface UserDefiningThemesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUserDefiningThemes(userDefiningThemes: List<UserDefiningTheme>)
+
+    @Query("delete from user_defining_themes")
+    suspend fun deleteAll()
 }

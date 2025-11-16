@@ -17,8 +17,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.fake.FakeData.filterUserCategoriesByUserId
-import xelagurd.socialdating.client.data.fake.FakeData.filterUserDefiningThemesByUserId
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
@@ -127,14 +125,10 @@ class ProfileStatisticsViewModel @Inject constructor(
                     localDefiningThemesRepository.insertDefiningThemes(FakeData.definingThemes)
                 }
                 if (localUserCategoriesRepository.getUserCategories().first().isEmpty()) {
-                    localUserCategoriesRepository.insertUserCategories(
-                        FakeData.userCategories.filterUserCategoriesByUserId()
-                    )
+                    localUserCategoriesRepository.insertUserCategories(FakeData.userCategories)
                 }
                 if (localUserDefiningThemesRepository.getUserDefiningThemes().first().isEmpty()) {
-                    localUserDefiningThemesRepository.insertUserDefiningThemes(
-                        FakeData.userDefiningThemes.filterUserDefiningThemesByUserId()
-                    )
+                    localUserDefiningThemesRepository.insertUserDefiningThemes(FakeData.userDefiningThemes)
                 }
             }
 

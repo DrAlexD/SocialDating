@@ -2,16 +2,12 @@ package xelagurd.socialdating.client
 
 import retrofit2.Response
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.fake.FakeData.filterUserCategoriesByUserId
-import xelagurd.socialdating.client.data.fake.FakeData.filterUserDefiningThemesByUserId
-import xelagurd.socialdating.client.data.fake.FakeData.filterUserStatementsByUserId
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.UserStatement
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.details.StatementDetails
 import xelagurd.socialdating.client.data.remote.ApiService
@@ -24,13 +20,13 @@ class FakeApiService : ApiService {
         Response.success(FakeData.categories)
 
     override suspend fun getUserCategories(userId: Int): Response<List<UserCategory>> =
-        Response.success(FakeData.userCategories.filterUserCategoriesByUserId())
+        Response.success(FakeData.userCategories)
 
     override suspend fun getDefiningThemes(categoryId: Int?): Response<List<DefiningTheme>> =
         Response.success(FakeData.definingThemes)
 
     override suspend fun getUserDefiningThemes(userId: Int): Response<List<UserDefiningTheme>> =
-        Response.success(FakeData.userDefiningThemes.filterUserDefiningThemesByUserId())
+        Response.success(FakeData.userDefiningThemes)
 
     override suspend fun getStatements(
         userId: Int,
@@ -38,17 +34,11 @@ class FakeApiService : ApiService {
     ): Response<List<Statement>> =
         Response.success(FakeData.statements)
 
-    override suspend fun getUserStatements(
-        userId: Int,
-        definingThemeIds: List<Int>
-    ): Response<List<UserStatement>> =
-        Response.success(FakeData.userStatements.filterUserStatementsByUserId())
-
     override suspend fun addStatement(statementDetails: StatementDetails): Response<Statement> =
         Response.success(FakeData.newStatement)
 
     override suspend fun processStatementReaction(
         statementReactionDetails: StatementReactionDetails
-    ): Response<UserStatement> =
-        Response.success(FakeData.newUserStatement)
+    ): Response<Unit> =
+        Response.success(null)
 }

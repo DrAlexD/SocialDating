@@ -30,4 +30,7 @@ interface UserCategoriesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUserCategories(userCategories: List<UserCategory>)
+
+    @Query("delete from user_categories")
+    suspend fun deleteAll()
 }

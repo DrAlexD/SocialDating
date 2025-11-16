@@ -58,7 +58,7 @@ object FakeCategoriesData {
         ),
         UserCategory(
             id = 9, interest = 25, userId = 3, categoryId = 3, maintained = arrayOf(1)
-        ),
+        )
     )
 
     fun List<Category>.toCategoriesWithNullIds() =

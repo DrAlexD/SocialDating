@@ -223,7 +223,7 @@ object FakeStatementsData {
         ),
         Statement(
             id = 65, text = "RemoteStatement65", isSupportDefiningTheme = true, definingThemeId = 12, creatorUserId = 1
-        ),
+        )
     )
 
     val userStatements = listOf(

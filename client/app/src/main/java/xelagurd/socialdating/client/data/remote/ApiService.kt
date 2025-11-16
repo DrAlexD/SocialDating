@@ -12,7 +12,6 @@ import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.UserStatement
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.details.StatementDetails
 
@@ -38,17 +37,11 @@ interface ApiService {
         @Query("definingThemeIds") definingThemeIds: List<Int>
     ): Response<List<Statement>>
 
-    @GET("statements/users")
-    suspend fun getUserStatements(
-        @Query("userId") userId: Int,
-        @Query("definingThemeIds") definingThemeIds: List<Int>
-    ): Response<List<UserStatement>>
-
     @POST("statements")
     suspend fun addStatement(@Body statementDetails: StatementDetails): Response<Statement>
 
     @POST("statements/users/reaction")
     suspend fun processStatementReaction(
         @Body statementReactionDetails: StatementReactionDetails
-    ): Response<UserStatement>
+    ): Response<Unit>
 }
