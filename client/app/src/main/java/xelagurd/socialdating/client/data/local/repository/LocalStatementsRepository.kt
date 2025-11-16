@@ -2,6 +2,7 @@ package xelagurd.socialdating.client.data.local.repository
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.room.Transaction
 import xelagurd.socialdating.client.data.local.dao.StatementsDao
 import xelagurd.socialdating.client.data.model.Statement
 
@@ -12,12 +13,19 @@ class LocalStatementsRepository @Inject constructor(
     fun getStatements() =
         statementsDao.getStatements()
 
-    fun getStatements(userId: Int, categoryId: Int) =
-        statementsDao.getStatements(userId, categoryId)
+    fun getStatements(categoryId: Int) =
+        statementsDao.getStatements(categoryId)
 
     suspend fun insertStatements(statements: List<Statement>) =
         statementsDao.insertStatements(statements)
 
-    suspend fun insertStatement(statement: Statement) =
-        statementsDao.insertStatement(statement)
+    @Transaction
+    suspend fun replaceStatements(categoryId: Int, statements: List<Statement>) {
+        statementsDao.deleteStatements(categoryId)
+        statementsDao.insertStatements(statements)
+    }
+
+    suspend fun deleteStatement(statement: Statement) =
+        statementsDao.deleteStatement(statement)
+
 }

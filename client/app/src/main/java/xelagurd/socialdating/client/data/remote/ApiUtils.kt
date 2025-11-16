@@ -23,9 +23,7 @@ suspend fun <T> safeApiCall(
         val response = apiCall()
 
         newStatus = if (response.isSuccessful) {
-            response.body()?.let { responseData ->
-                RequestStatus.SUCCESS.also { data = responseData }
-            } ?: RequestStatus.ERROR(context.getString(R.string.server_error))
+            RequestStatus.SUCCESS.also { data = response.body() }
         } else {
             when (response.code()) {
                 NOT_FOUND -> RequestStatus.FAILURE(context.getString(R.string.no_data))

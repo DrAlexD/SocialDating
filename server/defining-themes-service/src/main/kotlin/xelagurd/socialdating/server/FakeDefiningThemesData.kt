@@ -150,7 +150,7 @@ object FakeDefiningThemesData {
         UserDefiningTheme(id = 9, value = 90, interest = 25, userId = 3, definingThemeId = 1),
         UserDefiningTheme(id = 10, value = 15, interest = 25, userId = 3, definingThemeId = 2),
         UserDefiningTheme(id = 11, value = 15, interest = 25, userId = 3, definingThemeId = 8),
-        UserDefiningTheme(id = 12, value = 95, interest = 25, userId = 3, definingThemeId = 11),
+        UserDefiningTheme(id = 12, value = 95, interest = 25, userId = 3, definingThemeId = 11)
     )
 
     val userDefiningThemeUpdateDetails =

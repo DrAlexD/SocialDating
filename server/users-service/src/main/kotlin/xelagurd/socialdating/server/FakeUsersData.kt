@@ -48,7 +48,7 @@ object FakeUsersData {
             purpose = RELATIONSHIPS,
             activity = 75,
             role = USER
-        ),
+        )
     )
 
     fun List<User>.toUsersWithNullIds() =

@@ -1,6 +1,5 @@
 package xelagurd.socialdating.server.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -23,7 +22,6 @@ class UserStatement(
     @field:GeneratedValue(GenerationType.IDENTITY)
     var id: Int? = null,
 
-    @field:JsonIgnore
     @field:Enumerated(EnumType.STRING)
     var reactionType: StatementReactionType,
 

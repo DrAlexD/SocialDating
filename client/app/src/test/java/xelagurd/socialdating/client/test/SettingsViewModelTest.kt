@@ -12,6 +12,7 @@ import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
+import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.SettingsViewModel
 
@@ -22,12 +23,14 @@ class SettingsViewModelTest {
 
     private val preferencesRepository: PreferencesRepository = mockk()
 
+    private val commonLocalRepository: CommonLocalRepository = mockk()
+
     private lateinit var viewModel: SettingsViewModel
     private val settingsUiState
         get() = viewModel.uiState.value
 
     private fun initViewModel() {
-        viewModel = SettingsViewModel(preferencesRepository)
+        viewModel = SettingsViewModel(preferencesRepository, commonLocalRepository)
     }
 
     @Test
@@ -43,5 +46,6 @@ class SettingsViewModelTest {
 
     private fun mockLogout() {
         coEvery { preferencesRepository.clearPreferences() } just Runs
+        coEvery { commonLocalRepository.clearData() } just Runs
     }
 }

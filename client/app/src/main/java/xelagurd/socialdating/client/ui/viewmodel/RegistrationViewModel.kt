@@ -60,13 +60,13 @@ class RegistrationViewModel @Inject constructor(
             }
 
             if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
-                accountManager.saveCredentials(LoginFormData(FakeData.mainUser.username, "password1"))
+                accountManager.saveCredentials(LoginFormData(FakeData.users[0].username, "password1"))
 
-                if (!localRepository.getUsers().first().map { it.id }.contains(FakeData.mainUser.id)) {
-                    localRepository.insertUser(FakeData.mainUser)
+                if (!localRepository.getUsers().first().map { it.id }.contains(FakeData.users[0].id)) {
+                    localRepository.insertUser(FakeData.users[0])
                 }
 
-                preferencesRepository.saveCurrentUserId(FakeData.mainUser.id)
+                preferencesRepository.saveCurrentUserId(FakeData.users[0].id)
 
                 status = RequestStatus.SUCCESS
             }

@@ -9,12 +9,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import xelagurd.socialdating.client.data.PreferencesRepository
+import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.SettingsUiState
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val commonLocalRepository: CommonLocalRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -25,6 +27,7 @@ class SettingsViewModel @Inject constructor(
             _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
             preferencesRepository.clearPreferences()
+            commonLocalRepository.clearData()
 
             _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
         }

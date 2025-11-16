@@ -135,7 +135,7 @@ class StatementAddingViewModelTest {
         coEvery {
             remoteStatementsRepository.addStatement(statementFormData.toStatementDetails())
         } returns Response.success(statement)
-        coEvery { localStatementsRepository.insertStatement(statement) } just Runs
+        coEvery { localStatementsRepository.insertStatements(listOf(statement)) } just Runs
     }
 
     private fun mockWrongData() {
@@ -153,6 +153,6 @@ class StatementAddingViewModelTest {
 
         // FixMe: remove after adding server hosting
         every { localStatementsRepository.getStatements() } returns flowOf(FakeData.statements)
-        coEvery { localStatementsRepository.insertStatement(FakeData.newStatement) } just Runs
+        coEvery { localStatementsRepository.insertStatements(listOf(FakeData.newStatement)) } just Runs
     }
 }

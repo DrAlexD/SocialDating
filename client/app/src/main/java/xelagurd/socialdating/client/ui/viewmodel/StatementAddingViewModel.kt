@@ -87,13 +87,13 @@ class StatementAddingViewModel @Inject constructor(
             }
 
             if (statement != null) {
-                localStatementsRepository.insertStatement(statement)
+                localStatementsRepository.insertStatements(listOf(statement))
             }
 
             if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
                 if (!localStatementsRepository.getStatements().first().map { it.id }
                         .contains(FakeData.newStatement.id)) {
-                    localStatementsRepository.insertStatement(FakeData.newStatement)
+                    localStatementsRepository.insertStatements(listOf(FakeData.newStatement))
                 }
 
                 status = RequestStatus.SUCCESS

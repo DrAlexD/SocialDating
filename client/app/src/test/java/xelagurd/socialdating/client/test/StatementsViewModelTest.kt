@@ -26,14 +26,11 @@ import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
-import xelagurd.socialdating.client.data.local.repository.LocalUserStatementsRepository
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.Statement
-import xelagurd.socialdating.client.data.model.UserStatement
 import xelagurd.socialdating.client.data.remote.NOT_FOUND
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
-import xelagurd.socialdating.client.data.remote.repository.RemoteUserStatementsRepository
 import xelagurd.socialdating.client.mergeListsAsSets
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.StatementsViewModel
@@ -45,8 +42,6 @@ class StatementsViewModelTest {
 
     private val context: Context = mockk()
     private val savedStateHandle: SavedStateHandle = mockk()
-    private val remoteUserStatementsRepository: RemoteUserStatementsRepository = mockk()
-    private val localUserStatementsRepository: LocalUserStatementsRepository = mockk()
     private val remoteStatementsRepository: RemoteStatementsRepository = mockk()
     private val localStatementsRepository: LocalStatementsRepository = mockk()
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository = mockk()
@@ -54,7 +49,6 @@ class StatementsViewModelTest {
 
     private lateinit var viewModel: StatementsViewModel
     private lateinit var definingThemesFlow: MutableStateFlow<List<DefiningTheme>>
-    private lateinit var userStatementsFlow: MutableStateFlow<List<UserStatement>>
     private lateinit var statementsFlow: MutableStateFlow<List<Statement>>
     private val statementsUiState
         get() = viewModel.uiState.value
@@ -64,8 +58,6 @@ class StatementsViewModelTest {
 
     private val localDefiningThemes = FakeData.definingThemes.take(3)
     private val remoteDefiningThemes = FakeData.definingThemes.take(5)
-    private val localUserStatements = FakeData.userStatements.take(3)
-    private val remoteUserStatements = FakeData.userStatements.take(5)
     private val localStatements = FakeData.statements.take(3)
     private val remoteStatements = FakeData.statements.take(5)
 
@@ -74,7 +66,6 @@ class StatementsViewModelTest {
     @Before
     fun setup() {
         definingThemesFlow = MutableStateFlow(localDefiningThemes)
-        userStatementsFlow = MutableStateFlow(localUserStatements)
         statementsFlow = MutableStateFlow(localStatements)
 
         mockGeneralMethods()
@@ -84,8 +75,6 @@ class StatementsViewModelTest {
         viewModel = StatementsViewModel(
             context,
             savedStateHandle,
-            remoteUserStatementsRepository,
-            localUserStatementsRepository,
             remoteStatementsRepository,
             localStatementsRepository,
             remoteDefiningThemesRepository,
@@ -223,7 +212,7 @@ class StatementsViewModelTest {
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>("userId") } returns userId
         every { savedStateHandle.get<Int>("categoryId") } returns categoryId
-        every { localStatementsRepository.getStatements(userId, categoryId) } returns statementsFlow
+        every { localStatementsRepository.getStatements(categoryId) } returns statementsFlow
     }
 
     private fun mockDataWithInternet() {
@@ -232,18 +221,12 @@ class StatementsViewModelTest {
         coEvery {
             remoteStatementsRepository.getStatements(userId, remoteDefiningThemes.toIds())
         } returns Response.success(remoteStatements)
-        coEvery {
-            remoteUserStatementsRepository.getUserStatements(userId, remoteDefiningThemes.toIds())
-        } returns Response.success(remoteUserStatements)
 
         coEvery { localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes) } answers {
             definingThemesFlow.value = mergeListsAsSets(definingThemesFlow.value, remoteDefiningThemes)
         }
-        coEvery { localStatementsRepository.insertStatements(remoteStatements) } answers {
+        coEvery { localStatementsRepository.replaceStatements(categoryId, remoteStatements) } answers {
             statementsFlow.value = mergeListsAsSets(statementsFlow.value, remoteStatements)
-        }
-        coEvery { localUserStatementsRepository.insertUserStatements(remoteUserStatements) } answers {
-            userStatementsFlow.value = mergeListsAsSets(userStatementsFlow.value, remoteUserStatements)
         }
     }
 
@@ -252,8 +235,6 @@ class StatementsViewModelTest {
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns
                 Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
         coEvery { remoteStatementsRepository.getStatements(userId, emptyList()) } returns
-                Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
-        coEvery { remoteUserStatementsRepository.getUserStatements(userId, emptyList()) } returns
                 Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
 
         coEvery { localDefiningThemesRepository.insertDefiningThemes(emptyList()) } just Runs
@@ -266,6 +247,5 @@ class StatementsViewModelTest {
         // FixMe: remove after adding server hosting
         every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(localDefiningThemes)
         every { localStatementsRepository.getStatements() } returns flowOf(localStatements)
-        every { localUserStatementsRepository.getUserStatements() } returns flowOf(localUserStatements)
     }
 }
