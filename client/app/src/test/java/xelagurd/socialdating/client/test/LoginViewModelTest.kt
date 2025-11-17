@@ -6,10 +6,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import android.content.Context
-import androidx.credentials.GetCredentialResponse
-import androidx.credentials.PasswordCredential
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -22,31 +22,28 @@ import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
-import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
-import xelagurd.socialdating.client.data.model.details.LoginDetails
 import xelagurd.socialdating.client.data.remote.BAD_REQUEST
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
+import xelagurd.socialdating.client.mockkList
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.LoginViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
+
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val context: Context = mockk()
-    private val remoteRepository: RemoteUsersRepository = mockk()
-    private val localRepository: LocalUsersRepository = mockk()
-    private val preferencesRepository: PreferencesRepository = mockk()
-    private val accountManager: AccountManager = mockk()
+    private val context = mockk<Context>(relaxed = true)
+    private val preferencesRepository = mockk<PreferencesRepository>(relaxed = true)
+    private val accountManager = mockk<AccountManager>()
+    private val remoteRepository = mockk<RemoteUsersRepository>()
+    private val localRepository = mockk<LocalUsersRepository>()
 
     private lateinit var viewModel: LoginViewModel
     private val loginUiState
         get() = viewModel.uiState.value
-
-    private val loginFormData = FakeData.loginFormData
-    private val authResponse = FakeData.authResponse
 
     @Before
     fun setup() {
@@ -61,7 +58,6 @@ class LoginViewModelTest {
             preferencesRepository,
             accountManager
         )
-        viewModel.updateUiState(loginFormData)
         viewModel.loginWithInput()
     }
 
@@ -73,6 +69,15 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
+
+        coVerify(exactly = 1) { accountManager.findCredentials() }
+        coVerify(exactly = 1) { remoteRepository.loginUser(any()) }
+        coVerify(exactly = 1) { accountManager.saveCredentials(any()) }
+        coVerify(exactly = 1) { localRepository.insertUser(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveAccessToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveRefreshToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveCurrentUserId(any()) }
+        confirmVerified(preferencesRepository, localRepository, remoteRepository, accountManager)
     }
 
     @Test
@@ -84,6 +89,14 @@ class LoginViewModelTest {
 
         // FixMe: Change to ERROR after implementing server
         assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
+
+        coVerify(exactly = 1) { accountManager.findCredentials() }
+        coVerify(exactly = 1) { remoteRepository.loginUser(any()) }
+        coVerify(exactly = 1) { accountManager.saveCredentials(any()) } // FixMe: remove after adding server hosting
+        coVerify(exactly = 1) { localRepository.getUsers() } // FixMe: remove after adding server hosting
+        coVerify(exactly = 1) { localRepository.insertUser(any()) } // FixMe: remove after adding server hosting
+        coVerify(exactly = 1) { preferencesRepository.saveCurrentUserId(any()) } // FixMe: remove after adding server hosting
+        confirmVerified(preferencesRepository, localRepository, remoteRepository, accountManager)
     }
 
     @Test
@@ -94,6 +107,10 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.FAILURE(BAD_REQUEST.toString()), loginUiState.actionRequestStatus)
+
+        coVerify(exactly = 1) { accountManager.findCredentials() }
+        coVerify(exactly = 1) { remoteRepository.loginUser(any()) }
+        confirmVerified(preferencesRepository, localRepository, remoteRepository, accountManager)
     }
 
     @Test
@@ -109,6 +126,16 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
+
+        coVerify(exactly = 1) { accountManager.findCredentials() }
+        coVerify(exactly = 2) { remoteRepository.loginUser(any()) }
+        coVerify(exactly = 2) { accountManager.saveCredentials(any()) } // FixMe: set to 1 after adding server hosting
+        coVerify(exactly = 1) { localRepository.getUsers() } // FixMe: remove after adding server hosting
+        coVerify(exactly = 2) { localRepository.insertUser(any()) } // FixMe: set to 1 after adding server hosting
+        coVerify(exactly = 1) { preferencesRepository.saveAccessToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveRefreshToken(any()) }
+        coVerify(exactly = 2) { preferencesRepository.saveCurrentUserId(any()) } // FixMe: set to 1 after adding server hosting
+        confirmVerified(preferencesRepository, localRepository, remoteRepository, accountManager)
     }
 
     @Test
@@ -124,46 +151,38 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
-    }
 
-    private fun mockFindCredentialsWithData() {
-        // FixMe: Can't test due to `BaseBundle not mocked`
-        coEvery { accountManager.findCredentials() } returns
-                GetCredentialResponse(
-                    PasswordCredential(
-                        id = loginFormData.username,
-                        password = loginFormData.password
-                    )
-                )
+        coVerify(exactly = 1) { accountManager.findCredentials() }
+        coVerify(exactly = 2) { remoteRepository.loginUser(any()) }
+        coVerify(exactly = 1) { accountManager.saveCredentials(any()) }
+        coVerify(exactly = 1) { localRepository.insertUser(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveAccessToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveRefreshToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveCurrentUserId(any()) }
+        confirmVerified(preferencesRepository, localRepository, remoteRepository, accountManager)
     }
 
     private fun mockFindCredentialsWithError() {
         coEvery { accountManager.findCredentials() } returns null
-        coEvery { accountManager.saveCredentials(loginFormData) } just Runs
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } returns
-                Response.success(authResponse)
-        coEvery { localRepository.insertUser(authResponse.user) } just Runs
-        coEvery { preferencesRepository.saveAccessToken(authResponse.accessToken) } just Runs
-        coEvery { preferencesRepository.saveRefreshToken(authResponse.refreshToken) } just Runs
-        coEvery { preferencesRepository.saveCurrentUserId(authResponse.user.id) } just Runs
+        coEvery { remoteRepository.loginUser(any()) } returns Response.success(mockk(relaxed = true))
+        coEvery { accountManager.saveCredentials(any()) } just Runs
+        coEvery { localRepository.insertUser(any()) } just Runs
     }
 
     private fun mockWrongData() {
-        every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } returns
+        coEvery { remoteRepository.loginUser(any()) } returns
                 Response.error(BAD_REQUEST, BAD_REQUEST.toString().toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {
-        every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.loginUser(ofType<LoginDetails>()) } throws IOException()
+        coEvery { remoteRepository.loginUser(any()) } throws IOException()
 
         // FixMe: remove after adding server hosting
-        coEvery { accountManager.saveCredentials(loginFormData) } just Runs
-        every { localRepository.getUsers() } returns flowOf(listOf(FakeData.users[0]))
-        coEvery { preferencesRepository.saveCurrentUserId(FakeData.users[0].id) } just Runs
+        coEvery { accountManager.saveCredentials(any()) } just Runs
+        every { localRepository.getUsers() } returns flowOf(mockkList(relaxed = true))
+        coEvery { localRepository.insertUser(any()) } just Runs
     }
 }

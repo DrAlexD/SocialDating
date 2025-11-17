@@ -1,6 +1,7 @@
 package xelagurd.socialdating.client.test
 
 import java.io.IOException
+import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -13,9 +14,12 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
@@ -23,50 +27,40 @@ import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
-import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
-import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.remote.NOT_FOUND
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
-import xelagurd.socialdating.client.mergeListsAsSets
+import xelagurd.socialdating.client.mockkList
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.StatementsViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class StatementsViewModelTest {
+
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val context: Context = mockk()
-    private val savedStateHandle: SavedStateHandle = mockk()
-    private val remoteStatementsRepository: RemoteStatementsRepository = mockk()
-    private val localStatementsRepository: LocalStatementsRepository = mockk()
-    private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository = mockk()
-    private val localDefiningThemesRepository: LocalDefiningThemesRepository = mockk()
+    private val context = mockk<Context>(relaxed = true)
+    private val savedStateHandle = mockk<SavedStateHandle>()
+    private val remoteStatementsRepository = mockk<RemoteStatementsRepository>()
+    private val localStatementsRepository = mockk<LocalStatementsRepository>()
+    private val remoteDefiningThemesRepository = mockk<RemoteDefiningThemesRepository>()
+    private val localDefiningThemesRepository = mockk<LocalDefiningThemesRepository>()
 
     private lateinit var viewModel: StatementsViewModel
-    private lateinit var definingThemesFlow: MutableStateFlow<List<DefiningTheme>>
     private lateinit var statementsFlow: MutableStateFlow<List<Statement>>
     private val statementsUiState
         get() = viewModel.uiState.value
 
-    private val userId = 1
-    private val categoryId = 1
-
-    private val localDefiningThemes = FakeData.definingThemes.take(3)
-    private val remoteDefiningThemes = FakeData.definingThemes.take(5)
-    private val localStatements = FakeData.statements.take(3)
-    private val remoteStatements = FakeData.statements.take(5)
-
-    private fun List<DefiningTheme>.toIds() = this.map { it.id }
+    private val userId = Random.nextInt()
+    private val categoryId = Random.nextInt()
 
     @Before
     fun setup() {
-        definingThemesFlow = MutableStateFlow(localDefiningThemes)
-        statementsFlow = MutableStateFlow(localStatements)
+        statementsFlow = MutableStateFlow(mockkList())
 
         mockGeneralMethods()
     }
@@ -97,9 +91,17 @@ class StatementsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
-        assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements),
-            statementsUiState.entities
+
+        verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any()) }
+        coVerify(exactly = 1) { localDefiningThemesRepository.insertDefiningThemes(any()) }
+        coVerify(exactly = 1) { localStatementsRepository.replaceStatements(any(), any()) }
+        confirmVerified(
+            localDefiningThemesRepository,
+            remoteDefiningThemesRepository,
+            localStatementsRepository,
+            remoteStatementsRepository
         )
     }
 
@@ -112,9 +114,14 @@ class StatementsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.FAILURE(), statementsUiState.dataRequestStatus)
-        assertEquals(
-            localStatements,
-            statementsUiState.entities
+
+        verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        confirmVerified(
+            localDefiningThemesRepository,
+            remoteDefiningThemesRepository,
+            localStatementsRepository,
+            remoteStatementsRepository
         )
     }
 
@@ -127,9 +134,16 @@ class StatementsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
-        assertEquals(
-            localStatements,
-            statementsUiState.entities
+
+        verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes() } // FixMe: remove after adding server hosting
+        coVerify(exactly = 1) { localStatementsRepository.getStatements() } // FixMe: remove after adding server hosting
+        confirmVerified(
+            localDefiningThemesRepository,
+            remoteDefiningThemesRepository,
+            localStatementsRepository,
+            remoteStatementsRepository
         )
     }
 
@@ -147,9 +161,19 @@ class StatementsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
-        assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements),
-            statementsUiState.entities
+
+        verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
+        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any()) }
+        coVerify(exactly = 1) { localDefiningThemesRepository.insertDefiningThemes(any()) }
+        coVerify(exactly = 1) { localStatementsRepository.replaceStatements(any(), any()) }
+        coVerify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes() } // FixMe: remove after adding server hosting
+        coVerify(exactly = 1) { localStatementsRepository.getStatements() } // FixMe: remove after adding server hosting
+        confirmVerified(
+            localDefiningThemesRepository,
+            remoteDefiningThemesRepository,
+            localStatementsRepository,
+            remoteStatementsRepository
         )
     }
 
@@ -167,9 +191,19 @@ class StatementsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
-        assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements),
-            statementsUiState.entities
+
+        verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
+        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any()) }
+        coVerify(exactly = 1) { localDefiningThemesRepository.insertDefiningThemes(any()) }
+        coVerify(exactly = 1) { localStatementsRepository.replaceStatements(any(), any()) }
+        coVerify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes() } // FixMe: remove after adding server hosting
+        coVerify(exactly = 1) { localStatementsRepository.getStatements() } // FixMe: remove after adding server hosting
+        confirmVerified(
+            localDefiningThemesRepository,
+            remoteDefiningThemesRepository,
+            localStatementsRepository,
+            remoteStatementsRepository
         )
     }
 
@@ -185,9 +219,17 @@ class StatementsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
-        assertEquals(
-            mergeListsAsSets(localStatements, remoteStatements),
-            statementsUiState.entities
+
+        verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
+        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 2) { remoteStatementsRepository.getStatements(any(), any()) }
+        coVerify(exactly = 2) { localDefiningThemesRepository.insertDefiningThemes(any()) }
+        coVerify(exactly = 2) { localStatementsRepository.replaceStatements(any(), any()) }
+        confirmVerified(
+            localDefiningThemesRepository,
+            remoteDefiningThemesRepository,
+            localStatementsRepository,
+            remoteStatementsRepository
         )
     }
 
@@ -203,49 +245,45 @@ class StatementsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
-        assertEquals(
-            localStatements,
-            statementsUiState.entities
+
+        verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
+        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 2) { localDefiningThemesRepository.getDefiningThemes() } // FixMe: remove after adding server hosting
+        coVerify(exactly = 2) { localStatementsRepository.getStatements() } // FixMe: remove after adding server hosting
+        confirmVerified(
+            localDefiningThemesRepository,
+            remoteDefiningThemesRepository,
+            localStatementsRepository,
+            remoteStatementsRepository
         )
     }
 
     private fun mockGeneralMethods() {
-        every { savedStateHandle.get<Int>("userId") } returns userId
-        every { savedStateHandle.get<Int>("categoryId") } returns categoryId
-        every { localStatementsRepository.getStatements(categoryId) } returns statementsFlow
+        every { savedStateHandle.get<Int>(any()) } returns userId
+        every { savedStateHandle.get<Int>(any()) } returns categoryId
+        every { localStatementsRepository.getStatements(any()) } returns statementsFlow
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns
-                Response.success(remoteDefiningThemes)
-        coEvery {
-            remoteStatementsRepository.getStatements(userId, remoteDefiningThemes.toIds())
-        } returns Response.success(remoteStatements)
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any()) } returns
+                Response.success(mockkList(relaxed = true))
+        coEvery { remoteStatementsRepository.getStatements(any(), any()) } returns
+                Response.success(mockkList())
 
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes) } answers {
-            definingThemesFlow.value = mergeListsAsSets(definingThemesFlow.value, remoteDefiningThemes)
-        }
-        coEvery { localStatementsRepository.replaceStatements(categoryId, remoteStatements) } answers {
-            statementsFlow.value = mergeListsAsSets(statementsFlow.value, remoteStatements)
-        }
+        coEvery { localDefiningThemesRepository.insertDefiningThemes(any()) } just Runs
+        coEvery { localStatementsRepository.replaceStatements(any(), any()) } just Runs
     }
 
     private fun mockEmptyData() {
-        every { context.getString(any()) } returns ""
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } returns
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any()) } returns
                 Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
-        coEvery { remoteStatementsRepository.getStatements(userId, emptyList()) } returns
-                Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
-
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(emptyList()) } just Runs
     }
 
     private fun mockDataWithoutInternet() {
-        every { context.getString(any()) } returns ""
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(categoryId) } throws IOException()
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any()) } throws IOException()
 
         // FixMe: remove after adding server hosting
-        every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(localDefiningThemes)
-        every { localStatementsRepository.getStatements() } returns flowOf(localStatements)
+        every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(mockkList())
+        every { localStatementsRepository.getStatements() } returns flowOf(mockkList())
     }
 }

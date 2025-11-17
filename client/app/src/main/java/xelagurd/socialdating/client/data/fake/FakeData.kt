@@ -6,7 +6,6 @@ import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.additional.AuthResponse
 import xelagurd.socialdating.client.data.model.enums.Gender.MALE
 import xelagurd.socialdating.client.data.model.enums.Purpose.ALL_AT_ONCE
 import xelagurd.socialdating.client.data.model.enums.Purpose.FRIENDS
@@ -375,8 +374,6 @@ object FakeData {
             city = mainUser.city,
             purpose = mainUser.purpose
         )
-
-    val authResponse = AuthResponse(mainUser, "", "")
 
     val statementFormData = StatementFormData(
         text = mainStatement.text,

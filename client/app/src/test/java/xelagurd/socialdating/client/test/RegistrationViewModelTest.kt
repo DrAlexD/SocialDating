@@ -8,6 +8,8 @@ import kotlinx.coroutines.test.runTest
 import android.content.Context
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -21,29 +23,29 @@ import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
-import xelagurd.socialdating.client.data.model.details.RegistrationDetails
 import xelagurd.socialdating.client.data.remote.BAD_REQUEST
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
+import xelagurd.socialdating.client.mockkList
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.RegistrationViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RegistrationViewModelTest {
+
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val context: Context = mockk()
-    private val remoteRepository: RemoteUsersRepository = mockk()
-    private val localRepository: LocalUsersRepository = mockk()
-    private val preferencesRepository: PreferencesRepository = mockk()
-    private val accountManager: AccountManager = mockk()
+    private val context = mockk<Context>(relaxed = true)
+    private val preferencesRepository = mockk<PreferencesRepository>(relaxed = true)
+    private val accountManager = mockk<AccountManager>()
+    private val remoteRepository = mockk<RemoteUsersRepository>()
+    private val localRepository = mockk<LocalUsersRepository>()
 
     private lateinit var viewModel: RegistrationViewModel
     private val registrationUiState
         get() = viewModel.uiState.value
 
     private val registrationFormData = FakeData.registrationFormData
-    private val authResponse = FakeData.authResponse
 
     private fun initViewModel() {
         viewModel = RegistrationViewModel(
@@ -65,6 +67,14 @@ class RegistrationViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, registrationUiState.actionRequestStatus)
+
+        coVerify(exactly = 1) { remoteRepository.registerUser(any()) }
+        coVerify(exactly = 1) { accountManager.saveCredentials(any()) }
+        coVerify(exactly = 1) { localRepository.insertUser(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveAccessToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveRefreshToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveCurrentUserId(any()) }
+        confirmVerified(preferencesRepository, localRepository, remoteRepository, accountManager)
     }
 
     @Test
@@ -76,6 +86,13 @@ class RegistrationViewModelTest {
 
         // FixMe: Change to ERROR after implementing server
         assertEquals(RequestStatus.SUCCESS, registrationUiState.actionRequestStatus)
+
+        coVerify(exactly = 1) { remoteRepository.registerUser(any()) }
+        coVerify(exactly = 1) { accountManager.saveCredentials(any()) } // FixMe: remove after adding server hosting
+        coVerify(exactly = 1) { localRepository.getUsers() } // FixMe: remove after adding server hosting
+        coVerify(exactly = 1) { localRepository.insertUser(any()) } // FixMe: remove after adding server hosting
+        coVerify(exactly = 1) { preferencesRepository.saveCurrentUserId(any()) } // FixMe: remove after adding server hosting
+        confirmVerified(preferencesRepository, localRepository, remoteRepository, accountManager)
     }
 
     @Test
@@ -86,6 +103,9 @@ class RegistrationViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.FAILURE(BAD_REQUEST.toString()), registrationUiState.actionRequestStatus)
+
+        coVerify(exactly = 1) { remoteRepository.registerUser(any()) }
+        confirmVerified(preferencesRepository, localRepository, remoteRepository, accountManager)
     }
 
     @Test
@@ -101,6 +121,15 @@ class RegistrationViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, registrationUiState.actionRequestStatus)
+
+        coVerify(exactly = 2) { remoteRepository.registerUser(any()) }
+        coVerify(exactly = 2) { accountManager.saveCredentials(any()) } // FixMe: set to 1 after adding server hosting
+        coVerify(exactly = 1) { localRepository.getUsers() } // FixMe: remove after adding server hosting
+        coVerify(exactly = 2) { localRepository.insertUser(any()) } // FixMe: set to 1 after adding server hosting
+        coVerify(exactly = 1) { preferencesRepository.saveAccessToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveRefreshToken(any()) }
+        coVerify(exactly = 2) { preferencesRepository.saveCurrentUserId(any()) } // FixMe: set to 1 after adding server hosting
+        confirmVerified(preferencesRepository, localRepository, remoteRepository, accountManager)
     }
 
     @Test
@@ -116,31 +145,33 @@ class RegistrationViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, registrationUiState.actionRequestStatus)
+
+        coVerify(exactly = 2) { remoteRepository.registerUser(any()) }
+        coVerify(exactly = 1) { accountManager.saveCredentials(any()) }
+        coVerify(exactly = 1) { localRepository.insertUser(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveAccessToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveRefreshToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveCurrentUserId(any()) }
+        confirmVerified(preferencesRepository, localRepository, remoteRepository, accountManager)
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns
-                Response.success(authResponse)
-        coEvery { accountManager.saveCredentials(registrationFormData.toLoginFormData()) } just Runs
-        coEvery { localRepository.insertUser(authResponse.user) } just Runs
-        coEvery { preferencesRepository.saveAccessToken(authResponse.accessToken) } just Runs
-        coEvery { preferencesRepository.saveRefreshToken(authResponse.refreshToken) } just Runs
-        coEvery { preferencesRepository.saveCurrentUserId(authResponse.user.id) } just Runs
+        coEvery { remoteRepository.registerUser(any()) } returns Response.success(mockk(relaxed = true))
+        coEvery { accountManager.saveCredentials(any()) } just Runs
+        coEvery { localRepository.insertUser(any()) } just Runs
     }
 
     private fun mockWrongData() {
-        every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } returns
+        coEvery { remoteRepository.registerUser(any()) } returns
                 Response.error(BAD_REQUEST, BAD_REQUEST.toString().toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {
-        every { context.getString(any()) } returns ""
-        coEvery { remoteRepository.registerUser(ofType<RegistrationDetails>()) } throws IOException()
+        coEvery { remoteRepository.registerUser(any()) } throws IOException()
 
         // FixMe: remove after adding server hosting
-        coEvery { accountManager.saveCredentials(registrationFormData.toLoginFormData()) } just Runs
-        every { localRepository.getUsers() } returns flowOf(listOf(FakeData.users[0]))
-        coEvery { preferencesRepository.saveCurrentUserId(FakeData.users[0].id) } just Runs
+        coEvery { accountManager.saveCredentials(any()) } just Runs
+        every { localRepository.getUsers() } returns flowOf(mockkList(relaxed = true))
+        coEvery { localRepository.insertUser(any()) } just Runs
     }
 }

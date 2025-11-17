@@ -172,6 +172,15 @@ class RegistrationScreenTest {
     }
 
     @Test
+    fun registrationScreen_notNumberAge_disabledButton() {
+        val registrationUiState = RegistrationUiState(
+            formData = registrationFormData.copy(age = "abcde")
+        )
+
+        assertRegisterButtonIsDisabled(registrationUiState)
+    }
+
+    @Test
     fun registrationScreen_emptyCity_disabledButton() {
         val registrationUiState = RegistrationUiState(
             formData = registrationFormData.copy(city = "")
