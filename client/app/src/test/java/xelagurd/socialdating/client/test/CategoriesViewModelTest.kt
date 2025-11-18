@@ -9,45 +9,47 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import android.content.Context
+import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.confirmVerified
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
+import io.mockk.verify
 import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
-import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.remote.NOT_FOUND
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
-import xelagurd.socialdating.client.mergeListsAsSets
+import xelagurd.socialdating.client.mockkList
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.CategoriesViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CategoriesViewModelTest {
+
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val context: Context = mockk()
-    private val remoteRepository: RemoteCategoriesRepository = mockk()
-    private val localRepository: LocalCategoriesRepository = mockk()
+    private val context = mockk<Context>(relaxed = true)
+    private val remoteRepository = mockk<RemoteCategoriesRepository>()
+    private val localRepository = mockk<LocalCategoriesRepository>()
 
     private lateinit var viewModel: CategoriesViewModel
     private lateinit var categoriesFlow: MutableStateFlow<List<Category>>
     private val categoriesUiState
         get() = viewModel.uiState.value
 
-    private val localCategories = FakeData.categories.take(3)
-    private val remoteCategories = FakeData.categories.take(5)
-
     @Before
     fun setup() {
-        categoriesFlow = MutableStateFlow(localCategories)
+        categoriesFlow = MutableStateFlow(mockkList())
 
         mockGeneralMethods()
     }
@@ -75,10 +77,11 @@ class CategoriesViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
-        assertEquals(
-            mergeListsAsSets(localCategories, remoteCategories),
-            categoriesUiState.entities
-        )
+
+        verify(exactly = 1) { localRepository.getCategories() }
+        coVerify(exactly = 1) { remoteRepository.getCategories() }
+        coVerify(exactly = 1) { localRepository.insertCategories(any()) }
+        confirmVerified(localRepository, remoteRepository)
     }
 
     @Test
@@ -90,10 +93,10 @@ class CategoriesViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.FAILURE(), categoriesUiState.dataRequestStatus)
-        assertEquals(
-            localCategories,
-            categoriesUiState.entities
-        )
+
+        verify(exactly = 1) { localRepository.getCategories() }
+        coVerify(exactly = 1) { remoteRepository.getCategories() }
+        confirmVerified(localRepository, remoteRepository)
     }
 
     @Test
@@ -105,10 +108,10 @@ class CategoriesViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.ERROR(), categoriesUiState.dataRequestStatus)
-        assertEquals(
-            localCategories,
-            categoriesUiState.entities
-        )
+
+        verify(exactly = 2) { localRepository.getCategories() } // FixMe: set to 1 after adding server hosting
+        coVerify(exactly = 1) { remoteRepository.getCategories() }
+        confirmVerified(localRepository, remoteRepository)
     }
 
     @Test
@@ -125,10 +128,11 @@ class CategoriesViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.ERROR(), categoriesUiState.dataRequestStatus)
-        assertEquals(
-            mergeListsAsSets(localCategories, remoteCategories),
-            categoriesUiState.entities
-        )
+
+        verify(exactly = 2) { localRepository.getCategories() } // FixMe: set to 1 after adding server hosting
+        coVerify(exactly = 2) { remoteRepository.getCategories() }
+        coVerify(exactly = 1) { localRepository.insertCategories(any()) }
+        confirmVerified(localRepository, remoteRepository)
     }
 
     @Test
@@ -145,10 +149,11 @@ class CategoriesViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
-        assertEquals(
-            mergeListsAsSets(localCategories, remoteCategories),
-            categoriesUiState.entities
-        )
+
+        verify(exactly = 2) { localRepository.getCategories() } // FixMe: set to 1 after adding server hosting
+        coVerify(exactly = 2) { remoteRepository.getCategories() }
+        coVerify(exactly = 1) { localRepository.insertCategories(any()) }
+        confirmVerified(localRepository, remoteRepository)
     }
 
     @Test
@@ -163,10 +168,11 @@ class CategoriesViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
-        assertEquals(
-            mergeListsAsSets(localCategories, remoteCategories),
-            categoriesUiState.entities
-        )
+
+        verify(exactly = 1) { localRepository.getCategories() }
+        coVerify(exactly = 2) { remoteRepository.getCategories() }
+        coVerify(exactly = 2) { localRepository.insertCategories(any()) }
+        confirmVerified(localRepository, remoteRepository)
     }
 
     @Test
@@ -181,10 +187,10 @@ class CategoriesViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.ERROR(), categoriesUiState.dataRequestStatus)
-        assertEquals(
-            localCategories,
-            categoriesUiState.entities
-        )
+
+        verify(exactly = 3) { localRepository.getCategories() } // FixMe: set to 1 after adding server hosting
+        coVerify(exactly = 2) { remoteRepository.getCategories() }
+        confirmVerified(localRepository, remoteRepository)
     }
 
     private fun mockGeneralMethods() {
@@ -192,20 +198,16 @@ class CategoriesViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteRepository.getCategories() } returns Response.success(remoteCategories)
-        coEvery { localRepository.insertCategories(remoteCategories) } answers {
-            categoriesFlow.value = mergeListsAsSets(categoriesFlow.value, remoteCategories)
-        }
+        coEvery { remoteRepository.getCategories() } returns Response.success(mockkList())
+        coEvery { localRepository.insertCategories(any()) } just Runs
     }
 
     private fun mockEmptyData() {
-        every { context.getString(any()) } returns ""
         coEvery { remoteRepository.getCategories() } returns
                 Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
     }
 
     private fun mockDataWithoutInternet() {
-        every { context.getString(any()) } returns ""
         coEvery { remoteRepository.getCategories() } throws IOException()
     }
 }

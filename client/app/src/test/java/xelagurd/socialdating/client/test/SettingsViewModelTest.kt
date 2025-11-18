@@ -5,6 +5,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.confirmVerified
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
@@ -18,19 +20,23 @@ import xelagurd.socialdating.client.ui.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingsViewModelTest {
+
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val preferencesRepository: PreferencesRepository = mockk()
+    private val preferencesRepository = mockk<PreferencesRepository>()
 
-    private val commonLocalRepository: CommonLocalRepository = mockk()
+    private val commonLocalRepository = mockk<CommonLocalRepository>()
 
     private lateinit var viewModel: SettingsViewModel
     private val settingsUiState
         get() = viewModel.uiState.value
 
     private fun initViewModel() {
-        viewModel = SettingsViewModel(preferencesRepository, commonLocalRepository)
+        viewModel = SettingsViewModel(
+            preferencesRepository,
+            commonLocalRepository
+        )
     }
 
     @Test
@@ -42,6 +48,10 @@ class SettingsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, settingsUiState.actionRequestStatus)
+
+        coVerify(exactly = 1) { preferencesRepository.clearPreferences() }
+        coVerify(exactly = 1) { commonLocalRepository.clearData() }
+        confirmVerified(preferencesRepository, commonLocalRepository)
     }
 
     private fun mockLogout() {

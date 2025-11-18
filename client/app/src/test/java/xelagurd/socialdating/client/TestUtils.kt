@@ -1,7 +1,6 @@
 package xelagurd.socialdating.client
 
-fun <T> mergeListsAsSets(first: List<T>, second: List<T>) =
-    (first.toSet() + second).toList()
+import io.mockk.mockk
 
-fun <T> mergeListsAsSets(first: List<T>, second: List<T>, third: List<T>) =
-    mergeListsAsSets(mergeListsAsSets(first, second), third)
+inline fun <reified T : Any> mockkList(size: Int = 5, relaxed: Boolean = false): List<T> =
+    List(size) { mockk(relaxed = relaxed) }
