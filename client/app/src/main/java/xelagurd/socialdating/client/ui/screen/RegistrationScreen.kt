@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
 import xelagurd.socialdating.client.ui.AppTopBar
@@ -101,16 +102,16 @@ private inline fun RegistrationDetailsBody(
                 onValueChange = { onValueChange(registrationFormData.copy(username = it)) },
                 label = stringResource(R.string.username),
                 overrideModifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_very_small))
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
+                    .padding(dimensionResource(R.dimen.padding_4dp))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp))
             )
             AppTextField(
                 value = registrationFormData.name,
                 onValueChange = { onValueChange(registrationFormData.copy(name = it)) },
                 label = stringResource(R.string.name),
                 overrideModifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_very_small))
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
+                    .padding(dimensionResource(R.dimen.padding_4dp))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp))
             )
         }
         Row(
@@ -119,7 +120,7 @@ private inline fun RegistrationDetailsBody(
         ) {
             AppMediumTitleText(
                 text = stringResourceWithColon(R.string.gender),
-                overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
+                overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
             )
             Gender.entries.forEach {
                 RadioButton(
@@ -130,7 +131,7 @@ private inline fun RegistrationDetailsBody(
                 AppMediumTitleText(
                     text = stringResource(it.descriptionRes),
                     overrideModifier = Modifier.padding(
-                        end = dimensionResource(R.dimen.padding_very_small)
+                        end = dimensionResource(R.dimen.padding_4dp)
                     )
                 )
             }
@@ -139,7 +140,7 @@ private inline fun RegistrationDetailsBody(
             value = registrationFormData.email,
             onValueChange = { onValueChange(registrationFormData.copy(email = it)) },
             label = stringResource(R.string.email_optional),
-            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
+            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -150,16 +151,16 @@ private inline fun RegistrationDetailsBody(
                 onValueChange = { onValueChange(registrationFormData.copy(age = it)) },
                 label = stringResource(R.string.age),
                 overrideModifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_very_small))
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
+                    .padding(dimensionResource(R.dimen.padding_4dp))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp))
             )
             AppTextField(
                 value = registrationFormData.city,
                 onValueChange = { onValueChange(registrationFormData.copy(city = it)) },
                 label = stringResource(R.string.city),
                 overrideModifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_very_small))
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_very_small))
+                    .padding(dimensionResource(R.dimen.padding_4dp))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp))
             )
         }
         Row(
@@ -168,7 +169,7 @@ private inline fun RegistrationDetailsBody(
         ) {
             AppMediumTitleText(
                 text = stringResourceWithColon(R.string.purpose),
-                overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
+                overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
             )
             Column(
                 horizontalAlignment = Alignment.Start,
@@ -187,7 +188,7 @@ private inline fun RegistrationDetailsBody(
                         AppMediumTitleText(
                             text = stringResource(it.descriptionRes),
                             overrideModifier = Modifier.padding(
-                                end = dimensionResource(R.dimen.padding_very_small)
+                                end = dimensionResource(R.dimen.padding_4dp)
                             )
                         )
                     }
@@ -203,7 +204,7 @@ private inline fun RegistrationDetailsBody(
                 onValueChange = { onValueChange(registrationFormData.copy(password = it)) },
                 label = stringResource(R.string.password),
                 overrideModifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_very_small))
+                    .padding(dimensionResource(R.dimen.padding_4dp))
                     .width(TextFieldDefaults.MinWidth / 2 + 35.dp)
             )
             AppTextField(
@@ -211,7 +212,7 @@ private inline fun RegistrationDetailsBody(
                 onValueChange = { onValueChange(registrationFormData.copy(repeatedPassword = it)) },
                 label = stringResource(R.string.repeat_password),
                 overrideModifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_very_small))
+                    .padding(dimensionResource(R.dimen.padding_4dp))
                     .width(TextFieldDefaults.MinWidth / 2 + 35.dp)
             )
         }
@@ -236,12 +237,7 @@ private fun RegistrationComponentEmptyFormPreview() {
 private fun RegistrationComponentFullFormPreview() {
     AppTheme {
         RegistrationScreenComponent(
-            registrationUiState = RegistrationUiState(
-                formData = RegistrationFormData(
-                    "name", Gender.MALE, "username", "password",
-                    "password", "email", "40", "Moscow", Purpose.RELATIONSHIPS
-                )
-            )
+            registrationUiState = RegistrationUiState(formData = FakeData.registrationFormData)
         )
     }
 }
@@ -251,12 +247,7 @@ private fun RegistrationComponentFullFormPreview() {
 private fun RegistrationComponentFullFormRuPreview() {
     AppTheme {
         RegistrationScreenComponent(
-            registrationUiState = RegistrationUiState(
-                formData = RegistrationFormData(
-                    "name", Gender.MALE, "username", "password",
-                    "password", "email", "40", "Moscow", Purpose.RELATIONSHIPS
-                )
-            )
+            registrationUiState = RegistrationUiState(formData = FakeData.registrationFormData)
         )
     }
 }
@@ -267,10 +258,7 @@ private fun RegistrationComponentWrongDataPreview() {
     AppTheme {
         RegistrationScreenComponent(
             registrationUiState = RegistrationUiState(
-                formData = RegistrationFormData(
-                    "name", Gender.MALE, "username", "password",
-                    "password", "email", "40", "Moscow", Purpose.RELATIONSHIPS
-                ),
+                formData = FakeData.registrationFormData,
                 actionRequestStatus = RequestStatus.ERROR("Text")
             )
         )

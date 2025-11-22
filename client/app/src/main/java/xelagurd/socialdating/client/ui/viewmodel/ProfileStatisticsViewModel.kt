@@ -21,6 +21,7 @@ import xelagurd.socialdating.client.data.local.repository.LocalCategoriesReposit
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserDefiningThemesRepository
+import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
@@ -46,19 +47,21 @@ class ProfileStatisticsViewModel @Inject constructor(
     private val localDefiningThemesRepository: LocalDefiningThemesRepository
 ) : ViewModel() {
     private val userId: Int = checkNotNull(savedStateHandle[ProfileStatisticsDestination.userId])
+    private val anotherUserId: Int = checkNotNull(savedStateHandle[ProfileStatisticsDestination.anotherUserId])
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val userCategoriesFlow = localUserCategoriesRepository.getUserCategories(userId)
         .distinctUntilChanged()
-    private val userDefiningThemesFlow = localUserDefiningThemesRepository
-        .getUserDefiningThemes(userId)
+    private val userDefiningThemesFlow = localUserDefiningThemesRepository.getUserDefiningThemes(userId)
         .distinctUntilChanged()
+    private val detailedSimilarUserFlow = MutableStateFlow<DetailedSimilarUser?>(null)
 
-    val uiState = combine(userCategoriesFlow, userDefiningThemesFlow, dataRequestStatusFlow)
-    { userCategories, userDefiningThemes, dataRequestStatus ->
+    val uiState = combine(userCategoriesFlow, userDefiningThemesFlow, detailedSimilarUserFlow, dataRequestStatusFlow)
+    { userCategories, userDefiningThemes, detailedSimilarUser, dataRequestStatus ->
         ProfileStatisticsUiState(
             entities = userCategories,
             entityIdToData = userDefiningThemes.groupBy { it.categoryId },
+            entitiesMask = detailedSimilarUser,
             dataRequestStatus = dataRequestStatus
         )
     }.stateIn(
@@ -104,9 +107,23 @@ class ProfileStatisticsViewModel @Inject constructor(
 
                         if (remoteUserDefiningThemes != null) {
                             localUserDefiningThemesRepository.insertUserDefiningThemes(remoteUserDefiningThemes)
-                        }
 
-                        globalStatus = statusUserDefiningThemes
+                            if (userId != anotherUserId) {
+                                val (remoteDetailedSimilarUser, statusDetailedSimilarUser) = safeApiCall(context) {
+                                    remoteUserCategoriesRepository.getDetailedSimilarUser(userId, anotherUserId)
+                                }
+
+                                if (remoteDetailedSimilarUser != null) {
+                                    detailedSimilarUserFlow.update { remoteDetailedSimilarUser }
+                                }
+
+                                globalStatus = statusDetailedSimilarUser
+                            } else {
+                                globalStatus = statusUserDefiningThemes
+                            }
+                        } else {
+                            globalStatus = statusUserDefiningThemes
+                        }
                     } else {
                         globalStatus = statusUserCategories
                     }
@@ -129,6 +146,9 @@ class ProfileStatisticsViewModel @Inject constructor(
                 }
                 if (localUserDefiningThemesRepository.getUserDefiningThemes().first().isEmpty()) {
                     localUserDefiningThemesRepository.insertUserDefiningThemes(FakeData.userDefiningThemes)
+                }
+                if (userId != anotherUserId) {
+                    detailedSimilarUserFlow.update { FakeData.detailedSimilarUser }
                 }
             }
 

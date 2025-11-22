@@ -107,7 +107,7 @@ private inline fun StatementDetailsBody(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_8dp))
         ) {
             AppMediumTitleText(text = stringResourceWithColon(R.string.defining_theme))
             DataChoosingListComponent(
@@ -142,9 +142,9 @@ private inline fun StatementDetailsBody(
             AppMediumTitleText(
                 text = stringResource(R.string.yes),
                 overrideModifier = Modifier.padding(
-                    top = dimensionResource(R.dimen.padding_small),
-                    bottom = dimensionResource(R.dimen.padding_small),
-                    end = dimensionResource(R.dimen.padding_small)
+                    top = dimensionResource(R.dimen.padding_8dp),
+                    bottom = dimensionResource(R.dimen.padding_8dp),
+                    end = dimensionResource(R.dimen.padding_8dp)
                 )
             )
             RadioButton(
@@ -155,9 +155,9 @@ private inline fun StatementDetailsBody(
             AppMediumTitleText(
                 text = stringResource(R.string.no),
                 overrideModifier = Modifier.padding(
-                    top = dimensionResource(R.dimen.padding_small),
-                    bottom = dimensionResource(R.dimen.padding_small),
-                    end = dimensionResource(R.dimen.padding_small)
+                    top = dimensionResource(R.dimen.padding_8dp),
+                    bottom = dimensionResource(R.dimen.padding_8dp),
+                    end = dimensionResource(R.dimen.padding_8dp)
                 )
             )
         }
@@ -171,12 +171,12 @@ private inline fun StatementDetailsBody(
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementAddingComponentAllDataFullFormPreview() {
+private fun StatementAddingComponentDataPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
                 entities = FakeData.definingThemes,
-                formData = StatementFormData("Text", true)
+                formData = FakeData.statementFormData.copy(definingThemeId = null)
             )
         )
     }
@@ -184,12 +184,12 @@ private fun StatementAddingComponentAllDataFullFormPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
 @Composable
-private fun StatementAddingComponentAllDataFullFormRuPreview() {
+private fun StatementAddingComponentDataRuPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
                 entities = FakeData.definingThemes,
-                formData = StatementFormData("Text", true)
+                formData = FakeData.statementFormData.copy(definingThemeId = null)
             )
         )
     }
@@ -197,14 +197,25 @@ private fun StatementAddingComponentAllDataFullFormRuPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementAddingComponentFewDataPreview() {
+private fun StatementAddingComponentFullFormPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
-                entities = listOf(
-                    FakeData.definingThemes[0],
-                    FakeData.definingThemes[1]
-                )
+                entities = FakeData.definingThemes,
+                formData = FakeData.statementFormData
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
+@Composable
+private fun StatementAddingComponentFullFormRuPreview() {
+    AppTheme {
+        StatementAddingScreenComponent(
+            statementAddingUiState = StatementAddingUiState(
+                entities = FakeData.definingThemes,
+                formData = FakeData.statementFormData
             )
         )
     }
@@ -212,12 +223,12 @@ private fun StatementAddingComponentFewDataPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementAddingComponentChosenDataWrongFormPreview() {
+private fun StatementAddingComponentWrongDataPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
                 entities = FakeData.definingThemes,
-                formData = StatementFormData(definingThemeId = 1),
+                formData = FakeData.statementFormData,
                 actionRequestStatus = RequestStatus.ERROR("Text")
             )
         )
@@ -226,7 +237,7 @@ private fun StatementAddingComponentChosenDataWrongFormPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementAddingComponentEmptyDataPreview() {
+private fun StatementAddingComponentNoDataPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(

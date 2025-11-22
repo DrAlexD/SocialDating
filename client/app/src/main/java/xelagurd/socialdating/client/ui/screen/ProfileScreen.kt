@@ -135,7 +135,7 @@ private fun UserInfoHints() {
 private fun UserData(user: User) {
     Column {
         AppLargeBodyText(text = user.username)
-        UserNameWithAvatar(user)
+        NameWithAvatar(name = user.name, gender = user.gender)
         AppLargeBodyText(text = "${user.age}")
         AppLargeBodyText(text = user.city)
         AppLargeBodyText(text = stringResource(user.purpose.descriptionRes))
@@ -143,13 +143,13 @@ private fun UserData(user: User) {
 }
 
 @Composable
-private fun UserNameWithAvatar(user: User) {
+private fun NameWithAvatar(name: String, gender: Gender) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        AppLargeBodyText(text = user.name)
-        AvatarIcon(gender = user.gender)
+        AppLargeBodyText(text = name)
+        AvatarIcon(gender = gender)
     }
 }
 
@@ -164,7 +164,7 @@ private fun AvatarIcon(gender: Gender) {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun ProfileComponentAllDataPreview() {
+private fun ProfileComponentDataPreview() {
     AppTheme {
         ProfileScreenComponent(
             profileUiState = ProfileUiState(entity = FakeData.users[0])
@@ -174,7 +174,7 @@ private fun ProfileComponentAllDataPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
 @Composable
-private fun ProfileComponentAllDataRuPreview() {
+private fun ProfileComponentDataRuPreview() {
     AppTheme {
         ProfileScreenComponent(
             profileUiState = ProfileUiState(entity = FakeData.users[0])

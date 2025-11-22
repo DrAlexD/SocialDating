@@ -11,4 +11,5 @@ interface UsersRepository : JpaRepository<User, Int> {
 
     fun findByEmail(email: String): User?
 
+    fun findAllByIdIn(userIds: List<Int>): List<User>
 }

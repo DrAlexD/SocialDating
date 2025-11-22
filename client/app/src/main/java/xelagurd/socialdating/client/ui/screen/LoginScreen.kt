@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.ui.AppTopBar
 import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.navigation.LoginDestination
@@ -102,7 +103,7 @@ private inline fun LoginDetailsBody(
         )
         AppSmallTitleText(
             text = stringResource(R.string.or),
-            overrideModifier = Modifier.padding(top = dimensionResource(R.dimen.padding_medium))
+            overrideModifier = Modifier.padding(top = dimensionResource(R.dimen.padding_12dp))
         )
         AppMediumTextCard(
             text = stringResource(R.string.register),
@@ -125,9 +126,7 @@ private fun LoginComponentEmptyFormPreview() {
 private fun LoginComponentFullFormPreview() {
     AppTheme {
         LoginScreenComponent(
-            loginUiState = LoginUiState(
-                formData = LoginFormData("username", "password")
-            )
+            loginUiState = LoginUiState(formData = FakeData.loginFormData)
         )
     }
 }
@@ -137,9 +136,7 @@ private fun LoginComponentFullFormPreview() {
 private fun LoginComponentFullFormRuPreview() {
     AppTheme {
         LoginScreenComponent(
-            loginUiState = LoginUiState(
-                formData = LoginFormData("username", "password")
-            )
+            loginUiState = LoginUiState(formData = FakeData.loginFormData)
         )
     }
 }
@@ -150,7 +147,7 @@ private fun LoginComponentWrongDataPreview() {
     AppTheme {
         LoginScreenComponent(
             loginUiState = LoginUiState(
-                formData = LoginFormData("username", "password"),
+                formData = FakeData.loginFormData,
                 actionRequestStatus = RequestStatus.ERROR("Text")
             )
         )

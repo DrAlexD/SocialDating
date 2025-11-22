@@ -30,6 +30,7 @@ import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.remote.NOT_FOUND
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
+import xelagurd.socialdating.client.ui.navigation.ProfileDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.ProfileViewModel
 
@@ -50,6 +51,7 @@ class ProfileViewModelTest {
         get() = viewModel.uiState.value
 
     private val userId = Random.nextInt()
+    private val anotherUserId = userId
 
     @Before
     fun setup() {
@@ -199,7 +201,8 @@ class ProfileViewModelTest {
     }
 
     private fun mockGeneralMethods() {
-        every { savedStateHandle.get<Int>(any()) } returns userId
+        every { savedStateHandle.get<Int>(ProfileDestination.userId) } returns userId
+        every { savedStateHandle.get<Int>(ProfileDestination.anotherUserId) } returns anotherUserId
         every { localRepository.getUser(any()) } returns usersFlow
     }
 

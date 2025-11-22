@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import xelagurd.socialdating.server.model.UserCategory
+import xelagurd.socialdating.server.model.additional.DetailedSimilarUser
 import xelagurd.socialdating.server.model.additional.SimilarUser
-import xelagurd.socialdating.server.model.additional.UserWithSimilarity
 import xelagurd.socialdating.server.service.UserCategoriesService
 
 @RestController
@@ -24,21 +24,21 @@ class UserCategoriesController(
     }
 
     @Operation(security = [SecurityRequirement("bearerAuth")])
-    @GetMapping("/users-similarity")
-    fun getUsersWithSimilarity(
+    @GetMapping("/similar-users")
+    fun getSimilarUsers(
         @RequestParam userId: Int,
         @RequestParam(required = false) categoryIds: List<Int>?
-    ): List<UserWithSimilarity> {
-        return userCategoriesService.getUsersWithSimilarity(userId, categoryIds)
+    ): List<SimilarUser> {
+        return userCategoriesService.getSimilarUsers(userId, categoryIds)
     }
 
     @Operation(security = [SecurityRequirement("bearerAuth")])
-    @GetMapping("/similar-user")
-    fun getSimilarUser(
+    @GetMapping("/detailed-similar-user")
+    fun getDetailedSimilarUser(
         @RequestParam currentUserId: Int,
         @RequestParam anotherUserId: Int
-    ): SimilarUser {
-        return userCategoriesService.getSimilarUser(currentUserId, anotherUserId)
+    ): DetailedSimilarUser {
+        return userCategoriesService.getDetailedSimilarUser(currentUserId, anotherUserId)
     }
 
 }

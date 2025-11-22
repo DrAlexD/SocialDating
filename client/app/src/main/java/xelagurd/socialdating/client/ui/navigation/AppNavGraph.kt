@@ -2,9 +2,11 @@ package xelagurd.socialdating.client.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +29,7 @@ import xelagurd.socialdating.client.ui.screen.ProfileScreen
 import xelagurd.socialdating.client.ui.screen.ProfileStatisticsScreen
 import xelagurd.socialdating.client.ui.screen.RegistrationScreen
 import xelagurd.socialdating.client.ui.screen.SettingsScreen
+import xelagurd.socialdating.client.ui.screen.SimilarUsersScreen
 import xelagurd.socialdating.client.ui.screen.StatementAddingScreen
 import xelagurd.socialdating.client.ui.screen.StatementsScreen
 
@@ -40,6 +43,7 @@ fun AppNavHost(
 
     ProfileDestination.currentUserId = currentUserId
     ProfileStatisticsDestination.currentUserId = currentUserId
+    SimilarUsersDestination.currentUserId = currentUserId
 
     initializeTopLevelDestinations(navController)
 
@@ -131,12 +135,15 @@ fun AppNavHost(
             arguments = listOf(
                 navArgument(ProfileDestination.userId) {
                     type = NavType.IntType
+                },
+                navArgument(ProfileDestination.anotherUserId) {
+                    type = NavType.IntType
                 }
             )
         ) {
             ProfileScreen(
                 onProfileStatisticsClick = {
-                    navController.navigate("${ProfileStatisticsDestination.route}/$it")
+                    navController.navigate("${ProfileStatisticsDestination.route}/$currentUserId/$it")
                 }
             )
         }
@@ -146,11 +153,29 @@ fun AppNavHost(
             arguments = listOf(
                 navArgument(ProfileStatisticsDestination.userId) {
                     type = NavType.IntType
+                },
+                navArgument(ProfileStatisticsDestination.anotherUserId) {
+                    type = NavType.IntType
                 }
             )
         ) {
             ProfileStatisticsScreen(
                 onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        composable(
+            route = SimilarUsersDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(SimilarUsersDestination.userId) {
+                    type = NavType.IntType
+                }
+            )
+        ) {
+            SimilarUsersScreen(
+                onSimilarUserClick = {
+                    navController.navigate("${ProfileStatisticsDestination.route}/$currentUserId/$it")
+                }
             )
         }
 
@@ -192,6 +217,13 @@ fun initializeTopLevelDestinations(navController: NavHostController) {
             selectedIcon = Icons.Default.Home,
             unselectedIcon = Icons.Outlined.Home,
             contentDescription = R.string.nav_categories
+        ),
+        TopLevelDestination(
+            navigationDestination = SimilarUsersDestination,
+            navigateTo = { navigateTo(SimilarUsersDestination.topLevelRoute) },
+            selectedIcon = Icons.Default.Face,
+            unselectedIcon = Icons.Outlined.Face,
+            contentDescription = R.string.nav_similar_users
         ),
         TopLevelDestination(
             navigationDestination = SettingsDestination,

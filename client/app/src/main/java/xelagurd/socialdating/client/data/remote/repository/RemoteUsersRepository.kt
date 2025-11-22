@@ -15,6 +15,9 @@ class RemoteUsersRepository @Inject constructor(
     suspend fun getUser(userId: Int) =
         apiService.getUser(userId)
 
+    suspend fun getUsers(userIds: List<Int>) =
+        apiService.getUsers(userIds)
+
     suspend fun loginUser(loginDetails: LoginDetails) =
         authApiService.loginUser(loginDetails)
 

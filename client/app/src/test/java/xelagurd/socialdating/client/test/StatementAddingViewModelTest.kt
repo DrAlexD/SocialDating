@@ -29,6 +29,7 @@ import xelagurd.socialdating.client.data.local.repository.LocalStatementsReposit
 import xelagurd.socialdating.client.data.remote.BAD_REQUEST
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.client.mockkList
+import xelagurd.socialdating.client.ui.navigation.StatementAddingDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.StatementAddingViewModel
 
@@ -156,8 +157,8 @@ class StatementAddingViewModelTest {
     }
 
     private fun mockGeneralMethods() {
-        every { savedStateHandle.get<Int>(any()) } returns userId
-        every { savedStateHandle.get<Int>(any()) } returns categoryId
+        every { savedStateHandle.get<Int>(StatementAddingDestination.userId) } returns userId
+        every { savedStateHandle.get<Int>(StatementAddingDestination.categoryId) } returns categoryId
         every { localDefiningThemesRepository.getDefiningThemes(any()) } returns flowOf(mockkList())
     }
 

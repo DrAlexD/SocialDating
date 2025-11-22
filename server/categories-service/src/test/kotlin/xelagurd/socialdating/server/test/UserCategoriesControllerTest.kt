@@ -47,7 +47,7 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     @Disabled
     @Test
-    fun getUsersWithSimilarity_existData_ok() {
+    fun getSimilarUsers_existData_ok() {
         // TODO
     }
 

@@ -79,7 +79,7 @@ fun AppTopBar(
                                     is RequestStatus.FAILURE, is RequestStatus.ERROR -> R.string.offline
                                 }
                             ),
-                            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_very_small))
+                            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
                         )
                         if (dataRequestStatus.isAllowedRefresh()) {
                             Icon(

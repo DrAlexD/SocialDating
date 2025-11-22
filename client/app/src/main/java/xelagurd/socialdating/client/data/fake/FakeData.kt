@@ -6,14 +6,19 @@ import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
+import xelagurd.socialdating.client.data.model.additional.DetailedSimilarCategory
+import xelagurd.socialdating.client.data.model.additional.DetailedSimilarDefiningTheme
+import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
+import xelagurd.socialdating.client.data.model.additional.SimilarCategory
+import xelagurd.socialdating.client.data.model.additional.SimilarUser
 import xelagurd.socialdating.client.data.model.enums.Gender.MALE
 import xelagurd.socialdating.client.data.model.enums.Purpose.ALL_AT_ONCE
 import xelagurd.socialdating.client.data.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.client.data.model.enums.Purpose.RELATIONSHIPS
 import xelagurd.socialdating.client.data.model.enums.Role.ADMIN
 import xelagurd.socialdating.client.data.model.enums.Role.USER
-import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
-import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.enums.SimilarityType.OPPOSITE
+import xelagurd.socialdating.client.data.model.enums.SimilarityType.SIMILAR
 import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.form.RegistrationFormData
 import xelagurd.socialdating.client.ui.form.StatementFormData
@@ -355,9 +360,7 @@ object FakeData {
 
     val mainUser = users[0]
     val mainCategory = categories[0]
-    val mainUserCategory = userCategories[0]
     val mainDefiningTheme = definingThemes[0]
-    val mainUserDefiningTheme = userDefiningThemes[0]
     val mainStatement = statements[0]
 
     val loginFormData = LoginFormData(mainUser.username, "password1")
@@ -386,23 +389,66 @@ object FakeData {
         id = 66, text = "NewStatement66", isSupportDefiningTheme = true, definingThemeId = 1, creatorUserId = 1
     )
 
-    val userCategoryWithData = UserCategoryWithData(
-        id = mainUserCategory.id,
-        interest = mainUserCategory.interest,
-        userId = mainUserCategory.userId,
-        categoryId = mainUserCategory.categoryId,
-        categoryName = mainCategory.name
+    val similarUsers = listOf(
+        SimilarUser(
+            id = 2,
+            similarNumber = 3,
+            oppositeNumber = 1,
+            similarCategories = listOf(
+                SimilarCategory(name = "Category1", differenceNumber = 2),
+                SimilarCategory(name = "Category3", differenceNumber = 1)
+            ),
+            oppositeCategories = listOf(
+                SimilarCategory(name = "Category2", differenceNumber = -1)
+            )
+        )
     )
 
-    val userDefiningThemeWithData = UserDefiningThemeWithData(
-        id = mainUserDefiningTheme.id,
-        value = mainUserDefiningTheme.value,
-        interest = mainUserDefiningTheme.interest,
-        categoryId = mainDefiningTheme.categoryId,
-        definingThemeId = mainUserDefiningTheme.definingThemeId,
-        definingThemeName = mainDefiningTheme.name,
-        definingThemeFromOpinion = mainDefiningTheme.fromOpinion,
-        definingThemeToOpinion = mainDefiningTheme.toOpinion
+    val detailedSimilarUser = DetailedSimilarUser(
+        similarNumber = 3,
+        oppositeNumber = 1,
+        categories = mapOf(
+            1 to DetailedSimilarCategory(
+                id = 1,
+                similarityType = SIMILAR,
+                similarNumber = 2,
+                oppositeNumber = 0,
+                definingThemes = mapOf(
+                    1 to DetailedSimilarDefiningTheme(
+                        id = 1,
+                        similarityType = SIMILAR
+                    ),
+                    2 to DetailedSimilarDefiningTheme(
+                        id = 2,
+                        similarityType = SIMILAR
+                    )
+                )
+            ),
+            2 to DetailedSimilarCategory(
+                id = 2,
+                similarityType = OPPOSITE,
+                similarNumber = 0,
+                oppositeNumber = 1,
+                definingThemes = mapOf(
+                    3 to DetailedSimilarDefiningTheme(
+                        id = 3,
+                        similarityType = OPPOSITE
+                    )
+                )
+            ),
+            3 to DetailedSimilarCategory(
+                id = 3,
+                similarityType = SIMILAR,
+                similarNumber = 1,
+                oppositeNumber = 0,
+                definingThemes = mapOf(
+                    1 to DetailedSimilarDefiningTheme(
+                        id = 1,
+                        similarityType = SIMILAR
+                    )
+                )
+            )
+        )
     )
 
     const val FAILURE_TEXT = "Failure Text"
