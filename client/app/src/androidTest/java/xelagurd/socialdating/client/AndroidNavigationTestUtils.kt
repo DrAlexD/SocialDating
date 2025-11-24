@@ -134,7 +134,7 @@ fun MainComposeTestRule.checkBottomNavBarWithProfileTopLevel() {
     onNodeWithTagId(R.string.nav_settings).assertIsNotSelected()
 
     onNodeWithTagId(R.string.nav_profile).assertIsDisplayed()
-    // FixMe: onNodeWithTagId(R.string.nav_profile).assertIsSelected()
+    onNodeWithTagId(R.string.nav_profile).assertIsSelected()
 }
 
 fun MainComposeTestRule.checkBottomNavBarWithSettingsTopLevel() {

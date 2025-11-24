@@ -61,7 +61,7 @@ object CategoriesDestination : NavigationDestination() {
 
 object StatementsDestination : NavigationDestination() {
     override val route = AppScreen.Statements.name
-    override val topLevelRoute = CategoriesDestination.route
+    override val topLevelRoute = CategoriesDestination.topLevelRoute
 
     const val userId = "userId"
     const val categoryId = "categoryId"
@@ -70,7 +70,7 @@ object StatementsDestination : NavigationDestination() {
 
 object StatementAddingDestination : NavigationDestination() {
     override val route = AppScreen.StatementAdding.name
-    override val topLevelRoute = CategoriesDestination.route
+    override val topLevelRoute = CategoriesDestination.topLevelRoute
 
     const val userId = "userId"
     const val categoryId = "categoryId"
@@ -79,7 +79,7 @@ object StatementAddingDestination : NavigationDestination() {
 
 object StatementDetailsDestination : NavigationDestination() {
     override val route = AppScreen.StatementDetails.name
-    override val topLevelRoute = CategoriesDestination.route
+    override val topLevelRoute = CategoriesDestination.topLevelRoute
 
     const val statementId = "statementId"
     val routeWithArgs = "$route/{$statementId}"
@@ -100,9 +100,8 @@ object ProfileDestination : NavigationDestination() {
 object ProfileStatisticsDestination : NavigationDestination() {
     override val route = AppScreen.ProfileStatistics.name
 
-    var currentUserId = CURRENT_USER_ID_DEFAULT
     override val topLevelRoute
-        get() = "${ProfileDestination.route}/$currentUserId/$currentUserId"
+        get() = ProfileDestination.topLevelRoute
 
     const val userId = "userId"
     const val anotherUserId = "anotherUserId"

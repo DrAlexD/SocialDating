@@ -42,7 +42,6 @@ fun AppNavHost(
     val currentUserId by appNavViewModel.currentUserId.collectAsState()
 
     ProfileDestination.currentUserId = currentUserId
-    ProfileStatisticsDestination.currentUserId = currentUserId
     SimilarUsersDestination.currentUserId = currentUserId
 
     initializeTopLevelDestinations(navController)
