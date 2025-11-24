@@ -59,6 +59,8 @@ class ProfileStatisticsViewModel @Inject constructor(
     val uiState = combine(userCategoriesFlow, userDefiningThemesFlow, detailedSimilarUserFlow, dataRequestStatusFlow)
     { userCategories, userDefiningThemes, detailedSimilarUser, dataRequestStatus ->
         ProfileStatisticsUiState(
+            userId = userId,
+            anotherUserId = anotherUserId,
             entities = userCategories,
             entityIdToData = userDefiningThemes.groupBy { it.categoryId },
             entitiesMask = detailedSimilarUser,

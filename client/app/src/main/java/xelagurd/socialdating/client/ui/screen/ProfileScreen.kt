@@ -67,7 +67,8 @@ fun ProfileScreenComponent(
         },
         bottomBar = {
             AppBottomNavigationBar(
-                currentTopLevelRoute = ProfileDestination.topLevelRoute
+                currentTopLevelRoute = ProfileDestination.topLevelRoute,
+                isCurrentUser = profileUiState.userId == profileUiState.anotherUserId
             )
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)

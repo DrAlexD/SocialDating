@@ -103,22 +103,23 @@ fun AppTopBar(
 @Composable
 fun AppBottomNavigationBar(
     currentTopLevelRoute: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isCurrentUser: Boolean = true
 ) {
     NavigationBar(
         modifier = modifier
     ) {
         topLevelDestinations.forEach { item ->
-            val selectedRoute = currentTopLevelRoute == item.navigationDestination.route
+            val isSelectedRoute = currentTopLevelRoute == item.navigationDestination.topLevelRoute && isCurrentUser
             NavigationBarItem(
                 icon = {
                     Icon(
-                        imageVector = if (selectedRoute) item.selectedIcon else item.unselectedIcon,
+                        imageVector = if (isSelectedRoute) item.selectedIcon else item.unselectedIcon,
                         contentDescription = stringResource(item.contentDescription)
                     )
                 },
                 label = { Text(item.navigationDestination.route) },
-                selected = selectedRoute,
+                selected = isSelectedRoute,
                 onClick = item.navigateTo,
                 modifier = Modifier.testTag(stringResource(item.contentDescription))
             )

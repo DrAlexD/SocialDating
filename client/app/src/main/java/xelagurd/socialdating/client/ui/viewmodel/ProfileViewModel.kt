@@ -37,6 +37,8 @@ class ProfileViewModel @Inject constructor(
 
     val uiState = combine(userFlow, dataRequestStatusFlow) { user, dataRequestStatus ->
         ProfileUiState(
+            userId = userId,
+            anotherUserId = anotherUserId,
             entity = user,
             dataRequestStatus = dataRequestStatus
         )
