@@ -17,13 +17,11 @@ import xelagurd.socialdating.client.navigateToCategoriesFromBottomNavBar
 import xelagurd.socialdating.client.navigateToProfileFromBottomNavBar
 import xelagurd.socialdating.client.navigateToSettingsFromBottomNavBar
 import xelagurd.socialdating.client.navigateToStatementAdding
-import xelagurd.socialdating.client.navigateToStatementDetails
 import xelagurd.socialdating.client.navigateToStatements
 import xelagurd.socialdating.client.performNavigateUp
 import xelagurd.socialdating.client.ui.navigation.AppNavHost
 import xelagurd.socialdating.client.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.client.ui.navigation.StatementAddingDestination
-import xelagurd.socialdating.client.ui.navigation.StatementDetailsDestination
 import xelagurd.socialdating.client.ui.navigation.StatementsDestination
 
 @HiltAndroidTest
@@ -57,14 +55,6 @@ class StatementsScreenNavigationTest {
         composeTestRule.navigateToStatementAdding()
 
         navController.assertCurrentRouteName(StatementAddingDestination.routeWithArgs)
-        //navController.assertBackStackDepth(?)
-    }
-
-    @Test
-    fun appNavHost_clickStatement_navigatesToStatementDetails() {
-        composeTestRule.navigateToStatementDetails()
-
-        navController.assertCurrentRouteName(StatementDetailsDestination.routeWithArgs)
         //navController.assertBackStackDepth(?)
     }
 

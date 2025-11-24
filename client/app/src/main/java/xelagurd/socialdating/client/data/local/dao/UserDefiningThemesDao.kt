@@ -23,7 +23,8 @@ interface UserDefiningThemesDao {
                udt.definingThemeId,
                dt.name as definingThemeName,
                dt.fromOpinion as definingThemeFromOpinion,
-               dt.toOpinion as definingThemeToOpinion
+               dt.toOpinion as definingThemeToOpinion,
+               dt.numberInCategory as definingThemeNumberInCategory
         from user_defining_themes udt
         join defining_themes dt on udt.definingThemeId = dt.id
         where userId = :userId

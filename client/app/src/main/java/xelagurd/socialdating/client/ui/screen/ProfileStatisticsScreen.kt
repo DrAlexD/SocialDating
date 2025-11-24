@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
@@ -24,17 +25,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.fake.toUserCategoriesWithData
-import xelagurd.socialdating.client.data.fake.toUserDefiningThemeWithData
 import xelagurd.socialdating.client.data.fake.toUserDefiningThemesWithData
+import xelagurd.socialdating.client.data.model.additional.DetailedSimilarCategory
+import xelagurd.socialdating.client.data.model.additional.DetailedSimilarDefiningTheme
+import xelagurd.socialdating.client.data.model.enums.SimilarityType.OPPOSITE
+import xelagurd.socialdating.client.data.model.enums.SimilarityType.SIMILAR
+import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_MAINTAIN
+import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_NO_MAINTAIN
 import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
 import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
@@ -93,10 +101,11 @@ fun ProfileStatisticsScreenComponent(
             AppExpandedEntityCard(
                 entity = it
             ) { entity, isExpanded ->
+                val userCategory = entity as UserCategoryWithData
                 UserCategoryCardContent(
-                    userCategory = entity as UserCategoryWithData,
-                    userDefiningThemes = profileStatisticsUiState.entityIdToData
-                        .getOrDefault(entity.categoryId, listOf()),
+                    userCategory = userCategory,
+                    userDefiningThemes = profileStatisticsUiState.entityIdToData[userCategory.categoryId],
+                    detailedSimilarCategory = profileStatisticsUiState.entitiesMask?.categories[userCategory.categoryId],
                     isExpanded = isExpanded
                 )
             }
@@ -107,7 +116,8 @@ fun ProfileStatisticsScreenComponent(
 @Composable
 private fun UserCategoryCardContent(
     userCategory: UserCategoryWithData,
-    userDefiningThemes: List<UserDefiningThemeWithData>,
+    userDefiningThemes: List<UserDefiningThemeWithData>?,
+    detailedSimilarCategory: DetailedSimilarCategory?,
     isExpanded: Boolean
 ) {
     Column(
@@ -122,6 +132,30 @@ private fun UserCategoryCardContent(
                 modifier = Modifier.fillMaxSize()
             ) {
                 AppLargeTitleText(text = userCategory.categoryName)
+                if (detailedSimilarCategory != null) {
+                    Icon(
+                        painter = painterResource(FULL_MAINTAIN.iconRes),
+                        contentDescription = stringResource(FULL_MAINTAIN.descriptionRes),
+                        tint = detailedSimilarCategory.similarityType.takeIf { it == SIMILAR }?.color
+                            ?: LocalContentColor.current,
+                        modifier = Modifier.graphicsLayer {
+                            this.scaleX = 0.7f
+                            this.scaleY = 0.7f
+                        }
+                    )
+                    AppMediumTitleText(text = detailedSimilarCategory.similarNumber.toString())
+                    Icon(
+                        painter = painterResource(FULL_NO_MAINTAIN.iconRes),
+                        contentDescription = stringResource(FULL_NO_MAINTAIN.descriptionRes),
+                        tint = detailedSimilarCategory.similarityType.takeIf { it == OPPOSITE }?.color
+                            ?: LocalContentColor.current,
+                        modifier = Modifier.graphicsLayer {
+                            this.scaleX = 0.7f
+                            this.scaleY = 0.7f
+                        }
+                    )
+                    AppMediumTitleText(text = detailedSimilarCategory.oppositeNumber.toString())
+                }
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -131,14 +165,18 @@ private fun UserCategoryCardContent(
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = stringResource(R.string.expand_list),
-                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_8dp))
                 )
             }
         }
-        if (isExpanded) {
+        if (isExpanded && userDefiningThemes != null && userDefiningThemes.isNotEmpty()) {
             HorizontalDivider(color = MaterialTheme.colorScheme.secondary)
             AppList(entities = userDefiningThemes) {
-                UserDefiningThemeDetailsBody(userDefiningTheme = it as UserDefiningThemeWithData)
+                val userDefiningTheme = it as UserDefiningThemeWithData
+                UserDefiningThemeDetailsBody(
+                    userDefiningTheme = userDefiningTheme,
+                    detailedSimilarDefiningTheme = detailedSimilarCategory?.definingThemes[userDefiningTheme.definingThemeNumberInCategory]
+                )
             }
         }
     }
@@ -146,20 +184,39 @@ private fun UserCategoryCardContent(
 
 @Composable
 private fun UserDefiningThemeDetailsBody(
-    userDefiningTheme: UserDefiningThemeWithData
+    userDefiningTheme: UserDefiningThemeWithData,
+    detailedSimilarDefiningTheme: DetailedSimilarDefiningTheme?
 ) {
-    AppMediumTitleText(
-        text = userDefiningTheme.definingThemeName,
-        overrideModifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
-    )
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_small))
+        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_8dp))
+    ) {
+        AppMediumTitleText(
+            text = userDefiningTheme.definingThemeName,
+            overrideModifier = Modifier
+        )
+        if (detailedSimilarDefiningTheme != null) {
+            val image = if (detailedSimilarDefiningTheme.similarityType == SIMILAR) FULL_MAINTAIN else FULL_NO_MAINTAIN
+            Icon(
+                painter = painterResource(image.iconRes),
+                contentDescription = stringResource(image.descriptionRes),
+                tint = detailedSimilarDefiningTheme.similarityType.color,
+                modifier = Modifier.graphicsLayer {
+                    this.scaleX = 0.7f
+                    this.scaleY = 0.7f
+                }
+            )
+        }
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_8dp))
     ) {
         AppSmallTitleText(
             text = userDefiningTheme.definingThemeFromOpinion,
-            overrideModifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
+            overrideModifier = Modifier.padding(end = dimensionResource(R.dimen.padding_8dp))
         )
         LinearProgressIndicator(
             progress = { userDefiningTheme.value.toFloat() / 100 },
@@ -167,21 +224,20 @@ private fun UserDefiningThemeDetailsBody(
         )
         AppSmallTitleText(
             text = userDefiningTheme.definingThemeToOpinion,
-            overrideModifier = Modifier.padding(start = dimensionResource(R.dimen.padding_small))
+            overrideModifier = Modifier.padding(start = dimensionResource(R.dimen.padding_8dp))
         )
     }
 }
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun ProfileStatisticsComponentFewDataPreview() {
+private fun ProfileStatisticsComponentDataPreview() {
     AppTheme {
         ProfileStatisticsScreenComponent(
             profileStatisticsUiState = ProfileStatisticsUiState(
                 entities = FakeData.userCategories.toUserCategoriesWithData(),
-                entityIdToData = FakeData.userDefiningThemes
-                    .toUserDefiningThemesWithData()
-                    .groupBy { it.categoryId }
+                entityIdToData = FakeData.userDefiningThemes.toUserDefiningThemesWithData().groupBy { it.categoryId },
+                entitiesMask = null
             )
         )
     }
@@ -189,11 +245,13 @@ private fun ProfileStatisticsComponentFewDataPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun ProfileStatisticsComponentNoDataPreview() {
+private fun ProfileStatisticsComponentDataWithSimilarityPreview() {
     AppTheme {
         ProfileStatisticsScreenComponent(
             profileStatisticsUiState = ProfileStatisticsUiState(
-                dataRequestStatus = RequestStatus.ERROR("Text")
+                entities = FakeData.userCategories.toUserCategoriesWithData(),
+                entityIdToData = FakeData.userDefiningThemes.toUserDefiningThemesWithData().groupBy { it.categoryId },
+                entitiesMask = FakeData.detailedSimilarUser
             )
         )
     }
@@ -210,9 +268,41 @@ private fun UserDefiningThemeDetailsBodyPreview() {
         ) {
             HorizontalDivider()
             UserDefiningThemeDetailsBody(
-                userDefiningTheme = FakeData.userDefiningThemes[0].toUserDefiningThemeWithData()
+                userDefiningTheme = FakeData.userDefiningThemes.toUserDefiningThemesWithData()[0],
+                detailedSimilarDefiningTheme = null
             )
             HorizontalDivider()
         }
+    }
+}
+
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
+@Composable
+private fun UserDefiningThemeDetailsBodyWithSimilarityPreview() {
+    AppTheme {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            HorizontalDivider()
+            UserDefiningThemeDetailsBody(
+                userDefiningTheme = FakeData.userDefiningThemes.toUserDefiningThemesWithData()[0],
+                detailedSimilarDefiningTheme = FakeData.detailedSimilarUser.categories[1]?.definingThemes[1]
+            )
+            HorizontalDivider()
+        }
+    }
+}
+
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
+@Composable
+private fun ProfileStatisticsComponentNoDataPreview() {
+    AppTheme {
+        ProfileStatisticsScreenComponent(
+            profileStatisticsUiState = ProfileStatisticsUiState(
+                dataRequestStatus = RequestStatus.ERROR("Text")
+            )
+        )
     }
 }

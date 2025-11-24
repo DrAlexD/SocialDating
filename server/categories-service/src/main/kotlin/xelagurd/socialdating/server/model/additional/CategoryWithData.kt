@@ -1,6 +1,6 @@
 package xelagurd.socialdating.server.model.additional
 
-data class CategoryWithMaintainedLists(
+data class CategoryWithData(
     val id: Int,
     val name: String,
     val maintained: Array<Long>?,
@@ -10,7 +10,7 @@ data class CategoryWithMaintainedLists(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as CategoryWithMaintainedLists
+        other as CategoryWithData
 
         if (id != other.id) return false
         if (name != other.name) return false

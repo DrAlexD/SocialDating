@@ -94,22 +94,10 @@ private fun CategoryCardContent(
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun CategoriesComponentAllDataPreview() {
+private fun CategoriesComponentDataPreview() {
     AppTheme {
         CategoriesScreenComponent(
             categoriesUiState = CategoriesUiState(entities = FakeData.categories)
-        )
-    }
-}
-
-@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
-@Composable
-private fun CategoriesComponentFewDataPreview() {
-    AppTheme {
-        CategoriesScreenComponent(
-            categoriesUiState = CategoriesUiState(
-                entities = listOf(FakeData.categories[0], FakeData.categories[1])
-            )
         )
     }
 }

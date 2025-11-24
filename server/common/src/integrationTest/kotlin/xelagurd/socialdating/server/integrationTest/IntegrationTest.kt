@@ -66,6 +66,12 @@ class IntegrationTest {
         getUser()
     }
 
+    @Disabled
+    @Test
+    fun testGetUsers() {
+        // TODO
+    }
+
     @Test
     fun testRegisterUser() {
         registerUser()
@@ -79,13 +85,13 @@ class IntegrationTest {
 
     @Disabled
     @Test
-    fun testGetUsersWithSimilarity() {
+    fun testGetSimilarUsers() {
         // TODO
     }
 
     @Disabled
     @Test
-    fun testGetSimilarUser() {
+    fun testGetDetailedSimilarUser() {
         // TODO
     }
 

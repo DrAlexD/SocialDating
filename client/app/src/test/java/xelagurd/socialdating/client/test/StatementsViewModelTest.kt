@@ -34,6 +34,7 @@ import xelagurd.socialdating.client.data.remote.NOT_FOUND
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.client.mockkList
+import xelagurd.socialdating.client.ui.navigation.StatementsDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.StatementsViewModel
 
@@ -259,8 +260,8 @@ class StatementsViewModelTest {
     }
 
     private fun mockGeneralMethods() {
-        every { savedStateHandle.get<Int>(any()) } returns userId
-        every { savedStateHandle.get<Int>(any()) } returns categoryId
+        every { savedStateHandle.get<Int>(StatementsDestination.userId) } returns userId
+        every { savedStateHandle.get<Int>(StatementsDestination.categoryId) } returns categoryId
         every { localStatementsRepository.getStatements(any()) } returns statementsFlow
     }
 

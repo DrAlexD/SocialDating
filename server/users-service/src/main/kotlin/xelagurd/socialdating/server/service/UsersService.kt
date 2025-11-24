@@ -14,4 +14,9 @@ class UsersService(
     fun getUser(userId: Int): User {
         return usersRepository.findByIdOrNull(userId) ?: throw NoDataFoundException("User didn't found by id: $userId")
     }
+
+    fun getUsers(userIds: List<Int>): List<User> {
+        return usersRepository.findAllByIdIn(userIds).takeIf { it.isNotEmpty() }
+            ?: throw NoDataFoundException("Users didn't found for userIds $userIds")
+    }
 }

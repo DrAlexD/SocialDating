@@ -13,6 +13,7 @@
     <string name="nav_categories">Navigate to Categories</string>
     <string name="nav_profile">Navigate to Profile</string>
     <string name="nav_settings">Navigate to Settings</string>
+    <string name="nav_similar_users">Navigate to Similar Users</string>
     <string name="expand_list">Expand list</string>
     <string name="open_profile_statistics">Open profile statistics</string>
     <string name="full_maintain">Fully maintain</string>

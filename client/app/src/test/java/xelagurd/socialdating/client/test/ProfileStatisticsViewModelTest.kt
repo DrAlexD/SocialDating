@@ -39,6 +39,7 @@ import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesR
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserDefiningThemesRepository
 import xelagurd.socialdating.client.mockkList
+import xelagurd.socialdating.client.ui.navigation.ProfileStatisticsDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.ProfileStatisticsViewModel
 
@@ -66,6 +67,7 @@ class ProfileStatisticsViewModelTest {
         get() = viewModel.uiState.value
 
     private val userId = Random.nextInt()
+    private val anotherUserId = userId
 
     @Before
     fun setup() {
@@ -332,7 +334,8 @@ class ProfileStatisticsViewModelTest {
     }
 
     private fun mockGeneralMethods() {
-        every { savedStateHandle.get<Int>(any()) } returns userId
+        every { savedStateHandle.get<Int>(ProfileStatisticsDestination.userId) } returns userId
+        every { savedStateHandle.get<Int>(ProfileStatisticsDestination.anotherUserId) } returns anotherUserId
         every { localUserCategoriesRepository.getUserCategories(any()) } returns userCategoriesFlow
         every { localUserDefiningThemesRepository.getUserDefiningThemes(any()) } returns userDefiningThemesFlow
     }

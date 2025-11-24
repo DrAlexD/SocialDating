@@ -30,6 +30,7 @@ class ProfileViewModel @Inject constructor(
     private val localRepository: LocalUsersRepository
 ) : ViewModel() {
     private val userId: Int = checkNotNull(savedStateHandle[ProfileDestination.userId])
+    private val anotherUserId: Int = checkNotNull(savedStateHandle[ProfileDestination.anotherUserId])
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val userFlow = localRepository.getUser(userId).distinctUntilChanged()

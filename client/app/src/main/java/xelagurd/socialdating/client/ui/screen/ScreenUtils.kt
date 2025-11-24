@@ -49,8 +49,36 @@ fun AppLoadingIndicator(
 ) {
     CircularProgressIndicator(
         modifier = modifier
-            .padding(dimensionResource(R.dimen.padding_large))
+            .padding(dimensionResource(R.dimen.padding_16dp))
             .testTag(stringResource(R.string.loading))
+    )
+}
+
+@Composable
+fun AppSmallBodyText(
+    text: String,
+    modifier: Modifier = Modifier,
+    overrideModifier: Modifier? = null
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        modifier = overrideModifier
+            ?: modifier.padding(dimensionResource(R.dimen.padding_1dp))
+    )
+}
+
+@Composable
+fun AppMediumBodyText(
+    text: String,
+    modifier: Modifier = Modifier,
+    overrideModifier: Modifier? = null
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = overrideModifier
+            ?: modifier.padding(dimensionResource(R.dimen.padding_2dp))
     )
 }
 
@@ -64,7 +92,7 @@ fun AppLargeBodyText(
         text = text,
         style = MaterialTheme.typography.bodyLarge,
         modifier = overrideModifier
-            ?: modifier.padding(dimensionResource(R.dimen.padding_very_small))
+            ?: modifier.padding(dimensionResource(R.dimen.padding_4dp))
     )
 }
 
@@ -78,7 +106,7 @@ fun AppSmallTitleText(
         text = text,
         style = MaterialTheme.typography.titleSmall,
         modifier = overrideModifier
-            ?: modifier.padding(dimensionResource(R.dimen.padding_very_small))
+            ?: modifier.padding(dimensionResource(R.dimen.padding_4dp))
     )
 }
 
@@ -91,7 +119,7 @@ fun AppMediumTitleText(
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium,
-        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_small))
+        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_8dp))
     )
 }
 
@@ -104,7 +132,7 @@ fun AppLargeTitleText(
     Text(
         text = text,
         style = MaterialTheme.typography.titleLarge,
-        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_medium))
+        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_12dp))
     )
 }
 
@@ -120,7 +148,7 @@ fun AppMediumTextCard(
     AppTextCard(
         isEnabled = isEnabled,
         onClick = onClick,
-        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_small)),
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_2dp)),
         isHasBorder = isHasBorder,
         modifier = modifier,
         overrideModifier = overrideModifier
@@ -141,7 +169,7 @@ fun AppLargeTextCard(
     AppTextCard(
         isEnabled = isEnabled,
         onClick = onClick,
-        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_4dp)),
         isHasBorder = isHasBorder,
         modifier = modifier,
         overrideModifier = overrideModifier
@@ -165,7 +193,7 @@ private fun AppTextCard(
         onClick = onClick,
         elevation = elevation,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary).takeIf { isHasBorder },
-        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_small)),
+        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_8dp)),
         content = content
     )
 }
@@ -190,7 +218,7 @@ fun AppTextField(
             )
         },
         singleLine = singleLine,
-        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_small))
+        modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_8dp))
     )
 }
 
@@ -203,7 +231,7 @@ inline fun AppDataList(
 ) {
     LazyColumn(
         contentPadding = contentPadding,
-        modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_small))
+        modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_8dp))
     ) {
         items(items = entities, key = { it.id }) {
             card(it)
@@ -229,7 +257,7 @@ inline fun AppDataChoosingList(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_small))
+                modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_8dp))
             ) {
                 card(entities.first { it.id == chosenEntityId }, true)
             }
@@ -253,7 +281,7 @@ inline fun AppList(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = dimensionResource(R.dimen.padding_small))
+            .padding(horizontal = dimensionResource(R.dimen.padding_8dp))
     ) {
         entities.forEachIndexed { index, entity ->
             content(entity)
@@ -273,8 +301,8 @@ inline fun AppEntityCard(
 ) {
     Card(
         onClick = { onEntityClick(entity.id) },
-        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
-        modifier = modifier.padding(dimensionResource(R.dimen.padding_small)),
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_4dp)),
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_8dp)),
         content = { content(entity) }
     )
 }
@@ -289,8 +317,8 @@ inline fun AppExpandedEntityCard(
 
     Card(
         onClick = { isExpanded = !isExpanded },
-        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_medium)),
-        modifier = modifier.padding(dimensionResource(R.dimen.padding_small)),
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_4dp)),
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_8dp)),
         content = { content(entity, isExpanded) }
     )
 }

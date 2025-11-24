@@ -23,6 +23,6 @@ object DefaultDataProperties {
 
     const val USER_ACTIVITY_INITIAL = 50
 
-    const val SIMILAR_CATEGORIES_NUMBER = 3
-    const val OPPOSITE_CATEGORIES_NUMBER = 3
+    const val SIMILAR_CATEGORIES_NUMBER = 2
+    const val OPPOSITE_CATEGORIES_NUMBER = 2
 }

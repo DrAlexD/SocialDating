@@ -20,13 +20,13 @@ class UserCategoriesServiceUnitTest {
 
     @Disabled
     @Test
-    fun getUsersWithSimilarity() {
+    fun getSimilarUsers() {
         // TODO
     }
 
     @Disabled
     @Test
-    fun getSimilarUser() {
+    fun getDetailedSimilarUser() {
         // TODO
     }
 

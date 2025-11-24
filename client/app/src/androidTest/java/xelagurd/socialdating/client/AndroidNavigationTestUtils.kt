@@ -89,17 +89,6 @@ fun MainComposeTestRule.addStatementAndNavigateToStatementsScreen() {
     checkBottomNavBarWithCategoriesTopLevel()
 }
 
-fun MainComposeTestRule.navigateToStatementDetails() {
-    navigateToStatements()
-
-    waitUntil(TEST_TIMEOUT_MILLIS) {
-        onNodeWithText(FakeData.mainStatement.text).isDisplayed()
-    }
-
-    onNodeWithText(FakeData.mainStatement.text).checkButtonAndClick()
-    //checkBottomNavBarWithCategoriesTopLevel()
-}
-
 fun MainComposeTestRule.navigateToProfileStatistics() {
     navigateToProfileFromBottomNavBar()
 

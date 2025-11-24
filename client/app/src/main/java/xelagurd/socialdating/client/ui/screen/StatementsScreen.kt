@@ -107,7 +107,7 @@ fun StatementsScreenComponent(
         ) {
             AppEntityCard(
                 entity = it,
-                onEntityClick = onStatementClick
+                onEntityClick = { } // TODO
             ) {
                 StatementCardContent(
                     statement = it as Statement,
@@ -159,22 +159,10 @@ private inline fun ReactionsRow(
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementsComponentAllDataPreview() {
+private fun StatementsComponentDataPreview() {
     AppTheme {
         StatementsScreenComponent(
             statementsUiState = StatementsUiState(entities = FakeData.statements)
-        )
-    }
-}
-
-@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
-@Composable
-private fun StatementsComponentFewDataPreview() {
-    AppTheme {
-        StatementsScreenComponent(
-            statementsUiState = StatementsUiState(
-                entities = listOf(FakeData.statements[0], FakeData.statements[1])
-            )
         )
     }
 }

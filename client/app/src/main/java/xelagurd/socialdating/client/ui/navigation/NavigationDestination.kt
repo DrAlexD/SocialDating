@@ -35,7 +35,8 @@ enum class AppScreen {
     StatementAdding,
     StatementDetails,
     Profile,
-    ProfileStatistics
+    ProfileStatistics,
+    SimilarUsers
 }
 
 object LoginDestination : NavigationDestination() {
@@ -89,10 +90,11 @@ object ProfileDestination : NavigationDestination() {
 
     var currentUserId = CURRENT_USER_ID_DEFAULT
     override val topLevelRoute
-        get() = "$route/$currentUserId"
+        get() = "$route/$currentUserId/$currentUserId"
 
     const val userId = "userId"
-    val routeWithArgs = "$route/{$userId}"
+    const val anotherUserId = "anotherUserId"
+    val routeWithArgs = "$route/{$userId}/{$anotherUserId}"
 }
 
 object ProfileStatisticsDestination : NavigationDestination() {
@@ -100,7 +102,19 @@ object ProfileStatisticsDestination : NavigationDestination() {
 
     var currentUserId = CURRENT_USER_ID_DEFAULT
     override val topLevelRoute
-        get() = "${ProfileDestination.route}/$currentUserId"
+        get() = "${ProfileDestination.route}/$currentUserId/$currentUserId"
+
+    const val userId = "userId"
+    const val anotherUserId = "anotherUserId"
+    val routeWithArgs = "$route/{$userId}/{$anotherUserId}"
+}
+
+object SimilarUsersDestination : NavigationDestination() {
+    override val route = AppScreen.SimilarUsers.name
+
+    var currentUserId = CURRENT_USER_ID_DEFAULT
+    override val topLevelRoute
+        get() = "$route/$currentUserId"
 
     const val userId = "userId"
     val routeWithArgs = "$route/{$userId}"
