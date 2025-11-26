@@ -15,8 +15,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.fake.toSimilarUsersWithData
 import xelagurd.socialdating.client.data.model.additional.SimilarUserWithData
+import xelagurd.socialdating.client.data.model.toSimilarUsersWithData
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.data.remote.safeApiCall
@@ -71,10 +71,7 @@ class SimilarUsersViewModel @Inject constructor(
                 }
 
                 if (remoteUsers != null) {
-                    val remoteUsersById = remoteUsers.associateBy { it.id }
-                    similarUsersFlow.update {
-                        remoteSimilarUsers.mapNotNull { it.toSimilarUserWithData(remoteUsersById[it.id]) }
-                    }
+                    similarUsersFlow.update { remoteSimilarUsers.toSimilarUsersWithData(remoteUsers) }
                 }
 
                 globalStatus = statusUsers
@@ -83,7 +80,7 @@ class SimilarUsersViewModel @Inject constructor(
             }
 
             if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
-                similarUsersFlow.update { FakeData.similarUsers.toSimilarUsersWithData() }
+                similarUsersFlow.update { FakeData.similarUsers.toSimilarUsersWithData(FakeData.users) }
             }
 
             dataRequestStatusFlow.update { globalStatus }

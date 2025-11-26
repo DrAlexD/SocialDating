@@ -15,6 +15,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
+import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
@@ -33,7 +34,11 @@ class ProfileViewModel @Inject constructor(
     private val anotherUserId: Int = checkNotNull(savedStateHandle[ProfileDestination.anotherUserId])
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
-    private val userFlow = localRepository.getUser(userId).distinctUntilChanged()
+    private val userStateFlow = MutableStateFlow<User?>(null)
+    private val userFlow = when {
+        userId == anotherUserId -> localRepository.getUser(anotherUserId).distinctUntilChanged()
+        else -> userStateFlow
+    }
 
     val uiState = combine(userFlow, dataRequestStatusFlow) { user, dataRequestStatus ->
         ProfileUiState(
@@ -57,11 +62,15 @@ class ProfileViewModel @Inject constructor(
             dataRequestStatusFlow.update { RequestStatus.LOADING }
 
             val (remoteUser, status) = safeApiCall(context) {
-                remoteRepository.getUser(userId)
+                remoteRepository.getUser(anotherUserId)
             }
 
             if (remoteUser != null) {
-                localRepository.insertUser(remoteUser)
+                if (userId == anotherUserId) {
+                    localRepository.insertUser(remoteUser)
+                } else {
+                    userStateFlow.update { remoteUser }
+                }
             }
 
             dataRequestStatusFlow.update { status }
