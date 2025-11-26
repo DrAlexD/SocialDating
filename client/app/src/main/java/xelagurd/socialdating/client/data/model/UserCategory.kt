@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
 
 @Serializable
 @Entity(
@@ -31,4 +32,15 @@ data class UserCategory(
     val interest: Int,
     val userId: Int,
     val categoryId: Int
-) : DataEntity
+) : DataEntity {
+    fun toUserCategoryWithData(category: Category?) =
+        category?.let {
+            UserCategoryWithData(
+                id = id,
+                interest = interest,
+                userId = userId,
+                categoryId = categoryId,
+                categoryName = category.name
+            )
+        }
+}

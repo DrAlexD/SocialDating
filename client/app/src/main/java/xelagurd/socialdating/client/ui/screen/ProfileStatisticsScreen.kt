@@ -35,14 +35,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.fake.toUserCategoriesWithData
-import xelagurd.socialdating.client.data.fake.toUserDefiningThemesWithData
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarCategory
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarDefiningTheme
 import xelagurd.socialdating.client.data.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.client.data.model.enums.SimilarityType.SIMILAR
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_NO_MAINTAIN
+import xelagurd.socialdating.client.data.model.toUserCategoriesWithData
+import xelagurd.socialdating.client.data.model.toUserDefiningThemesWithData
 import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
 import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
@@ -236,8 +236,9 @@ private fun ProfileStatisticsComponentDataPreview() {
     AppTheme {
         ProfileStatisticsScreenComponent(
             profileStatisticsUiState = ProfileStatisticsUiState(
-                entities = FakeData.userCategories.toUserCategoriesWithData(),
-                entityIdToData = FakeData.userDefiningThemes.toUserDefiningThemesWithData().groupBy { it.categoryId },
+                entities = FakeData.userCategories.toUserCategoriesWithData(FakeData.categories),
+                entityIdToData = FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)
+                    .groupBy { it.categoryId },
                 entitiesMask = null
             )
         )
@@ -250,8 +251,9 @@ private fun ProfileStatisticsComponentDataWithSimilarityPreview() {
     AppTheme {
         ProfileStatisticsScreenComponent(
             profileStatisticsUiState = ProfileStatisticsUiState(
-                entities = FakeData.userCategories.toUserCategoriesWithData(),
-                entityIdToData = FakeData.userDefiningThemes.toUserDefiningThemesWithData().groupBy { it.categoryId },
+                entities = FakeData.userCategories.toUserCategoriesWithData(FakeData.categories),
+                entityIdToData = FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)
+                    .groupBy { it.categoryId },
                 entitiesMask = FakeData.detailedSimilarUser
             )
         )
@@ -269,7 +271,7 @@ private fun UserDefiningThemeDetailsBodyPreview() {
         ) {
             HorizontalDivider()
             UserDefiningThemeDetailsBody(
-                userDefiningTheme = FakeData.userDefiningThemes.toUserDefiningThemesWithData()[0],
+                userDefiningTheme = FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)[0],
                 detailedSimilarDefiningTheme = null
             )
             HorizontalDivider()
@@ -288,7 +290,7 @@ private fun UserDefiningThemeDetailsBodyWithSimilarityPreview() {
         ) {
             HorizontalDivider()
             UserDefiningThemeDetailsBody(
-                userDefiningTheme = FakeData.userDefiningThemes.toUserDefiningThemesWithData()[0],
+                userDefiningTheme = FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)[0],
                 detailedSimilarDefiningTheme = FakeData.detailedSimilarUser.categories[1]?.definingThemes[1]
             )
             HorizontalDivider()

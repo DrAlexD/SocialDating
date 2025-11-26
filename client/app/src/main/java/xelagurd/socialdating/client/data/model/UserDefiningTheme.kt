@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 
 @Serializable
 @Entity(
@@ -32,4 +33,19 @@ data class UserDefiningTheme(
     val interest: Int,
     val userId: Int,
     val definingThemeId: Int
-) : DataEntity
+) : DataEntity {
+    fun toUserDefiningThemeWithData(definingTheme: DefiningTheme?) =
+        definingTheme?.let {
+            UserDefiningThemeWithData(
+                id = id,
+                value = value,
+                interest = interest,
+                categoryId = definingTheme.categoryId,
+                definingThemeId = definingThemeId,
+                definingThemeName = definingTheme.name,
+                definingThemeFromOpinion = definingTheme.fromOpinion,
+                definingThemeToOpinion = definingTheme.toOpinion,
+                definingThemeNumberInCategory = definingTheme.numberInCategory
+            )
+        }
+}

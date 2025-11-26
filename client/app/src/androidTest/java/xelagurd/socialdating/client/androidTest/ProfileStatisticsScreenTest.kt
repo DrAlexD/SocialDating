@@ -14,8 +14,8 @@ import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.checkButtonAndClick
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.fake.toUserCategoriesWithData
-import xelagurd.socialdating.client.data.fake.toUserDefiningThemesWithData
+import xelagurd.socialdating.client.data.model.toUserCategoriesWithData
+import xelagurd.socialdating.client.data.model.toUserDefiningThemesWithData
 import xelagurd.socialdating.client.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.onNodeWithTagId
 import xelagurd.socialdating.client.ui.screen.ProfileStatisticsScreenComponent
@@ -36,8 +36,9 @@ class ProfileStatisticsScreenTest {
         hiltRule.inject()
     }
 
-    private val userCategoryWithData = FakeData.userCategories.toUserCategoriesWithData()[0]
-    private val userDefiningThemeWithData = FakeData.userDefiningThemes.toUserDefiningThemesWithData()[0]
+    private val userCategoryWithData = FakeData.userCategories.toUserCategoriesWithData(FakeData.categories)[0]
+    private val userDefiningThemeWithData = FakeData.userDefiningThemes
+        .toUserDefiningThemesWithData(FakeData.definingThemes)[0]
 
     @Test
     fun profileStatisticsScreen_loadingStateAndEmptyData_loadingIndicator() {
