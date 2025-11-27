@@ -4,7 +4,6 @@ import java.lang.Long.numberOfTrailingZeros
 import kotlin.math.min
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import xelagurd.socialdating.server.exception.NoDataFoundException
 import xelagurd.socialdating.server.model.DefaultDataProperties.OPPOSITE_CATEGORIES_NUMBER
 import xelagurd.socialdating.server.model.DefaultDataProperties.SIMILAR_CATEGORIES_NUMBER
 import xelagurd.socialdating.server.model.UserCategory
@@ -24,21 +23,20 @@ class UserCategoriesService(
     private val userCategoriesRepository: UserCategoriesRepository
 ) {
 
-    fun getUserCategories(userId: Int): List<UserCategory> {
-        return userCategoriesRepository.findAllByUserId(userId).takeIf { it.isNotEmpty() }
-            ?: throw NoDataFoundException("UserCategories didn't found for userId: $userId")
-    }
+    fun getUserCategories(userId: Int) =
+        userCategoriesRepository.findAllByUserId(userId)
 
-    fun addUserCategory(userCategory: UserCategory): UserCategory {
-        return userCategoriesRepository.save(userCategory)
-    }
+    fun addUserCategory(userCategory: UserCategory) =
+        userCategoriesRepository.save(userCategory)
 
-    fun getUserCategory(userId: Int, categoryId: Int): UserCategory? {
-        return userCategoriesRepository.findByUserIdAndCategoryId(userId, categoryId)
-    }
+    fun getUserCategory(userId: Int, categoryId: Int) =
+        userCategoriesRepository.findByUserIdAndCategoryId(userId, categoryId)
 
     @Transactional(readOnly = true)
-    fun getSimilarUsers(userId: Int, categoryIds: List<Int>? = null): List<SimilarUser> {
+    fun getSimilarUsers(
+        userId: Int,
+        categoryIds: List<Int>? = null
+    ): List<SimilarUser> {
         val currentUserCategoriesById = userCategoriesRepository
             .findCurrentUserCategories(userId, categoryIds)
             .associateBy { it.id }
@@ -70,12 +68,13 @@ class UserCategoriesService(
                 } else null
             }
             .sortedByDescending { it.differenceNumber }
-            .takeIf { it.isNotEmpty() }
-            ?: throw NoDataFoundException("SimilarUsers didn't found for userId: $userId")
     }
 
     @Transactional(readOnly = true)
-    fun getDetailedSimilarUser(currentUserId: Int, anotherUserId: Int): DetailedSimilarUser {
+    fun getDetailedSimilarUser(
+        currentUserId: Int,
+        anotherUserId: Int
+    ): DetailedSimilarUser {
         val currentUserCategoriesById = userCategoriesRepository
             .findCurrentUserCategories(currentUserId, null)
             .associateBy { it.id }

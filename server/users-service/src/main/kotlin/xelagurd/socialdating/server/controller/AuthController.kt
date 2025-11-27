@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import jakarta.validation.Valid
-import xelagurd.socialdating.server.model.additional.AuthResponse
 import xelagurd.socialdating.server.model.details.LoginDetails
 import xelagurd.socialdating.server.model.details.RefreshTokenDetails
 import xelagurd.socialdating.server.model.details.RegistrationDetails
@@ -18,17 +17,14 @@ class AuthController(
 ) {
 
     @PostMapping("/login")
-    fun loginUser(@RequestBody @Valid loginDetails: LoginDetails): AuthResponse {
-        return authService.loginUser(loginDetails)
-    }
+    fun loginUser(@RequestBody @Valid loginDetails: LoginDetails) =
+        authService.loginUser(loginDetails)
 
     @PostMapping("/register")
-    fun registerUser(@RequestBody @Valid registrationDetails: RegistrationDetails): AuthResponse {
-        return authService.registerUser(registrationDetails)
-    }
+    fun registerUser(@RequestBody @Valid registrationDetails: RegistrationDetails) =
+        authService.registerUser(registrationDetails)
 
     @PostMapping("/refresh-token")
-    fun refreshToken(@RequestBody @Valid refreshTokenDetails: RefreshTokenDetails): AuthResponse {
-        return authService.refreshToken(refreshTokenDetails)
-    }
+    fun refreshToken(@RequestBody @Valid refreshTokenDetails: RefreshTokenDetails) =
+        authService.refreshToken(refreshTokenDetails)
 }

@@ -1,8 +1,6 @@
 package xelagurd.socialdating.server.service
 
 import org.springframework.stereotype.Service
-import xelagurd.socialdating.server.exception.NoDataFoundException
-import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.details.StatementDetails
 import xelagurd.socialdating.server.repository.StatementsRepository
 
@@ -11,12 +9,9 @@ class StatementsService(
     private val statementsRepository: StatementsRepository
 ) {
 
-    fun getStatements(userId: Int, definingThemeIds: List<Int>): List<Statement> {
-        return statementsRepository.findUnreactedStatements(userId, definingThemeIds).takeIf { it.isNotEmpty() }
-            ?: throw NoDataFoundException("Statements didn't found for userId $userId and definingThemeIds $definingThemeIds")
-    }
+    fun getStatements(userId: Int, definingThemeIds: List<Int>) =
+        statementsRepository.findUnreactedStatements(userId, definingThemeIds)
 
-    fun addStatement(statementDetails: StatementDetails): Statement {
-        return statementsRepository.save(statementDetails.toStatement())
-    }
+    fun addStatement(statementDetails: StatementDetails) =
+        statementsRepository.save(statementDetails.toStatement())
 }

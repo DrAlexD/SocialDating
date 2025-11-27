@@ -43,12 +43,6 @@ class BaseExceptionHandler {
         return message
     }
 
-    @ExceptionHandler(NoDataFoundException::class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    fun handleNoDataFoundException(ex: NoDataFoundException): String {
-        return ex.message ?: "No data found"
-    }
-
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     fun handleGenericException(ex: Exception): String {

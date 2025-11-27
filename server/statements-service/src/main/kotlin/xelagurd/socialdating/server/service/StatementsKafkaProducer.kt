@@ -9,10 +9,9 @@ class StatementsKafkaProducer(
     private val kafkaTemplate: KafkaTemplate<String, UserCategoryUpdateDetails>
 ) {
 
-    fun updateUserCategory(userCategoryUpdateDetails: UserCategoryUpdateDetails) {
+    fun updateUserCategory(userCategoryUpdateDetails: UserCategoryUpdateDetails) =
         kafkaTemplate.send(
             "update-user-category-on-statement-reaction",
             userCategoryUpdateDetails
         )
-    }
 }

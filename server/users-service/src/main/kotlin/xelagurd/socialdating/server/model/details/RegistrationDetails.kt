@@ -45,7 +45,7 @@ data class RegistrationDetails(
 
     val purpose: Purpose
 ) {
-    fun toUser(passwordEncoder: PasswordEncoder): User =
+    fun toUser(passwordEncoder: PasswordEncoder) =
         User(
             name = name,
             gender = gender,

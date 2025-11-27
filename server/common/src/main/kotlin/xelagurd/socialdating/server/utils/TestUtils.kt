@@ -20,5 +20,6 @@ object TestUtils {
     inline fun <reified T : Any> mockkList(size: Int = 5, relaxed: Boolean = false): List<T> =
         List(size) { mockk(relaxed = relaxed) }
 
-    fun Random.nextIntList() = List(5) { this.nextInt() }
+    fun Random.nextIntList() =
+        List(5) { this.nextInt() }
 }

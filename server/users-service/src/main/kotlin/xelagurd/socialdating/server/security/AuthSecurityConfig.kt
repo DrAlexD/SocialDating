@@ -21,15 +21,15 @@ class AuthSecurityConfig(
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
-    fun userDetailsService(): UserDetailsService = UserDetailsService { username ->
-        usersRepository.findByUsername(username)
-            ?: throw UsernameNotFoundException("User didn't found by username: $username")
-    }
+    fun userDetailsService(): UserDetailsService =
+        UserDetailsService { username ->
+            usersRepository.findByUsername(username)
+                ?: throw UsernameNotFoundException("User didn't found by username: $username")
+        }
 
     @Bean
     fun authenticationManager(
         authenticationConfiguration: AuthenticationConfiguration
-    ): AuthenticationManager {
-        return authenticationConfiguration.authenticationManager
-    }
+    ): AuthenticationManager =
+        authenticationConfiguration.authenticationManager
 }

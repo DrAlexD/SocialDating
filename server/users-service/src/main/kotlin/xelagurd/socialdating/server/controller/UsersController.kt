@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import xelagurd.socialdating.server.model.User
+import xelagurd.socialdating.server.security.BearerAuth
 import xelagurd.socialdating.server.service.UsersService
+import xelagurd.socialdating.server.utils.DataUtils.responseEntities
+import xelagurd.socialdating.server.utils.DataUtils.responseEntity
 
 
 @RestController
@@ -17,15 +17,13 @@ class UsersController(
     private val usersService: UsersService
 ) {
 
-    @Operation(security = [SecurityRequirement("bearerAuth")])
+    @BearerAuth
     @GetMapping("/{id}")
-    fun getUser(@PathVariable("id") userId: Int): User {
-        return usersService.getUser(userId)
-    }
+    fun getUser(@PathVariable("id") userId: Int) =
+        responseEntity { usersService.getUser(userId) }
 
-    @Operation(security = [SecurityRequirement("bearerAuth")])
+    @BearerAuth
     @GetMapping
-    fun getUsers(@RequestParam userIds: List<Int>): List<User> {
-        return usersService.getUsers(userIds)
-    }
+    fun getUsers(@RequestParam userIds: List<Int>) =
+        responseEntities { usersService.getUsers(userIds) }
 }
