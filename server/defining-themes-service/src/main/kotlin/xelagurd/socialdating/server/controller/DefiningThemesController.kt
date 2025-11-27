@@ -8,13 +8,12 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
-import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.security.AdminAccess
+import xelagurd.socialdating.server.security.BearerAuth
 import xelagurd.socialdating.server.service.DefiningThemesService
+import xelagurd.socialdating.server.utils.DataUtils.responseEntities
 
 @RestController
 @RequestMapping(path = ["/defining-themes"], produces = ["application/json"])
@@ -22,17 +21,15 @@ class DefiningThemesController(
     private val definingThemesService: DefiningThemesService
 ) {
 
-    @Operation(security = [SecurityRequirement("bearerAuth")])
+    @BearerAuth
     @GetMapping
-    fun getDefiningThemes(@RequestParam(required = false) categoryId: Int?): List<DefiningTheme> {
-        return definingThemesService.getDefiningThemes(categoryId)
-    }
+    fun getDefiningThemes(@RequestParam(required = false) categoryId: Int?) =
+        responseEntities { definingThemesService.getDefiningThemes(categoryId) }
 
-    @Operation(security = [SecurityRequirement("bearerAuth")])
+    @BearerAuth
     @AdminAccess
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun addDefiningTheme(@RequestBody @Valid definingThemeDetails: DefiningThemeDetails): DefiningTheme {
-        return definingThemesService.addDefiningTheme(definingThemeDetails)
-    }
+    fun addDefiningTheme(@RequestBody @Valid definingThemeDetails: DefiningThemeDetails) =
+        definingThemesService.addDefiningTheme(definingThemeDetails)
 }

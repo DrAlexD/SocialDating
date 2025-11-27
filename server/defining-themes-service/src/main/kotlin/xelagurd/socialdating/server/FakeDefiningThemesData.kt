@@ -182,6 +182,7 @@ object FakeDefiningThemesData {
             )
         }
 
-    fun List<DefiningTheme>.filterByCategoryId(categoryId: Int) = this.filter { it.categoryId == categoryId }
+    fun List<DefiningTheme>.filterByCategoryId(categoryId: Int) =
+        this.filter { it.categoryId == categoryId }
 
 }

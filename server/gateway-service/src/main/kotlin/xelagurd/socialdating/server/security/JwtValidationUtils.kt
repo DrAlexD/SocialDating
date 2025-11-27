@@ -31,11 +31,10 @@ class JwtValidationUtils(
         return !isTokenExpired
     }
 
-    fun getClaims(token: String): Claims {
-        return Jwts.parser()
+    fun getClaims(token: String): Claims =
+        Jwts.parser()
             .verifyWith(key)
             .build()
             .parseSignedClaims(token)
             .payload
-    }
 }

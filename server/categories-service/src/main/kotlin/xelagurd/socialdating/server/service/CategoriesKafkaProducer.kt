@@ -9,10 +9,9 @@ class CategoriesKafkaProducer(
     private val kafkaTemplate: KafkaTemplate<String, UserDefiningThemeUpdateDetails>
 ) {
 
-    fun updateUserDefiningTheme(userDefiningThemeUpdateDetails: UserDefiningThemeUpdateDetails) {
+    fun updateUserDefiningTheme(userDefiningThemeUpdateDetails: UserDefiningThemeUpdateDetails) =
         kafkaTemplate.send(
             "update-user-defining-theme-on-statement-reaction",
             userDefiningThemeUpdateDetails
         )
-    }
 }

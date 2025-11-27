@@ -64,7 +64,7 @@ class JwtAuthFilter(
         }
     }
 
-    override fun getOrder(): Int = -1
+    override fun getOrder() = -1
 
     private fun unauthorized(exchange: ServerWebExchange, message: String): Mono<Void> {
         val response = exchange.response

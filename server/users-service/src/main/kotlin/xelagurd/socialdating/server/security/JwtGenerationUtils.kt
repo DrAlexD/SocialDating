@@ -29,8 +29,8 @@ class JwtGenerationUtils(
             ?: throw IllegalStateException("REFRESH_TOKEN_EXPIRATION is not set")
     }
 
-    fun generateAccessToken(username: String, role: Role): String {
-        return Jwts.builder()
+    fun generateAccessToken(username: String, role: Role): String =
+        Jwts.builder()
             .subject(username)
             .claim("role", role.name)
             .claim("type", "access")
@@ -38,17 +38,15 @@ class JwtGenerationUtils(
             .expiration(Date(System.currentTimeMillis() + accessTokenExpiration))
             .signWith(key)
             .compact()
-    }
 
-    fun generateRefreshToken(username: String): String {
-        return Jwts.builder()
+    fun generateRefreshToken(username: String): String =
+        Jwts.builder()
             .subject(username)
             .claim("type", "refresh")
             .issuedAt(Date())
             .expiration(Date(System.currentTimeMillis() + refreshTokenExpiration))
             .signWith(key)
             .compact()
-    }
 
     fun isRefreshToken(refreshToken: String): Boolean {
         val claims = getClaims(refreshToken)
@@ -63,11 +61,10 @@ class JwtGenerationUtils(
         return !isTokenExpired
     }
 
-    fun getClaims(token: String): Claims {
-        return Jwts.parser()
+    fun getClaims(token: String): Claims =
+        Jwts.parser()
             .verifyWith(key)
             .build()
             .parseSignedClaims(token)
             .payload
-    }
 }

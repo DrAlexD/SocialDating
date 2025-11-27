@@ -9,10 +9,9 @@ class DefiningThemesKafkaProducer(
     private val kafkaTemplate: KafkaTemplate<String, MaintainedListUpdateDetails>
 ) {
 
-    fun updateMaintainedList(maintainedListUpdateDetails: MaintainedListUpdateDetails) {
+    fun updateMaintainedList(maintainedListUpdateDetails: MaintainedListUpdateDetails) =
         kafkaTemplate.send(
             "update-maintained-list-on-statement-reaction",
             maintainedListUpdateDetails
         )
-    }
 }
