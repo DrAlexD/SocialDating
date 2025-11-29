@@ -29,11 +29,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
 
     @Order(1)
     @Test
-    fun testAddStatement() {
-        addStatements()
-    }
-
-    private fun addStatements() {
+    fun addStatement() {
         statementsDetails.forEachIndexed { index, statementDetails ->
             val response = restTemplate.postForEntity(
                 "/statements",

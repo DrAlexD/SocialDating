@@ -15,7 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_STEP
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.additional.UserCategoryUpdateDetails
+import xelagurd.socialdating.server.model.common.UserCategoryUpdateDetails
 import xelagurd.socialdating.server.service.CategoriesKafkaConsumer
 import xelagurd.socialdating.server.service.CategoriesKafkaProducer
 import xelagurd.socialdating.server.service.UserCategoriesService

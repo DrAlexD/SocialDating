@@ -14,8 +14,8 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_V
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.additional.MaintainedListUpdateDetails
-import xelagurd.socialdating.server.model.additional.UserDefiningThemeUpdateDetails
+import xelagurd.socialdating.server.model.common.MaintainedListUpdateDetails
+import xelagurd.socialdating.server.model.common.UserDefiningThemeUpdateDetails
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_NOT_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.INCREASE_MAINTAINED
@@ -90,19 +90,20 @@ class DefiningThemesKafkaConsumer(
         return if (updateDetails.isSupportDefiningTheme) diff else -diff
     }
 
-    private fun determineUpdateType(value: Int, diff: Int) = when {
-        value > DEFINING_THEME_VALUE_LOW_BORDER && value + diff <= DEFINING_THEME_VALUE_LOW_BORDER
-            -> INCREASE_NOT_MAINTAINED
+    private fun determineUpdateType(value: Int, diff: Int) =
+        when {
+            value > DEFINING_THEME_VALUE_LOW_BORDER && value + diff <= DEFINING_THEME_VALUE_LOW_BORDER
+                -> INCREASE_NOT_MAINTAINED
 
-        value <= DEFINING_THEME_VALUE_LOW_BORDER && value + diff > DEFINING_THEME_VALUE_LOW_BORDER
-            -> DECREASE_NOT_MAINTAINED
+            value <= DEFINING_THEME_VALUE_LOW_BORDER && value + diff > DEFINING_THEME_VALUE_LOW_BORDER
+                -> DECREASE_NOT_MAINTAINED
 
-        value >= DEFINING_THEME_VALUE_HIGH_BORDER && value + diff < DEFINING_THEME_VALUE_HIGH_BORDER
-            -> DECREASE_MAINTAINED
+            value >= DEFINING_THEME_VALUE_HIGH_BORDER && value + diff < DEFINING_THEME_VALUE_HIGH_BORDER
+                -> DECREASE_MAINTAINED
 
-        value < DEFINING_THEME_VALUE_HIGH_BORDER && value + diff >= DEFINING_THEME_VALUE_HIGH_BORDER
-            -> INCREASE_MAINTAINED
+            value < DEFINING_THEME_VALUE_HIGH_BORDER && value + diff >= DEFINING_THEME_VALUE_HIGH_BORDER
+                -> INCREASE_MAINTAINED
 
-        else -> null
-    }
+            else -> null
+        }
 }

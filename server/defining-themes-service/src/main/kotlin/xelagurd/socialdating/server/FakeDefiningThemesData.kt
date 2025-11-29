@@ -2,7 +2,7 @@ package xelagurd.socialdating.server
 
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.additional.UserDefiningThemeUpdateDetails
+import xelagurd.socialdating.server.model.common.UserDefiningThemeUpdateDetails
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_NO_MAINTAIN
 

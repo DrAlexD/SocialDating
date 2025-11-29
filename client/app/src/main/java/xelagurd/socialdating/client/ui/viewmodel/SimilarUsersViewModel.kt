@@ -15,13 +15,13 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.model.additional.SimilarUserWithData
-import xelagurd.socialdating.client.data.model.toSimilarUsersWithData
+import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
+import xelagurd.socialdating.client.data.model.DataUtils.toSimilarUsersWithData
+import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
+import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
-import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
-import xelagurd.socialdating.client.ui.navigation.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.SimilarUsersUiState
 

@@ -285,9 +285,8 @@ inline fun AppList(
     ) {
         entities.forEachIndexed { index, entity ->
             content(entity)
-            if (index != entities.lastIndex) {
+            if (index != entities.lastIndex)
                 HorizontalDivider()
-            }
         }
     }
 }

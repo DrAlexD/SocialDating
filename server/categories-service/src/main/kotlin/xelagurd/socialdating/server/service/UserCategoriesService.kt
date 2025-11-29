@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import xelagurd.socialdating.server.model.DefaultDataProperties.OPPOSITE_CATEGORIES_NUMBER
 import xelagurd.socialdating.server.model.DefaultDataProperties.SIMILAR_CATEGORIES_NUMBER
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.additional.CategoryWithData
+import xelagurd.socialdating.server.model.repository.CategoryWithData
 import xelagurd.socialdating.server.model.additional.DetailedSimilarCategory
 import xelagurd.socialdating.server.model.additional.DetailedSimilarDefiningTheme
 import xelagurd.socialdating.server.model.additional.DetailedSimilarUser
@@ -181,10 +181,9 @@ class UserCategoriesService(
                 if (bitMask != 0L) {
                     val bitsNumber = bitMask.countOneBits()
 
-                    if (isSimilar) {
-                        similarNumberCategory += bitsNumber
-                    } else {
-                        oppositeNumberCategory += bitsNumber
+                    when {
+                        isSimilar -> similarNumberCategory += bitsNumber
+                        else -> oppositeNumberCategory += bitsNumber
                     }
 
                     definingThemesWithSimilarity?.addAll(

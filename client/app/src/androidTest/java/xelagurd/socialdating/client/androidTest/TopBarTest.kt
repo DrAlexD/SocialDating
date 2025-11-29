@@ -15,10 +15,10 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
-import xelagurd.socialdating.client.onNodeWithContentDescriptionId
-import xelagurd.socialdating.client.onNodeWithTextId
 import xelagurd.socialdating.client.ui.AppTopBar
 import xelagurd.socialdating.client.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -56,11 +56,11 @@ class TopBarTest {
     }
 
     @Test
-    fun topBar_successState_onlineText() {
+    fun topBar_successState_onlineTextWithRefresh() {
         setContentToAppTopBar(RequestStatus.SUCCESS)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsNotDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.online).assertIsDisplayed()
     }
 

@@ -33,21 +33,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
 
     @Order(1)
     @Test
-    fun testAddDefiningTheme() {
-        addDefiningThemes()
-    }
-
-    @Test
-    fun testGetDefiningThemesByCategoryId() {
-        getDefiningThemesByCategoryId()
-    }
-
-    @Test
-    fun testGetDefiningThemes() {
-        getDefiningThemes()
-    }
-
-    private fun addDefiningThemes() {
+    fun addDefiningTheme() {
         definingThemesDetails.forEachIndexed { index, definingThemeDetails ->
             val response = restTemplate.postForEntity(
                 "/defining-themes",
@@ -59,7 +45,8 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
         }
     }
 
-    private fun getDefiningThemesByCategoryId() {
+    @Test
+    fun getDefiningThemesByCategoryId() {
         val expected = definingThemes.filterByCategoryId(categoryId)
         val response = restTemplate.getForEntity(
             "/defining-themes?categoryId=$categoryId",
@@ -70,7 +57,8 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
         assertContentEquals(expected.toTypedArray(), response.body!!)
     }
 
-    private fun getDefiningThemes() {
+    @Test
+    fun getDefiningThemes() {
         val response = restTemplate.getForEntity(
             "/defining-themes",
             Array<DefiningTheme>::class.java

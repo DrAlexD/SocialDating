@@ -16,54 +16,58 @@ import androidx.navigation.NavController
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.junit.Assert.assertEquals
 
-fun NavController.getCurrentRoute() = currentBackStackEntry?.destination?.route
+object AndroidTestUtils {
 
-fun NavController.assertCurrentRouteName(expectedRouteName: String) {
-    assertEquals(expectedRouteName, getCurrentRoute())
-}
+    fun NavController.getCurrentRoute() = currentBackStackEntry?.destination?.route
 
-fun NavController.assertBackStackDepth(expectedDepth: Int) {
-    assertEquals(expectedDepth, currentBackStack.value.size)
-}
+    fun NavController.assertCurrentRouteName(expectedRouteName: String) =
+        assertEquals(expectedRouteName, getCurrentRoute())
 
-fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithContentDescriptionId(
-    @StringRes id: Int
-): SemanticsNodeInteraction = onNodeWithContentDescription(activity.getString(id))
+    fun NavController.assertBackStackDepth(expectedDepth: Int) =
+        assertEquals(expectedDepth, currentBackStack.value.size)
 
-fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithTagId(
-    @StringRes id: Int
-): SemanticsNodeInteraction = onNodeWithTag(activity.getString(id))
+    fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithContentDescriptionId(
+        @StringRes id: Int
+    ) =
+        onNodeWithContentDescription(activity.getString(id))
 
-fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithTextId(
-    @StringRes id: Int
-): SemanticsNodeInteraction = onNodeWithText(activity.getString(id))
+    fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithTagId(
+        @StringRes id: Int
+    ) =
+        onNodeWithTag(activity.getString(id))
 
-fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithTextIdWithColon(
-    @StringRes id: Int
-): SemanticsNodeInteraction =
-    onNodeWithText(activity.getString(R.string.text_with_colon, activity.getString(id)))
+    fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithTextId(
+        @StringRes id: Int
+    ) =
+        onNodeWithText(activity.getString(id))
 
-fun SemanticsNodeInteraction.checkEnabledButton() {
-    this.assertIsDisplayed()
-    this.assertIsEnabled()
-}
+    fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithTextIdWithColon(
+        @StringRes id: Int
+    ) =
+        onNodeWithText(activity.getString(R.string.text_with_colon, activity.getString(id)))
 
-fun SemanticsNodeInteraction.checkDisabledButton() {
-    this.assertIsDisplayed()
-    this.assertIsNotEnabled()
-}
+    fun SemanticsNodeInteraction.checkEnabledButton() {
+        this.assertIsDisplayed()
+        this.assertIsEnabled()
+    }
 
-fun SemanticsNodeInteraction.checkButtonAndClick() {
-    this.checkEnabledButton()
-    this.performClick()
-}
+    fun SemanticsNodeInteraction.checkDisabledButton() {
+        this.assertIsDisplayed()
+        this.assertIsNotEnabled()
+    }
 
-fun SemanticsNodeInteraction.checkTextField() {
-    this.assertIsDisplayed()
-    this.assertIsEnabled()
-}
+    fun SemanticsNodeInteraction.checkButtonAndClick() {
+        this.checkEnabledButton()
+        this.performClick()
+    }
 
-fun SemanticsNodeInteraction.checkTextFieldAndInput(text: String) {
-    this.checkTextField()
-    this.performTextInput(text)
+    fun SemanticsNodeInteraction.checkTextField() {
+        this.assertIsDisplayed()
+        this.assertIsEnabled()
+    }
+
+    fun SemanticsNodeInteraction.checkTextFieldAndInput(text: String) {
+        this.checkTextField()
+        this.performTextInput(text)
+    }
 }

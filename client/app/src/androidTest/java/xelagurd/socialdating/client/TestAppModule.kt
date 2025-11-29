@@ -44,10 +44,10 @@ object TestAppModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context) = Room
-        .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-        .allowMainThreadQueries()
-        .build()
+    fun provideDatabase(@ApplicationContext context: Context) =
+        Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
 
     @Provides
     fun provideCategoriesDao(database: AppDatabase) = database.categoriesDao()

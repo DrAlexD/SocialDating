@@ -40,10 +40,11 @@ object AppModule {
     @Provides
     @Singleton
     @Named("auth")
-    fun provideAuthRetrofit(): Retrofit = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:8080/api/v1/")
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-        .build()
+    fun provideAuthRetrofit(): Retrofit =
+        Retrofit.Builder()
+            .baseUrl("http://10.0.2.2:8080/api/v1/")
+            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .build()
 
     @Provides
     @Singleton
@@ -59,11 +60,12 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:8080/api/v1/")
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-        .client(okHttpClient)
-        .build()
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
+        Retrofit.Builder()
+            .baseUrl("http://10.0.2.2:8080/api/v1/")
+            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .client(okHttpClient)
+            .build()
 
     @Provides
     @Singleton
@@ -72,10 +74,10 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context) = Room
-        .databaseBuilder(context, AppDatabase::class.java, "app_database")
-        .fallbackToDestructiveMigration(false)
-        .build()
+    fun provideDatabase(@ApplicationContext context: Context) =
+        Room.databaseBuilder(context, AppDatabase::class.java, "app_database")
+            .fallbackToDestructiveMigration(false)
+            .build()
 
     @Provides
     fun provideCategoriesDao(database: AppDatabase) = database.categoriesDao()

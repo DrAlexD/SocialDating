@@ -7,8 +7,8 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTERES
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.additional.MaintainedListUpdateDetails
-import xelagurd.socialdating.server.model.additional.UserCategoryUpdateDetails
+import xelagurd.socialdating.server.model.common.MaintainedListUpdateDetails
+import xelagurd.socialdating.server.model.common.UserCategoryUpdateDetails
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_NOT_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.INCREASE_MAINTAINED

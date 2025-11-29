@@ -18,8 +18,8 @@ import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
+import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
-import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.state.LoginUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -48,27 +48,20 @@ class LoginViewModel @Inject constructor(
 
     private suspend fun loginWithCredentials(credentialResponse: GetCredentialResponse) {
         when (val credential = credentialResponse.credential) {
-            is PasswordCredential -> {
-                val username = credential.id
-                val password = credential.password
-
+            is PasswordCredential ->
                 loginUser(
-                    loginFormData = LoginFormData(username, password),
+                    loginFormData = LoginFormData(credential.id, credential.password),
                     isLoginWithInput = false
                 )
-            }
 
-            else -> {
-                Log.e(AccountManager::class.simpleName, "Unexpected type of credential")
-            }
+            else -> Log.e(AccountManager::class.simpleName, "Unexpected type of credential")
         }
     }
 
-    fun updateUiState(loginFormData: LoginFormData) {
+    fun updateUiState(loginFormData: LoginFormData) =
         _uiState.update {
             it.copy(formData = loginFormData)
         }
-    }
 
     fun loginWithInput() {
         viewModelScope.launch {

@@ -88,7 +88,7 @@ fun StatementsScreenComponent(
             )
         },
         floatingActionButton = {
-            if (statementsUiState.entities.isNotEmpty()) {
+            if (statementsUiState.isDataExist()) {
                 FloatingActionButton(
                     onClick = { onStatementAddingClick(statementsUiState.categoryId) },
                 ) {

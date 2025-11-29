@@ -17,18 +17,16 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
+import xelagurd.socialdating.client.TestUtils.mockkList
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.model.Category
-import xelagurd.socialdating.client.data.remote.NOT_FOUND
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
-import xelagurd.socialdating.client.mockkList
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.CategoriesViewModel
 
@@ -92,7 +90,7 @@ class CategoriesViewModelTest {
         setupUiStateCollecting()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILURE(), categoriesUiState.dataRequestStatus)
+        assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
 
         verify(exactly = 1) { localRepository.getCategories() }
         coVerify(exactly = 1) { remoteRepository.getCategories() }
@@ -203,8 +201,7 @@ class CategoriesViewModelTest {
     }
 
     private fun mockEmptyData() {
-        coEvery { remoteRepository.getCategories() } returns
-                Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
+        coEvery { remoteRepository.getCategories() } returns Response.success(null)
     }
 
     private fun mockDataWithoutInternet() {

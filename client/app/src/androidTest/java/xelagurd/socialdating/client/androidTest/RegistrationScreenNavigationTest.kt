@@ -9,11 +9,11 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToRegistration
+import xelagurd.socialdating.client.AndroidNavigationTestUtils.performNavigateUp
+import xelagurd.socialdating.client.AndroidNavigationTestUtils.registerAndNavigateToCategories
+import xelagurd.socialdating.client.AndroidTestUtils.assertCurrentRouteName
 import xelagurd.socialdating.client.MainActivity
-import xelagurd.socialdating.client.assertCurrentRouteName
-import xelagurd.socialdating.client.navigateToRegistration
-import xelagurd.socialdating.client.performNavigateUp
-import xelagurd.socialdating.client.registerAndNavigateToCategories
 import xelagurd.socialdating.client.ui.navigation.AppNavHost
 import xelagurd.socialdating.client.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.client.ui.navigation.LoginDestination

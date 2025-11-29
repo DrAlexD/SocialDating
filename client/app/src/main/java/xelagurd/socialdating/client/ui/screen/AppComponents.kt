@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.model.DataEntity
 import xelagurd.socialdating.client.ui.state.DataEntityUiState
 import xelagurd.socialdating.client.ui.state.DataListUiState
@@ -111,7 +113,7 @@ private fun DataRequestStatusComponent(
             RequestStatus.UNDEFINED, RequestStatus.LOADING -> AppLoadingIndicator()
             is RequestStatus.FAILURE -> AppLargeTitleText(text = dataRequestStatus.failureText)
             is RequestStatus.ERROR -> AppLargeTitleText(text = dataRequestStatus.errorText)
-            RequestStatus.SUCCESS -> {}
+            RequestStatus.SUCCESS -> AppLargeTitleText(text = stringResource(R.string.no_data))
         }
     }
 }

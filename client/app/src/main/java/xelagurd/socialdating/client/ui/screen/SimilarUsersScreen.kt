@@ -29,12 +29,12 @@ import androidx.compose.ui.util.fastJoinToString
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.model.additional.SimilarUserWithData
+import xelagurd.socialdating.client.data.model.DataUtils.toSimilarUsersWithData
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_NO_MAINTAIN
-import xelagurd.socialdating.client.data.model.toSimilarUsersWithData
+import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
 import xelagurd.socialdating.client.ui.AppTopBar
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination

@@ -40,12 +40,12 @@ data class UserDefiningTheme(
                 id = id,
                 value = value,
                 interest = interest,
-                categoryId = definingTheme.categoryId,
+                categoryId = it.categoryId,
                 definingThemeId = definingThemeId,
-                definingThemeName = definingTheme.name,
-                definingThemeFromOpinion = definingTheme.fromOpinion,
-                definingThemeToOpinion = definingTheme.toOpinion,
-                definingThemeNumberInCategory = definingTheme.numberInCategory
+                definingThemeName = it.name,
+                definingThemeFromOpinion = it.fromOpinion,
+                definingThemeToOpinion = it.toOpinion,
+                definingThemeNumberInCategory = it.numberInCategory
             )
         }
 }

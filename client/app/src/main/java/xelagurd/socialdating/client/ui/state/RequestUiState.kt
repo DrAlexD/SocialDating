@@ -14,17 +14,13 @@ sealed interface DataRequestUiState : RequestUiState {
 sealed interface DataListUiState : DataRequestUiState {
     val entities: List<DataEntity>
 
-    override fun isDataExist(): Boolean {
-        return entities.isNotEmpty()
-    }
+    override fun isDataExist() = entities.isNotEmpty()
 }
 
 sealed interface DataEntityUiState : DataRequestUiState {
     val entity: DataEntity?
 
-    override fun isDataExist(): Boolean {
-        return entity != null
-    }
+    override fun isDataExist() = entity != null
 }
 
 sealed interface ActionRequestUiState : RequestUiState {
