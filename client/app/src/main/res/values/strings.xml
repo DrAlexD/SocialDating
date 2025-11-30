@@ -21,6 +21,7 @@
     <string name="not_sure">Not sure</string>
     <string name="part_no_maintain">Partially don\'t maintain</string>
     <string name="full_no_maintain">Fully don\'t maintain</string>
+    <string name="offline_mode">Offline mode</string>
     <string name="login">Login</string>
     <string name="failed_login">Check credentials or register</string>
     <string name="register">Register</string>

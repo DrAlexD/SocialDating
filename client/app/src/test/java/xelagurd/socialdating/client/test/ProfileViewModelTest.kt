@@ -4,6 +4,7 @@ import java.io.IOException
 import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -25,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
+import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
@@ -40,8 +42,9 @@ class ProfileViewModelTest {
 
     private val context = mockk<Context>(relaxed = true)
     private val savedStateHandle = mockk<SavedStateHandle>()
-    private val remoteRepository = mockk<RemoteUsersRepository>()
-    private val localRepository = mockk<LocalUsersRepository>()
+    private val preferencesRepository = mockk<PreferencesRepository>()
+    private val remoteUsersRepository = mockk<RemoteUsersRepository>()
+    private val localUsersRepository = mockk<LocalUsersRepository>()
 
     private lateinit var viewModel: ProfileViewModel
     private lateinit var usersFlow: MutableStateFlow<User>
@@ -50,6 +53,7 @@ class ProfileViewModelTest {
 
     private val userId = Random.nextInt()
     private val anotherUserId = userId
+    private val isOfflineModeFlow = flowOf(false)
 
     @Before
     fun setup() {
@@ -62,8 +66,9 @@ class ProfileViewModelTest {
         viewModel = ProfileViewModel(
             context,
             savedStateHandle,
-            remoteRepository,
-            localRepository
+            preferencesRepository,
+            remoteUsersRepository,
+            localUsersRepository
         )
     }
 
@@ -83,10 +88,10 @@ class ProfileViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
 
-        verify(exactly = 1) { localRepository.getUser(any()) }
-        coVerify(exactly = 1) { remoteRepository.getUser(any()) }
-        coVerify(exactly = 1) { localRepository.insertUser(any()) }
-        confirmVerified(localRepository, remoteRepository)
+        verify(exactly = 1) { localUsersRepository.getUser(any()) }
+        coVerify(exactly = 1) { remoteUsersRepository.getUser(any()) }
+        coVerify(exactly = 1) { localUsersRepository.insertUser(any()) }
+        confirmVerified(localUsersRepository, remoteUsersRepository)
     }
 
     @Test
@@ -99,9 +104,9 @@ class ProfileViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
 
-        verify(exactly = 1) { localRepository.getUser(any()) }
-        coVerify(exactly = 1) { remoteRepository.getUser(any()) }
-        confirmVerified(localRepository, remoteRepository)
+        verify(exactly = 1) { localUsersRepository.getUser(any()) }
+        coVerify(exactly = 1) { remoteUsersRepository.getUser(any()) }
+        confirmVerified(localUsersRepository, remoteUsersRepository)
     }
 
     @Test
@@ -114,9 +119,9 @@ class ProfileViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), profileUiState.dataRequestStatus)
 
-        verify(exactly = 1) { localRepository.getUser(any()) }
-        coVerify(exactly = 1) { remoteRepository.getUser(any()) }
-        confirmVerified(localRepository, remoteRepository)
+        verify(exactly = 1) { localUsersRepository.getUser(any()) }
+        coVerify(exactly = 1) { remoteUsersRepository.getUser(any()) }
+        confirmVerified(localUsersRepository, remoteUsersRepository)
     }
 
     @Test
@@ -134,10 +139,10 @@ class ProfileViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), profileUiState.dataRequestStatus)
 
-        verify(exactly = 1) { localRepository.getUser(any()) }
-        coVerify(exactly = 2) { remoteRepository.getUser(any()) }
-        coVerify(exactly = 1) { localRepository.insertUser(any()) }
-        confirmVerified(localRepository, remoteRepository)
+        verify(exactly = 1) { localUsersRepository.getUser(any()) }
+        coVerify(exactly = 2) { remoteUsersRepository.getUser(any()) }
+        coVerify(exactly = 1) { localUsersRepository.insertUser(any()) }
+        confirmVerified(localUsersRepository, remoteUsersRepository)
     }
 
     @Test
@@ -155,10 +160,10 @@ class ProfileViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
 
-        verify(exactly = 1) { localRepository.getUser(any()) }
-        coVerify(exactly = 2) { remoteRepository.getUser(any()) }
-        coVerify(exactly = 1) { localRepository.insertUser(any()) }
-        confirmVerified(localRepository, remoteRepository)
+        verify(exactly = 1) { localUsersRepository.getUser(any()) }
+        coVerify(exactly = 2) { remoteUsersRepository.getUser(any()) }
+        coVerify(exactly = 1) { localUsersRepository.insertUser(any()) }
+        confirmVerified(localUsersRepository, remoteUsersRepository)
     }
 
     @Test
@@ -174,10 +179,10 @@ class ProfileViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
 
-        verify(exactly = 1) { localRepository.getUser(any()) }
-        coVerify(exactly = 2) { remoteRepository.getUser(any()) }
-        coVerify(exactly = 2) { localRepository.insertUser(any()) }
-        confirmVerified(localRepository, remoteRepository)
+        verify(exactly = 1) { localUsersRepository.getUser(any()) }
+        coVerify(exactly = 2) { remoteUsersRepository.getUser(any()) }
+        coVerify(exactly = 2) { localUsersRepository.insertUser(any()) }
+        confirmVerified(localUsersRepository, remoteUsersRepository)
     }
 
     @Test
@@ -193,27 +198,28 @@ class ProfileViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), profileUiState.dataRequestStatus)
 
-        verify(exactly = 1) { localRepository.getUser(any()) }
-        coVerify(exactly = 2) { remoteRepository.getUser(any()) }
-        confirmVerified(localRepository, remoteRepository)
+        verify(exactly = 1) { localUsersRepository.getUser(any()) }
+        coVerify(exactly = 2) { remoteUsersRepository.getUser(any()) }
+        confirmVerified(localUsersRepository, remoteUsersRepository)
     }
 
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(ProfileDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(ProfileDestination.anotherUserId) } returns anotherUserId
-        every { localRepository.getUser(any()) } returns usersFlow
+        every { preferencesRepository.isOfflineMode } returns isOfflineModeFlow
+        every { localUsersRepository.getUser(any()) } returns usersFlow
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteRepository.getUser(any()) } returns Response.success(mockk())
-        coEvery { localRepository.insertUser(any()) } just Runs
+        coEvery { remoteUsersRepository.getUser(any()) } returns Response.success(mockk())
+        coEvery { localUsersRepository.insertUser(any()) } just Runs
     }
 
     private fun mockEmptyData() {
-        coEvery { remoteRepository.getUser(any()) } returns Response.success(null)
+        coEvery { remoteUsersRepository.getUser(any()) } returns Response.success(null)
     }
 
     private fun mockDataWithoutInternet() {
-        coEvery { remoteRepository.getUser(any()) } throws IOException()
+        coEvery { remoteUsersRepository.getUser(any()) } throws IOException()
     }
 }

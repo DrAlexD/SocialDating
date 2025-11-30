@@ -46,7 +46,7 @@ fun StatementAddingScreen(
         onSuccessStatementAdding = onSuccessStatementAdding,
         onNavigateUp = onNavigateUp,
         onValueChange = statementAddingViewModel::updateUiState,
-        onStatementAddingClick = statementAddingViewModel::statementAdding
+        onStatementAddingClick = statementAddingViewModel::addStatement
     )
 }
 

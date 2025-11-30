@@ -9,10 +9,6 @@ import xelagurd.socialdating.client.data.model.User
 
 @Dao
 interface UsersDao {
-    // FixMe: remove after adding server hosting
-    @Query("select * from users")
-    fun getUsers(): Flow<List<User>>
-
     @Query("select * from users where id = :userId")
     fun getUser(userId: Int): Flow<User>
 

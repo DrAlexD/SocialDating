@@ -10,10 +10,6 @@ import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 
 @Dao
 interface UserDefiningThemesDao {
-    // FixMe: remove after adding server hosting
-    @Query("select * from user_defining_themes")
-    fun getUserDefiningThemes(): Flow<List<UserDefiningTheme>>
-
     @Query(
         """
         select udt.id,

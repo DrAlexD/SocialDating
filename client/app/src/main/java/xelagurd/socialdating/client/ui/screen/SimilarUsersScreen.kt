@@ -25,7 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastJoinToString
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
@@ -147,8 +146,8 @@ private fun SimilarUserCardContent(
                     )
                     AppMediumTitleText(text = similarUser.oppositeNumber.toString())
                 }
-                AppSmallBodyText(text = similarUser.similarCategories.fastJoinToString())
-                AppSmallBodyText(text = similarUser.oppositeCategories.fastJoinToString())
+                AppSmallBodyText(text = similarUser.similarCategories.joinToString())
+                AppSmallBodyText(text = similarUser.oppositeCategories.joinToString())
             }
         }
     }

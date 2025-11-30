@@ -24,6 +24,7 @@ import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.TestUtils.mockkList
+import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
@@ -41,6 +42,7 @@ class StatementAddingViewModelTest {
 
     private val context = mockk<Context>(relaxed = true)
     private val savedStateHandle = mockk<SavedStateHandle>()
+    private val preferencesRepository = mockk<PreferencesRepository>()
     private val localDefiningThemesRepository = mockk<LocalDefiningThemesRepository>()
     private val remoteStatementsRepository = mockk<RemoteStatementsRepository>()
     private val localStatementsRepository = mockk<LocalStatementsRepository>()
@@ -51,6 +53,7 @@ class StatementAddingViewModelTest {
 
     private val userId = Random.nextInt()
     private val categoryId = Random.nextInt()
+    private val isOfflineModeFlow = flowOf(false)
 
     private val statementFormData = FakeData.statementFormData
 
@@ -63,12 +66,13 @@ class StatementAddingViewModelTest {
         viewModel = StatementAddingViewModel(
             context,
             savedStateHandle,
+            preferencesRepository,
             localDefiningThemesRepository,
             remoteStatementsRepository,
             localStatementsRepository
         )
         viewModel.updateUiState(statementFormData)
-        viewModel.statementAdding()
+        viewModel.addStatement()
     }
 
     @Test
@@ -93,13 +97,10 @@ class StatementAddingViewModelTest {
         initViewModel()
         advanceUntilIdle()
 
-        // FixMe: Change to ERROR after implementing server
-        assertEquals(RequestStatus.SUCCESS, statementAddingUiState.actionRequestStatus)
+        assertEquals(RequestStatus.ERROR(), statementAddingUiState.actionRequestStatus)
 
         verify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes(any()) }
         coVerify(exactly = 1) { remoteStatementsRepository.addStatement(any()) }
-        coVerify(exactly = 1) { localStatementsRepository.getStatements() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 1) { localStatementsRepository.insertStatements(any()) } // FixMe: remove after adding server hosting
         confirmVerified(localDefiningThemesRepository, localStatementsRepository, remoteStatementsRepository)
     }
 
@@ -125,15 +126,14 @@ class StatementAddingViewModelTest {
         advanceUntilIdle()
 
         mockDataWithInternet()
-        viewModel.statementAdding()
+        viewModel.addStatement()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, statementAddingUiState.actionRequestStatus)
 
         verify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes(any()) }
         coVerify(exactly = 2) { remoteStatementsRepository.addStatement(any()) }
-        coVerify(exactly = 1) { localStatementsRepository.getStatements() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 2) { localStatementsRepository.insertStatements(any()) } // FixMe: set to 1 after adding server hosting
+        coVerify(exactly = 1) { localStatementsRepository.insertStatements(any()) }
         confirmVerified(localDefiningThemesRepository, localStatementsRepository, remoteStatementsRepository)
     }
 
@@ -145,7 +145,7 @@ class StatementAddingViewModelTest {
         advanceUntilIdle()
 
         mockDataWithInternet()
-        viewModel.statementAdding()
+        viewModel.addStatement()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, statementAddingUiState.actionRequestStatus)
@@ -159,6 +159,7 @@ class StatementAddingViewModelTest {
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(StatementAddingDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(StatementAddingDestination.categoryId) } returns categoryId
+        every { preferencesRepository.isOfflineMode } returns isOfflineModeFlow
         every { localDefiningThemesRepository.getDefiningThemes(any()) } returns flowOf(mockkList())
     }
 
@@ -174,9 +175,5 @@ class StatementAddingViewModelTest {
 
     private fun mockDataWithoutInternet() {
         coEvery { remoteStatementsRepository.addStatement(any()) } throws IOException()
-
-        // FixMe: remove after adding server hosting
-        every { localStatementsRepository.getStatements() } returns flowOf(mockkList(relaxed = true))
-        coEvery { localStatementsRepository.insertStatements(any()) } just Runs
     }
 }

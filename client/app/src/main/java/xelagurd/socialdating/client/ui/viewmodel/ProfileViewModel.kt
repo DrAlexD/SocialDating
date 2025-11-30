@@ -5,15 +5,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import xelagurd.socialdating.client.data.PreferencesRepository
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.data.model.User
@@ -27,16 +31,19 @@ import xelagurd.socialdating.client.ui.state.RequestStatus
 class ProfileViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
-    private val remoteRepository: RemoteUsersRepository,
-    private val localRepository: LocalUsersRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val remoteUsersRepository: RemoteUsersRepository,
+    private val localUsersRepository: LocalUsersRepository
 ) : ViewModel() {
+
     private val userId: Int = checkNotNull(savedStateHandle[ProfileDestination.userId])
     private val anotherUserId: Int = checkNotNull(savedStateHandle[ProfileDestination.anotherUserId])
+    private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val userStateFlow = MutableStateFlow<User?>(null)
     private val userFlow = when (anotherUserId) {
-        userId -> localRepository.getUser(anotherUserId).distinctUntilChanged()
+        userId -> localUsersRepository.getUser(anotherUserId).distinctUntilChanged()
         else -> userStateFlow
     }
 
@@ -54,7 +61,15 @@ class ProfileViewModel @Inject constructor(
     )
 
     init {
-        getUser()
+        if (!isOfflineMode) { // FixMe: remove after adding server hosting
+            getUser()
+        } else if (anotherUserId != userId) {
+            dataRequestStatusFlow.update { RequestStatus.LOADING }
+            userStateFlow.update { FakeData.users[1] }
+            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+        } else {
+            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+        }
     }
 
     fun getUser() {
@@ -62,12 +77,12 @@ class ProfileViewModel @Inject constructor(
             dataRequestStatusFlow.update { RequestStatus.LOADING }
 
             val (remoteUser, status) = safeApiCall(context) {
-                remoteRepository.getUser(anotherUserId)
+                remoteUsersRepository.getUser(anotherUserId)
             }
 
             if (remoteUser != null) {
                 when (anotherUserId) {
-                    userId -> localRepository.insertUser(remoteUser)
+                    userId -> localUsersRepository.insertUser(remoteUser)
                     else -> userStateFlow.update { remoteUser }
                 }
             }

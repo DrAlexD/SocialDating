@@ -9,12 +9,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
@@ -25,11 +26,15 @@ import xelagurd.socialdating.client.ui.state.RequestStatus
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val remoteRepository: RemoteCategoriesRepository,
-    private val localRepository: LocalCategoriesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val remoteCategoriesRepository: RemoteCategoriesRepository,
+    private val localCategoriesRepository: LocalCategoriesRepository
 ) : ViewModel() {
+
+    private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
+
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
-    private val categoriesFlow = localRepository.getCategories().distinctUntilChanged()
+    private val categoriesFlow = localCategoriesRepository.getCategories().distinctUntilChanged()
 
     val uiState = combine(categoriesFlow, dataRequestStatusFlow) { categories, dataRequestStatus ->
         CategoriesUiState(
@@ -43,7 +48,11 @@ class CategoriesViewModel @Inject constructor(
     )
 
     init {
-        getCategories()
+        if (!isOfflineMode) { // FixMe: remove after adding server hosting
+            getCategories()
+        } else {
+            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+        }
     }
 
     fun getCategories() {
@@ -51,17 +60,11 @@ class CategoriesViewModel @Inject constructor(
             dataRequestStatusFlow.update { RequestStatus.LOADING }
 
             val (remoteCategories, status) = safeApiCall(context) {
-                remoteRepository.getCategories()
+                remoteCategoriesRepository.getCategories()
             }
 
             if (remoteCategories != null) {
-                localRepository.insertCategories(remoteCategories)
-            }
-
-            if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
-                if (localRepository.getCategories().first().isEmpty()) {
-                    localRepository.insertCategories(FakeData.categories)
-                }
+                localCategoriesRepository.insertCategories(remoteCategories)
             }
 
             dataRequestStatusFlow.update { status }

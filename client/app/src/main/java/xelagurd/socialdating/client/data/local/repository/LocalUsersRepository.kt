@@ -9,9 +9,6 @@ import xelagurd.socialdating.client.data.model.User
 class LocalUsersRepository @Inject constructor(
     private val usersDao: UsersDao
 ) {
-    fun getUsers() =
-        usersDao.getUsers()
-
     fun getUser(userId: Int) =
         usersDao.getUser(userId)
 

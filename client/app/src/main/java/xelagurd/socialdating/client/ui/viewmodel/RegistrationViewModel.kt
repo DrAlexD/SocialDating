@@ -3,7 +3,6 @@ package xelagurd.socialdating.client.ui.viewmodel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.content.Context
@@ -13,11 +12,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
-import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
-import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.form.RegistrationFormData
 import xelagurd.socialdating.client.ui.state.RegistrationUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -25,10 +22,10 @@ import xelagurd.socialdating.client.ui.state.RequestStatus
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val remoteRepository: RemoteUsersRepository,
-    private val localRepository: LocalUsersRepository,
+    private val accountManager: AccountManager,
     private val preferencesRepository: PreferencesRepository,
-    private val accountManager: AccountManager
+    private val remoteUsersRepository: RemoteUsersRepository,
+    private val localUsersRepository: LocalUsersRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegistrationUiState())
@@ -45,29 +42,17 @@ class RegistrationViewModel @Inject constructor(
 
             val registrationFormData = uiState.value.formData
 
-            var (authResponse, status) = safeApiCall(context) {
-                remoteRepository.registerUser(registrationFormData.toRegistrationDetails())
+            val (authResponse, status) = safeApiCall(context) {
+                remoteUsersRepository.registerUser(registrationFormData.toRegistrationDetails())
             }
 
             if (authResponse != null) {
                 accountManager.saveCredentials(registrationFormData.toLoginFormData())
 
-                localRepository.insertUser(authResponse.user)
+                localUsersRepository.insertUser(authResponse.user)
                 preferencesRepository.saveAccessToken(authResponse.accessToken)
                 preferencesRepository.saveRefreshToken(authResponse.refreshToken)
                 preferencesRepository.saveCurrentUserId(authResponse.user.id)
-            }
-
-            if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
-                accountManager.saveCredentials(LoginFormData(FakeData.users[0].username, "password1"))
-
-                if (!localRepository.getUsers().first().map { it.id }.contains(FakeData.users[0].id)) {
-                    localRepository.insertUser(FakeData.users[0])
-                }
-
-                preferencesRepository.saveCurrentUserId(FakeData.users[0].id)
-
-                status = RequestStatus.SUCCESS
             }
 
             _uiState.update { it.copy(actionRequestStatus = status) }

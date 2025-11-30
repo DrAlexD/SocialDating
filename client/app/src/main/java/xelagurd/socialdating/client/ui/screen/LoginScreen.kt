@@ -39,7 +39,8 @@ fun LoginScreen(
         onSuccessLogin = onSuccessLogin,
         onRegistrationClick = onRegistrationClick,
         onValueChange = loginViewModel::updateUiState,
-        onLoginClick = loginViewModel::loginWithInput
+        onLoginClick = loginViewModel::loginWithInput,
+        onOfflineModeClick = loginViewModel::initOfflineMode
     )
 }
 
@@ -50,7 +51,8 @@ fun LoginScreenComponent(
     onSuccessLogin: () -> Unit = {},
     onRegistrationClick: () -> Unit = {},
     onValueChange: (LoginFormData) -> Unit = {},
-    onLoginClick: () -> Unit = {}
+    onLoginClick: () -> Unit = {},
+    onOfflineModeClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -68,7 +70,8 @@ fun LoginScreenComponent(
                 loginFormData = loginUiState.formData,
                 onValueChange = onValueChange,
                 onLoginClick = onLoginClick,
-                onRegistrationClick = onRegistrationClick
+                onRegistrationClick = onRegistrationClick,
+                onOfflineModeClick = onOfflineModeClick
             )
         }
     }
@@ -79,7 +82,8 @@ private inline fun LoginDetailsBody(
     loginFormData: LoginFormData,
     crossinline onValueChange: (LoginFormData) -> Unit,
     noinline onLoginClick: () -> Unit,
-    noinline onRegistrationClick: () -> Unit
+    noinline onRegistrationClick: () -> Unit,
+    noinline onOfflineModeClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -109,6 +113,10 @@ private inline fun LoginDetailsBody(
             text = stringResource(R.string.register),
             onClick = onRegistrationClick,
             overrideModifier = Modifier
+        )
+        AppLargeTextCard(
+            text = stringResource(R.string.offline_mode),
+            onClick = onOfflineModeClick
         )
     }
 }

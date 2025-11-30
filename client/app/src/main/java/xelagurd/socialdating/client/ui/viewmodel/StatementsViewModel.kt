@@ -10,13 +10,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
@@ -35,14 +36,17 @@ import xelagurd.socialdating.client.ui.state.StatementsUiState
 class StatementsViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
+    private val preferencesRepository: PreferencesRepository,
     private val remoteStatementsRepository: RemoteStatementsRepository,
     private val localStatementsRepository: LocalStatementsRepository,
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository,
     private val localDefiningThemesRepository: LocalDefiningThemesRepository
 ) : ViewModel() {
+
     private val userId: Int = checkNotNull(savedStateHandle[StatementsDestination.userId])
 
     private val categoryId: Int = checkNotNull(savedStateHandle[StatementsDestination.categoryId])
+    private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val statementsFlow = localStatementsRepository.getStatements(categoryId)
@@ -61,7 +65,11 @@ class StatementsViewModel @Inject constructor(
     )
 
     init {
-        getStatements()
+        if (!isOfflineMode) { // FixMe: remove after adding server hosting
+            getStatements()
+        } else {
+            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+        }
     }
 
     fun getStatements() {
@@ -91,43 +99,34 @@ class StatementsViewModel @Inject constructor(
                 globalStatus = statusDefiningThemes
             }
 
-            if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
-                if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
-                    localDefiningThemesRepository.insertDefiningThemes(FakeData.definingThemes)
-                }
-                if (localStatementsRepository.getStatements().first().isEmpty()) {
-                    localStatementsRepository.insertStatements(FakeData.statements)
-                }
-            }
-
             dataRequestStatusFlow.update { globalStatus }
         }
     }
 
     fun onStatementReactionClick(statement: Statement, reactionType: StatementReactionType) {
         viewModelScope.launch {
-            val (_, status) = safeApiCall(context) {
-                remoteStatementsRepository.processStatementReaction(
-                    StatementReactionDetails(
-                        userId = userId,
-                        statementId = statement.id,
-                        categoryId = categoryId,
-                        definingThemeId = statement.definingThemeId,
-                        reactionType = reactionType,
-                        isSupportDefiningTheme = statement.isSupportDefiningTheme
+            if (!isOfflineMode) { // FixMe: remove after adding server hosting
+                val (_, status) = safeApiCall(context) {
+                    remoteStatementsRepository.processStatementReaction(
+                        StatementReactionDetails(
+                            userId = userId,
+                            statementId = statement.id,
+                            categoryId = categoryId,
+                            definingThemeId = statement.definingThemeId,
+                            reactionType = reactionType,
+                            isSupportDefiningTheme = statement.isSupportDefiningTheme
+                        )
                     )
-                )
-            }
+                }
 
-            if (status is RequestStatus.SUCCESS) {
+                if (status is RequestStatus.SUCCESS) {
+                    localStatementsRepository.deleteStatement(statement)
+                }
+
+                // TODO: implement action on error
+            } else {
                 localStatementsRepository.deleteStatement(statement)
             }
-
-            if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
-                localStatementsRepository.deleteStatement(statement)
-            }
-
-            // TODO: implement action on error
         }
     }
 }
