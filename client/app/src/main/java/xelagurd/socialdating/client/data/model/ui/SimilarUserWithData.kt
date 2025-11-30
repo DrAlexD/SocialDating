@@ -1,7 +1,8 @@
-package xelagurd.socialdating.client.data.model.additional
+package xelagurd.socialdating.client.data.model.ui
 
 import kotlinx.serialization.Serializable
 import xelagurd.socialdating.client.data.model.DataEntity
+import xelagurd.socialdating.client.data.model.additional.SimilarCategory
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
 

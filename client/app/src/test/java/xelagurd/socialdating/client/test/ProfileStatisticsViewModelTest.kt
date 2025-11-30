@@ -21,24 +21,22 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
+import xelagurd.socialdating.client.TestUtils.mockkList
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserDefiningThemesRepository
 import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
 import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
-import xelagurd.socialdating.client.data.remote.NOT_FOUND
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserDefiningThemesRepository
-import xelagurd.socialdating.client.mockkList
 import xelagurd.socialdating.client.ui.navigation.ProfileStatisticsDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.ProfileStatisticsViewModel
@@ -138,7 +136,7 @@ class ProfileStatisticsViewModelTest {
         setupUiStateCollecting()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILURE(), profileStatisticsUiState.dataRequestStatus)
+        assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
 
         verify(exactly = 1) { localUserCategoriesRepository.getUserCategories(any()) }
         verify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes(any()) }
@@ -357,8 +355,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     private fun mockEmptyData() {
-        coEvery { remoteCategoriesRepository.getCategories() } returns
-                Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
+        coEvery { remoteCategoriesRepository.getCategories() } returns Response.success(null)
     }
 
     private fun mockDataWithoutInternet() {

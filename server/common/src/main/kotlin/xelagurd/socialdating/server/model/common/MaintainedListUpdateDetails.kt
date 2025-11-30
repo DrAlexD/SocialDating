@@ -1,4 +1,4 @@
-package xelagurd.socialdating.server.model.additional
+package xelagurd.socialdating.server.model.common
 
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType
 

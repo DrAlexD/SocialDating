@@ -9,13 +9,11 @@ import org.springframework.security.web.SecurityFilterChain
 class NoSecurityConfig {
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
         http
             .csrf { it.disable() }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
             .authorizeHttpRequests { it.anyRequest().permitAll() }
-
-        return http.build()
-    }
+            .build()
 }

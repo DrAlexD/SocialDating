@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import xelagurd.socialdating.client.data.PreferencesRepository
+import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
 
 @HiltViewModel
 class AppNavViewModel @Inject constructor(

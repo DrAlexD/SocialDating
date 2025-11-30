@@ -15,8 +15,8 @@ import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
+import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
-import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.form.RegistrationFormData
 import xelagurd.socialdating.client.ui.state.RegistrationUiState
@@ -34,11 +34,10 @@ class RegistrationViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(RegistrationUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun updateUiState(registrationFormData: RegistrationFormData) {
+    fun updateUiState(registrationFormData: RegistrationFormData) =
         _uiState.update {
             it.copy(formData = registrationFormData)
         }
-    }
 
     fun register() {
         viewModelScope.launch {

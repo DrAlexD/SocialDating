@@ -35,14 +35,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.model.DataUtils.toUserCategoriesWithData
+import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesWithData
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarCategory
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarDefiningTheme
 import xelagurd.socialdating.client.data.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.client.data.model.enums.SimilarityType.SIMILAR
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_NO_MAINTAIN
-import xelagurd.socialdating.client.data.model.toUserCategoriesWithData
-import xelagurd.socialdating.client.data.model.toUserDefiningThemesWithData
 import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
 import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar

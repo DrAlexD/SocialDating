@@ -9,12 +9,12 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
-import xelagurd.socialdating.client.checkEnabledButton
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.onNodeWithContentDescriptionId
-import xelagurd.socialdating.client.onNodeWithTagId
 import xelagurd.socialdating.client.ui.screen.StatementsScreenComponent
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.StatementsUiState
@@ -115,10 +115,8 @@ class StatementsScreenTest {
         composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).checkEnabledButton()
         composeTestRule.onNodeWithContentDescriptionId(R.string.part_maintain).checkEnabledButton()
         composeTestRule.onNodeWithContentDescriptionId(R.string.not_sure).checkEnabledButton()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.part_no_maintain)
-            .checkEnabledButton()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.full_no_maintain)
-            .checkEnabledButton()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.part_no_maintain).checkEnabledButton()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.full_no_maintain).checkEnabledButton()
     }
 
     private fun setContentToStatementsBody(statementsUiState: StatementsUiState) {

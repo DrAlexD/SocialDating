@@ -2,6 +2,7 @@ package xelagurd.socialdating.client.data.model.additional
 
 import kotlinx.serialization.Serializable
 import xelagurd.socialdating.client.data.model.User
+import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
 
 @Serializable
 data class SimilarUser(
@@ -15,11 +16,11 @@ data class SimilarUser(
         user?.let {
             SimilarUserWithData(
                 id = id,
-                name = user.name,
-                gender = user.gender,
-                age = user.age,
-                city = user.city,
-                purpose = user.purpose,
+                name = it.name,
+                gender = it.gender,
+                age = it.age,
+                city = it.city,
+                purpose = it.purpose,
                 similarNumber = similarNumber,
                 oppositeNumber = oppositeNumber,
                 similarCategories = similarCategories,

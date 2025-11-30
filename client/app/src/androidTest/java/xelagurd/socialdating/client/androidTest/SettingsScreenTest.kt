@@ -8,11 +8,11 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
-import xelagurd.socialdating.client.checkEnabledButton
-import xelagurd.socialdating.client.onNodeWithTagId
-import xelagurd.socialdating.client.onNodeWithTextId
 import xelagurd.socialdating.client.ui.screen.SettingsScreenComponent
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.SettingsUiState

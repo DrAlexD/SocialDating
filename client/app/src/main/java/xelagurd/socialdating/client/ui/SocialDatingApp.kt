@@ -64,8 +64,7 @@ fun AppTopBar(
         },
         actions = {
             if (dataRequestStatus != null) {
-                val onCardStatusClick =
-                    refreshAction.takeIf { dataRequestStatus.isAllowedRefresh() } ?: {}
+                val onCardStatusClick = refreshAction.takeIf { dataRequestStatus.isAllowedRefresh() } ?: {}
                 Card(onClick = onCardStatusClick) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

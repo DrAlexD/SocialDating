@@ -12,12 +12,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
+import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
-import xelagurd.socialdating.client.data.remote.safeApiCall
 import xelagurd.socialdating.client.ui.form.StatementFormData
 import xelagurd.socialdating.client.ui.navigation.StatementAddingDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -51,30 +50,19 @@ class StatementAddingViewModel @Inject constructor(
 
             val definingThemes = localDefiningThemesRepository.getDefiningThemes(categoryId).first()
 
-            if (definingThemes.isNotEmpty()) {
-                _uiState.update {
-                    it.copy(
-                        entities = definingThemes,
-                        dataRequestStatus = RequestStatus.SUCCESS
-                    )
-                }
-            } else {
-                _uiState.update {
-                    it.copy(
-                        dataRequestStatus = RequestStatus.FAILURE(
-                            failureText = context.getString(R.string.no_data)
-                        )
-                    )
-                }
+            _uiState.update {
+                it.copy(
+                    entities = definingThemes,
+                    dataRequestStatus = RequestStatus.SUCCESS
+                )
             }
         }
     }
 
-    fun updateUiState(statementFormData: StatementFormData) {
+    fun updateUiState(statementFormData: StatementFormData) =
         _uiState.update {
             it.copy(formData = statementFormData)
         }
-    }
 
     fun statementAdding() {
         viewModelScope.launch {

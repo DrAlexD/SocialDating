@@ -1,4 +1,4 @@
-package xelagurd.socialdating.server.model.additional
+package xelagurd.socialdating.server.model.repository
 
 data class CategoryWithData(
     val id: Int,

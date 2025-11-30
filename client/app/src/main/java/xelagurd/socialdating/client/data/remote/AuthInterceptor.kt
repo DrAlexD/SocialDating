@@ -11,6 +11,8 @@ import okhttp3.Response
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.model.details.RefreshTokenDetails
+import xelagurd.socialdating.client.data.remote.ApiUtils.UNAUTHORIZED
+import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 
 @Singleton
 class AuthInterceptor @Inject constructor(

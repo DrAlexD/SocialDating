@@ -21,19 +21,17 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
+import xelagurd.socialdating.client.TestUtils.mockkList
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.model.Statement
-import xelagurd.socialdating.client.data.remote.NOT_FOUND
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
-import xelagurd.socialdating.client.mockkList
 import xelagurd.socialdating.client.ui.navigation.StatementsDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.StatementsViewModel
@@ -114,7 +112,7 @@ class StatementsViewModelTest {
         setupUiStateCollecting()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILURE(), statementsUiState.dataRequestStatus)
+        assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
         coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
@@ -276,8 +274,7 @@ class StatementsViewModelTest {
     }
 
     private fun mockEmptyData() {
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any()) } returns
-                Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any()) } returns Response.success(null)
     }
 
     private fun mockDataWithoutInternet() {

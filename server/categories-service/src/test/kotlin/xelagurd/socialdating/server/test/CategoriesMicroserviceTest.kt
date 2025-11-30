@@ -30,16 +30,7 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
 
     @Order(1)
     @Test
-    fun testAddCategory() {
-        addCategories()
-    }
-
-    @Test
-    fun testGetCategories() {
-        getCategories()
-    }
-
-    private fun addCategories() {
+    fun addCategory() {
         categoriesDetails.forEachIndexed { index, categoryDetails ->
             val response = restTemplate.postForEntity(
                 "/categories",
@@ -51,7 +42,8 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
         }
     }
 
-    private fun getCategories() {
+    @Test
+    fun getCategories() {
         val response = restTemplate.getForEntity(
             "/categories",
             Array<Category>::class.java

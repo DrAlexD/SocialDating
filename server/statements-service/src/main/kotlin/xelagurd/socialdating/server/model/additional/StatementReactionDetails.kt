@@ -2,6 +2,7 @@ package xelagurd.socialdating.server.model.additional
 
 import jakarta.validation.constraints.Positive
 import xelagurd.socialdating.server.model.UserStatement
+import xelagurd.socialdating.server.model.common.UserCategoryUpdateDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 
 data class StatementReactionDetails(

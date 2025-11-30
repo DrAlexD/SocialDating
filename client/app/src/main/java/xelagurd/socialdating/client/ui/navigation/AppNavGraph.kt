@@ -48,11 +48,10 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination =
-            if (currentUserId == CURRENT_USER_ID_DEFAULT)
-                LoginDestination.route
-            else
-                CategoriesDestination.route
+        startDestination = when (currentUserId) {
+            CURRENT_USER_ID_DEFAULT -> LoginDestination.route
+            else -> CategoriesDestination.route
+        }
     ) {
         composable(route = LoginDestination.route) {
             LoginScreen(

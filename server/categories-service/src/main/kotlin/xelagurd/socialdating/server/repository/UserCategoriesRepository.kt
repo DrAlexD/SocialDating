@@ -3,7 +3,7 @@ package xelagurd.socialdating.server.repository
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.additional.CategoryWithData
+import xelagurd.socialdating.server.model.repository.CategoryWithData
 
 interface UserCategoriesRepository : JpaRepository<UserCategory, Int> {
 

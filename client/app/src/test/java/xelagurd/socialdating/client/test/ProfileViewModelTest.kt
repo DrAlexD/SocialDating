@@ -20,7 +20,6 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +27,6 @@ import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.User
-import xelagurd.socialdating.client.data.remote.NOT_FOUND
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -99,7 +97,7 @@ class ProfileViewModelTest {
         setupUiStateCollecting()
         advanceUntilIdle()
 
-        assertEquals(RequestStatus.FAILURE(), profileUiState.dataRequestStatus)
+        assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
 
         verify(exactly = 1) { localRepository.getUser(any()) }
         coVerify(exactly = 1) { remoteRepository.getUser(any()) }
@@ -212,8 +210,7 @@ class ProfileViewModelTest {
     }
 
     private fun mockEmptyData() {
-        coEvery { remoteRepository.getUser(any()) } returns
-                Response.error(NOT_FOUND, NOT_FOUND.toString().toResponseBody())
+        coEvery { remoteRepository.getUser(any()) } returns Response.success(null)
     }
 
     private fun mockDataWithoutInternet() {

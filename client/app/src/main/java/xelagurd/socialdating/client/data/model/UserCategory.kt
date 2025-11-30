@@ -40,7 +40,7 @@ data class UserCategory(
                 interest = interest,
                 userId = userId,
                 categoryId = categoryId,
-                categoryName = category.name
+                categoryName = it.name
             )
         }
 }

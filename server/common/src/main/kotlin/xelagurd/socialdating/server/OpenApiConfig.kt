@@ -15,15 +15,14 @@ class OpenApiConfig {
     fun customOpenAPI(): OpenAPI =
         OpenAPI()
             .components(
-                Components().addSecuritySchemes(
-                    "bearerAuth",
-                    SecurityScheme()
-                        .type(SecurityScheme.Type.HTTP)
-                        .scheme("bearer")
-                        .bearerFormat("JWT")
-                )
+                Components()
+                    .addSecuritySchemes(
+                        "bearerAuth",
+                        SecurityScheme()
+                            .type(SecurityScheme.Type.HTTP)
+                            .scheme("bearer")
+                            .bearerFormat("JWT")
+                    )
             )
-            .servers(
-                listOf(Server().url(GATEWAY_URL))
-            )
+            .servers(listOf(Server().url(GATEWAY_URL)))
 }
