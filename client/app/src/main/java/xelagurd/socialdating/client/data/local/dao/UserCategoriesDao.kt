@@ -10,10 +10,6 @@ import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
 
 @Dao
 interface UserCategoriesDao {
-    // FixMe: remove after adding server hosting
-    @Query("select * from user_categories")
-    fun getUserCategories(): Flow<List<UserCategory>>
-
     @Query(
         """
         select uc.id,

@@ -25,7 +25,6 @@ class SettingsViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val preferencesRepository = mockk<PreferencesRepository>()
-
     private val commonLocalRepository = mockk<CommonLocalRepository>()
 
     private lateinit var viewModel: SettingsViewModel

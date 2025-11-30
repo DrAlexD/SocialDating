@@ -27,6 +27,7 @@ import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.TestUtils.mockkList
+import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
@@ -49,6 +50,7 @@ class ProfileStatisticsViewModelTest {
 
     private val context = mockk<Context>(relaxed = true)
     private val savedStateHandle = mockk<SavedStateHandle>()
+    private val preferencesRepository = mockk<PreferencesRepository>()
     private val remoteUserCategoriesRepository = mockk<RemoteUserCategoriesRepository>()
     private val localUserCategoriesRepository = mockk<LocalUserCategoriesRepository>()
     private val remoteUserDefiningThemesRepository = mockk<RemoteUserDefiningThemesRepository>()
@@ -66,6 +68,7 @@ class ProfileStatisticsViewModelTest {
 
     private val userId = Random.nextInt()
     private val anotherUserId = userId
+    private val isOfflineModeFlow = flowOf(false)
 
     @Before
     fun setup() {
@@ -79,6 +82,7 @@ class ProfileStatisticsViewModelTest {
         viewModel = ProfileStatisticsViewModel(
             context,
             savedStateHandle,
+            preferencesRepository,
             remoteUserCategoriesRepository,
             localUserCategoriesRepository,
             remoteUserDefiningThemesRepository,
@@ -166,10 +170,6 @@ class ProfileStatisticsViewModelTest {
         verify(exactly = 1) { localUserCategoriesRepository.getUserCategories(any()) }
         verify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes(any()) }
         coVerify(exactly = 1) { remoteCategoriesRepository.getCategories() }
-        coVerify(exactly = 1) { localCategoriesRepository.getCategories() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 1) { localUserCategoriesRepository.getUserCategories() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes() } // FixMe: remove after adding server hosting
         confirmVerified(
             localUserCategoriesRepository,
             remoteUserCategoriesRepository,
@@ -207,10 +207,6 @@ class ProfileStatisticsViewModelTest {
         coVerify(exactly = 1) { localDefiningThemesRepository.insertDefiningThemes(any()) }
         coVerify(exactly = 1) { localUserCategoriesRepository.insertUserCategories(any()) }
         coVerify(exactly = 1) { localUserDefiningThemesRepository.insertUserDefiningThemes(any()) }
-        coVerify(exactly = 1) { localCategoriesRepository.getCategories() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 1) { localUserCategoriesRepository.getUserCategories() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes() } // FixMe: remove after adding server hosting
         confirmVerified(
             localUserCategoriesRepository,
             remoteUserCategoriesRepository,
@@ -248,10 +244,6 @@ class ProfileStatisticsViewModelTest {
         coVerify(exactly = 1) { localDefiningThemesRepository.insertDefiningThemes(any()) }
         coVerify(exactly = 1) { localUserCategoriesRepository.insertUserCategories(any()) }
         coVerify(exactly = 1) { localUserDefiningThemesRepository.insertUserDefiningThemes(any()) }
-        coVerify(exactly = 1) { localCategoriesRepository.getCategories() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 1) { localUserCategoriesRepository.getUserCategories() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes() } // FixMe: remove after adding server hosting
         confirmVerified(
             localUserCategoriesRepository,
             remoteUserCategoriesRepository,
@@ -315,10 +307,6 @@ class ProfileStatisticsViewModelTest {
         verify(exactly = 1) { localUserCategoriesRepository.getUserCategories(any()) }
         verify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes(any()) }
         coVerify(exactly = 2) { remoteCategoriesRepository.getCategories() }
-        coVerify(exactly = 2) { localCategoriesRepository.getCategories() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 2) { localDefiningThemesRepository.getDefiningThemes() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 2) { localUserCategoriesRepository.getUserCategories() } // FixMe: remove after adding server hosting
-        coVerify(exactly = 2) { localUserDefiningThemesRepository.getUserDefiningThemes() } // FixMe: remove after adding server hosting
         confirmVerified(
             localUserCategoriesRepository,
             remoteUserCategoriesRepository,
@@ -334,6 +322,7 @@ class ProfileStatisticsViewModelTest {
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(ProfileStatisticsDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(ProfileStatisticsDestination.anotherUserId) } returns anotherUserId
+        every { preferencesRepository.isOfflineMode } returns isOfflineModeFlow
         every { localUserCategoriesRepository.getUserCategories(any()) } returns userCategoriesFlow
         every { localUserDefiningThemesRepository.getUserDefiningThemes(any()) } returns userDefiningThemesFlow
     }
@@ -360,11 +349,5 @@ class ProfileStatisticsViewModelTest {
 
     private fun mockDataWithoutInternet() {
         coEvery { remoteCategoriesRepository.getCategories() } throws IOException()
-
-        // FixMe: remove after adding server hosting
-        every { localCategoriesRepository.getCategories() } returns flowOf(mockkList())
-        every { localDefiningThemesRepository.getDefiningThemes() } returns flowOf(mockkList())
-        every { localUserCategoriesRepository.getUserCategories() } returns flowOf(mockkList())
-        every { localUserDefiningThemesRepository.getUserDefiningThemes() } returns flowOf(mockkList())
     }
 }

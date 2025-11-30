@@ -3,7 +3,6 @@ package xelagurd.socialdating.client.ui.viewmodel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.content.Context
@@ -17,6 +16,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
@@ -27,10 +27,11 @@ import xelagurd.socialdating.client.ui.state.RequestStatus
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val remoteRepository: RemoteUsersRepository,
-    private val localRepository: LocalUsersRepository,
+    private val accountManager: AccountManager,
     private val preferencesRepository: PreferencesRepository,
-    private val accountManager: AccountManager
+    private val commonLocalRepository: CommonLocalRepository,
+    private val remoteUsersRepository: RemoteUsersRepository,
+    private val localUsersRepository: LocalUsersRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -75,8 +76,8 @@ class LoginViewModel @Inject constructor(
     private suspend fun loginUser(loginFormData: LoginFormData, isLoginWithInput: Boolean) {
         _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
-        var (authResponse, status) = safeApiCall(context) {
-            remoteRepository.loginUser(loginFormData.toLoginDetails())
+        val (authResponse, status) = safeApiCall(context) {
+            remoteUsersRepository.loginUser(loginFormData.toLoginDetails())
         }
 
         if (authResponse != null) {
@@ -84,24 +85,24 @@ class LoginViewModel @Inject constructor(
                 accountManager.saveCredentials(loginFormData)
             }
 
-            localRepository.insertUser(authResponse.user)
+            localUsersRepository.insertUser(authResponse.user)
             preferencesRepository.saveAccessToken(authResponse.accessToken)
             preferencesRepository.saveRefreshToken(authResponse.refreshToken)
             preferencesRepository.saveCurrentUserId(authResponse.user.id)
         }
 
-        if (status is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
-            accountManager.saveCredentials(LoginFormData(FakeData.users[0].username, "password1"))
+        _uiState.update { it.copy(actionRequestStatus = status) }
+    }
 
-            if (!localRepository.getUsers().first().map { it.id }.contains(FakeData.users[0].id)) {
-                localRepository.insertUser(FakeData.users[0])
-            }
+    fun initOfflineMode() { // FixMe: remove after adding server hosting
+        viewModelScope.launch {
+            _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
+            commonLocalRepository.initOfflineModeData()
+            preferencesRepository.saveIsOfflineMode(true)
             preferencesRepository.saveCurrentUserId(FakeData.users[0].id)
 
-            status = RequestStatus.SUCCESS
+            _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
         }
-
-        _uiState.update { it.copy(actionRequestStatus = status) }
     }
 }

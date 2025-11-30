@@ -14,4 +14,8 @@ interface CategoriesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategories(categories: List<Category>)
+
+    // FixMe: remove after adding server hosting
+    @Query("delete from categories")
+    suspend fun deleteAll()
 }

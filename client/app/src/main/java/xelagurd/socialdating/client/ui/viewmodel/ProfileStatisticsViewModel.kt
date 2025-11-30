@@ -10,12 +10,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
@@ -41,6 +43,7 @@ import xelagurd.socialdating.client.ui.state.RequestStatus
 class ProfileStatisticsViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
+    private val preferencesRepository: PreferencesRepository,
     private val remoteUserCategoriesRepository: RemoteUserCategoriesRepository,
     private val localUserCategoriesRepository: LocalUserCategoriesRepository,
     private val remoteUserDefiningThemesRepository: RemoteUserDefiningThemesRepository,
@@ -50,8 +53,10 @@ class ProfileStatisticsViewModel @Inject constructor(
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository,
     private val localDefiningThemesRepository: LocalDefiningThemesRepository
 ) : ViewModel() {
+
     private val userId: Int = checkNotNull(savedStateHandle[ProfileStatisticsDestination.userId])
     private val anotherUserId: Int = checkNotNull(savedStateHandle[ProfileStatisticsDestination.anotherUserId])
+    private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val userCategoriesStateFlow = MutableStateFlow<List<UserCategoryWithData>>(listOf())
@@ -83,7 +88,19 @@ class ProfileStatisticsViewModel @Inject constructor(
     )
 
     init {
-        getProfileStatistics()
+        if (!isOfflineMode) { // FixMe: remove after adding server hosting
+            getProfileStatistics()
+        } else if (anotherUserId != userId) {
+            dataRequestStatusFlow.update { RequestStatus.LOADING }
+            userCategoriesStateFlow.update { FakeData.userCategories.toUserCategoriesWithData(FakeData.categories) }
+            userDefiningThemesStateFlow.update {
+                FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)
+            }
+            detailedSimilarUserFlow.update { FakeData.detailedSimilarUser }
+            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+        } else {
+            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+        }
     }
 
     fun getProfileStatistics() {
@@ -154,31 +171,6 @@ class ProfileStatisticsViewModel @Inject constructor(
                 }
             } else {
                 globalStatus = statusCategories
-            }
-
-            if (globalStatus is RequestStatus.ERROR) { // FixMe: remove after adding server hosting
-                if (localCategoriesRepository.getCategories().first().isEmpty()) {
-                    localCategoriesRepository.insertCategories(FakeData.categories)
-                }
-                if (localDefiningThemesRepository.getDefiningThemes().first().isEmpty()) {
-                    localDefiningThemesRepository.insertDefiningThemes(FakeData.definingThemes)
-                }
-                if (userId == anotherUserId) {
-                    if (localUserCategoriesRepository.getUserCategories().first().isEmpty()) {
-                        localUserCategoriesRepository.insertUserCategories(FakeData.userCategories)
-                    }
-                    if (localUserDefiningThemesRepository.getUserDefiningThemes().first().isEmpty()) {
-                        localUserDefiningThemesRepository.insertUserDefiningThemes(FakeData.userDefiningThemes)
-                    }
-                } else {
-                    userCategoriesStateFlow.update {
-                        FakeData.userCategories.toUserCategoriesWithData(FakeData.categories)
-                    }
-                    userDefiningThemesStateFlow.update {
-                        FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)
-                    }
-                    detailedSimilarUserFlow.update { FakeData.detailedSimilarUser }
-                }
             }
 
             dataRequestStatusFlow.update { globalStatus }
