@@ -4,11 +4,20 @@ updates:
     directory: "/client"
     schedule:
       interval: "monthly"
+    groups:
+      client-updates:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "androidx.compose:compose-bom"          # fixed due to using Icons class
       - dependency-name: "androidx.activity:activity-compose"    # fixed due to API 35
       - dependency-name: "androidx.core:core-ktx"                # fixed due to API 35
+
   - package-ecosystem: "gradle"
     directory: "/server"
     schedule:
       interval: "monthly"
+    groups:
+      server-updates:
+        patterns:
+          - "*"
