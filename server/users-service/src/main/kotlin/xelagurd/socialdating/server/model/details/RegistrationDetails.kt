@@ -50,7 +50,7 @@ data class RegistrationDetails(
             name = name,
             gender = gender,
             username = username,
-            password = passwordEncoder.encode(password),
+            password = passwordEncoder.encode(password)!!,
             email = email,
             age = age,
             city = city,
