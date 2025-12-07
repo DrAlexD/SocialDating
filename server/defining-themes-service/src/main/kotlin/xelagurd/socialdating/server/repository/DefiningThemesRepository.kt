@@ -6,7 +6,16 @@ import xelagurd.socialdating.server.model.DefiningTheme
 
 interface DefiningThemesRepository : JpaRepository<DefiningTheme, Int> {
 
-    fun findAllByCategoryId(categoryId: Int): List<DefiningTheme>
+    @Query(
+        """
+        select *
+        from defining_themes
+        where (coalesce(:definingThemeIds) is null or id in (:definingThemeIds))
+          and (:categoryId is null or category_id = :categoryId)
+        """,
+        nativeQuery = true
+    )
+    fun findAllByIdsAndCategoryId(definingThemeIds: List<Int>?, categoryId: Int?): List<DefiningTheme>
 
     @Query(
         """

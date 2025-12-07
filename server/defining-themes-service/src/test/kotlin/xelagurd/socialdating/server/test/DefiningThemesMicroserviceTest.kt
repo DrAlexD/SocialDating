@@ -17,7 +17,9 @@ import org.junit.jupiter.api.TestMethodOrder
 import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.FakeDefiningThemesData.filterByCategoryId
+import xelagurd.socialdating.server.FakeDefiningThemesData.filterByIds
 import xelagurd.socialdating.server.model.DefiningTheme
+import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @ActiveProfiles("dev", "test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,6 +29,7 @@ import xelagurd.socialdating.server.model.DefiningTheme
 class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemplate) {
 
     private val categoryId = 1
+    private val definingThemeIds = listOf(1, 2)
 
     private val definingThemesDetails = FakeDefiningThemesData.definingThemesDetails
     private val definingThemes = FakeDefiningThemesData.definingThemes.take(definingThemesDetails.size)
@@ -50,6 +53,18 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
         val expected = definingThemes.filterByCategoryId(categoryId)
         val response = restTemplate.getForEntity(
             "/defining-themes?categoryId=$categoryId",
+            Array<DefiningTheme>::class.java
+        )
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertEquals(expected.size, response.body!!.size)
+        assertContentEquals(expected.toTypedArray(), response.body!!)
+    }
+
+    @Test
+    fun getDefiningThemesByIds() {
+        val expected = definingThemes.filterByIds(definingThemeIds)
+        val response = restTemplate.getForEntity(
+            "/defining-themes?definingThemeIds=${definingThemeIds.toRequestParams()}",
             Array<DefiningTheme>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)

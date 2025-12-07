@@ -14,4 +14,7 @@ class LocalUsersRepository @Inject constructor(
 
     suspend fun insertUser(user: User) =
         usersDao.insertUser(user)
+
+    suspend fun deleteAll() =
+        usersDao.deleteAll()
 }

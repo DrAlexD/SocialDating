@@ -27,31 +27,9 @@ class DefiningThemesServiceUnitTest {
     @InjectMockKs
     private lateinit var definingThemesService: DefiningThemesService
 
-    private val categoryId = Random.nextInt()
-
     private val definingThemeDetails = FakeDefiningThemesData.definingThemesDetails[0]
     private val definingThemeSlot = slot<DefiningTheme>()
     private val numberInCategory = Random.nextInt()
-
-    @Test
-    fun getDefiningThemes() {
-        every { definingThemesRepository.findAll() } returns mockkList()
-
-        definingThemesService.getDefiningThemes()
-
-        verify(exactly = 1) { definingThemesRepository.findAll() }
-        confirmVerified(definingThemesRepository)
-    }
-
-    @Test
-    fun getDefiningThemes_byCategoryId() {
-        every { definingThemesRepository.findAllByCategoryId(any()) } returns mockkList()
-
-        definingThemesService.getDefiningThemes(categoryId)
-
-        verify(exactly = 1) { definingThemesRepository.findAllByCategoryId(any()) }
-        confirmVerified(definingThemesRepository)
-    }
 
     @Test
     fun addDefiningTheme() {

@@ -14,4 +14,7 @@ class LocalCategoriesRepository @Inject constructor(
 
     suspend fun insertCategories(categories: List<Category>) =
         categoriesDao.insertCategories(categories)
+
+    suspend fun deleteAll() =
+        categoriesDao.deleteAll()
 }

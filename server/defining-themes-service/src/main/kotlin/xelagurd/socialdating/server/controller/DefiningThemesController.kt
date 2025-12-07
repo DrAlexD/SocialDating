@@ -23,8 +23,11 @@ class DefiningThemesController(
 
     @BearerAuth
     @GetMapping
-    fun getDefiningThemes(@RequestParam(required = false) categoryId: Int?) =
-        responseEntities { definingThemesService.getDefiningThemes(categoryId) }
+    fun getDefiningThemes(
+        @RequestParam(required = false) definingThemeIds: List<Int>?,
+        @RequestParam(required = false) categoryId: Int?
+    ) =
+        responseEntities { definingThemesService.getDefiningThemes(definingThemeIds, categoryId) }
 
     @BearerAuth
     @AdminAccess

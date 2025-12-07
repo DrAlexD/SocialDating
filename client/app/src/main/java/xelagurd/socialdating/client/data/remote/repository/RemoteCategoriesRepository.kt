@@ -8,6 +8,6 @@ import xelagurd.socialdating.client.data.remote.ApiService
 class RemoteCategoriesRepository @Inject constructor(
     private val apiService: ApiService
 ) {
-    suspend fun getCategories() =
-        apiService.getCategories()
+    suspend fun getCategories(categoryIds: List<Int>? = null) =
+        apiService.getCategories(categoryIds)
 }

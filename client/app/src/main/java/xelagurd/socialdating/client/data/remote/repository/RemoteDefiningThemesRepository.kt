@@ -8,6 +8,6 @@ import xelagurd.socialdating.client.data.remote.ApiService
 class RemoteDefiningThemesRepository @Inject constructor(
     private val apiService: ApiService
 ) {
-    suspend fun getDefiningThemes(categoryId: Int? = null) =
-        apiService.getDefiningThemes(categoryId)
+    suspend fun getDefiningThemes(definingThemeIds: List<Int>? = null, categoryId: Int? = null) =
+        apiService.getDefiningThemes(definingThemeIds, categoryId)
 }

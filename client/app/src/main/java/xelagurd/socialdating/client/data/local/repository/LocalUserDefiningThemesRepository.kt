@@ -14,4 +14,7 @@ class LocalUserDefiningThemesRepository @Inject constructor(
 
     suspend fun insertUserDefiningThemes(userDefiningThemes: List<UserDefiningTheme>) =
         userDefiningThemesDao.insertUserDefiningThemes(userDefiningThemes)
+
+    suspend fun deleteAll() =
+        userDefiningThemesDao.deleteAll()
 }

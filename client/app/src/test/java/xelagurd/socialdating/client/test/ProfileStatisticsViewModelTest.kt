@@ -28,10 +28,13 @@ import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.TestUtils.mockkList
 import xelagurd.socialdating.client.data.PreferencesRepository
+import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserDefiningThemesRepository
+import xelagurd.socialdating.client.data.model.Category
+import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
 import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
@@ -59,8 +62,11 @@ class ProfileStatisticsViewModelTest {
     private val localCategoriesRepository = mockk<LocalCategoriesRepository>()
     private val remoteDefiningThemesRepository = mockk<RemoteDefiningThemesRepository>()
     private val localDefiningThemesRepository = mockk<LocalDefiningThemesRepository>()
+    private val commonLocalRepository = mockk<CommonLocalRepository>()
 
     private lateinit var viewModel: ProfileStatisticsViewModel
+    private lateinit var categoriesFlow: MutableStateFlow<List<Category>>
+    private lateinit var definingThemesFlow: MutableStateFlow<List<DefiningTheme>>
     private lateinit var userCategoriesFlow: MutableStateFlow<List<UserCategoryWithData>>
     private lateinit var userDefiningThemesFlow: MutableStateFlow<List<UserDefiningThemeWithData>>
     private val profileStatisticsUiState
@@ -72,6 +78,8 @@ class ProfileStatisticsViewModelTest {
 
     @Before
     fun setup() {
+        categoriesFlow = MutableStateFlow(mockkList(relaxed = true))
+        definingThemesFlow = MutableStateFlow(mockkList(relaxed = true))
         userCategoriesFlow = MutableStateFlow(mockkList())
         userDefiningThemesFlow = MutableStateFlow(mockkList(relaxed = true))
 
@@ -90,7 +98,8 @@ class ProfileStatisticsViewModelTest {
             remoteCategoriesRepository,
             localCategoriesRepository,
             remoteDefiningThemesRepository,
-            localDefiningThemesRepository
+            localDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -110,16 +119,13 @@ class ProfileStatisticsViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
 
+        verify(exactly = 1) { localCategoriesRepository.getCategories() }
+        verify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes() }
         verify(exactly = 1) { localUserCategoriesRepository.getUserCategories(any()) }
         verify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes(any()) }
-        coVerify(exactly = 1) { remoteCategoriesRepository.getCategories() }
-        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes() }
         coVerify(exactly = 1) { remoteUserCategoriesRepository.getUserCategories(any()) }
         coVerify(exactly = 1) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
-        coVerify(exactly = 1) { localCategoriesRepository.insertCategories(any()) }
-        coVerify(exactly = 1) { localDefiningThemesRepository.insertDefiningThemes(any()) }
-        coVerify(exactly = 1) { localUserCategoriesRepository.insertUserCategories(any()) }
-        coVerify(exactly = 1) { localUserDefiningThemesRepository.insertUserDefiningThemes(any()) }
+        coVerify(exactly = 1) { commonLocalRepository.updateProfileStatisticsScreenData(any(), any(), any(), any()) }
         confirmVerified(
             localUserCategoriesRepository,
             remoteUserCategoriesRepository,
@@ -128,7 +134,8 @@ class ProfileStatisticsViewModelTest {
             localCategoriesRepository,
             remoteCategoriesRepository,
             localDefiningThemesRepository,
-            remoteDefiningThemesRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -144,7 +151,7 @@ class ProfileStatisticsViewModelTest {
 
         verify(exactly = 1) { localUserCategoriesRepository.getUserCategories(any()) }
         verify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes(any()) }
-        coVerify(exactly = 1) { remoteCategoriesRepository.getCategories() }
+        coVerify(exactly = 1) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
         confirmVerified(
             localUserCategoriesRepository,
             remoteUserCategoriesRepository,
@@ -153,7 +160,8 @@ class ProfileStatisticsViewModelTest {
             localCategoriesRepository,
             remoteCategoriesRepository,
             localDefiningThemesRepository,
-            remoteDefiningThemesRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -169,7 +177,7 @@ class ProfileStatisticsViewModelTest {
 
         verify(exactly = 1) { localUserCategoriesRepository.getUserCategories(any()) }
         verify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes(any()) }
-        coVerify(exactly = 1) { remoteCategoriesRepository.getCategories() }
+        coVerify(exactly = 1) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
         confirmVerified(
             localUserCategoriesRepository,
             remoteUserCategoriesRepository,
@@ -178,7 +186,8 @@ class ProfileStatisticsViewModelTest {
             localCategoriesRepository,
             remoteCategoriesRepository,
             localDefiningThemesRepository,
-            remoteDefiningThemesRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -197,16 +206,13 @@ class ProfileStatisticsViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), profileStatisticsUiState.dataRequestStatus)
 
+        verify(exactly = 1) { localCategoriesRepository.getCategories() }
+        verify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes() }
         verify(exactly = 1) { localUserCategoriesRepository.getUserCategories(any()) }
         verify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes(any()) }
-        coVerify(exactly = 2) { remoteCategoriesRepository.getCategories() }
-        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes() }
         coVerify(exactly = 1) { remoteUserCategoriesRepository.getUserCategories(any()) }
-        coVerify(exactly = 1) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
-        coVerify(exactly = 1) { localCategoriesRepository.insertCategories(any()) }
-        coVerify(exactly = 1) { localDefiningThemesRepository.insertDefiningThemes(any()) }
-        coVerify(exactly = 1) { localUserCategoriesRepository.insertUserCategories(any()) }
-        coVerify(exactly = 1) { localUserDefiningThemesRepository.insertUserDefiningThemes(any()) }
+        coVerify(exactly = 2) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
+        coVerify(exactly = 1) { commonLocalRepository.updateProfileStatisticsScreenData(any(), any(), any(), any()) }
         confirmVerified(
             localUserCategoriesRepository,
             remoteUserCategoriesRepository,
@@ -215,7 +221,8 @@ class ProfileStatisticsViewModelTest {
             localCategoriesRepository,
             remoteCategoriesRepository,
             localDefiningThemesRepository,
-            remoteDefiningThemesRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -234,16 +241,13 @@ class ProfileStatisticsViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
 
+        verify(exactly = 1) { localCategoriesRepository.getCategories() }
+        verify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes() }
         verify(exactly = 1) { localUserCategoriesRepository.getUserCategories(any()) }
         verify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes(any()) }
-        coVerify(exactly = 2) { remoteCategoriesRepository.getCategories() }
-        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes() }
         coVerify(exactly = 1) { remoteUserCategoriesRepository.getUserCategories(any()) }
-        coVerify(exactly = 1) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
-        coVerify(exactly = 1) { localCategoriesRepository.insertCategories(any()) }
-        coVerify(exactly = 1) { localDefiningThemesRepository.insertDefiningThemes(any()) }
-        coVerify(exactly = 1) { localUserCategoriesRepository.insertUserCategories(any()) }
-        coVerify(exactly = 1) { localUserDefiningThemesRepository.insertUserDefiningThemes(any()) }
+        coVerify(exactly = 2) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
+        coVerify(exactly = 1) { commonLocalRepository.updateProfileStatisticsScreenData(any(), any(), any(), any()) }
         confirmVerified(
             localUserCategoriesRepository,
             remoteUserCategoriesRepository,
@@ -252,7 +256,8 @@ class ProfileStatisticsViewModelTest {
             localCategoriesRepository,
             remoteCategoriesRepository,
             localDefiningThemesRepository,
-            remoteDefiningThemesRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -269,16 +274,13 @@ class ProfileStatisticsViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
 
+        verify(exactly = 2) { localCategoriesRepository.getCategories() }
+        verify(exactly = 2) { localDefiningThemesRepository.getDefiningThemes() }
         verify(exactly = 1) { localUserCategoriesRepository.getUserCategories(any()) }
         verify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes(any()) }
-        coVerify(exactly = 2) { remoteCategoriesRepository.getCategories() }
-        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes() }
         coVerify(exactly = 2) { remoteUserCategoriesRepository.getUserCategories(any()) }
         coVerify(exactly = 2) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
-        coVerify(exactly = 2) { localCategoriesRepository.insertCategories(any()) }
-        coVerify(exactly = 2) { localDefiningThemesRepository.insertDefiningThemes(any()) }
-        coVerify(exactly = 2) { localUserCategoriesRepository.insertUserCategories(any()) }
-        coVerify(exactly = 2) { localUserDefiningThemesRepository.insertUserDefiningThemes(any()) }
+        coVerify(exactly = 2) { commonLocalRepository.updateProfileStatisticsScreenData(any(), any(), any(), any()) }
         confirmVerified(
             localUserCategoriesRepository,
             remoteUserCategoriesRepository,
@@ -287,7 +289,8 @@ class ProfileStatisticsViewModelTest {
             localCategoriesRepository,
             remoteCategoriesRepository,
             localDefiningThemesRepository,
-            remoteDefiningThemesRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -306,7 +309,7 @@ class ProfileStatisticsViewModelTest {
 
         verify(exactly = 1) { localUserCategoriesRepository.getUserCategories(any()) }
         verify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes(any()) }
-        coVerify(exactly = 2) { remoteCategoriesRepository.getCategories() }
+        coVerify(exactly = 2) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
         confirmVerified(
             localUserCategoriesRepository,
             remoteUserCategoriesRepository,
@@ -315,7 +318,8 @@ class ProfileStatisticsViewModelTest {
             localCategoriesRepository,
             remoteCategoriesRepository,
             localDefiningThemesRepository,
-            remoteDefiningThemesRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -323,31 +327,26 @@ class ProfileStatisticsViewModelTest {
         every { savedStateHandle.get<Int>(ProfileStatisticsDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(ProfileStatisticsDestination.anotherUserId) } returns anotherUserId
         every { preferencesRepository.isOfflineMode } returns isOfflineModeFlow
+        every { localCategoriesRepository.getCategories() } returns categoriesFlow
+        every { localDefiningThemesRepository.getDefiningThemes() } returns definingThemesFlow
         every { localUserCategoriesRepository.getUserCategories(any()) } returns userCategoriesFlow
         every { localUserDefiningThemesRepository.getUserDefiningThemes(any()) } returns userDefiningThemesFlow
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteCategoriesRepository.getCategories() } returns
-                Response.success(mockkList())
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes() } returns
-                Response.success(mockkList())
         coEvery { remoteUserCategoriesRepository.getUserCategories(any()) } returns
-                Response.success(mockkList())
+                Response.success(mockkList(relaxed = true))
         coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) } returns
-                Response.success(mockkList())
+                Response.success(mockkList(relaxed = true))
 
-        coEvery { localCategoriesRepository.insertCategories(any()) } just Runs
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(any()) } just Runs
-        coEvery { localUserCategoriesRepository.insertUserCategories(any()) } just Runs
-        coEvery { localUserDefiningThemesRepository.insertUserDefiningThemes(any()) } just Runs
+        coEvery { commonLocalRepository.updateProfileStatisticsScreenData(any(), any(), any(), any()) } just Runs
     }
 
     private fun mockEmptyData() {
-        coEvery { remoteCategoriesRepository.getCategories() } returns Response.success(null)
+        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) } returns Response.success(null)
     }
 
     private fun mockDataWithoutInternet() {
-        coEvery { remoteCategoriesRepository.getCategories() } throws IOException()
+        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) } throws IOException()
     }
 }

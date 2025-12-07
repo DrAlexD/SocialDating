@@ -19,6 +19,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
@@ -45,13 +46,14 @@ class ProfileStatisticsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val preferencesRepository: PreferencesRepository,
     private val remoteUserCategoriesRepository: RemoteUserCategoriesRepository,
-    private val localUserCategoriesRepository: LocalUserCategoriesRepository,
+    localUserCategoriesRepository: LocalUserCategoriesRepository,
     private val remoteUserDefiningThemesRepository: RemoteUserDefiningThemesRepository,
-    private val localUserDefiningThemesRepository: LocalUserDefiningThemesRepository,
+    localUserDefiningThemesRepository: LocalUserDefiningThemesRepository,
     private val remoteCategoriesRepository: RemoteCategoriesRepository,
     private val localCategoriesRepository: LocalCategoriesRepository,
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository,
-    private val localDefiningThemesRepository: LocalDefiningThemesRepository
+    private val localDefiningThemesRepository: LocalDefiningThemesRepository,
+    private val commonLocalRepository: CommonLocalRepository
 ) : ViewModel() {
 
     private val userId: Int = checkNotNull(savedStateHandle[ProfileStatisticsDestination.userId])
@@ -92,11 +94,11 @@ class ProfileStatisticsViewModel @Inject constructor(
             getProfileStatistics()
         } else if (anotherUserId != userId) {
             dataRequestStatusFlow.update { RequestStatus.LOADING }
-            userCategoriesStateFlow.update { FakeData.userCategories.toUserCategoriesWithData(FakeData.categories) }
+            detailedSimilarUserFlow.update { FakeData.detailedSimilarUser }
             userDefiningThemesStateFlow.update {
                 FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)
             }
-            detailedSimilarUserFlow.update { FakeData.detailedSimilarUser }
+            userCategoriesStateFlow.update { FakeData.userCategories.toUserCategoriesWithData(FakeData.categories) }
             dataRequestStatusFlow.update { RequestStatus.SUCCESS }
         } else {
             dataRequestStatusFlow.update { RequestStatus.SUCCESS }
@@ -109,68 +111,98 @@ class ProfileStatisticsViewModel @Inject constructor(
 
             dataRequestStatusFlow.update { globalStatus }
 
-            val (remoteCategories, statusCategories) = safeApiCall(context) {
-                remoteCategoriesRepository.getCategories()
+            val (remoteDetailedSimilarUser, statusDetailedSimilarUser) = when (anotherUserId) {
+                userId -> null to RequestStatus.UNDEFINED
+                else -> safeApiCall(context) {
+                    remoteUserCategoriesRepository.getDetailedSimilarUser(userId, anotherUserId)
+                }
             }
 
-            if (remoteCategories != null) {
-                localCategoriesRepository.insertCategories(remoteCategories)
-
-                val (remoteDefiningThemes, statusDefiningThemes) = safeApiCall(context) {
-                    remoteDefiningThemesRepository.getDefiningThemes()
+            if (anotherUserId == userId || remoteDetailedSimilarUser != null) {
+                val (remoteUserDefiningThemes, statusUserDefiningThemes) = safeApiCall(context) {
+                    remoteUserDefiningThemesRepository.getUserDefiningThemes(anotherUserId)
                 }
 
-                if (remoteDefiningThemes != null) {
-                    localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
-
+                if (remoteUserDefiningThemes != null) {
                     val (remoteUserCategories, statusUserCategories) = safeApiCall(context) {
                         remoteUserCategoriesRepository.getUserCategories(anotherUserId)
                     }
 
                     if (remoteUserCategories != null) {
-                        if (userId == anotherUserId) {
-                            localUserCategoriesRepository.insertUserCategories(remoteUserCategories)
-                        } else {
-                            userCategoriesStateFlow.update {
-                                remoteUserCategories.toUserCategoriesWithData(remoteCategories)
+                        val localDefiningThemes = localDefiningThemesRepository.getDefiningThemes().first()
+                        val localDefiningThemeIds = localDefiningThemes.map { it.id }
+                        val neededDefiningThemeIds = remoteUserDefiningThemes
+                            .filter { it.definingThemeId !in localDefiningThemeIds }
+                            .map { it.definingThemeId }
+
+                        val (remoteDefiningThemes, statusDefiningThemes) = when {
+                            neededDefiningThemeIds.isEmpty() -> null to RequestStatus.UNDEFINED
+                            else -> safeApiCall(context) {
+                                remoteDefiningThemesRepository.getDefiningThemes(neededDefiningThemeIds)
                             }
                         }
 
-                        val (remoteUserDefiningThemes, statusUserDefiningThemes) = safeApiCall(context) {
-                            remoteUserDefiningThemesRepository.getUserDefiningThemes(anotherUserId)
-                        }
+                        if (neededDefiningThemeIds.isEmpty() || remoteDefiningThemes != null) {
+                            val localCategories = localCategoriesRepository.getCategories().first()
+                            val localCategoryIds = localCategories.map { it.id }
+                            val neededCategoryIds = remoteUserCategories
+                                .filter { it.categoryId !in localCategoryIds }
+                                .map { it.categoryId }
 
-                        if (remoteUserDefiningThemes != null) {
-                            if (userId == anotherUserId) {
-                                localUserDefiningThemesRepository.insertUserDefiningThemes(remoteUserDefiningThemes)
-
-                                globalStatus = statusUserDefiningThemes
-                            } else {
-                                userDefiningThemesStateFlow.update {
-                                    remoteUserDefiningThemes.toUserDefiningThemesWithData(remoteDefiningThemes)
+                            val (remoteCategories, statusCategories) = when {
+                                neededCategoryIds.isEmpty() -> null to RequestStatus.UNDEFINED
+                                else -> safeApiCall(context) {
+                                    remoteCategoriesRepository.getCategories(neededCategoryIds)
                                 }
+                            }
 
-                                val (remoteDetailedSimilarUser, statusDetailedSimilarUser) = safeApiCall(context) {
-                                    remoteUserCategoriesRepository.getDetailedSimilarUser(userId, anotherUserId)
-                                }
+                            if (neededCategoryIds.isEmpty() || remoteCategories != null) {
+                                if (userId == anotherUserId) {
+                                    commonLocalRepository.updateProfileStatisticsScreenData(
+                                        remoteCategories,
+                                        remoteDefiningThemes,
+                                        remoteUserCategories,
+                                        remoteUserDefiningThemes
+                                    )
+                                } else {
+                                    commonLocalRepository.updateProfileStatisticsScreenData(
+                                        remoteCategories,
+                                        remoteDefiningThemes
+                                    )
 
-                                if (remoteDetailedSimilarUser != null) {
                                     detailedSimilarUserFlow.update { remoteDetailedSimilarUser }
+
+                                    val allDefiningThemes = localDefiningThemes.toMutableList()
+                                    allDefiningThemes.addAll(remoteDefiningThemes ?: emptyList())
+                                    userDefiningThemesStateFlow.update {
+                                        remoteUserDefiningThemes.toUserDefiningThemesWithData(allDefiningThemes)
+                                    }
+
+                                    val allCategories = localCategories.toMutableList()
+                                    allCategories.addAll(remoteCategories ?: emptyList())
+                                    userCategoriesStateFlow.update {
+                                        remoteUserCategories.toUserCategoriesWithData(allCategories)
+                                    }
                                 }
 
-                                globalStatus = statusDetailedSimilarUser
+                                globalStatus = when {
+                                    neededCategoryIds.isEmpty() -> RequestStatus.SUCCESS
+                                    else -> statusCategories
+                                }
+                            } else {
+                                globalStatus = statusCategories
                             }
                         } else {
-                            globalStatus = statusUserDefiningThemes
+                            globalStatus = statusDefiningThemes
                         }
                     } else {
                         globalStatus = statusUserCategories
                     }
                 } else {
-                    globalStatus = statusDefiningThemes
+                    globalStatus = statusUserDefiningThemes
                 }
             } else {
-                globalStatus = statusCategories
+                globalStatus = statusDetailedSimilarUser
             }
 
             dataRequestStatusFlow.update { globalStatus }

@@ -10,8 +10,8 @@ class CategoriesService(
     private val categoriesRepository: CategoriesRepository
 ) {
 
-    fun getCategories(): List<Category> =
-        categoriesRepository.findAll()
+    fun getCategories(categoryIds: List<Int>? = null) =
+        categoriesRepository.findAllByIds(categoryIds)
 
     fun addCategory(categoryDetails: CategoryDetails) =
         categoriesRepository.save(categoryDetails.toCategory())

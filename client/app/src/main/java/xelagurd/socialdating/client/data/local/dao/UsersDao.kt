@@ -10,7 +10,7 @@ import xelagurd.socialdating.client.data.model.User
 @Dao
 interface UsersDao {
     @Query("select * from users where id = :userId")
-    fun getUser(userId: Int): Flow<User>
+    fun getUser(userId: Int): Flow<User?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUser(user: User)
