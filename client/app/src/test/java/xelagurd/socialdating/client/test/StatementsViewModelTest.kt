@@ -28,7 +28,7 @@ import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.TestUtils.mockkList
 import xelagurd.socialdating.client.data.PreferencesRepository
-import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
+import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
@@ -49,7 +49,7 @@ class StatementsViewModelTest {
     private val remoteStatementsRepository = mockk<RemoteStatementsRepository>()
     private val localStatementsRepository = mockk<LocalStatementsRepository>()
     private val remoteDefiningThemesRepository = mockk<RemoteDefiningThemesRepository>()
-    private val localDefiningThemesRepository = mockk<LocalDefiningThemesRepository>()
+    private val commonLocalRepository = mockk<CommonLocalRepository>()
 
     private lateinit var viewModel: StatementsViewModel
     private lateinit var statementsFlow: MutableStateFlow<List<Statement>>
@@ -75,7 +75,7 @@ class StatementsViewModelTest {
             remoteStatementsRepository,
             localStatementsRepository,
             remoteDefiningThemesRepository,
-            localDefiningThemesRepository
+            commonLocalRepository
         )
     }
 
@@ -96,15 +96,14 @@ class StatementsViewModelTest {
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
-        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
         coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any()) }
-        coVerify(exactly = 1) { localDefiningThemesRepository.insertDefiningThemes(any()) }
-        coVerify(exactly = 1) { localStatementsRepository.replaceStatements(any(), any()) }
+        coVerify(exactly = 1) { commonLocalRepository.updateStatementsScreenData(any(), any(), any()) }
         confirmVerified(
-            localDefiningThemesRepository,
-            remoteDefiningThemesRepository,
+            remoteStatementsRepository,
             localStatementsRepository,
-            remoteStatementsRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -119,12 +118,12 @@ class StatementsViewModelTest {
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
-        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
         confirmVerified(
-            localDefiningThemesRepository,
-            remoteDefiningThemesRepository,
+            remoteStatementsRepository,
             localStatementsRepository,
-            remoteStatementsRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -139,12 +138,12 @@ class StatementsViewModelTest {
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
-        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
         confirmVerified(
-            localDefiningThemesRepository,
-            remoteDefiningThemesRepository,
+            remoteStatementsRepository,
             localStatementsRepository,
-            remoteStatementsRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -164,15 +163,14 @@ class StatementsViewModelTest {
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
-        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
         coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any()) }
-        coVerify(exactly = 1) { localDefiningThemesRepository.insertDefiningThemes(any()) }
-        coVerify(exactly = 1) { localStatementsRepository.replaceStatements(any(), any()) }
+        coVerify(exactly = 1) { commonLocalRepository.updateStatementsScreenData(any(), any(), any()) }
         confirmVerified(
-            localDefiningThemesRepository,
-            remoteDefiningThemesRepository,
+            remoteStatementsRepository,
             localStatementsRepository,
-            remoteStatementsRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -192,15 +190,14 @@ class StatementsViewModelTest {
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
-        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
         coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any()) }
-        coVerify(exactly = 1) { localDefiningThemesRepository.insertDefiningThemes(any()) }
-        coVerify(exactly = 1) { localStatementsRepository.replaceStatements(any(), any()) }
+        coVerify(exactly = 1) { commonLocalRepository.updateStatementsScreenData(any(), any(), any()) }
         confirmVerified(
-            localDefiningThemesRepository,
-            remoteDefiningThemesRepository,
+            remoteStatementsRepository,
             localStatementsRepository,
-            remoteStatementsRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -218,15 +215,14 @@ class StatementsViewModelTest {
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
-        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
         coVerify(exactly = 2) { remoteStatementsRepository.getStatements(any(), any()) }
-        coVerify(exactly = 2) { localDefiningThemesRepository.insertDefiningThemes(any()) }
-        coVerify(exactly = 2) { localStatementsRepository.replaceStatements(any(), any()) }
+        coVerify(exactly = 2) { commonLocalRepository.updateStatementsScreenData(any(), any(), any()) }
         confirmVerified(
-            localDefiningThemesRepository,
-            remoteDefiningThemesRepository,
+            remoteStatementsRepository,
             localStatementsRepository,
-            remoteStatementsRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -244,12 +240,12 @@ class StatementsViewModelTest {
         assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
-        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
         confirmVerified(
-            localDefiningThemesRepository,
-            remoteDefiningThemesRepository,
+            remoteStatementsRepository,
             localStatementsRepository,
-            remoteStatementsRepository
+            remoteDefiningThemesRepository,
+            commonLocalRepository
         )
     }
 
@@ -261,20 +257,19 @@ class StatementsViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any()) } returns
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) } returns
                 Response.success(mockkList(relaxed = true))
         coEvery { remoteStatementsRepository.getStatements(any(), any()) } returns
                 Response.success(mockkList())
 
-        coEvery { localDefiningThemesRepository.insertDefiningThemes(any()) } just Runs
-        coEvery { localStatementsRepository.replaceStatements(any(), any()) } just Runs
+        coEvery { commonLocalRepository.updateStatementsScreenData(any(), any(), any()) } just Runs
     }
 
     private fun mockEmptyData() {
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any()) } returns Response.success(null)
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) } returns Response.success(null)
     }
 
     private fun mockDataWithoutInternet() {
-        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any()) } throws IOException()
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) } throws IOException()
     }
 }

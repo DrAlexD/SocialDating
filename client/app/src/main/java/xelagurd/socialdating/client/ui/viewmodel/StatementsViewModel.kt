@@ -18,7 +18,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.PreferencesRepository
-import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
+import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.data.model.Statement
@@ -40,7 +40,7 @@ class StatementsViewModel @Inject constructor(
     private val remoteStatementsRepository: RemoteStatementsRepository,
     private val localStatementsRepository: LocalStatementsRepository,
     private val remoteDefiningThemesRepository: RemoteDefiningThemesRepository,
-    private val localDefiningThemesRepository: LocalDefiningThemesRepository
+    private val commonLocalRepository: CommonLocalRepository
 ) : ViewModel() {
 
     private val userId: Int = checkNotNull(savedStateHandle[StatementsDestination.userId])
@@ -79,19 +79,21 @@ class StatementsViewModel @Inject constructor(
             dataRequestStatusFlow.update { globalStatus }
 
             val (remoteDefiningThemes, statusDefiningThemes) = safeApiCall(context) {
-                remoteDefiningThemesRepository.getDefiningThemes(categoryId)
+                remoteDefiningThemesRepository.getDefiningThemes(categoryId = categoryId)
             }
 
             if (remoteDefiningThemes != null) {
-                localDefiningThemesRepository.insertDefiningThemes(remoteDefiningThemes)
-
                 val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
                 val (remoteStatements, statusStatements) = safeApiCall(context) {
                     remoteStatementsRepository.getStatements(userId, remoteDefiningThemeIds)
                 }
 
                 if (remoteStatements != null) {
-                    localStatementsRepository.replaceStatements(categoryId, remoteStatements)
+                    commonLocalRepository.updateStatementsScreenData(
+                        remoteDefiningThemes,
+                        categoryId,
+                        remoteStatements
+                    )
                 }
 
                 globalStatus = statusStatements

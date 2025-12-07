@@ -77,9 +77,9 @@ class SimilarUsersViewModel @Inject constructor(
             }
 
             if (remoteSimilarUsers != null) {
-                val remoteSimilarUsersIds = remoteSimilarUsers.map { it.id }
+                val neededUserIds = remoteSimilarUsers.map { it.id }
                 val (remoteUsers, statusUsers) = safeApiCall(context) {
-                    remoteUsersRepository.getUsers(remoteSimilarUsersIds)
+                    remoteUsersRepository.getUsers(neededUserIds)
                 }
 
                 if (remoteUsers != null) {

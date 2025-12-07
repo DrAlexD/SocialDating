@@ -9,9 +9,12 @@ import xelagurd.socialdating.client.data.model.DefiningTheme
 class LocalDefiningThemesRepository @Inject constructor(
     private val definingThemesDao: DefiningThemesDao
 ) {
-    fun getDefiningThemes(categoryId: Int) =
+    fun getDefiningThemes(categoryId: Int? = null) =
         definingThemesDao.getDefiningThemes(categoryId)
 
     suspend fun insertDefiningThemes(definingThemes: List<DefiningTheme>) =
         definingThemesDao.insertDefiningThemes(definingThemes)
+
+    suspend fun deleteAll() =
+        definingThemesDao.deleteAll()
 }

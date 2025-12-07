@@ -16,7 +16,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
 import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeCategoriesData
+import xelagurd.socialdating.server.FakeCategoriesData.filterByIds
 import xelagurd.socialdating.server.model.Category
+import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @ActiveProfiles("dev", "test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -24,6 +26,8 @@ import xelagurd.socialdating.server.model.Category
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemplate) {
+
+    private val categoryIds = listOf(1, 2)
 
     private val categoriesDetails = FakeCategoriesData.categoriesDetails
     private val categories = FakeCategoriesData.categories.take(categoriesDetails.size)
@@ -51,6 +55,18 @@ class CategoriesMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(categories.size, response.body!!.size)
         assertContentEquals(categories.toTypedArray(), response.body!!)
+    }
+
+    @Test
+    fun getCategoriesByIds() {
+        val expected = categories.filterByIds(categoryIds)
+        val response = restTemplate.getForEntity(
+            "/categories?categoryIds=${categoryIds.toRequestParams()}",
+            Array<Category>::class.java
+        )
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertEquals(expected.size, response.body!!.size)
+        assertContentEquals(expected.toTypedArray(), response.body!!)
     }
 
     companion object {
