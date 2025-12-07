@@ -140,7 +140,10 @@ private inline fun ReactionsRow(
         modifier = Modifier.fillMaxWidth()
     ) {
         StatementReactionType.entries.forEachIndexed { index, statementReactionType ->
-            IconButton(onClick = { onStatementReactionClick(statementReactionType) }) {
+            IconButton(
+                enabled = true, // TODO: change to actionRequestStatus.isAllowedActionRefresh(isBlockOnSuccess = false)
+                onClick = { onStatementReactionClick(statementReactionType) }
+            ) {
                 Icon(
                     painter = painterResource(statementReactionType.iconRes),
                     contentDescription = stringResource(statementReactionType.descriptionRes),

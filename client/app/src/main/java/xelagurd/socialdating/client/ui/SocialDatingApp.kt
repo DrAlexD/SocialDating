@@ -64,7 +64,7 @@ fun AppTopBar(
         },
         actions = {
             if (dataRequestStatus != null) {
-                val onCardStatusClick = refreshAction.takeIf { dataRequestStatus.isAllowedRefresh() } ?: {}
+                val onCardStatusClick = refreshAction.takeIf { dataRequestStatus.isAllowedDataRefresh() } ?: {}
                 Card(onClick = onCardStatusClick) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -80,7 +80,7 @@ fun AppTopBar(
                             ),
                             overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
                         )
-                        if (dataRequestStatus.isAllowedRefresh()) {
+                        if (dataRequestStatus.isAllowedDataRefresh()) {
                             Icon(
                                 imageVector = Icons.Default.Refresh,
                                 contentDescription = stringResource(R.string.refresh),

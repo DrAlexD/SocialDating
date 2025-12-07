@@ -7,5 +7,9 @@ sealed class RequestStatus {
     data class ERROR(val errorText: String = "") : RequestStatus()
     data object UNDEFINED : RequestStatus()
 
-    fun isAllowedRefresh() = this is SUCCESS || this is FAILURE || this is ERROR
+    fun isAllowedDataRefresh() =
+        this !is LOADING && this !is UNDEFINED
+
+    fun isAllowedActionRefresh(isBlockOnSuccess: Boolean = true) =
+        this !is LOADING && (!isBlockOnSuccess || this !is SUCCESS)
 }

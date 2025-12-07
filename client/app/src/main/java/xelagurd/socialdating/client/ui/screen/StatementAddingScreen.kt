@@ -93,6 +93,7 @@ private inline fun StatementDetailsBody(
     noinline onStatementAddingClick: () -> Unit
 ) {
     val statementFormData = statementAddingUiState.formData
+    val actionRequestStatus = statementAddingUiState.actionRequestStatus
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -162,7 +163,7 @@ private inline fun StatementDetailsBody(
             )
         }
         AppLargeTextCard(
-            isEnabled = statementFormData.isValid,
+            isEnabled = statementFormData.isValid && actionRequestStatus.isAllowedActionRefresh(),
             text = stringResource(R.string.add_statement),
             onClick = onStatementAddingClick
         )
