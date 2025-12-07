@@ -67,7 +67,7 @@ fun LoginScreenComponent(
             contentPadding = innerPadding
         ) {
             LoginDetailsBody(
-                loginFormData = loginUiState.formData,
+                loginUiState = loginUiState,
                 onValueChange = onValueChange,
                 onLoginClick = onLoginClick,
                 onRegistrationClick = onRegistrationClick,
@@ -79,12 +79,15 @@ fun LoginScreenComponent(
 
 @Composable
 private inline fun LoginDetailsBody(
-    loginFormData: LoginFormData,
+    loginUiState: LoginUiState,
     crossinline onValueChange: (LoginFormData) -> Unit,
     noinline onLoginClick: () -> Unit,
     noinline onRegistrationClick: () -> Unit,
     noinline onOfflineModeClick: () -> Unit
 ) {
+    val loginFormData = loginUiState.formData
+    val actionRequestStatus = loginUiState.actionRequestStatus
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -101,7 +104,7 @@ private inline fun LoginDetailsBody(
             label = stringResource(R.string.password)
         )
         AppLargeTextCard(
-            isEnabled = loginFormData.isValid,
+            isEnabled = loginFormData.isValid && actionRequestStatus.isAllowedActionRefresh(),
             text = stringResource(R.string.login),
             onClick = onLoginClick
         )

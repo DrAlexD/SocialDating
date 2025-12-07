@@ -74,7 +74,7 @@ fun RegistrationScreenComponent(
             contentPadding = innerPadding
         ) {
             RegistrationDetailsBody(
-                registrationFormData = registrationUiState.formData,
+                registrationUiState = registrationUiState,
                 onValueChange = onValueChange,
                 onRegisterClick = onRegisterClick
             )
@@ -84,10 +84,13 @@ fun RegistrationScreenComponent(
 
 @Composable
 private inline fun RegistrationDetailsBody(
-    registrationFormData: RegistrationFormData,
+    registrationUiState: RegistrationUiState,
     crossinline onValueChange: (RegistrationFormData) -> Unit,
     noinline onRegisterClick: () -> Unit
 ) {
+    val registrationFormData = registrationUiState.formData
+    val actionRequestStatus = registrationUiState.actionRequestStatus
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -217,7 +220,7 @@ private inline fun RegistrationDetailsBody(
             )
         }
         AppLargeTextCard(
-            isEnabled = registrationFormData.isValid,
+            isEnabled = registrationFormData.isValid && actionRequestStatus.isAllowedActionRefresh(),
             text = stringResource(R.string.register),
             onClick = onRegisterClick
         )
