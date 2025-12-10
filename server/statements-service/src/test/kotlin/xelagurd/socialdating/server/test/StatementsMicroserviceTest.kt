@@ -48,6 +48,7 @@ class StatementsMicroserviceTest(@param:Autowired val restTemplate: TestRestTemp
                 withDatabaseName("test_db")
                 withUsername("test_user")
                 withPassword("test_password")
+                withInitScript("init-schema.sql")
             }
     }
 }

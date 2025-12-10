@@ -19,7 +19,12 @@ spring:
   application:
     name: categories-service
   datasource:
-    url: jdbc:postgresql://postgres-categories-service:5432/categories_db
+    hikari:
+      connection-init-sql: set search_path to categories_schema
+  jpa:
+    properties:
+      hibernate:
+        default_schema: categories_schema
   kafka:
     bootstrap-servers: kafka:9092
     consumer:

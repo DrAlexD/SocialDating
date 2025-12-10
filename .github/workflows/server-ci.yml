@@ -65,14 +65,8 @@ jobs:
 
       - name: Set up environment variables
         run: |
-          echo "POSTGRES_USERS_USER=${{ secrets.POSTGRES_USERS_USER }}" >> .env
-          echo "POSTGRES_USERS_PASSWORD=${{ secrets.POSTGRES_USERS_PASSWORD }}" >> .env
-          echo "POSTGRES_CATEGORIES_USER=${{ secrets.POSTGRES_CATEGORIES_USER }}" >> .env
-          echo "POSTGRES_CATEGORIES_PASSWORD=${{ secrets.POSTGRES_CATEGORIES_PASSWORD }}" >> .env
-          echo "POSTGRES_DEFINING_THEMES_USER=${{ secrets.POSTGRES_DEFINING_THEMES_USER }}" >> .env
-          echo "POSTGRES_DEFINING_THEMES_PASSWORD=${{ secrets.POSTGRES_DEFINING_THEMES_PASSWORD }}" >> .env
-          echo "POSTGRES_STATEMENTS_USER=${{ secrets.POSTGRES_STATEMENTS_USER }}" >> .env
-          echo "POSTGRES_STATEMENTS_PASSWORD=${{ secrets.POSTGRES_STATEMENTS_PASSWORD }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "ACCESS_TOKEN_EXPIRATION=${{ secrets.ACCESS_TOKEN_EXPIRATION }}" >> .env
           echo "REFRESH_TOKEN_EXPIRATION=${{ secrets.REFRESH_TOKEN_EXPIRATION }}" >> .env
