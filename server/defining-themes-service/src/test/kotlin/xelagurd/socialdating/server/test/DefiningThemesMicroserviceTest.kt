@@ -90,6 +90,7 @@ class DefiningThemesMicroserviceTest(@param:Autowired val restTemplate: TestRest
                 withDatabaseName("test_db")
                 withUsername("test_user")
                 withPassword("test_password")
+                withInitScript("init-schema.sql")
             }
     }
 }

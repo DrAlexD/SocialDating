@@ -33,73 +33,23 @@ services:
       start_period: 10s
       timeout: 5s
 
-  postgres-users-service:
+  postgres:
     image: postgres:18
     ports:
       - "5433:5432"
     environment:
-      POSTGRES_DB: users_db
-      POSTGRES_USER: ${POSTGRES_USERS_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_USERS_PASSWORD}
+      POSTGRES_DB: social_dating_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
-      test: pg_isready -U ${POSTGRES_USERS_USER} -d users_db
+      test: pg_isready -U ${POSTGRES_USER} -d social_dating_db
       retries: 5
       interval: 10s
       start_period: 10s
       timeout: 5s
     volumes:
-      - postgres-users-data:/var/lib/postgresql
-
-  postgres-categories-service:
-    image: postgres:18
-    ports:
-      - "5434:5432"
-    environment:
-      POSTGRES_DB: categories_db
-      POSTGRES_USER: ${POSTGRES_CATEGORIES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_CATEGORIES_PASSWORD}
-    healthcheck:
-      test: pg_isready -U ${POSTGRES_CATEGORIES_USER} -d categories_db
-      retries: 5
-      interval: 10s
-      start_period: 10s
-      timeout: 5s
-    volumes:
-      - postgres-categories-data:/var/lib/postgresql
-
-  postgres-defining-themes-service:
-    image: postgres:18
-    ports:
-      - "5435:5432"
-    environment:
-      POSTGRES_DB: defining_themes_db
-      POSTGRES_USER: ${POSTGRES_DEFINING_THEMES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_DEFINING_THEMES_PASSWORD}
-    healthcheck:
-      test: pg_isready -U ${POSTGRES_DEFINING_THEMES_USER} -d defining_themes_db
-      retries: 5
-      interval: 10s
-      start_period: 10s
-      timeout: 5s
-    volumes:
-      - postgres-defining-themes-data:/var/lib/postgresql
-
-  postgres-statements-service:
-    image: postgres:18
-    ports:
-      - "5436:5432"
-    environment:
-      POSTGRES_DB: statements_db
-      POSTGRES_USER: ${POSTGRES_STATEMENTS_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_STATEMENTS_PASSWORD}
-    healthcheck:
-      test: pg_isready -U ${POSTGRES_STATEMENTS_USER} -d statements_db
-      retries: 5
-      interval: 10s
-      start_period: 10s
-      timeout: 5s
-    volumes:
-      - postgres-statements-data:/var/lib/postgresql
+      - social_dating_data:/var/lib/postgresql
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
 
   gateway-service:
     depends_on:
@@ -120,13 +70,13 @@ services:
 
   users-service:
     depends_on:
-      postgres-users-service:
+      postgres:
         condition: service_healthy
       gateway-service:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERS_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_USERS_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       ACCESS_TOKEN_EXPIRATION: ${ACCESS_TOKEN_EXPIRATION}
       REFRESH_TOKEN_EXPIRATION: ${REFRESH_TOKEN_EXPIRATION}
@@ -143,13 +93,13 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-      postgres-categories-service:
+      postgres:
         condition: service_healthy
       gateway-service:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_CATEGORIES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_CATEGORIES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     build:
       context: ./categories-service
     healthcheck:
@@ -163,13 +113,13 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-      postgres-defining-themes-service:
+      postgres:
         condition: service_healthy
       gateway-service:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_DEFINING_THEMES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_DEFINING_THEMES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     build:
       context: ./defining-themes-service
     healthcheck:
@@ -183,13 +133,13 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-      postgres-statements-service:
+      postgres:
         condition: service_healthy
       gateway-service:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_STATEMENTS_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_STATEMENTS_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     build:
       context: ./statements-service
     healthcheck:
@@ -200,7 +150,4 @@ services:
       timeout: 5s
 
 volumes:
-  postgres-users-data:
-  postgres-categories-data:
-  postgres-defining-themes-data:
-  postgres-statements-data:
+  social_dating_data:

@@ -4,6 +4,4 @@ spring:
       - optional:file:.env[.properties]
       - optional:file:.env
   datasource:
-    url: jdbc:postgresql://localhost:5433/users_db
-    username: ${POSTGRES_USERS_USER}
-    password: ${POSTGRES_USERS_PASSWORD}
+    url: jdbc:postgresql://localhost:5433/social_dating_db

@@ -6,10 +6,7 @@
           <list>
             <option value="zookeeper" />
             <option value="kafka" />
-            <option value="postgres-users-service" />
-            <option value="postgres-categories-service" />
-            <option value="postgres-defining-themes-service" />
-            <option value="postgres-statements-service" />
+            <option value="postgres" />
           </list>
         </option>
         <option name="sourceFilePath" value="docker-compose.yml" />

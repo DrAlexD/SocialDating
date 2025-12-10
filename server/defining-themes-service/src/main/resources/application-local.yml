@@ -4,8 +4,6 @@ spring:
       - optional:file:.env[.properties]
       - optional:file:.env
   datasource:
-    url: jdbc:postgresql://localhost:5435/defining_themes_db
-    username: ${POSTGRES_DEFINING_THEMES_USER}
-    password: ${POSTGRES_DEFINING_THEMES_PASSWORD}
+    url: jdbc:postgresql://localhost:5433/social_dating_db
   kafka:
     bootstrap-servers: localhost:9093

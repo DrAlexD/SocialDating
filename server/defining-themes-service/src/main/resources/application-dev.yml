@@ -19,7 +19,12 @@ spring:
   application:
     name: defining-themes-service
   datasource:
-    url: jdbc:postgresql://postgres-defining-themes-service:5432/defining_themes_db
+    hikari:
+      connection-init-sql: set search_path to defining_themes_schema
+  jpa:
+    properties:
+      hibernate:
+        default_schema: defining_themes_schema
   kafka:
     bootstrap-servers: kafka:9092
     consumer:
