@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew build -x test)",
+      "Bash(docker compose up -d --build)",
+      "Bash(./check_containers_health.sh)",
+      "Bash(./log_unhealthy_containers.sh)",
+      "Bash(./gradlew installDebug)",
+      "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe shell am start -n xelagurd.socialdating.client/.MainActivity)",
+      "Bash(./gradlew test)",
+      "Bash(./gradlew :users-service:test *)",
+      "Bash(./gradlew :categories-service:test *)",
+      "Bash(./gradlew :defining-themes-service:test *)",
+      "Bash(./gradlew :statements-service:test *)",
+      "Bash(./gradlew integrationTest)",
+      "Bash(./gradlew testDebugUnitTest *)",
+      "Bash(./gradlew connectedAndroidTest)",
+      "Bash(./gradlew lintDebug)",
+      "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe devices)",
+      "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe shell screencap *)",
+      "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe shell uiautomator dump *)",
+      "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe pull *)",
+      "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe shell input tap *)",
+      "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe shell input text *)",
+      "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe shell input swipe *)",
+      "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe shell input keycombination 113 29)",
+      "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe shell input keyevent 67)"
+    ]
+  },
+  "disabledMcpjsonServers": [
+    "mobile-mcp"
+  ],
+  "enabledPlugins": {
+    "kotlin-lsp@claude-plugins-official": false,
+    "frontend-design@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "context7@claude-plugins-official": true
+  }
+}
