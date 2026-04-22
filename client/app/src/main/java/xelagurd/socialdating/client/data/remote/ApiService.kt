@@ -41,7 +41,7 @@ interface ApiService {
 
     @GET("statements")
     suspend fun getStatements(
-        @Query("userId") userId: Int,
+        @Query("currentUserId") currentUserId: Int,
         @Query("definingThemeIds") definingThemeIds: List<Int>
     ): Response<List<Statement>>
 
@@ -55,7 +55,7 @@ interface ApiService {
 
     @GET("categories/users/similar-users")
     suspend fun getSimilarUsers(
-        @Query("userId") userId: Int,
+        @Query("currentUserId") currentUserId: Int,
         @Query("categoryIds") categoryIds: List<Int>?
     ): Response<List<SimilarUser>>
 

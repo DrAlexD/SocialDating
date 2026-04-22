@@ -2,6 +2,7 @@ package xelagurd.socialdating.server.exception
 
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.transaction.TransactionSystemException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -38,6 +39,24 @@ class BaseExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     fun handleDataIntegrityViolationException(ex: DataIntegrityViolationException): String {
         val message = ex.message?.transformNotUniqueDataMessage() ?: "Invalid data (not unique values)"
+        val origin = getErrorPositionFromStackTrace(ex.stackTrace)
+        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
+        return message
+    }
+
+    @ExceptionHandler(AccessDeniedException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    fun handleAccessDeniedException(ex: AccessDeniedException): String {
+        val message = "Access denied"
+        val origin = getErrorPositionFromStackTrace(ex.stackTrace)
+        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
+        return message
+    }
+
+    @ExceptionHandler(IllegalArgumentException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleIllegalArgumentException(ex: IllegalArgumentException): String {
+        val message = "Invalid argument"
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
         logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
         return message

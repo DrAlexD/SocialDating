@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional
 import xelagurd.socialdating.server.model.DefaultDataProperties.OPPOSITE_CATEGORIES_NUMBER
 import xelagurd.socialdating.server.model.DefaultDataProperties.SIMILAR_CATEGORIES_NUMBER
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.repository.CategoryWithData
 import xelagurd.socialdating.server.model.additional.DetailedSimilarCategory
 import xelagurd.socialdating.server.model.additional.DetailedSimilarDefiningTheme
 import xelagurd.socialdating.server.model.additional.DetailedSimilarUser
@@ -16,7 +15,9 @@ import xelagurd.socialdating.server.model.additional.SimilarUser
 import xelagurd.socialdating.server.model.enums.SimilarityType.Companion.fromSimilarityDiff
 import xelagurd.socialdating.server.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.server.model.enums.SimilarityType.SIMILAR
+import xelagurd.socialdating.server.model.repository.CategoryWithData
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
+import xelagurd.socialdating.server.utils.SecurityUtils.checkCurrentUserAuth
 
 @Service
 class UserCategoriesService(
@@ -34,15 +35,17 @@ class UserCategoriesService(
 
     @Transactional(readOnly = true)
     fun getSimilarUsers(
-        userId: Int,
+        currentUserId: Int,
         categoryIds: List<Int>? = null
     ): List<SimilarUser> {
+        checkCurrentUserAuth(currentUserId)
+
         val currentUserCategoriesById = userCategoriesRepository
-            .findCurrentUserCategories(userId, categoryIds)
+            .findCurrentUserCategories(currentUserId, categoryIds)
             .associateBy { it.id }
 
         val anotherUsersCategories = userCategoriesRepository
-            .findAnotherUsersCategories(userId, null, currentUserCategoriesById.keys.toList())
+            .findAnotherUsersCategories(currentUserId, null, currentUserCategoriesById.keys.toList())
 
         return anotherUsersCategories
             .groupBy { it.userId }
@@ -75,6 +78,8 @@ class UserCategoriesService(
         currentUserId: Int,
         anotherUserId: Int
     ): DetailedSimilarUser {
+        checkCurrentUserAuth(currentUserId)
+
         val currentUserCategoriesById = userCategoriesRepository
             .findCurrentUserCategories(currentUserId, null)
             .associateBy { it.id }

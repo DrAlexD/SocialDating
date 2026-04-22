@@ -29,10 +29,11 @@ class JwtGenerationUtils(
             ?: throw IllegalStateException("REFRESH_TOKEN_EXPIRATION is not set")
     }
 
-    fun generateAccessToken(username: String, role: Role): String =
+    fun generateAccessToken(username: String, role: Role, userId: Int): String =
         Jwts.builder()
             .subject(username)
             .claim("role", role.name)
+            .claim("userId", userId)
             .claim("type", "access")
             .issuedAt(Date())
             .expiration(Date(System.currentTimeMillis() + accessTokenExpiration))

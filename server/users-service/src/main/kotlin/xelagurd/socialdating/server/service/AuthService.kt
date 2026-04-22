@@ -34,7 +34,7 @@ class AuthService(
         )
         val user = auth.principal as User
 
-        val accessToken = jwtUtils.generateAccessToken(user.username, user.role)
+        val accessToken = jwtUtils.generateAccessToken(user.username, user.role, user.id!!)
         val refreshToken = jwtUtils.generateRefreshToken(user.username)
 
         return AuthResponse(user, accessToken, refreshToken)
@@ -52,7 +52,7 @@ class AuthService(
 
         val user = usersRepository.save(registrationDetails.toUser(passwordEncoder))
 
-        val accessToken = jwtUtils.generateAccessToken(user.username, user.role)
+        val accessToken = jwtUtils.generateAccessToken(user.username, user.role, user.id!!)
         val refreshToken = jwtUtils.generateRefreshToken(user.username)
 
         return AuthResponse(user, accessToken, refreshToken)
@@ -73,8 +73,8 @@ class AuthService(
         val userDetails = userDetailsService.loadUserByUsername(username)
         val user = userDetails as User
 
-        val accessToken = jwtUtils.generateAccessToken(username, user.role)
-        val refreshToken = jwtUtils.generateRefreshToken(username)
+        val accessToken = jwtUtils.generateAccessToken(user.username, user.role, user.id!!)
+        val refreshToken = jwtUtils.generateRefreshToken(user.username)
 
         return AuthResponse(user, accessToken, refreshToken)
     }

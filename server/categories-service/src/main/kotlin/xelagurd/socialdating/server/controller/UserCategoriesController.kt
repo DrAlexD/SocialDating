@@ -22,10 +22,10 @@ class UserCategoriesController(
     @BearerAuth
     @GetMapping("/similar-users")
     fun getSimilarUsers(
-        @RequestParam userId: Int,
+        @RequestParam currentUserId: Int,
         @RequestParam(required = false) categoryIds: List<Int>?
     ) =
-        responseEntities { userCategoriesService.getSimilarUsers(userId, categoryIds) }
+        responseEntities { userCategoriesService.getSimilarUsers(currentUserId, categoryIds) }
 
     @BearerAuth
     @GetMapping("/detailed-similar-user")

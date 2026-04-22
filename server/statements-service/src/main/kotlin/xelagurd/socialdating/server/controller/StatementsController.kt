@@ -23,10 +23,10 @@ class StatementsController(
     @BearerAuth
     @GetMapping
     fun getStatements(
-        @RequestParam userId: Int,
+        @RequestParam currentUserId: Int,
         @RequestParam definingThemeIds: List<Int>
     ) =
-        responseEntities { statementsService.getStatements(userId, definingThemeIds) }
+        responseEntities { statementsService.getStatements(currentUserId, definingThemeIds) }
 
     @BearerAuth
     @PostMapping

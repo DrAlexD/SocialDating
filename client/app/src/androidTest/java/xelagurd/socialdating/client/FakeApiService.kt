@@ -37,7 +37,7 @@ class FakeApiService : ApiService {
         Response.success(FakeData.userDefiningThemes)
 
     override suspend fun getStatements(
-        userId: Int,
+        currentUserId: Int,
         definingThemeIds: List<Int>
     ): Response<List<Statement>> =
         Response.success(FakeData.statements)
@@ -51,7 +51,7 @@ class FakeApiService : ApiService {
         Response.success(null)
 
     override suspend fun getSimilarUsers(
-        userId: Int,
+        currentUserId: Int,
         categoryIds: List<Int>?
     ): Response<List<SimilarUser>> =
         Response.success(FakeData.similarUsers)

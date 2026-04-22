@@ -9,7 +9,7 @@ import xelagurd.socialdating.server.FakeDefiningThemesData.toUserDefiningThemesW
 import xelagurd.socialdating.server.repository.DefiningThemesRepository
 import xelagurd.socialdating.server.repository.UserDefiningThemesRepository
 
-@Profile("!test")
+@Profile("(dev | local) & !test")
 @Configuration
 class DevelopmentConfig {
 
