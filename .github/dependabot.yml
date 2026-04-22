@@ -21,3 +21,8 @@ updates:
       server-updates:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "org.springframework.boot:spring-boot-starter-web"       # fixed due to Spring Boot 4.0.0
+      - dependency-name: "org.springdoc:springdoc-openapi-starter-webmvc-ui"      # fixed due to Spring Boot 4.0.0
+      - dependency-name: "org.springframework.cloud:spring-cloud-dependencies"    # fixed due to Spring Boot 4.0.0
+      - dependency-name: "org.springframework.kafka:spring-kafka"                 # fixed due to Spring Boot 4.0.0
