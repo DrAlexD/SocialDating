@@ -47,11 +47,11 @@ class JwtAuthFilter(
                 return unauthorized(exchange, "Expired access token")
             }
 
-            val username = claims.subject
+            val userId = claims["userId"].toString()
             val role = claims["role"].toString()
 
             val mutatedRequest = request.mutate()
-                .header("X-Auth-Username", username)
+                .header("X-Auth-UserId", userId)
                 .header("X-Auth-Role", role)
                 .build()
 

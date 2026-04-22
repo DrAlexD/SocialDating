@@ -39,7 +39,7 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
                 mockkList(relaxed = true)
 
         mockMvc.perform(
-            get("/statements?userId=${userId}&definingThemeIds=${definingThemeIds.toRequestParams()}")
+            get("/statements?currentUserId=${userId}&definingThemeIds=${definingThemeIds.toRequestParams()}")
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
