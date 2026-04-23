@@ -83,8 +83,10 @@ class RegistrationScreenTest {
     @Test
     fun registrationScreen_emptyData_disabledButton() {
         val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(name = "", gender = null, username = "", password = "",
-                repeatedPassword = "", email = "", age = "", city = "", purpose = null)
+            formData = registrationFormData.copy(
+                name = "", gender = null, username = "", password = "", repeatedPassword = "",
+                email = "", age = "", city = "", purpose = null
+            )
         )
 
         assertRegisterButtonIsDisabled(registrationUiState)

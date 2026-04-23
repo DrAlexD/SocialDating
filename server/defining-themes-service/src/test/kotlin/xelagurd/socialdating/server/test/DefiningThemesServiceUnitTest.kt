@@ -16,7 +16,6 @@ import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.repository.DefiningThemesRepository
 import xelagurd.socialdating.server.service.DefiningThemesService
-import xelagurd.socialdating.server.utils.TestUtils.mockkList
 
 @ExtendWith(MockKExtension::class)
 class DefiningThemesServiceUnitTest {

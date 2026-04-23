@@ -6,4 +6,6 @@ import kotlinx.serialization.Serializable
 data class LoginDetails(
     val username: String,
     val password: String
-)
+) {
+    override fun toString() = "LoginDetails(username=$username)"
+}
