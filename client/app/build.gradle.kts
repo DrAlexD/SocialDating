@@ -1,3 +1,11 @@
+import java.util.Properties
+
+val envProps = Properties().apply {
+    rootProject.file(".env").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}
+
+fun prop(key: String) = envProps[key] as String?
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.plugin.compose)
@@ -6,10 +14,15 @@ plugins {
     alias(libs.plugins.dagger.hilt.android)
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
 android {
     namespace = "xelagurd.socialdating.client"
     compileSdk = 35
-    buildToolsVersion = "35.0.0"
 
     defaultConfig {
         applicationId = "xelagurd.socialdating.client"
@@ -19,18 +32,30 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "xelagurd.socialdating.client.HiltTestRunner"
-        vectorDrawables {
-            useSupportLibrary = true
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = prop("KEYSTORE_PATH")?.let { file(it) }
+            storePassword = prop("STORE_PASSWORD")
+            keyAlias = prop("KEY_ALIAS")
+            keyPassword = prop("KEY_PASSWORD")
         }
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/api/v1/\"")
+        }
         release {
-            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", "\"https://socialdating.example.com/api/v1/\"")
         }
     }
 
@@ -39,14 +64,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
-        }
-    }
-
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {

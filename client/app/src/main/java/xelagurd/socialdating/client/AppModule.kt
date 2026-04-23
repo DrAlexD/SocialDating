@@ -42,7 +42,7 @@ object AppModule {
     @Named("auth")
     fun provideAuthRetrofit(): Retrofit =
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/api/v1/")
+            .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
 
@@ -62,7 +62,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/api/v1/")
+            .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .client(okHttpClient)
             .build()

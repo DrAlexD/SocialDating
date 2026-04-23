@@ -1,7 +1,9 @@
 package xelagurd.socialdating.client.data.remote
 
+import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.concurrent.withLock
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import android.content.Context
@@ -22,6 +24,8 @@ class AuthInterceptor @Inject constructor(
     private val authApiService: AuthApiService
 ) : Interceptor {
 
+    private val refreshLock = ReentrantLock()
+
     override fun intercept(chain: Interceptor.Chain): Response {
         val accessToken = runBlocking { preferencesRepository.accessToken.first() }
 
@@ -34,31 +38,45 @@ class AuthInterceptor @Inject constructor(
         val response = chain.proceed(request)
 
         if (response.code == UNAUTHORIZED) {
-            val refreshToken = runBlocking { preferencesRepository.refreshToken.first() }
+            refreshLock.withLock {
+                val currentAccessToken = runBlocking { preferencesRepository.accessToken.first() }
 
-            val (refreshResponse, _) = runBlocking {
-                safeApiCall(context) {
-                    authApiService.refreshToken(RefreshTokenDetails(refreshToken))
+                if (currentAccessToken != accessToken) {
+                    val newRequest = chain
+                        .request()
+                        .newBuilder()
+                        .header("Authorization", "Bearer $currentAccessToken")
+                        .build()
+
+                    return chain.proceed(newRequest)
                 }
-            }
 
-            if (refreshResponse != null) {
-                runBlocking {
-                    preferencesRepository.saveAccessToken(refreshResponse.accessToken)
-                    preferencesRepository.saveRefreshToken(refreshResponse.refreshToken)
+                val refreshToken = runBlocking { preferencesRepository.refreshToken.first() }
+
+                val (refreshResponse, _) = runBlocking {
+                    safeApiCall(context) {
+                        authApiService.refreshToken(RefreshTokenDetails(refreshToken))
+                    }
                 }
 
-                val newRequest = chain
-                    .request()
-                    .newBuilder()
-                    .header("Authorization", "Bearer ${refreshResponse.accessToken}")
-                    .build()
+                if (refreshResponse != null) {
+                    runBlocking {
+                        preferencesRepository.saveAccessToken(refreshResponse.accessToken)
+                        preferencesRepository.saveRefreshToken(refreshResponse.refreshToken)
+                    }
 
-                return chain.proceed(newRequest)
-            } else {
-                runBlocking {
-                    preferencesRepository.clearPreferences()
-                    commonLocalRepository.clearData()
+                    val newRequest = chain
+                        .request()
+                        .newBuilder()
+                        .header("Authorization", "Bearer ${refreshResponse.accessToken}")
+                        .build()
+
+                    return chain.proceed(newRequest)
+                } else {
+                    runBlocking {
+                        preferencesRepository.clearPreferences()
+                        commonLocalRepository.clearData()
+                    }
                 }
             }
         }

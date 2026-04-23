@@ -18,7 +18,7 @@ class FakeApiService : ApiService {
     override suspend fun getUser(userId: Int): Response<User> =
         Response.success(FakeData.mainUser)
 
-    override suspend fun getUsers(userIds: List<Int>):  Response<List<User>> =
+    override suspend fun getUsers(userIds: List<Int>): Response<List<User>> =
         Response.success(FakeData.users)
 
     override suspend fun getCategories(categoryIds: List<Int>?): Response<List<Category>> =

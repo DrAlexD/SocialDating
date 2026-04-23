@@ -132,8 +132,9 @@ class StatementAddingScreenTest {
         val statementAddingUiState = StatementAddingUiState(
             dataRequestStatus = RequestStatus.SUCCESS,
             entities = definingThemes,
-            formData = statementFormData.copy(text = "", isSupportDefiningTheme = null, definingThemeId = null,
-                creatorUserId = null)
+            formData = statementFormData.copy(
+                text = "", isSupportDefiningTheme = null, definingThemeId = null, creatorUserId = null
+            )
         )
 
         assertAddStatementButtonIsDisabled(statementAddingUiState)
