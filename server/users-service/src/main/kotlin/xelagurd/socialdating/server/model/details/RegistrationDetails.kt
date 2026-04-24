@@ -57,4 +57,7 @@ data class RegistrationDetails(
             purpose = purpose,
             role = Role.USER
         )
+
+    override fun toString() = "RegistrationDetails(name=$name, gender=$gender, username=$username, email=$email, " +
+            "age=$age, city=$city, purpose=$purpose)"
 }

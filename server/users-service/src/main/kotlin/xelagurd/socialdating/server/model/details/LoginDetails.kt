@@ -14,4 +14,6 @@ data class LoginDetails(
     @field:NotBlank
     @field:Size(max = LENGTH_MAX)
     val password: String
-)
+) {
+    override fun toString() = "LoginDetails(username=$username)"
+}

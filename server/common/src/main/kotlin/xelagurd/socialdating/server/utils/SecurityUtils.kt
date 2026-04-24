@@ -9,7 +9,7 @@ object SecurityUtils {
         val authenticatedUserId = SecurityContextHolder.getContext().authentication.principal as Int
 
         if (currentUserId != authenticatedUserId)
-            throw AccessDeniedException("Access denied")
+            throw AccessDeniedException("Access denied due to request another user`s data")
     }
 
 }
