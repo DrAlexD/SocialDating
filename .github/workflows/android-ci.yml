@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        api-level: [ 34, 35 ]
+        api-level: [ 35, 36 ]
         profile: [ small_phone, medium_phone ]
       fail-fast: false
 
