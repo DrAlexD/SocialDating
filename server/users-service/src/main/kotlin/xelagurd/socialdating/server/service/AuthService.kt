@@ -43,11 +43,11 @@ class AuthService(
     @Transactional
     fun registerUser(registrationDetails: RegistrationDetails): AuthResponse {
         if (usersRepository.findByUsername(registrationDetails.username) != null) {
-            throw IllegalArgumentException("User with username ${registrationDetails.username} already exists")
+            throw IllegalArgumentException("User with this username already exists")
         }
 
         if (registrationDetails.email != null && usersRepository.findByEmail(registrationDetails.email) != null) {
-            throw IllegalArgumentException("User with email ${registrationDetails.email} already exists")
+            throw IllegalArgumentException("User with this email already exists")
         }
 
         val user = usersRepository.save(registrationDetails.toUser(passwordEncoder))

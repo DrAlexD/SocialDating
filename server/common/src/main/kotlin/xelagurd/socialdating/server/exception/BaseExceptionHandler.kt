@@ -30,8 +30,9 @@ class BaseExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleTransactionSystemException(ex: TransactionSystemException): String {
         val message = "Invalid data (empty or wrong values)"
+        val detailedMessage = ex.message ?: message
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
-        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
+        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $detailedMessage" }
         return message
     }
 
@@ -47,7 +48,7 @@ class BaseExceptionHandler {
     @ExceptionHandler(AccessDeniedException::class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     fun handleAccessDeniedException(ex: AccessDeniedException): String {
-        val message = "Access denied"
+        val message = ex.message ?: "Access denied"
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
         logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
         return message
@@ -56,7 +57,7 @@ class BaseExceptionHandler {
     @ExceptionHandler(IllegalArgumentException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleIllegalArgumentException(ex: IllegalArgumentException): String {
-        val message = "Invalid argument"
+        val message = ex.message ?: "Invalid argument"
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
         logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
         return message
@@ -65,9 +66,10 @@ class BaseExceptionHandler {
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     fun handleGenericException(ex: Exception): String {
-        val message = ex.message ?: "Unknown server error"
+        val message = "Unknown server error"
+        val detailedMessage = ex.message ?: message
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
-        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
+        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $detailedMessage" }
         return message
     }
 }

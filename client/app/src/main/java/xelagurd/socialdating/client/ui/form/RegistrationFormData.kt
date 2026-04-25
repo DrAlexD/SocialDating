@@ -38,4 +38,7 @@ data class RegistrationFormData(
             city = city,
             purpose = purpose!!
         )
+
+    override fun toString() = "RegistrationFormData(name=$name, gender=$gender, username=$username, email=$email, " +
+            "age=$age, city=$city, purpose=$purpose)"
 }

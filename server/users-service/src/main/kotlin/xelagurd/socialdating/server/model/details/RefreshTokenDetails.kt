@@ -5,4 +5,6 @@ import jakarta.validation.constraints.NotBlank
 data class RefreshTokenDetails(
     @field:NotBlank
     val refreshToken: String
-)
+) {
+    override fun toString() = "RefreshTokenDetails()"
+}
