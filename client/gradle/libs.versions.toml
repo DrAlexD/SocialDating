@@ -1,8 +1,8 @@
 [versions]
-activityCompose = "1.10.1" # fixed due to API 35
+activityCompose = "1.13.0"
 agp = "9.2.0"
 composeBomVersion = "2025.09.00" # fixed due to using Icons class
-coreKtx = "1.16.0" # fixed due to API 35
+coreKtx = "1.18.0"
 credentials = "1.6.0"
 datastorePreferences = "1.2.1"
 hilt = "2.59.2"

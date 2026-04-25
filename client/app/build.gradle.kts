@@ -22,12 +22,12 @@ kotlin {
 
 android {
     namespace = "xelagurd.socialdating.client"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "xelagurd.socialdating.client"
-        minSdk = 34
-        targetSdk = 35
+        minSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 

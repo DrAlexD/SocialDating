@@ -32,11 +32,11 @@ class User(
 
     @field:Column(unique = true)
     @JvmField
-    var username: String,
+    final var username: String,
 
     @field:JsonIgnore
     @JvmField
-    var password: String,
+    final var password: String,
 
     @field:JsonIgnore
     var email: String?,
