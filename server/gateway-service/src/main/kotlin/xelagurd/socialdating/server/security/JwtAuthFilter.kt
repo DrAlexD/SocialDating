@@ -6,6 +6,7 @@ import org.springframework.core.Ordered
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
+import org.springframework.util.AntPathMatcher
 import org.springframework.web.server.ServerWebExchange
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.jsonwebtoken.JwtException
@@ -18,12 +19,14 @@ class JwtAuthFilter(
 ) : GlobalFilter, Ordered {
 
     val logger = KotlinLogging.logger { }
+    val antPathMatcher = AntPathMatcher()
 
     override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void> {
         val request = exchange.request
         val whitelist = securityProperties.whitelist
+        val requestPath = request.uri.path
 
-        if (whitelist.any { request.uri.path.startsWith(it.removeSuffix("/**")) }) {
+        if (whitelist.any { antPathMatcher.match(it, requestPath) }) {
             return chain.filter(exchange)
         }
 
@@ -47,11 +50,11 @@ class JwtAuthFilter(
                 return unauthorized(exchange, "Expired access token")
             }
 
-            val username = claims.subject
+            val userId = claims["userId"].toString()
             val role = claims["role"].toString()
 
             val mutatedRequest = request.mutate()
-                .header("X-Auth-Username", username)
+                .header("X-Auth-UserId", userId)
                 .header("X-Auth-Role", role)
                 .build()
 

@@ -14,4 +14,6 @@ data class LoginFormData(
             username = username,
             password = password
         )
+
+    override fun toString() = "LoginFormData(username=$username)"
 }

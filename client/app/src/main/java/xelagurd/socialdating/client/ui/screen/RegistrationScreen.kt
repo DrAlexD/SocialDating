@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -143,7 +144,8 @@ private inline fun RegistrationDetailsBody(
             value = registrationFormData.email,
             onValueChange = { onValueChange(registrationFormData.copy(email = it)) },
             label = stringResource(R.string.email_optional),
-            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
+            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp)),
+            keyboardType = KeyboardType.Email
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -155,7 +157,8 @@ private inline fun RegistrationDetailsBody(
                 label = stringResource(R.string.age),
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_4dp))
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp)),
+                keyboardType = KeyboardType.Number
             )
             AppTextField(
                 value = registrationFormData.city,
@@ -208,7 +211,8 @@ private inline fun RegistrationDetailsBody(
                 label = stringResource(R.string.password),
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_4dp))
-                    .width(TextFieldDefaults.MinWidth / 2 + 35.dp)
+                    .width(TextFieldDefaults.MinWidth / 2 + 35.dp),
+                isPassword = true
             )
             AppTextField(
                 value = registrationFormData.repeatedPassword,
@@ -216,7 +220,8 @@ private inline fun RegistrationDetailsBody(
                 label = stringResource(R.string.repeat_password),
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_4dp))
-                    .width(TextFieldDefaults.MinWidth / 2 + 35.dp)
+                    .width(TextFieldDefaults.MinWidth / 2 + 35.dp),
+                isPassword = true
             )
         }
         AppLargeTextCard(

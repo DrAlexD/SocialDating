@@ -8,7 +8,7 @@ management:
 
 security:
   whitelist:
-    - /actuator/**
+    - /actuator/health
     - /statements/v3/api-docs
 
 springdoc:

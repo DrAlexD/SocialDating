@@ -16,7 +16,7 @@ interface UserCategoriesRepository : JpaRepository<UserCategory, Int> {
         with current_user_categories as
                (select *
                 from user_categories
-                where user_id = :userId
+                where user_id = :currentUserId
                   and (maintained is not null or not_maintained is not null)
                   and (coalesce(:categoryIds) is null or category_id in (:categoryIds)))
         select uc.category_id as id,
@@ -28,7 +28,7 @@ interface UserCategoriesRepository : JpaRepository<UserCategory, Int> {
         """,
         nativeQuery = true
     )
-    fun findCurrentUserCategories(userId: Int, categoryIds: List<Int>?): List<CategoryWithData>
+    fun findCurrentUserCategories(currentUserId: Int, categoryIds: List<Int>?): List<CategoryWithData>
 
     @Query(
         """

@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Profile
 import xelagurd.socialdating.server.FakeUsersData.toUsersWithNullIds
 import xelagurd.socialdating.server.repository.UsersRepository
 
-@Profile("!test")
+@Profile("(dev | local) & !test")
 @Configuration
 class DevelopmentConfig {
 

@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.content.Context
-import android.util.Log
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.PasswordCredential
 import androidx.lifecycle.ViewModel
@@ -54,8 +53,6 @@ class LoginViewModel @Inject constructor(
                     loginFormData = LoginFormData(credential.id, credential.password),
                     isLoginWithInput = false
                 )
-
-            else -> Log.e(AccountManager::class.simpleName, "Unexpected type of credential")
         }
     }
 

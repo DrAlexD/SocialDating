@@ -9,10 +9,10 @@ interface StatementsRepository : JpaRepository<Statement, Int> {
         """
         select stm.*
         from statements stm
-        left join user_statements ustm on stm.id = ustm.statement_id and ustm.user_id = :userId
+        left join user_statements ustm on stm.id = ustm.statement_id and ustm.user_id = :currentUserId
         where defining_theme_id in (:definingThemeIds) and ustm.id is null
         """,
         nativeQuery = true
     )
-    fun findUnreactedStatements(userId: Int, definingThemeIds: List<Int>): List<Statement>
+    fun findUnreactedStatements(currentUserId: Int, definingThemeIds: List<Int>): List<Statement>
 }

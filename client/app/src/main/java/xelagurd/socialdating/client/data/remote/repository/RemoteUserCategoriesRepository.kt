@@ -11,8 +11,8 @@ class RemoteUserCategoriesRepository @Inject constructor(
     suspend fun getUserCategories(userId: Int) =
         apiService.getUserCategories(userId)
 
-    suspend fun getSimilarUsers(userId: Int, categoryIds: List<Int>? = null) =
-        apiService.getSimilarUsers(userId, categoryIds)
+    suspend fun getSimilarUsers(currentUserId: Int, categoryIds: List<Int>? = null) =
+        apiService.getSimilarUsers(currentUserId, categoryIds)
 
     suspend fun getDetailedSimilarUser(currentUserId: Int, anotherUserId: Int) =
         apiService.getDetailedSimilarUser(currentUserId, anotherUserId)

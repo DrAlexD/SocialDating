@@ -18,7 +18,7 @@ class AuthSecurityConfig(
 ) {
 
     @Bean
-    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
+    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder(12)
 
     @Bean
     fun userDetailsService(): UserDetailsService =

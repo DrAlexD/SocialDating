@@ -4,7 +4,7 @@ server:
 security:
   whitelist:
     - /users/auth/**
-    - /actuator/**
+    - /actuator/health
     - /users/v3/api-docs
 
 springdoc:

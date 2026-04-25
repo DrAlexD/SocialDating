@@ -101,7 +101,8 @@ private inline fun LoginDetailsBody(
         AppTextField(
             value = loginFormData.password,
             onValueChange = { onValueChange(loginFormData.copy(password = it)) },
-            label = stringResource(R.string.password)
+            label = stringResource(R.string.password),
+            isPassword = true
         )
         AppLargeTextCard(
             isEnabled = loginFormData.isValid && actionRequestStatus.isAllowedActionRefresh(),

@@ -8,4 +8,6 @@ data class AuthResponse(
     val user: User,
     val accessToken: String,
     val refreshToken: String
-)
+) {
+    override fun toString() = "AuthResponse(user=$user)"
+}

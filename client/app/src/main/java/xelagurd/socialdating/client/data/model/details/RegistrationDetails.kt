@@ -14,4 +14,7 @@ data class RegistrationDetails(
     val age: Int,
     val city: String,
     val purpose: Purpose
-)
+) {
+    override fun toString() = "RegistrationDetails(name=$name, gender=$gender, username=$username, email=$email, " +
+            "age=$age, city=$city, purpose=$purpose)"
+}

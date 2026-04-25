@@ -17,13 +17,13 @@ class HeaderAuthFilter : OncePerRequestFilter() {
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val username = request.getHeader("X-Auth-Username")
+        val userId = request.getHeader("X-Auth-UserId")
         val role = request.getHeader("X-Auth-Role")
 
-        if (username != null && role != null) {
+        if (userId != null && role != null) {
             val authority = SimpleGrantedAuthority("ROLE_$role")
             val authentication = UsernamePasswordAuthenticationToken(
-                username,
+                userId.toInt(),
                 null,
                 listOf(authority)
             )

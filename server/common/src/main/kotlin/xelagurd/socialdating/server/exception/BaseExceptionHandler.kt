@@ -2,6 +2,7 @@ package xelagurd.socialdating.server.exception
 
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.transaction.TransactionSystemException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -29,8 +30,9 @@ class BaseExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleTransactionSystemException(ex: TransactionSystemException): String {
         val message = "Invalid data (empty or wrong values)"
+        val detailedMessage = ex.message ?: message
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
-        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
+        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $detailedMessage" }
         return message
     }
 
@@ -43,12 +45,31 @@ class BaseExceptionHandler {
         return message
     }
 
+    @ExceptionHandler(AccessDeniedException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    fun handleAccessDeniedException(ex: AccessDeniedException): String {
+        val message = ex.message ?: "Access denied"
+        val origin = getErrorPositionFromStackTrace(ex.stackTrace)
+        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
+        return message
+    }
+
+    @ExceptionHandler(IllegalArgumentException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleIllegalArgumentException(ex: IllegalArgumentException): String {
+        val message = ex.message ?: "Invalid argument"
+        val origin = getErrorPositionFromStackTrace(ex.stackTrace)
+        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
+        return message
+    }
+
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     fun handleGenericException(ex: Exception): String {
-        val message = ex.message ?: "Unknown server error"
+        val message = "Unknown server error"
+        val detailedMessage = ex.message ?: message
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
-        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
+        logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $detailedMessage" }
         return message
     }
 }
