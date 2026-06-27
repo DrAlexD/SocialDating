@@ -81,7 +81,7 @@ jobs:
           working-directory: client
           script: |
             chmod +x gradlew
-            ./gradlew connectedAndroidTest
+            ./gradlew connectedDebugAndroidTest
 
       - name: Upload Instrumented tests report
         if: failure()

@@ -65,3 +65,7 @@ amplicode.xml
 
 ### VS Code ###
 .vscode/
+
+# Tests coverage
+*/tests-coverage/reports/
+*/tests-coverage/logs/

@@ -15,8 +15,8 @@ SocialDating is a dating/social app consisting of:
 
 1. Build JARs: `./gradlew build -x test`
 2. Start containers: `docker compose up -d --build`
-3. Wait for containers health: `./check_containers_health.sh`
-4. Log unhealthy containers (if needed): `./log_unhealthy_containers.sh`
+3. Wait for containers health: `./scripts/wait_containers_health.sh`
+4. Log unhealthy containers (if needed): `./scripts/log_unhealthy_containers.sh`
 
 #### Testing
 
@@ -25,6 +25,13 @@ SocialDating is a dating/social app consisting of:
 - Run a specific test class: `./gradlew :{service-name}:test --tests {test-class-name}`
 - Run a specific test method: `./gradlew :{service-name}:test --tests {test-class-name}.{test-method-name}`
 - Run global integration tests (requires server running in Docker): `./gradlew integrationTest`
+
+#### Tests coverage
+
+- Run unit and local integration tests and build reports: `./gradlew test koverHtmlReport koverXmlReport`
+- Run global integration tests and build reports: `./scripts/tests-coverage/create_integration_coverage_report.sh`
+
+Reports are written to `tests-coverage/reports/`.
 
 ### Architecture
 
@@ -73,7 +80,14 @@ Spring Boot microservices, entry point is `gateway-service/` (Spring Cloud Gatew
 - Run unit tests: `./gradlew test`
 - Run a specific test class: `./gradlew testDebugUnitTest --tests {test-class-name}`
 - Run a specific test method: `./gradlew testDebugUnitTest --tests {test-class-name}.{test-method-name}`
-- Run instrumented tests: `./gradlew connectedAndroidTest`
+- Run instrumented tests: `./gradlew connectedDebugAndroidTest`
+
+#### Tests coverage
+
+- Run unit tests and build reports: `./gradlew test koverHtmlReport koverXmlReport`
+- Run instrumented tests and build reports: `./gradlew createInstrumentedCoverageReport`
+
+Reports are written to `tests-coverage/reports/`.
 
 ### Architecture
 

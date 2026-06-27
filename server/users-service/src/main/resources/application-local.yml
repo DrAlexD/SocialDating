@@ -1,3 +1,19 @@
+management:
+  endpoint:
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,shutdown
+
+security:
+  whitelist:
+    - /users/auth/**
+    - /actuator/health
+    - /actuator/shutdown
+    - /users/v3/api-docs
+
 spring:
   config:
     import:
