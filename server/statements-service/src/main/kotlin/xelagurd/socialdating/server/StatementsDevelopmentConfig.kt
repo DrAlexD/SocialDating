@@ -11,7 +11,7 @@ import xelagurd.socialdating.server.repository.UserStatementsRepository
 
 @Profile("(dev | local) & !test")
 @Configuration
-class DevelopmentConfig {
+class StatementsDevelopmentConfig {
 
     @Bean
     fun dataLoader(

@@ -26,4 +26,8 @@ dependencies {
     runtimeOnly(libs.jwt.jackson)
 
     developmentOnly(libs.spring.boot.devtools)
+
+    testImplementation(libs.kotlin.test.junit5)
+    testImplementation(libs.spring.boot.test)
+    testImplementation(libs.mockk)
 }

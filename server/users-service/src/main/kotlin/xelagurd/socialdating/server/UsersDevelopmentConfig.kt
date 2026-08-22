@@ -9,7 +9,7 @@ import xelagurd.socialdating.server.repository.UsersRepository
 
 @Profile("(dev | local) & !test")
 @Configuration
-class DevelopmentConfig {
+class UsersDevelopmentConfig {
 
     @Bean
     fun dataLoader(

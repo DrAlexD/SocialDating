@@ -41,8 +41,7 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
 
-        verify(exactly = 1) { userDefiningThemesService.getUserDefiningThemes(any()) }
+        verify(exactly = 1) { userDefiningThemesService.getUserDefiningThemes(userId) }
         confirmVerified(userDefiningThemesService)
     }
-
 }

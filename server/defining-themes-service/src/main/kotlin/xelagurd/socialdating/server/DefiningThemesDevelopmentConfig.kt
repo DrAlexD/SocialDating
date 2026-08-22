@@ -11,7 +11,7 @@ import xelagurd.socialdating.server.repository.UserDefiningThemesRepository
 
 @Profile("(dev | local) & !test")
 @Configuration
-class DevelopmentConfig {
+class DefiningThemesDevelopmentConfig {
 
     @Bean
     fun dataLoader(
