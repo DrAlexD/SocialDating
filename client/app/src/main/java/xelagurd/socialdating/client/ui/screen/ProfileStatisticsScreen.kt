@@ -300,7 +300,7 @@ private fun UserDefiningThemeDetailsBodyWithSimilarityPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun ProfileStatisticsComponentNoDataPreview() {
+private fun ProfileStatisticsComponentDataErrorPreview() {
     AppTheme {
         ProfileStatisticsScreenComponent(
             profileStatisticsUiState = ProfileStatisticsUiState(

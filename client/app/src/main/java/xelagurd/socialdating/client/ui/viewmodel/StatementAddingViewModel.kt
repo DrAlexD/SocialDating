@@ -86,7 +86,7 @@ class StatementAddingViewModel @Inject constructor(
             } else {
                 _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
                 val statementFormDetails = uiState.value.formData
-                val newId = localStatementsRepository.getStatements().first().maxOf { it.id } + 1
+                val newId = (localStatementsRepository.getStatements().first().maxOfOrNull { it.id } ?: 0) + 1
                 localStatementsRepository.insertStatements(
                     listOf(
                         Statement(

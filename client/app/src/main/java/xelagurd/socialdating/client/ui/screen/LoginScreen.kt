@@ -155,7 +155,7 @@ private fun LoginComponentFullFormRuPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun LoginComponentWrongDataPreview() {
+private fun LoginComponentActionErrorPreview() {
     AppTheme {
         LoginScreenComponent(
             loginUiState = LoginUiState(

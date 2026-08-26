@@ -172,7 +172,7 @@ private inline fun StatementDetailsBody(
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementAddingComponentDataPreview() {
+private fun StatementAddingComponentWithoutChosenDefiningThemePreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
@@ -185,7 +185,7 @@ private fun StatementAddingComponentDataPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
 @Composable
-private fun StatementAddingComponentDataRuPreview() {
+private fun StatementAddingComponentWithoutChosenDefiningThemeRuPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
@@ -198,20 +198,7 @@ private fun StatementAddingComponentDataRuPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementAddingComponentFullFormPreview() {
-    AppTheme {
-        StatementAddingScreenComponent(
-            statementAddingUiState = StatementAddingUiState(
-                entities = FakeData.definingThemes,
-                formData = FakeData.statementFormData
-            )
-        )
-    }
-}
-
-@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
-@Composable
-private fun StatementAddingComponentFullFormRuPreview() {
+private fun StatementAddingComponentWithChosenDefiningThemePreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
@@ -224,7 +211,7 @@ private fun StatementAddingComponentFullFormRuPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementAddingComponentWrongDataPreview() {
+private fun StatementAddingComponentActionErrorPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
@@ -238,7 +225,7 @@ private fun StatementAddingComponentWrongDataPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementAddingComponentNoDataPreview() {
+private fun StatementAddingComponentDataErrorPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(

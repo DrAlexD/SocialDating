@@ -57,7 +57,7 @@ class RegistrationViewModelTest {
     }
 
     @Test
-    fun registrationViewModel_registrationWithInternet() = runTest {
+    fun registrationViewModel_registrationWithInternet_successStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -75,7 +75,7 @@ class RegistrationViewModelTest {
     }
 
     @Test
-    fun registrationViewModel_registrationWithoutInternet() = runTest {
+    fun registrationViewModel_registrationWithoutInternet_errorStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -88,7 +88,7 @@ class RegistrationViewModelTest {
     }
 
     @Test
-    fun registrationViewModel_registrationWithWrongData() = runTest {
+    fun registrationViewModel_registrationWithWrongData_failureStatus() = runTest {
         mockWrongData()
 
         initViewModel()
@@ -101,7 +101,7 @@ class RegistrationViewModelTest {
     }
 
     @Test
-    fun registrationViewModel_retryRegistrationWithInternet() = runTest {
+    fun registrationViewModel_retryRegistrationWithInternetAfterError_successStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -124,7 +124,7 @@ class RegistrationViewModelTest {
     }
 
     @Test
-    fun registrationViewModel_retryRegistrationWithRightData() = runTest {
+    fun registrationViewModel_retryRegistrationWithRightDataAfterFailure_successStatus() = runTest {
         mockWrongData()
 
         initViewModel()

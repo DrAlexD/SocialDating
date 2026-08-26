@@ -104,7 +104,7 @@ private fun CategoriesComponentDataPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun CategoriesComponentNoDataPreview() {
+private fun CategoriesComponentDataErrorPreview() {
     AppTheme {
         CategoriesScreenComponent(
             categoriesUiState = CategoriesUiState(dataRequestStatus = RequestStatus.ERROR("Text"))

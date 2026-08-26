@@ -1,7 +1,10 @@
 package xelagurd.socialdating.client
 
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -15,8 +18,39 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.NavController
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import xelagurd.socialdating.client.ui.theme.AppTheme
 
 object AndroidTestUtils {
+
+    const val INPUT_TEXT = "Text"
+
+    fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.setContentToScreen(
+        content: @Composable () -> Unit
+    ) {
+        activity.setContent {
+            AppTheme {
+                content()
+            }
+        }
+    }
+
+    fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.setContentToScreenAndRecompose(
+        content: @Composable () -> Unit
+    ) {
+        val recompositionTrigger = mutableIntStateOf(0)
+
+        setContentToScreen {
+            if (recompositionTrigger.intValue >= 0) {
+                content()
+            }
+        }
+        waitForIdle()
+
+        runOnUiThread { recompositionTrigger.intValue++ }
+        waitForIdle()
+    }
 
     fun NavController.getCurrentRoute() = currentBackStackEntry?.destination?.route
 
@@ -25,6 +59,15 @@ object AndroidTestUtils {
 
     fun NavController.assertBackStackDepth(expectedDepth: Int) =
         assertEquals(expectedDepth, currentBackStack.value.size)
+
+    fun NavController.assertRouteInBackStack(expectedRouteName: String) =
+        assertTrue(isRouteInBackStack(expectedRouteName))
+
+    fun NavController.assertRouteNotInBackStack(notExpectedRouteName: String) =
+        assertFalse(isRouteInBackStack(notExpectedRouteName))
+
+    private fun NavController.isRouteInBackStack(routeName: String) =
+        currentBackStack.value.any { it.destination.route == routeName }
 
     fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithContentDescriptionId(
         @StringRes id: Int

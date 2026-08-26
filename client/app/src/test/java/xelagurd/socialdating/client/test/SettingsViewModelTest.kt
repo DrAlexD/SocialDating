@@ -39,7 +39,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun settingsViewModel_logout() = runTest {
+    fun settingsViewModel_logout_successStatusWithClearedData() = runTest {
         mockLogout()
 
         initViewModel()

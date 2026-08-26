@@ -1,28 +1,34 @@
 package xelagurd.socialdating.client.androidTest
 
-import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.INPUT_TEXT
+import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.checkDisabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.checkTextField
+import xelagurd.socialdating.client.AndroidTestUtils.checkTextFieldAndInput
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextIdWithColon
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.ui.form.StatementFormData
 import xelagurd.socialdating.client.ui.screen.StatementAddingScreenComponent
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.StatementAddingUiState
-import xelagurd.socialdating.client.ui.theme.AppTheme
 
 @HiltAndroidTest
 class StatementAddingScreenTest {
@@ -41,164 +47,103 @@ class StatementAddingScreenTest {
     private val statementFormData = FakeData.statementFormData
 
     @Test
-    fun statementAddingScreen_loadingStateAndEmptyDefiningThemes_assertContentIsDisplayed() {
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.LOADING
-        )
+    fun statementAddingScreen_defaultParameters_displayedContentWithDisabledButton() {
+        composeTestRule.setContentToScreen {
+            StatementAddingScreenComponent()
+        }
 
-        assertContentIsDisplayed(statementAddingUiState)
-
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
-    }
-
-    @Test
-    fun statementAddingScreen_failureStateAndEmptyDefiningThemes_assertContentIsDisplayed() {
-        val failureText = FakeData.FAILURE_TEXT
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.FAILURE(failureText)
-        )
-
-        assertContentIsDisplayed(statementAddingUiState)
-
-        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
-    }
-
-    @Test
-    fun statementAddingScreen_allDefiningThemes_assertContentIsDisplayed() {
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.SUCCESS,
-            entities = definingThemes,
-            formData = statementFormData.copy(definingThemeId = null)
-        )
-
-        assertContentIsDisplayed(statementAddingUiState)
-        composeTestRule.onNodeWithText(definingThemes[0].name).assertIsDisplayed()
-        composeTestRule.onNodeWithText(definingThemes[1].name).assertIsDisplayed()
-    }
-
-    @Test
-    fun statementAddingScreen_chosenDefiningTheme_assertContentIsDisplayed() {
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.SUCCESS,
-            entities = definingThemes,
-            formData = statementFormData
-        )
-
-        assertContentIsDisplayed(statementAddingUiState)
-        composeTestRule.onNodeWithText(definingThemes[0].name).assertIsDisplayed()
-        composeTestRule.onNodeWithText(definingThemes[1].name).assertIsNotDisplayed()
-    }
-
-    @Test
-    fun statementAddingScreen_loadingState_loadingIndicator() {
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.SUCCESS,
-            actionRequestStatus = RequestStatus.LOADING
-        )
-
-        setContentToStatementAddingBody(statementAddingUiState)
-
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
-    }
-
-    @Test
-    fun statementAddingScreen_failureState_failureText() {
-        val failureText = FakeData.FAILURE_TEXT
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.SUCCESS,
-            actionRequestStatus = RequestStatus.FAILURE(failureText)
-        )
-
-        setContentToStatementAddingBody(statementAddingUiState)
-
-        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
-    }
-
-    @Test
-    fun statementAddingScreen_errorState_errorText() {
-        val errorText = FakeData.ERROR_TEXT
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.SUCCESS,
-            actionRequestStatus = RequestStatus.ERROR(errorText)
-        )
-
-        setContentToStatementAddingBody(statementAddingUiState)
-
-        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
-    }
-
-    @Test
-    fun statementAddingScreen_emptyData_disabledButton() {
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.SUCCESS,
-            entities = definingThemes,
-            formData = statementFormData.copy(
-                text = "", isSupportDefiningTheme = null, definingThemeId = null, creatorUserId = null
-            )
-        )
-
-        assertAddStatementButtonIsDisabled(statementAddingUiState)
-    }
-
-    @Test
-    fun statementAddingScreen_allData_enabledButton() {
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.SUCCESS,
-            entities = definingThemes,
-            formData = statementFormData
-        )
-
-        assertAddStatementButtonIsEnabled(statementAddingUiState)
-    }
-
-    @Test
-    fun statementAddingScreen_emptyStatementText_disabledButton() {
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.SUCCESS,
-            entities = definingThemes,
-            formData = statementFormData.copy(text = "")
-        )
-
-        assertAddStatementButtonIsDisabled(statementAddingUiState)
-    }
-
-    @Test
-    fun statementAddingScreen_emptySupportDefiningTheme_disabledButton() {
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.SUCCESS,
-            entities = definingThemes,
-            formData = statementFormData.copy(isSupportDefiningTheme = null)
-        )
-
-        assertAddStatementButtonIsDisabled(statementAddingUiState)
-    }
-
-    @Test
-    fun statementAddingScreen_emptyDefiningTheme_disabledButton() {
-        val statementAddingUiState = StatementAddingUiState(
-            dataRequestStatus = RequestStatus.SUCCESS,
-            entities = definingThemes,
-            formData = statementFormData.copy(definingThemeId = null)
-        )
-
-        assertAddStatementButtonIsDisabled(statementAddingUiState)
-    }
-
-    private fun assertAddStatementButtonIsEnabled(statementAddingUiState: StatementAddingUiState) {
-        setContentToStatementAddingBody(statementAddingUiState)
-
-        composeTestRule.onNodeWithTextId(R.string.add_statement).checkEnabledButton()
-    }
-
-    private fun assertAddStatementButtonIsDisabled(statementAddingUiState: StatementAddingUiState) {
-        setContentToStatementAddingBody(statementAddingUiState)
-
+        assertContentIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.add_statement).checkDisabledButton()
     }
 
-    private fun assertContentIsDisplayed(statementAddingUiState: StatementAddingUiState) {
-        setContentToStatementAddingBody(statementAddingUiState)
+    @Test
+    fun statementAddingScreen_recomposition_displayedContentWithDisabledButton() {
+        composeTestRule.setContentToScreenAndRecompose {
+            StatementAddingScreenComponent(statementAddingUiState = StatementAddingUiState())
+        }
 
+        assertContentIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.add_statement).checkDisabledButton()
+    }
+
+    @Test
+    fun statementAddingScreen_validFormData_displayedContentWithEnabledButton() {
+        composeTestRule.setContentToScreen {
+            StatementAddingScreenComponent(
+                statementAddingUiState = StatementAddingUiState(
+                    dataRequestStatus = RequestStatus.SUCCESS,
+                    entities = definingThemes,
+                    formData = statementFormData
+                )
+            )
+        }
+
+        assertContentIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.add_statement).checkEnabledButton()
+    }
+
+    @Test
+    fun statementAddingScreen_allActionsWithoutAddStatement_calledAllActions() {
+        var changedFormData: StatementFormData? = null
+        var isNavigateUpClicked = false
+
+        composeTestRule.setContentToScreen {
+            StatementAddingScreenComponent(
+                statementAddingUiState = StatementAddingUiState(
+                    dataRequestStatus = RequestStatus.SUCCESS,
+                    entities = definingThemes,
+                    formData = statementFormData.copy(definingThemeId = null)
+                ),
+                onSuccessStatementAdding = {},
+                onNavigateUp = { isNavigateUpClicked = true },
+                onValueChange = { changedFormData = it },
+                onStatementAddingClick = {}
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.statement_text).checkTextFieldAndInput(INPUT_TEXT)
+        assertEquals(true, changedFormData?.text?.contains(INPUT_TEXT))
+
+        composeTestRule.onNodeWithText(definingThemes[0].name).checkButtonAndClick()
+        assertEquals(definingThemes[0].id, changedFormData?.definingThemeId)
+
+        composeTestRule.onNodeWithTagId(R.string.yes).checkButtonAndClick()
+        assertEquals(true, changedFormData?.isSupportDefiningTheme)
+
+        composeTestRule.onNodeWithTagId(R.string.no).checkButtonAndClick()
+        assertEquals(false, changedFormData?.isSupportDefiningTheme)
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).checkButtonAndClick()
+        assertTrue(isNavigateUpClicked)
+    }
+
+    @Test
+    fun statementAddingScreen_chosenDefiningThemeClick_clearedDefiningThemeAndCalledAddStatement() {
+        var changedFormData: StatementFormData? = null
+        var isStatementAddingClicked = false
+
+        composeTestRule.setContentToScreen {
+            StatementAddingScreenComponent(
+                statementAddingUiState = StatementAddingUiState(
+                    dataRequestStatus = RequestStatus.SUCCESS,
+                    entities = definingThemes,
+                    formData = statementFormData
+                ),
+                onSuccessStatementAdding = {},
+                onNavigateUp = {},
+                onValueChange = { changedFormData = it },
+                onStatementAddingClick = { isStatementAddingClicked = true }
+            )
+        }
+
+        composeTestRule.onNodeWithText(definingThemes[0].name).checkButtonAndClick()
+        assertEquals(null, changedFormData?.definingThemeId)
+
+        composeTestRule.onNodeWithTextId(R.string.add_statement).checkButtonAndClick()
+        assertTrue(isStatementAddingClicked)
+    }
+
+    private fun assertContentIsDisplayed() {
         composeTestRule.onNodeWithTextId(R.string.statement_text).checkTextField()
 
         composeTestRule.onNodeWithTextIdWithColon(R.string.defining_theme).assertIsDisplayed()
@@ -206,15 +151,5 @@ class StatementAddingScreenTest {
         composeTestRule.onNodeWithTextId(R.string.is_support_defining_theme).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.yes).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.no).assertIsDisplayed()
-    }
-
-    private fun setContentToStatementAddingBody(statementAddingUiState: StatementAddingUiState) {
-        composeTestRule.activity.setContent {
-            AppTheme {
-                StatementAddingScreenComponent(
-                    statementAddingUiState = statementAddingUiState
-                )
-            }
-        }
     }
 }

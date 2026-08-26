@@ -262,7 +262,7 @@ private fun RegistrationComponentFullFormRuPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun RegistrationComponentWrongDataPreview() {
+private fun RegistrationComponentActionErrorPreview() {
     AppTheme {
         RegistrationScreenComponent(
             registrationUiState = RegistrationUiState(

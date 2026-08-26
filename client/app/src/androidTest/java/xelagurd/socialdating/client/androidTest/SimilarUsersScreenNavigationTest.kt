@@ -11,8 +11,8 @@ import org.junit.Test
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.loginAndNavigateToCategories
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToCategoriesFromBottomNavBar
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToProfileFromBottomNavBar
-import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToProfileStatistics
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToSettingsFromBottomNavBar
+import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToSimilarUserProfileStatistics
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToSimilarUsersFromBottomNavBar
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.setContentToAppNavHost
 import xelagurd.socialdating.client.AndroidTestUtils.assertBackStackDepth
@@ -28,7 +28,7 @@ import xelagurd.socialdating.client.ui.navigation.SettingsDestination
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
 
 @HiltAndroidTest
-class ProfileScreenNavigationTest {
+class SimilarUsersScreenNavigationTest {
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -45,21 +45,21 @@ class ProfileScreenNavigationTest {
     }
 
     @Test
-    fun appNavHost_clickProfileStatistics_navigatesToProfileStatisticsScreenWithProfileInBackStack() {
+    fun appNavHost_clickSimilarUser_navigatesToProfileStatisticsScreenWithSimilarUsersInBackStack() {
         composeTestRule.loginAndNavigateToCategories()
-        composeTestRule.navigateToProfileStatistics()
+        composeTestRule.navigateToSimilarUserProfileStatistics()
 
         navController.assertCurrentRouteName(ProfileStatisticsDestination.routeWithArgs)
-        navController.assertRouteInBackStack(ProfileDestination.routeWithArgs)
+        navController.assertRouteInBackStack(SimilarUsersDestination.routeWithArgs)
         //navController.assertBackStackDepth(5)
     }
 
     @Test
-    fun appNavHost_navigateToProfile_stayOnProfileScreen() {
+    fun appNavHost_navigateToSimilarUsers_stayOnSimilarUsersScreen() {
         composeTestRule.loginAndNavigateToCategories()
-        composeTestRule.navigateToProfileFromBottomNavBar()
+        composeTestRule.navigateToSimilarUsersFromBottomNavBar()
         val previousRoute = navController.getCurrentRoute()
-        composeTestRule.navigateToProfileFromBottomNavBar()
+        composeTestRule.navigateToSimilarUsersFromBottomNavBar()
         val currentRoute = navController.getCurrentRoute()
 
         assertEquals(previousRoute, currentRoute)
@@ -67,35 +67,35 @@ class ProfileScreenNavigationTest {
     }
 
     @Test
-    fun appNavHost_navigateToCategories_navigatesToCategoriesScreenWithoutProfile() {
+    fun appNavHost_navigateToCategories_navigatesToCategoriesScreenWithoutSimilarUsers() {
         composeTestRule.loginAndNavigateToCategories()
-        composeTestRule.navigateToProfileFromBottomNavBar()
+        composeTestRule.navigateToSimilarUsersFromBottomNavBar()
         composeTestRule.navigateToCategoriesFromBottomNavBar()
 
         navController.assertCurrentRouteName(CategoriesDestination.route)
-        navController.assertRouteNotInBackStack(ProfileDestination.routeWithArgs)
+        navController.assertRouteNotInBackStack(SimilarUsersDestination.routeWithArgs)
         //navController.assertBackStackDepth(3)
     }
 
     @Test
-    fun appNavHost_navigateToSimilarUsers_navigatesToSimilarUsersScreenWithoutProfile() {
+    fun appNavHost_navigateToProfile_navigatesToProfileScreenWithoutSimilarUsers() {
         composeTestRule.loginAndNavigateToCategories()
-        composeTestRule.navigateToProfileFromBottomNavBar()
         composeTestRule.navigateToSimilarUsersFromBottomNavBar()
+        composeTestRule.navigateToProfileFromBottomNavBar()
 
-        navController.assertCurrentRouteName(SimilarUsersDestination.routeWithArgs)
-        navController.assertRouteNotInBackStack(ProfileDestination.routeWithArgs)
+        navController.assertCurrentRouteName(ProfileDestination.routeWithArgs)
+        navController.assertRouteNotInBackStack(SimilarUsersDestination.routeWithArgs)
         //navController.assertBackStackDepth(4)
     }
 
     @Test
-    fun appNavHost_navigateToSettings_navigatesToSettingsScreenWithoutProfile() {
+    fun appNavHost_navigateToSettings_navigatesToSettingsScreenWithoutSimilarUsers() {
         composeTestRule.loginAndNavigateToCategories()
-        composeTestRule.navigateToProfileFromBottomNavBar()
+        composeTestRule.navigateToSimilarUsersFromBottomNavBar()
         composeTestRule.navigateToSettingsFromBottomNavBar()
 
         navController.assertCurrentRouteName(SettingsDestination.route)
-        navController.assertRouteNotInBackStack(ProfileDestination.routeWithArgs)
+        navController.assertRouteNotInBackStack(SimilarUsersDestination.routeWithArgs)
         //navController.assertBackStackDepth(4)
     }
 }

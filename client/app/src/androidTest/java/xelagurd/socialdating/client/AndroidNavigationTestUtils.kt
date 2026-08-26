@@ -1,5 +1,7 @@
 package xelagurd.socialdating.client
 
+import androidx.activity.compose.setContent
+import androidx.annotation.StringRes
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
@@ -7,6 +9,8 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.checkTextFieldAndInput
@@ -15,10 +19,37 @@ import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.fake.FakeData.TEST_TIMEOUT_MILLIS
+import xelagurd.socialdating.client.data.model.DataUtils.toSimilarUsersWithData
+import xelagurd.socialdating.client.ui.navigation.AppNavHost
 
 typealias MainComposeTestRule = AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>
 
 object AndroidNavigationTestUtils {
+
+    private val similarUser = FakeData.similarUsers.toSimilarUsersWithData(FakeData.users)[0]
+    private val similarUserNameWithAge = "${similarUser.name}, ${similarUser.age}"
+
+    private val bottomNavBarItemIds = listOf(
+        R.string.nav_profile,
+        R.string.nav_categories,
+        R.string.nav_similar_users,
+        R.string.nav_settings
+    )
+
+    fun MainComposeTestRule.setContentToAppNavHost(): TestNavHostController {
+        var navController: TestNavHostController? = null
+
+        activity.setContent {
+            val testNavHostController = TestNavHostController(activity).apply {
+                navigatorProvider.addNavigator(ComposeNavigator())
+            }
+            navController = testNavHostController
+
+            AppNavHost(testNavHostController)
+        }
+
+        return runOnIdle { requireNotNull(navController) }
+    }
 
     fun MainComposeTestRule.loginAndNavigateToCategories() {
         onNodeWithTextId(R.string.username).checkTextFieldAndInput(FakeData.loginFormData.username)
@@ -107,6 +138,16 @@ object AndroidNavigationTestUtils {
         checkBottomNavBarWithProfileTopLevel()
     }
 
+    fun MainComposeTestRule.navigateToSimilarUserProfileStatistics() {
+        navigateToSimilarUsersFromBottomNavBar()
+
+        waitUntil(TEST_TIMEOUT_MILLIS) {
+            onNodeWithText(similarUserNameWithAge).isDisplayed()
+        }
+
+        onNodeWithText(similarUserNameWithAge).checkButtonAndClick()
+    }
+
     fun MainComposeTestRule.navigateToCategoriesFromBottomNavBar() {
         onNodeWithTagId(R.string.nav_categories).checkButtonAndClick()
         checkBottomNavBarWithCategoriesTopLevel()
@@ -117,45 +158,45 @@ object AndroidNavigationTestUtils {
         checkBottomNavBarWithProfileTopLevel()
     }
 
+    fun MainComposeTestRule.navigateToSimilarUsersFromBottomNavBar() {
+        onNodeWithTagId(R.string.nav_similar_users).checkButtonAndClick()
+        checkBottomNavBarWithSimilarUsersTopLevel()
+    }
+
     fun MainComposeTestRule.navigateToSettingsFromBottomNavBar() {
         onNodeWithTagId(R.string.nav_settings).checkButtonAndClick()
         checkBottomNavBarWithSettingsTopLevel()
     }
 
     fun MainComposeTestRule.checkBottomNavBarWithCategoriesTopLevel() {
-        onNodeWithTagId(R.string.nav_profile).assertIsDisplayed()
-        onNodeWithTagId(R.string.nav_profile).assertIsNotSelected()
-
-        onNodeWithTagId(R.string.nav_settings).assertIsDisplayed()
-        onNodeWithTagId(R.string.nav_settings).assertIsNotSelected()
-
-        onNodeWithTagId(R.string.nav_categories).assertIsDisplayed()
-        onNodeWithTagId(R.string.nav_categories).assertIsSelected()
+        checkBottomNavBar(R.string.nav_categories)
     }
 
     fun MainComposeTestRule.checkBottomNavBarWithProfileTopLevel() {
-        onNodeWithTagId(R.string.nav_categories).assertIsDisplayed()
-        onNodeWithTagId(R.string.nav_categories).assertIsNotSelected()
+        checkBottomNavBar(R.string.nav_profile)
+    }
 
-        onNodeWithTagId(R.string.nav_settings).assertIsDisplayed()
-        onNodeWithTagId(R.string.nav_settings).assertIsNotSelected()
-
-        onNodeWithTagId(R.string.nav_profile).assertIsDisplayed()
-        onNodeWithTagId(R.string.nav_profile).assertIsSelected()
+    fun MainComposeTestRule.checkBottomNavBarWithSimilarUsersTopLevel() {
+        checkBottomNavBar(R.string.nav_similar_users)
     }
 
     fun MainComposeTestRule.checkBottomNavBarWithSettingsTopLevel() {
-        onNodeWithTagId(R.string.nav_profile).assertIsDisplayed()
-        onNodeWithTagId(R.string.nav_profile).assertIsNotSelected()
-
-        onNodeWithTagId(R.string.nav_categories).assertIsDisplayed()
-        onNodeWithTagId(R.string.nav_categories).assertIsNotSelected()
-
-        onNodeWithTagId(R.string.nav_settings).assertIsDisplayed()
-        onNodeWithTagId(R.string.nav_settings).assertIsSelected()
+        checkBottomNavBar(R.string.nav_settings)
     }
 
     fun MainComposeTestRule.performNavigateUp() {
         onNodeWithContentDescriptionId(R.string.back_button).checkButtonAndClick()
+    }
+
+    private fun MainComposeTestRule.checkBottomNavBar(@StringRes selectedItemId: Int) {
+        bottomNavBarItemIds.forEach {
+            onNodeWithTagId(it).assertIsDisplayed()
+
+            if (it == selectedItemId) {
+                onNodeWithTagId(it).assertIsSelected()
+            } else {
+                onNodeWithTagId(it).assertIsNotSelected()
+            }
+        }
     }
 }
