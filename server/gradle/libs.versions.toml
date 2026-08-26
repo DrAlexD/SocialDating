@@ -1,20 +1,20 @@
 [versions]
-kotlin = "2.3.20"
-kotlinxDatetime = "0.7.1-0.6.x-compat"
+kotlin = "2.4.10"
+kotlinxDatetime = "0.8.0-0.6.x-compat"
 kotlinxSerializationJson = "1.11.0"
-kotlinxCoroutines = "1.10.2"
-jacksonKotlin = "2.21.2"
-kotlinLogging = "8.0.01"
-springBoot = "3.5.13" # fixed due to Spring Boot 4.0.0
+kotlinxCoroutines = "1.11.0"
+jacksonKotlin = "2.22.2"
+kotlinLogging = "8.0.4"
+springBoot = "4.1.1" # fixed due to Spring Boot 4.0.0
 springDependencyManagement = "1.1.7"
 springKafka = "3.3.15" # fixed due to Spring Boot 4.0.0
-springCloudGateway = "4.3.4"
+springCloudGateway = "4.3.5"
 springCloudDependencies = "2025.0.2" # fixed due to Spring Boot 4.0.0
-springdocOpenapi = "2.8.17" # fixed due to Spring Boot 4.0.0
+springdocOpenapi = "3.1.0" # fixed due to Spring Boot 4.0.0
 jwt = "0.13.0"
-postgresql = "42.7.10"
+postgresql = "42.7.13"
 testcontainers = "1.21.4"
-mockk = "1.14.9"
+mockk = "1.14.11"
 springmockk = "5.0.1"
 
 [libraries]
