@@ -1,26 +1,29 @@
 package xelagurd.socialdating.client.androidTest
 
-import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.INPUT_TEXT
+import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.checkDisabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.checkTextField
-import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
+import xelagurd.socialdating.client.AndroidTestUtils.checkTextFieldAndInput
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.screen.LoginScreenComponent
 import xelagurd.socialdating.client.ui.state.LoginUiState
-import xelagurd.socialdating.client.ui.state.RequestStatus
-import xelagurd.socialdating.client.ui.theme.AppTheme
 
 @HiltAndroidTest
 class LoginScreenTest {
@@ -38,109 +41,75 @@ class LoginScreenTest {
     private val loginFormData = FakeData.loginFormData
 
     @Test
-    fun loginScreen_assertContentIsDisplayed() {
-        val loginUiState = LoginUiState()
+    fun loginScreen_defaultParameters_displayedContentWithDisabledButton() {
+        composeTestRule.setContentToScreen {
+            LoginScreenComponent()
+        }
 
-        assertContentIsDisplayed(loginUiState)
-    }
-
-    @Test
-    fun loginScreen_loadingState_loadingIndicator() {
-        val loginUiState = LoginUiState(
-            actionRequestStatus = RequestStatus.LOADING
-        )
-
-        setContentToLoginBody(loginUiState)
-
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
-    }
-
-    @Test
-    fun loginScreen_failureState_failureText() {
-        val failureText = FakeData.FAILURE_TEXT
-        val loginUiState = LoginUiState(
-            actionRequestStatus = RequestStatus.FAILURE(failureText)
-        )
-
-        setContentToLoginBody(loginUiState)
-
-        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
-    }
-
-    @Test
-    fun loginScreen_errorState_errorText() {
-        val errorText = FakeData.ERROR_TEXT
-        val loginUiState = LoginUiState(
-            actionRequestStatus = RequestStatus.ERROR(errorText)
-        )
-
-        setContentToLoginBody(loginUiState)
-
-        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
-    }
-
-    @Test
-    fun loginScreen_emptyData_disabledButton() {
-        val loginUiState = LoginUiState(
-            formData = loginFormData.copy(username = "", password = "")
-        )
-
-        assertLoginButtonIsDisabled(loginUiState)
-    }
-
-    @Test
-    fun loginScreen_allData_enabledButton() {
-        val loginUiState = LoginUiState(
-            formData = loginFormData
-        )
-
-        assertLoginButtonIsEnabled(loginUiState)
-    }
-
-    @Test
-    fun loginScreen_emptyUsername_disabledButton() {
-        val loginUiState = LoginUiState(
-            formData = loginFormData.copy(username = "")
-        )
-
-        assertLoginButtonIsDisabled(loginUiState)
-    }
-
-    @Test
-    fun loginScreen_emptyPassword_disabledButton() {
-        val loginUiState = LoginUiState(
-            formData = loginFormData.copy(password = "")
-        )
-
-        assertLoginButtonIsDisabled(loginUiState)
-    }
-
-    private fun assertLoginButtonIsEnabled(loginUiState: LoginUiState) {
-        setContentToLoginBody(loginUiState)
-
-        composeTestRule.onNodeWithTextId(R.string.login).checkEnabledButton()
-    }
-
-    private fun assertLoginButtonIsDisabled(loginUiState: LoginUiState) {
-        setContentToLoginBody(loginUiState)
-
+        assertContentIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.login).checkDisabledButton()
     }
 
-    private fun assertContentIsDisplayed(loginUiState: LoginUiState) {
-        setContentToLoginBody(loginUiState)
+    @Test
+    fun loginScreen_recomposition_displayedContentWithDisabledButton() {
+        composeTestRule.setContentToScreenAndRecompose {
+            LoginScreenComponent(loginUiState = LoginUiState())
+        }
 
+        assertContentIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.login).checkDisabledButton()
+    }
+
+    @Test
+    fun loginScreen_validFormData_displayedContentWithEnabledButton() {
+        composeTestRule.setContentToScreen {
+            LoginScreenComponent(loginUiState = LoginUiState(formData = loginFormData))
+        }
+
+        assertContentIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.login).checkEnabledButton()
+    }
+
+    @Test
+    fun loginScreen_allActions_calledAllActions() {
+        var changedFormData: LoginFormData? = null
+        var isLoginClicked = false
+        var isRegistrationClicked = false
+        var isOfflineModeClicked = false
+
+        composeTestRule.setContentToScreen {
+            LoginScreenComponent(
+                loginUiState = LoginUiState(formData = loginFormData),
+                onSuccessLogin = {},
+                onRegistrationClick = { isRegistrationClicked = true },
+                onValueChange = { changedFormData = it },
+                onLoginClick = { isLoginClicked = true },
+                onOfflineModeClick = { isOfflineModeClicked = true }
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.username).checkTextFieldAndInput(INPUT_TEXT)
+        assertEquals(true, changedFormData?.username?.contains(INPUT_TEXT))
+
+        composeTestRule.onNodeWithTextId(R.string.password).checkTextFieldAndInput(INPUT_TEXT)
+        assertEquals(true, changedFormData?.password?.contains(INPUT_TEXT))
+
+        composeTestRule.onNodeWithTextId(R.string.login).checkButtonAndClick()
+        assertTrue(isLoginClicked)
+
+        composeTestRule.onNodeWithTextId(R.string.register).checkButtonAndClick()
+        assertTrue(isRegistrationClicked)
+
+        composeTestRule.onNodeWithTextId(R.string.offline_mode).checkButtonAndClick()
+        assertTrue(isOfflineModeClicked)
+    }
+
+    private fun assertContentIsDisplayed() {
         composeTestRule.onNodeWithTextId(R.string.username).checkTextField()
         composeTestRule.onNodeWithTextId(R.string.password).checkTextField()
 
+        composeTestRule.onNodeWithTextId(R.string.or).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.register).checkEnabledButton()
-    }
-
-    private fun setContentToLoginBody(loginUiState: LoginUiState) {
-        composeTestRule.activity.setContent {
-            AppTheme {
-                LoginScreenComponent(loginUiState = loginUiState)
-            }
-        }
+        composeTestRule.onNodeWithTextId(R.string.offline_mode).checkEnabledButton()
     }
 }

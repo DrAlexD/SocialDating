@@ -1,18 +1,22 @@
 package xelagurd.socialdating.client.androidTest
 
-import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
@@ -21,7 +25,6 @@ import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesWit
 import xelagurd.socialdating.client.ui.screen.ProfileStatisticsScreenComponent
 import xelagurd.socialdating.client.ui.state.ProfileStatisticsUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
-import xelagurd.socialdating.client.ui.theme.AppTheme
 
 @HiltAndroidTest
 class ProfileStatisticsScreenTest {
@@ -36,88 +39,41 @@ class ProfileStatisticsScreenTest {
         hiltRule.inject()
     }
 
-    private val userCategoryWithData = FakeData.userCategories.toUserCategoriesWithData(FakeData.categories)[0]
-    private val userDefiningThemeWithData = FakeData.userDefiningThemes
-        .toUserDefiningThemesWithData(FakeData.definingThemes)[0]
+    private val userCategoriesWithData = FakeData.userCategories.toUserCategoriesWithData(FakeData.categories)
+    private val userDefiningThemesWithData = FakeData.userDefiningThemes
+        .toUserDefiningThemesWithData(FakeData.definingThemes)
+
+    private val userCategoryWithData = userCategoriesWithData[0]
+    private val userDefiningThemeWithData = userDefiningThemesWithData[0]
+
+    private val entityIdToData = userDefiningThemesWithData.groupBy { it.categoryId }
 
     @Test
-    fun profileStatisticsScreen_loadingStateAndEmptyData_loadingIndicator() {
-        val profileStatisticsUiState = ProfileStatisticsUiState()
-
-        setContentToProfileStatisticsBody(profileStatisticsUiState)
+    fun profileStatisticsScreen_defaultParameters_loadingIndicator() {
+        composeTestRule.setContentToScreen {
+            ProfileStatisticsScreenComponent()
+        }
 
         composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
-    fun profileStatisticsScreen_errorStateAndEmptyData_errorText() {
-        val errorText = FakeData.ERROR_TEXT
-        val profileStatisticsUiState = ProfileStatisticsUiState(
-            dataRequestStatus = RequestStatus.ERROR(errorText)
-        )
+    fun profileStatisticsScreen_recomposition_loadingIndicator() {
+        composeTestRule.setContentToScreenAndRecompose {
+            ProfileStatisticsScreenComponent(profileStatisticsUiState = ProfileStatisticsUiState())
+        }
 
-        setContentToProfileStatisticsBody(profileStatisticsUiState)
-
-        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
-    fun profileStatisticsScreen_failureStateAndEmptyData_failureText() {
-        val failureText = FakeData.FAILURE_TEXT
-        val profileStatisticsUiState = ProfileStatisticsUiState(
-            dataRequestStatus = RequestStatus.FAILURE(failureText)
-        )
-
-        setContentToProfileStatisticsBody(profileStatisticsUiState)
-
-        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
-    }
-
-    @Test
-    fun profileStatisticsScreen_loadingStateAndData_displayedData() {
-        val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = listOf(userCategoryWithData),
-            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf(userDefiningThemeWithData)),
-            dataRequestStatus = RequestStatus.LOADING
-        )
-
-        assertDataIsDisplayed(profileStatisticsUiState)
-    }
-
-    @Test
-    fun profileStatisticsScreen_errorStateAndData_displayedData() {
-        val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = listOf(userCategoryWithData),
-            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf(userDefiningThemeWithData)),
-            dataRequestStatus = RequestStatus.ERROR()
-        )
-
-        assertDataIsDisplayed(profileStatisticsUiState)
-    }
-
-    @Test
-    fun profileStatisticsScreen_failureStateAndData_displayedData() {
-        val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = listOf(userCategoryWithData),
-            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf(userDefiningThemeWithData)),
-            dataRequestStatus = RequestStatus.FAILURE()
-        )
-
-        assertDataIsDisplayed(profileStatisticsUiState)
-    }
-
-    @Test
-    fun profileStatisticsScreen_successStateAndData_displayedData() {
+    fun profileStatisticsScreen_expandedCategoryWithDefiningThemes_displayedDefiningThemes() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
             entities = listOf(userCategoryWithData),
             entityIdToData = mapOf(userCategoryWithData.categoryId to listOf(userDefiningThemeWithData)),
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
-        assertDataIsDisplayed(profileStatisticsUiState)
-    }
-
-    private fun assertDataIsDisplayed(profileStatisticsUiState: ProfileStatisticsUiState) {
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
         composeTestRule.onNodeWithText(userCategoryWithData.categoryName).assertIsDisplayed()
@@ -135,13 +91,117 @@ class ProfileStatisticsScreenTest {
         composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsDisplayed()
     }
 
+    @Test
+    fun profileStatisticsScreen_similarCategory_displayedSimilarityData() {
+        assertSimilarityDataIsDisplayed(categoryIndex = 0)
+    }
+
+    @Test
+    fun profileStatisticsScreen_oppositeCategory_displayedSimilarityData() {
+        assertSimilarityDataIsDisplayed(categoryIndex = 1)
+    }
+
+    @Test
+    fun profileStatisticsScreen_expandedCategoryWithoutDefiningThemes_displayedOnlyCategory() {
+        val profileStatisticsUiState = ProfileStatisticsUiState(
+            entities = listOf(userCategoryWithData),
+            entityIdToData = mapOf(),
+            dataRequestStatus = RequestStatus.SUCCESS
+        )
+
+        setContentToProfileStatisticsBody(profileStatisticsUiState)
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list).checkButtonAndClick()
+
+        composeTestRule.onNodeWithText(userCategoryWithData.categoryName).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun profileStatisticsScreen_expandedCategoryWithEmptyDefiningThemes_displayedOnlyCategory() {
+        val profileStatisticsUiState = ProfileStatisticsUiState(
+            entities = listOf(userCategoryWithData),
+            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf()),
+            dataRequestStatus = RequestStatus.SUCCESS
+        )
+
+        setContentToProfileStatisticsBody(profileStatisticsUiState)
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list).checkButtonAndClick()
+
+        composeTestRule.onNodeWithText(userCategoryWithData.categoryName).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun profileStatisticsScreen_anotherUser_notSelectedProfileNavigationItem() {
+        val profileStatisticsUiState = ProfileStatisticsUiState(
+            userId = FakeData.mainUser.id,
+            anotherUserId = FakeData.mainUser.id + 1,
+            entities = listOf(userCategoryWithData),
+            dataRequestStatus = RequestStatus.SUCCESS
+        )
+
+        setContentToProfileStatisticsBody(profileStatisticsUiState)
+
+        composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsNotSelected()
+    }
+
+    @Test
+    fun profileStatisticsScreen_allActions_calledAllActions() {
+        var isNavigateUpClicked = false
+        var isRefreshClicked = false
+        val profileStatisticsUiState = ProfileStatisticsUiState(
+            entities = listOf(userCategoryWithData),
+            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf(userDefiningThemeWithData)),
+            dataRequestStatus = RequestStatus.SUCCESS
+        )
+
+        composeTestRule.setContentToScreen {
+            ProfileStatisticsScreenComponent(
+                profileStatisticsUiState = profileStatisticsUiState,
+                onNavigateUp = { isNavigateUpClicked = true },
+                refreshAction = { isRefreshClicked = true }
+            )
+        }
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).checkButtonAndClick()
+        assertTrue(isNavigateUpClicked)
+
+        composeTestRule.onNodeWithTextId(R.string.online).checkButtonAndClick()
+        assertTrue(isRefreshClicked)
+    }
+
+    private fun assertSimilarityDataIsDisplayed(categoryIndex: Int) {
+        val userCategory = userCategoriesWithData[categoryIndex]
+        val userDefiningThemes = entityIdToData[userCategory.categoryId].orEmpty()
+        val detailedSimilarCategory = FakeData.detailedSimilarUser.categories[userCategory.categoryId]!!
+
+        val profileStatisticsUiState = ProfileStatisticsUiState(
+            entities = listOf(userCategory),
+            entityIdToData = mapOf(userCategory.categoryId to userDefiningThemes),
+            entitiesMask = FakeData.detailedSimilarUser,
+            dataRequestStatus = RequestStatus.SUCCESS
+        )
+
+        setContentToProfileStatisticsBody(profileStatisticsUiState)
+
+        composeTestRule.onNodeWithText(userCategory.categoryName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(detailedSimilarCategory.similarNumber.toString()).assertIsDisplayed()
+        composeTestRule.onNodeWithText(detailedSimilarCategory.oppositeNumber.toString()).assertIsDisplayed()
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list).checkButtonAndClick()
+
+        userDefiningThemes.forEach {
+            composeTestRule.onNodeWithText(it.definingThemeName).assertIsDisplayed()
+        }
+    }
+
     private fun setContentToProfileStatisticsBody(profileStatisticsUiState: ProfileStatisticsUiState) {
-        composeTestRule.activity.setContent {
-            AppTheme {
-                ProfileStatisticsScreenComponent(
-                    profileStatisticsUiState = profileStatisticsUiState
-                )
-            }
+        composeTestRule.setContentToScreen {
+            ProfileStatisticsScreenComponent(
+                profileStatisticsUiState = profileStatisticsUiState
+            )
         }
     }
 }

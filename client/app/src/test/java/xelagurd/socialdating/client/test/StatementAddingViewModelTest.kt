@@ -76,7 +76,7 @@ class StatementAddingViewModelTest {
     }
 
     @Test
-    fun statementAddingViewModel_statementAddingWithInternet() = runTest {
+    fun statementAddingViewModel_statementAddingWithInternet_successStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -91,7 +91,7 @@ class StatementAddingViewModelTest {
     }
 
     @Test
-    fun statementAddingViewModel_statementAddingWithoutInternet() = runTest {
+    fun statementAddingViewModel_statementAddingWithoutInternet_errorStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -105,7 +105,7 @@ class StatementAddingViewModelTest {
     }
 
     @Test
-    fun statementAddingViewModel_statementAddingWithWrongData() = runTest {
+    fun statementAddingViewModel_statementAddingWithWrongData_failureStatus() = runTest {
         mockWrongData()
 
         initViewModel()
@@ -119,7 +119,7 @@ class StatementAddingViewModelTest {
     }
 
     @Test
-    fun statementAddingViewModel_retryStatementAddingWithInternet() = runTest {
+    fun statementAddingViewModel_retryStatementAddingWithInternetAfterError_successStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -138,7 +138,7 @@ class StatementAddingViewModelTest {
     }
 
     @Test
-    fun statementAddingViewModel_retryStatementAddingWithRightData() = runTest {
+    fun statementAddingViewModel_retryStatementAddingWithRightDataAfterFailure_successStatus() = runTest {
         mockWrongData()
 
         initViewModel()

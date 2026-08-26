@@ -5,10 +5,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import android.content.Context
+import androidx.credentials.Credential
+import androidx.credentials.GetCredentialResponse
+import androidx.credentials.PasswordCredential
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
+import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
@@ -20,6 +24,7 @@ import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.AccountManager
 import xelagurd.socialdating.client.data.PreferencesRepository
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.remote.ApiUtils.BAD_REQUEST
@@ -58,14 +63,19 @@ class LoginViewModelTest {
             remoteUsersRepository,
             localUsersRepository
         )
+    }
+
+    private fun initViewModelAndLoginWithInput() {
+        initViewModel()
+        viewModel.updateUiState(FakeData.loginFormData)
         viewModel.loginWithInput()
     }
 
     @Test
-    fun loginViewModel_loginWithInternet() = runTest {
+    fun loginViewModel_loginWithInternet_successStatus() = runTest {
         mockDataWithInternet()
 
-        initViewModel()
+        initViewModelAndLoginWithInput()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
@@ -81,10 +91,10 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun loginViewModel_loginWithoutInternet() = runTest {
+    fun loginViewModel_loginWithoutInternet_errorStatus() = runTest {
         mockDataWithoutInternet()
 
-        initViewModel()
+        initViewModelAndLoginWithInput()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.ERROR(), loginUiState.actionRequestStatus)
@@ -95,10 +105,10 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun loginViewModel_loginWithWrongData() = runTest {
+    fun loginViewModel_loginWithWrongData_failureStatus() = runTest {
         mockWrongData()
 
-        initViewModel()
+        initViewModelAndLoginWithInput()
         advanceUntilIdle()
 
         assertEquals(RequestStatus.FAILURE(BAD_REQUEST.toString()), loginUiState.actionRequestStatus)
@@ -109,10 +119,10 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun loginViewModel_retryLoginWithInternet() = runTest {
+    fun loginViewModel_retryLoginWithInternetAfterError_successStatus() = runTest {
         mockDataWithoutInternet()
 
-        initViewModel()
+        initViewModelAndLoginWithInput()
         advanceUntilIdle()
 
         mockDataWithInternet()
@@ -133,10 +143,10 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun loginViewModel_retryLoginWithRightData() = runTest {
+    fun loginViewModel_retryLoginWithRightDataAfterFailure_successStatus() = runTest {
         mockWrongData()
 
-        initViewModel()
+        initViewModelAndLoginWithInput()
         advanceUntilIdle()
 
         mockDataWithInternet()
@@ -156,14 +166,95 @@ class LoginViewModelTest {
         confirmVerified(preferencesRepository, localUsersRepository, remoteUsersRepository, accountManager)
     }
 
+    @Test
+    fun loginViewModel_foundCredentials_successStatus() = runTest {
+        mockFindCredentials()
+        mockDataWithInternet()
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
+
+        coVerify(exactly = 1) { accountManager.findCredentials() }
+        coVerify(exactly = 1) { remoteUsersRepository.loginUser(any()) }
+        coVerify(exactly = 1) { localUsersRepository.insertUser(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveAccessToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveRefreshToken(any()) }
+        coVerify(exactly = 1) { preferencesRepository.saveCurrentUserId(any()) }
+        confirmVerified(preferencesRepository, localUsersRepository, remoteUsersRepository, accountManager)
+    }
+
+    @Test
+    fun loginViewModel_foundUnsupportedCredentials_undefinedStatus() = runTest {
+        mockFindUnsupportedCredentials()
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.UNDEFINED, loginUiState.actionRequestStatus)
+
+        coVerify(exactly = 1) { accountManager.findCredentials() }
+        confirmVerified(preferencesRepository, localUsersRepository, remoteUsersRepository, accountManager)
+    }
+
+    @Test
+    fun loginViewModel_initOfflineMode_successStatusWithSavedOfflineMode() = runTest {
+        mockInitOfflineModeData()
+
+        initViewModel()
+        viewModel.initOfflineMode()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, loginUiState.actionRequestStatus)
+
+        coVerify(exactly = 1) { accountManager.findCredentials() }
+        coVerify(exactly = 1) { commonLocalRepository.initOfflineModeData() }
+        coVerify(exactly = 1) { preferencesRepository.saveIsOfflineMode(true) }
+        coVerify(exactly = 1) { preferencesRepository.saveCurrentUserId(FakeData.users[0].id) }
+        confirmVerified(
+            preferencesRepository,
+            localUsersRepository,
+            remoteUsersRepository,
+            accountManager,
+            commonLocalRepository
+        )
+    }
+
     private fun mockFindCredentialsWithError() {
         coEvery { accountManager.findCredentials() } returns null
+    }
+
+    private fun mockFindCredentials() {
+        coEvery { accountManager.findCredentials() } returns credentialResponse()
+    }
+
+    private fun mockFindUnsupportedCredentials() {
+        val credentialResponse = mockk<GetCredentialResponse>()
+        every { credentialResponse.credential } returns mockk<Credential>()
+
+        coEvery { accountManager.findCredentials() } returns credentialResponse
+    }
+
+    private fun credentialResponse(): GetCredentialResponse {
+        val passwordCredential = mockk<PasswordCredential>()
+        every { passwordCredential.id } returns FakeData.loginFormData.username
+        every { passwordCredential.password } returns FakeData.loginFormData.password
+
+        val credentialResponse = mockk<GetCredentialResponse>()
+        every { credentialResponse.credential } returns passwordCredential
+
+        return credentialResponse
     }
 
     private fun mockDataWithInternet() {
         coEvery { remoteUsersRepository.loginUser(any()) } returns Response.success(mockk(relaxed = true))
         coEvery { accountManager.saveCredentials(any()) } just Runs
         coEvery { localUsersRepository.insertUser(any()) } just Runs
+    }
+
+    private fun mockInitOfflineModeData() {
+        coEvery { commonLocalRepository.initOfflineModeData() } just Runs
     }
 
     private fun mockWrongData() {

@@ -1,22 +1,21 @@
 package xelagurd.socialdating.client.androidTest
 
-import androidx.activity.compose.setContent
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
-import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.ui.screen.SettingsScreenComponent
-import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.SettingsUiState
-import xelagurd.socialdating.client.ui.theme.AppTheme
 
 @HiltAndroidTest
 class SettingsScreenTest {
@@ -32,36 +31,37 @@ class SettingsScreenTest {
     }
 
     @Test
-    fun registrationScreen_assertContentIsDisplayed() {
-        val settingsUiState = SettingsUiState()
-
-        assertContentIsDisplayed(settingsUiState)
-    }
-
-    @Test
-    fun settingsScreen_loadingState_loadingIndicator() {
-        val settingsUiState = SettingsUiState(
-            actionRequestStatus = RequestStatus.LOADING
-        )
-
-        setContentToSettingsBody(settingsUiState)
-
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
-    }
-
-    private fun assertContentIsDisplayed(settingsUiState: SettingsUiState) {
-        setContentToSettingsBody(settingsUiState)
+    fun settingsScreen_defaultParameters_displayedLogoutButton() {
+        composeTestRule.setContentToScreen {
+            SettingsScreenComponent()
+        }
 
         composeTestRule.onNodeWithTextId(R.string.logout).checkEnabledButton()
     }
 
-    private fun setContentToSettingsBody(settingsUiState: SettingsUiState) {
-        composeTestRule.activity.setContent {
-            AppTheme {
-                SettingsScreenComponent(
-                    settingsUiState = settingsUiState
-                )
-            }
+    @Test
+    fun settingsScreen_recomposition_displayedLogoutButton() {
+        composeTestRule.setContentToScreenAndRecompose {
+            SettingsScreenComponent(settingsUiState = SettingsUiState())
         }
+
+        composeTestRule.onNodeWithTextId(R.string.logout).checkEnabledButton()
+    }
+
+    @Test
+    fun settingsScreen_logoutClick_calledLogoutAction() {
+        var isLogoutClicked = false
+
+        composeTestRule.setContentToScreen {
+            SettingsScreenComponent(
+                settingsUiState = SettingsUiState(),
+                onSuccessLogout = {},
+                onLogoutClick = { isLogoutClicked = true }
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.logout).checkButtonAndClick()
+
+        assertTrue(isLogoutClicked)
     }
 }

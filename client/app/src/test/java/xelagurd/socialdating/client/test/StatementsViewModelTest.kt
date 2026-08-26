@@ -28,9 +28,11 @@ import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.TestUtils.mockkList
 import xelagurd.socialdating.client.data.PreferencesRepository
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.model.Statement
+import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.client.ui.navigation.StatementsDestination
@@ -60,6 +62,8 @@ class StatementsViewModelTest {
     private val categoryId = Random.nextInt()
     private val isOfflineModeFlow = flowOf(false)
 
+    private val statement = FakeData.mainStatement
+
     @Before
     fun setup() {
         statementsFlow = MutableStateFlow(mockkList())
@@ -86,7 +90,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkStateWithInternet() = runTest {
+    fun statementsViewModel_withInternet_successStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -108,7 +112,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkStateWithEmptyData() = runTest {
+    fun statementsViewModel_withEmptyRemoteDefiningThemes_successStatus() = runTest {
         mockEmptyData()
 
         initViewModel()
@@ -128,7 +132,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkStateWithoutInternet() = runTest {
+    fun statementsViewModel_withoutInternet_errorStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -148,7 +152,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
+    fun statementsViewModel_refreshWithoutInternetAfterSuccess_errorStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -175,7 +179,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkRefreshedErrorStateWithInternet() = runTest {
+    fun statementsViewModel_refreshWithInternetAfterError_successStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -202,7 +206,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
+    fun statementsViewModel_refreshWithInternetAfterSuccess_successStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -227,7 +231,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
+    fun statementsViewModel_refreshWithoutInternetAfterError_errorStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -249,6 +253,59 @@ class StatementsViewModelTest {
         )
     }
 
+    @Test
+    fun statementsViewModel_withEmptyRemoteStatements_successStatus() = runTest {
+        mockEmptyStatements()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
+
+        verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
+        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any()) }
+        confirmVerified(
+            remoteStatementsRepository,
+            localStatementsRepository,
+            remoteDefiningThemesRepository,
+            commonLocalRepository
+        )
+    }
+
+    @Test
+    fun statementsViewModel_statementReactionWithInternet_deletedStatement() = runTest {
+        mockDataWithInternet()
+        mockStatementReactionWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.onStatementReactionClick(statement, StatementReactionType.FULL_MAINTAIN)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { remoteStatementsRepository.processStatementReaction(any()) }
+        coVerify(exactly = 1) { localStatementsRepository.deleteStatement(statement) }
+    }
+
+    @Test
+    fun statementsViewModel_statementReactionWithoutInternet_notDeletedStatement() = runTest {
+        mockDataWithInternet()
+        mockStatementReactionWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.onStatementReactionClick(statement, StatementReactionType.FULL_MAINTAIN)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { remoteStatementsRepository.processStatementReaction(any()) }
+        coVerify(exactly = 0) { localStatementsRepository.deleteStatement(any()) }
+    }
+
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(StatementsDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(StatementsDestination.categoryId) } returns categoryId
@@ -265,8 +322,23 @@ class StatementsViewModelTest {
         coEvery { commonLocalRepository.updateStatementsScreenData(any(), any(), any()) } just Runs
     }
 
+    private fun mockStatementReactionWithInternet() {
+        coEvery { remoteStatementsRepository.processStatementReaction(any()) } returns Response.success(mockk())
+        coEvery { localStatementsRepository.deleteStatement(any()) } just Runs
+    }
+
+    private fun mockStatementReactionWithoutInternet() {
+        coEvery { remoteStatementsRepository.processStatementReaction(any()) } throws IOException()
+    }
+
     private fun mockEmptyData() {
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) } returns Response.success(null)
+    }
+
+    private fun mockEmptyStatements() {
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) } returns
+                Response.success(mockkList(relaxed = true))
+        coEvery { remoteStatementsRepository.getStatements(any(), any()) } returns Response.success(null)
     }
 
     private fun mockDataWithoutInternet() {

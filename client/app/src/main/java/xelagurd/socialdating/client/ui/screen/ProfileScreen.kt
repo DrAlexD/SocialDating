@@ -185,7 +185,7 @@ private fun ProfileComponentDataRuPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun ProfileComponentNoDataPreview() {
+private fun ProfileComponentDataErrorPreview() {
     AppTheme {
         ProfileScreenComponent(
             profileUiState = ProfileUiState(dataRequestStatus = RequestStatus.ERROR("Text"))

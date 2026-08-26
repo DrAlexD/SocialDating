@@ -73,7 +73,7 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_checkStateWithInternet() = runTest {
+    fun categoriesViewModel_withInternet_successStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -89,7 +89,7 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_checkStateWithEmptyData() = runTest {
+    fun categoriesViewModel_withEmptyRemoteCategories_successStatus() = runTest {
         mockEmptyData()
 
         initViewModel()
@@ -104,7 +104,7 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_checkStateWithoutInternet() = runTest {
+    fun categoriesViewModel_withoutInternet_errorStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -119,7 +119,7 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
+    fun categoriesViewModel_refreshWithoutInternetAfterSuccess_errorStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -140,7 +140,7 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_checkRefreshedErrorStateWithInternet() = runTest {
+    fun categoriesViewModel_refreshWithInternetAfterError_successStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -161,7 +161,7 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
+    fun categoriesViewModel_refreshWithInternetAfterSuccess_successStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -180,7 +180,7 @@ class CategoriesViewModelTest {
     }
 
     @Test
-    fun categoriesViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
+    fun categoriesViewModel_refreshWithoutInternetAfterError_errorStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()

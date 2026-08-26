@@ -1,6 +1,5 @@
 package xelagurd.socialdating.client.androidTest
 
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -12,11 +11,14 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.ui.AppTopBar
@@ -56,6 +58,15 @@ class TopBarTest {
     }
 
     @Test
+    fun topBar_failureState_offlineTextWithRefresh() {
+        setContentToAppTopBar(RequestStatus.FAILURE())
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.offline).assertIsDisplayed()
+    }
+
+    @Test
     fun topBar_successState_onlineTextWithRefresh() {
         setContentToAppTopBar(RequestStatus.SUCCESS)
 
@@ -65,17 +76,60 @@ class TopBarTest {
     }
 
     @Test
-    fun topBar_backButton() {
+    fun topBar_withNavigateUpAction_displayedBackButton() {
         setContentToAppTopBar(RequestStatus.SUCCESS) {}
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsDisplayed()
+    }
+
+    @Test
+    fun topBar_withoutDataRequestStatus_onlyTitle() {
+        composeTestRule.setContentToScreen {
+            AppTopBar(
+                title = stringResource(CategoriesDestination.titleRes),
+                modifier = Modifier
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.app_name).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun topBar_withoutRefreshAction_offlineTextWithRefreshIcon() {
+        composeTestRule.setContentToScreen {
+            AppTopBar(
+                title = stringResource(CategoriesDestination.titleRes),
+                dataRequestStatus = RequestStatus.ERROR()
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.offline).checkButtonAndClick()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.refresh).assertIsDisplayed()
+    }
+
+    @Test
+    fun topBar_refreshClick_calledRefreshAction() {
+        var isRefreshClicked = false
+
+        composeTestRule.setContentToScreen {
+            AppTopBar(
+                title = stringResource(CategoriesDestination.titleRes),
+                dataRequestStatus = RequestStatus.SUCCESS,
+                refreshAction = { isRefreshClicked = true }
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.online).checkButtonAndClick()
+
+        assertTrue(isRefreshClicked)
     }
 
     private fun setContentToAppTopBar(
         dataRequestStatus: RequestStatus,
         navigateUp: (() -> Unit)? = null
     ) {
-        composeTestRule.activity.setContent {
+        composeTestRule.setContentToScreen {
             Scaffold(
                 topBar = {
                     AppTopBar(

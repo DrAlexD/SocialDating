@@ -199,9 +199,19 @@ private fun SimilarUsersComponentDataPreview() {
     }
 }
 
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
+@Composable
+private fun SimilarUsersComponentDataRuPreview() {
+    AppTheme {
+        SimilarUsersScreenComponent(
+            similarUsersUiState = SimilarUsersUiState(entities = FakeData.similarUsers.toSimilarUsersWithData(FakeData.users))
+        )
+    }
+}
+
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun SimilarUsersComponentNoDataPreview() {
+private fun SimilarUsersComponentDataErrorPreview() {
     AppTheme {
         SimilarUsersScreenComponent(
             similarUsersUiState = SimilarUsersUiState(dataRequestStatus = RequestStatus.ERROR("Text"))

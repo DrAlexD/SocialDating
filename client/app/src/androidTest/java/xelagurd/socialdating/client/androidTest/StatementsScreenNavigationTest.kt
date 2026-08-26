@@ -1,8 +1,6 @@
 package xelagurd.socialdating.client.androidTest
 
-import androidx.activity.compose.setContent
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -13,13 +11,17 @@ import org.junit.Test
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToCategoriesFromBottomNavBar
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToProfileFromBottomNavBar
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToSettingsFromBottomNavBar
+import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToSimilarUsersFromBottomNavBar
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToStatementAdding
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToStatements
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.performNavigateUp
+import xelagurd.socialdating.client.AndroidNavigationTestUtils.setContentToAppNavHost
+import xelagurd.socialdating.client.AndroidTestUtils.assertBackStackDepth
 import xelagurd.socialdating.client.AndroidTestUtils.assertCurrentRouteName
+import xelagurd.socialdating.client.AndroidTestUtils.assertRouteInBackStack
+import xelagurd.socialdating.client.AndroidTestUtils.assertRouteNotInBackStack
 import xelagurd.socialdating.client.AndroidTestUtils.getCurrentRoute
 import xelagurd.socialdating.client.MainActivity
-import xelagurd.socialdating.client.ui.navigation.AppNavHost
 import xelagurd.socialdating.client.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.client.ui.navigation.StatementAddingDestination
 import xelagurd.socialdating.client.ui.navigation.StatementsDestination
@@ -38,33 +40,26 @@ class StatementsScreenNavigationTest {
     fun setup() {
         hiltRule.inject()
 
-        composeTestRule.activity.setContent {
-            navController = TestNavHostController(composeTestRule.activity).apply {
-                navigatorProvider.addNavigator(ComposeNavigator())
-            }
-            AppNavHost(navController)
-        }
-
-        composeTestRule.runOnIdle {
-            assert(::navController.isInitialized)
-        }
+        navController = composeTestRule.setContentToAppNavHost()
     }
 
     @Test
-    fun appNavHost_clickAddStatement_navigatesToStatementAddingScreen() {
+    fun appNavHost_clickAddStatement_navigatesToStatementAddingScreenWithStatementsInBackStack() {
         composeTestRule.navigateToStatementAdding()
 
         navController.assertCurrentRouteName(StatementAddingDestination.routeWithArgs)
-        //navController.assertBackStackDepth(?)
+        navController.assertRouteInBackStack(StatementsDestination.routeWithArgs)
+        //navController.assertBackStackDepth(5)
     }
 
     @Test
-    fun appNavHost_clickBack_navigatesToCategories() {
+    fun appNavHost_clickBack_navigatesToCategoriesScreen() {
         composeTestRule.navigateToStatements()
         composeTestRule.performNavigateUp()
 
         navController.assertCurrentRouteName(CategoriesDestination.route)
-        //navController.assertBackStackDepth(?)
+        navController.assertRouteNotInBackStack(StatementsDestination.routeWithArgs)
+        //navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -75,26 +70,39 @@ class StatementsScreenNavigationTest {
         val currentRoute = navController.getCurrentRoute()
 
         assertEquals(previousRoute, currentRoute)
-        //navController.assertBackStackDepth(?)
+        //navController.assertBackStackDepth(4)
     }
 
     @Test
-    fun appNavHost_navigateToProfileAndBack_navigatesToStatementsScreen() {
+    fun appNavHost_navigateToProfileAndBack_restoredStatementsScreenWithCategories() {
         composeTestRule.navigateToStatements()
         composeTestRule.navigateToProfileFromBottomNavBar()
         composeTestRule.navigateToCategoriesFromBottomNavBar()
 
         navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
-        //navController.assertBackStackDepth(?)
+        navController.assertRouteInBackStack(CategoriesDestination.route)
+        //navController.assertBackStackDepth(4)
     }
 
     @Test
-    fun appNavHost_navigateToSettingsAndBack_navigatesToStatementsScreen() {
+    fun appNavHost_navigateToSimilarUsersAndBack_restoredStatementsScreenWithCategories() {
+        composeTestRule.navigateToStatements()
+        composeTestRule.navigateToSimilarUsersFromBottomNavBar()
+        composeTestRule.navigateToCategoriesFromBottomNavBar()
+
+        navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
+        navController.assertRouteInBackStack(CategoriesDestination.route)
+        //navController.assertBackStackDepth(4)
+    }
+
+    @Test
+    fun appNavHost_navigateToSettingsAndBack_restoredStatementsScreenWithCategories() {
         composeTestRule.navigateToStatements()
         composeTestRule.navigateToSettingsFromBottomNavBar()
         composeTestRule.navigateToCategoriesFromBottomNavBar()
 
         navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
-        //navController.assertBackStackDepth(?)
+        navController.assertRouteInBackStack(CategoriesDestination.route)
+        //navController.assertBackStackDepth(4)
     }
 }

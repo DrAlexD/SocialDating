@@ -27,6 +27,7 @@ import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
@@ -52,17 +53,17 @@ class ProfileViewModelTest {
         get() = viewModel.uiState.value
 
     private val userId = Random.nextInt()
-    private val anotherUserId = userId
+    private var anotherUserId = userId
     private val isOfflineModeFlow = flowOf(false)
 
     @Before
     fun setup() {
         usersFlow = MutableStateFlow(mockk())
-
-        mockGeneralMethods()
     }
 
     private fun initViewModel() {
+        mockGeneralMethods()
+
         viewModel = ProfileViewModel(
             context,
             savedStateHandle,
@@ -79,7 +80,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkStateWithInternet() = runTest {
+    fun profileViewModel_withInternet_successStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -95,7 +96,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkStateWithEmptyData() = runTest {
+    fun profileViewModel_withEmptyRemoteUser_successStatus() = runTest {
         mockEmptyData()
 
         initViewModel()
@@ -110,7 +111,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkStateWithoutInternet() = runTest {
+    fun profileViewModel_withoutInternet_errorStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -125,7 +126,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
+    fun profileViewModel_refreshWithoutInternetAfterSuccess_errorStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -146,7 +147,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkRefreshedErrorStateWithInternet() = runTest {
+    fun profileViewModel_refreshWithInternetAfterError_successStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -167,7 +168,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
+    fun profileViewModel_refreshWithInternetAfterSuccess_successStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -186,7 +187,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun profileViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
+    fun profileViewModel_refreshWithoutInternetAfterError_errorStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -203,6 +204,22 @@ class ProfileViewModelTest {
         confirmVerified(localUsersRepository, remoteUsersRepository)
     }
 
+    @Test
+    fun profileViewModel_anotherUserWithInternet_successStatusWithAnotherUser() = runTest {
+        anotherUserId = userId + 1
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
+        assertEquals(FakeData.users[1], profileUiState.entity)
+
+        coVerify(exactly = 1) { remoteUsersRepository.getUser(any()) }
+        confirmVerified(localUsersRepository, remoteUsersRepository)
+    }
+
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(ProfileDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(ProfileDestination.anotherUserId) } returns anotherUserId
@@ -211,7 +228,7 @@ class ProfileViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteUsersRepository.getUser(any()) } returns Response.success(mockk())
+        coEvery { remoteUsersRepository.getUser(any()) } returns Response.success(FakeData.users[1])
         coEvery { localUsersRepository.insertUser(any()) } just Runs
     }
 

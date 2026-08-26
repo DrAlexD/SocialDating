@@ -172,7 +172,7 @@ private fun StatementsComponentDataPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementsComponentNoDataPreview() {
+private fun StatementsComponentDataErrorPreview() {
     AppTheme {
         StatementsScreenComponent(
             statementsUiState = StatementsUiState(dataRequestStatus = RequestStatus.ERROR("Text"))

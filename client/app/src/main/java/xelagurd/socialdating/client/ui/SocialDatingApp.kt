@@ -1,6 +1,7 @@
 package xelagurd.socialdating.client.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -25,9 +27,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.ui.navigation.AppNavHost
 import xelagurd.socialdating.client.ui.navigation.CategoriesDestination
+import xelagurd.socialdating.client.ui.navigation.LoginDestination
+import xelagurd.socialdating.client.ui.navigation.initializeTopLevelDestinations
 import xelagurd.socialdating.client.ui.navigation.topLevelDestinations
 import xelagurd.socialdating.client.ui.screen.AppMediumTitleText
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -129,6 +134,20 @@ fun AppBottomNavigationBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
+fun AppTopBarLoadingPreview() {
+    AppTheme {
+        AppTopBar(
+            title = stringResource(CategoriesDestination.titleRes),
+            dataRequestStatus = RequestStatus.LOADING,
+            refreshAction = {},
+            navigateUp = {}
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
+@Composable
 fun AppTopBarOfflinePreview() {
     AppTheme {
         AppTopBar(
@@ -169,15 +188,30 @@ fun AppTopBarOnlinePreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-fun AppTopBarOnlineRuPreview() {
+fun AppTopBarWithoutDataRequestStatusPreview() {
     AppTheme {
         AppTopBar(
-            title = stringResource(CategoriesDestination.titleRes),
-            dataRequestStatus = RequestStatus.SUCCESS,
-            refreshAction = {},
-            navigateUp = {}
+            title = stringResource(LoginDestination.titleRes)
         )
+    }
+}
+
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
+@Composable
+fun AppBottomNavigationBarPreview() {
+    initializeTopLevelDestinations(rememberNavController())
+
+    AppTheme {
+        Scaffold(
+            bottomBar = {
+                AppBottomNavigationBar(
+                    currentTopLevelRoute = CategoriesDestination.topLevelRoute
+                )
+            }
+        ) { innerPadding ->
+            Box(modifier = Modifier.padding(innerPadding))
+        }
     }
 }

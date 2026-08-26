@@ -1,27 +1,34 @@
 package xelagurd.socialdating.client.androidTest
 
-import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.INPUT_TEXT
+import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.checkDisabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.checkTextField
+import xelagurd.socialdating.client.AndroidTestUtils.checkTextFieldAndInput
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextIdWithColon
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.model.enums.Gender
+import xelagurd.socialdating.client.data.model.enums.Purpose
+import xelagurd.socialdating.client.ui.form.RegistrationFormData
 import xelagurd.socialdating.client.ui.screen.RegistrationScreenComponent
 import xelagurd.socialdating.client.ui.state.RegistrationUiState
-import xelagurd.socialdating.client.ui.state.RequestStatus
-import xelagurd.socialdating.client.ui.theme.AppTheme
 
 @HiltAndroidTest
 class RegistrationScreenTest {
@@ -39,182 +46,100 @@ class RegistrationScreenTest {
     private val registrationFormData = FakeData.registrationFormData
 
     @Test
-    fun registrationScreen_assertContentIsDisplayed() {
-        val registrationUiState = RegistrationUiState()
+    fun registrationScreen_defaultParameters_displayedContentWithDisabledButton() {
+        composeTestRule.setContentToScreen {
+            RegistrationScreenComponent()
+        }
 
-        assertContentIsDisplayed(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_loadingState_loadingIndicator() {
-        val registrationUiState = RegistrationUiState(
-            actionRequestStatus = RequestStatus.LOADING
-        )
-
-        setContentToRegistrationBody(registrationUiState)
-
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
-    }
-
-    @Test
-    fun registrationScreen_failureState_failureText() {
-        val failureText = FakeData.FAILURE_TEXT
-        val registrationUiState = RegistrationUiState(
-            actionRequestStatus = RequestStatus.FAILURE(failureText)
-        )
-
-        setContentToRegistrationBody(registrationUiState)
-
-        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
-    }
-
-    @Test
-    fun registrationScreen_errorState_errorText() {
-        val errorText = FakeData.ERROR_TEXT
-        val registrationUiState = RegistrationUiState(
-            actionRequestStatus = RequestStatus.ERROR(errorText)
-        )
-
-        setContentToRegistrationBody(registrationUiState)
-
-        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
-    }
-
-    @Test
-    fun registrationScreen_emptyData_disabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(
-                name = "", gender = null, username = "", password = "", repeatedPassword = "",
-                email = "", age = "", city = "", purpose = null
-            )
-        )
-
-        assertRegisterButtonIsDisabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_allData_enabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData
-        )
-
-        assertRegisterButtonIsEnabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_emptyEmail_enabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(email = "")
-        )
-
-        assertRegisterButtonIsEnabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_emptyName_disabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(name = "")
-        )
-
-        assertRegisterButtonIsDisabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_emptyGender_disabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(gender = null)
-        )
-
-        assertRegisterButtonIsDisabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_emptyUsername_disabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(username = "")
-        )
-
-        assertRegisterButtonIsDisabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_emptyPassword_disabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(password = "")
-        )
-
-        assertRegisterButtonIsDisabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_emptyRepeatedPassword_disabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(repeatedPassword = "")
-        )
-
-        assertRegisterButtonIsDisabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_passwordIsNotEqualToRepeatedPassword_disabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(password = "123", repeatedPassword = "321")
-        )
-
-        assertRegisterButtonIsDisabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_emptyAge_disabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(age = "")
-        )
-
-        assertRegisterButtonIsDisabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_notNumberAge_disabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(age = "abcde")
-        )
-
-        assertRegisterButtonIsDisabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_emptyCity_disabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(city = "")
-        )
-
-        assertRegisterButtonIsDisabled(registrationUiState)
-    }
-
-    @Test
-    fun registrationScreen_emptyPurpose_disabledButton() {
-        val registrationUiState = RegistrationUiState(
-            formData = registrationFormData.copy(purpose = null)
-        )
-
-        assertRegisterButtonIsDisabled(registrationUiState)
-    }
-
-    private fun assertRegisterButtonIsEnabled(registrationUiState: RegistrationUiState) {
-        setContentToRegistrationBody(registrationUiState)
-
-        composeTestRule.onNodeWithTextId(R.string.register).checkEnabledButton()
-    }
-
-    private fun assertRegisterButtonIsDisabled(registrationUiState: RegistrationUiState) {
-        setContentToRegistrationBody(registrationUiState)
-
+        assertContentIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.register).checkDisabledButton()
     }
 
-    private fun assertContentIsDisplayed(registrationUiState: RegistrationUiState) {
-        setContentToRegistrationBody(registrationUiState)
+    @Test
+    fun registrationScreen_recomposition_displayedContentWithDisabledButton() {
+        composeTestRule.setContentToScreenAndRecompose {
+            RegistrationScreenComponent(registrationUiState = RegistrationUiState())
+        }
 
+        assertContentIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.register).checkDisabledButton()
+    }
+
+    @Test
+    fun registrationScreen_validFormData_displayedContentWithEnabledButton() {
+        composeTestRule.setContentToScreen {
+            RegistrationScreenComponent(
+                registrationUiState = RegistrationUiState(formData = registrationFormData)
+            )
+        }
+
+        assertContentIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.register).checkEnabledButton()
+    }
+
+    @Test
+    fun registrationScreen_allActionsWithoutPasswords_calledAllActions() {
+        var changedFormData: RegistrationFormData? = null
+        var isRegisterClicked = false
+        var isNavigateUpClicked = false
+
+        composeTestRule.setContentToScreen {
+            RegistrationScreenComponent(
+                registrationUiState = RegistrationUiState(formData = registrationFormData),
+                onSuccessRegistration = {},
+                onNavigateUp = { isNavigateUpClicked = true },
+                onValueChange = { changedFormData = it },
+                onRegisterClick = { isRegisterClicked = true }
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.username).checkTextFieldAndInput(INPUT_TEXT)
+        assertEquals(true, changedFormData?.username?.contains(INPUT_TEXT))
+
+        composeTestRule.onNodeWithTextId(R.string.name).checkTextFieldAndInput(INPUT_TEXT)
+        assertEquals(true, changedFormData?.name?.contains(INPUT_TEXT))
+
+        composeTestRule.onNodeWithTextId(R.string.email_optional).checkTextFieldAndInput(INPUT_TEXT)
+        assertEquals(true, changedFormData?.email?.contains(INPUT_TEXT))
+
+        composeTestRule.onNodeWithTextId(R.string.age).checkTextFieldAndInput("1")
+        assertEquals(true, changedFormData?.age?.contains("1"))
+
+        composeTestRule.onNodeWithTextId(R.string.city).checkTextFieldAndInput(INPUT_TEXT)
+        assertEquals(true, changedFormData?.city?.contains(INPUT_TEXT))
+
+        composeTestRule.onNodeWithTagId(R.string.female).checkButtonAndClick()
+        assertEquals(Gender.FEMALE, changedFormData?.gender)
+
+        composeTestRule.onNodeWithTagId(R.string.friends).checkButtonAndClick()
+        assertEquals(Purpose.FRIENDS, changedFormData?.purpose)
+
+        composeTestRule.onNodeWithTextId(R.string.register).checkButtonAndClick()
+        assertTrue(isRegisterClicked)
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).checkButtonAndClick()
+        assertTrue(isNavigateUpClicked)
+    }
+
+    @Test
+    fun registrationScreen_passwordsInput_calledValueChangeAction() {
+        var changedFormData: RegistrationFormData? = null
+
+        composeTestRule.setContentToScreen {
+            RegistrationScreenComponent(
+                registrationUiState = RegistrationUiState(formData = registrationFormData),
+                onValueChange = { changedFormData = it }
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.password).checkTextFieldAndInput(INPUT_TEXT)
+        assertEquals(true, changedFormData?.password?.contains(INPUT_TEXT))
+
+        composeTestRule.onNodeWithTextId(R.string.repeat_password).checkTextFieldAndInput(INPUT_TEXT)
+        assertEquals(true, changedFormData?.repeatedPassword?.contains(INPUT_TEXT))
+    }
+
+    private fun assertContentIsDisplayed() {
         composeTestRule.onNodeWithTextId(R.string.username).checkTextField()
         composeTestRule.onNodeWithTextId(R.string.name).checkTextField()
 
@@ -233,15 +158,5 @@ class RegistrationScreenTest {
 
         composeTestRule.onNodeWithTextId(R.string.password).checkTextField()
         composeTestRule.onNodeWithTextId(R.string.repeat_password).checkTextField()
-    }
-
-    private fun setContentToRegistrationBody(registrationUiState: RegistrationUiState) {
-        composeTestRule.activity.setContent {
-            AppTheme {
-                RegistrationScreenComponent(
-                    registrationUiState = registrationUiState
-                )
-            }
-        }
     }
 }

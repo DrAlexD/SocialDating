@@ -1,22 +1,26 @@
 package xelagurd.socialdating.client.androidTest
 
-import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.ui.screen.CategoriesScreenComponent
 import xelagurd.socialdating.client.ui.state.CategoriesUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
-import xelagurd.socialdating.client.ui.theme.AppTheme
 
 @HiltAndroidTest
 class CategoriesScreenTest {
@@ -34,91 +38,65 @@ class CategoriesScreenTest {
     private val categories = FakeData.categories
 
     @Test
-    fun categoriesScreen_loadingStateAndEmptyData_loadingIndicator() {
-        val categoriesUiState = CategoriesUiState()
-
-        setContentToCategoriesBody(categoriesUiState)
+    fun categoriesScreen_defaultParameters_loadingIndicator() {
+        composeTestRule.setContentToScreen {
+            CategoriesScreenComponent()
+        }
 
         composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
-    fun categoriesScreen_errorStateAndEmptyData_errorText() {
-        val errorText = FakeData.ERROR_TEXT
-        val categoriesUiState = CategoriesUiState(
-            dataRequestStatus = RequestStatus.ERROR(errorText)
-        )
+    fun categoriesScreen_recomposition_loadingIndicator() {
+        composeTestRule.setContentToScreenAndRecompose {
+            CategoriesScreenComponent(categoriesUiState = CategoriesUiState())
+        }
 
-        setContentToCategoriesBody(categoriesUiState)
-
-        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
-    fun categoriesScreen_failureStateAndEmptyData_failureText() {
-        val failureText = FakeData.FAILURE_TEXT
-        val categoriesUiState = CategoriesUiState(
-            dataRequestStatus = RequestStatus.FAILURE(failureText)
-        )
-
-        setContentToCategoriesBody(categoriesUiState)
-
-        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
-    }
-
-    @Test
-    fun categoriesScreen_loadingStateAndData_displayedData() {
-        val categoriesUiState = CategoriesUiState(
-            entities = categories,
-            dataRequestStatus = RequestStatus.LOADING
-        )
-
-        assertDataIsDisplayed(categoriesUiState)
-    }
-
-    @Test
-    fun categoriesScreen_errorStateAndData_displayedData() {
-        val categoriesUiState = CategoriesUiState(
-            entities = categories,
-            dataRequestStatus = RequestStatus.ERROR()
-        )
-
-        assertDataIsDisplayed(categoriesUiState)
-    }
-
-    @Test
-    fun categoriesScreen_failureStateAndData_displayedData() {
-        val categoriesUiState = CategoriesUiState(
-            entities = categories,
-            dataRequestStatus = RequestStatus.FAILURE()
-        )
-
-        assertDataIsDisplayed(categoriesUiState)
-    }
-
-    @Test
-    fun categoriesScreen_successStateAndData_displayedData() {
+    fun categoriesScreen_data_displayedData() {
         val categoriesUiState = CategoriesUiState(
             entities = categories,
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
-        assertDataIsDisplayed(categoriesUiState)
-    }
-
-    private fun assertDataIsDisplayed(categoriesUiState: CategoriesUiState) {
         setContentToCategoriesBody(categoriesUiState)
 
         composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
+        composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
+    }
+
+    @Test
+    fun categoriesScreen_allActions_calledAllActions() {
+        var clickedCategoryId = -1
+        var isRefreshClicked = false
+        val categoriesUiState = CategoriesUiState(
+            entities = categories,
+            dataRequestStatus = RequestStatus.SUCCESS
+        )
+
+        composeTestRule.setContentToScreen {
+            CategoriesScreenComponent(
+                categoriesUiState = categoriesUiState,
+                onCategoryClick = { clickedCategoryId = it },
+                refreshAction = { isRefreshClicked = true }
+            )
+        }
+
+        composeTestRule.onNodeWithText(categories[0].name).checkButtonAndClick()
+        assertEquals(categories[0].id, clickedCategoryId)
+
+        composeTestRule.onNodeWithTextId(R.string.online).checkButtonAndClick()
+        assertTrue(isRefreshClicked)
     }
 
     private fun setContentToCategoriesBody(categoriesUiState: CategoriesUiState) {
-        composeTestRule.activity.setContent {
-            AppTheme {
-                CategoriesScreenComponent(
-                    categoriesUiState = categoriesUiState
-                )
-            }
+        composeTestRule.setContentToScreen {
+            CategoriesScreenComponent(
+                categoriesUiState = categoriesUiState
+            )
         }
     }
 }

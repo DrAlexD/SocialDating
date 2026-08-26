@@ -1,8 +1,6 @@
 package xelagurd.socialdating.client.androidTest
 
-import androidx.activity.compose.setContent
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -14,13 +12,18 @@ import xelagurd.socialdating.client.AndroidNavigationTestUtils.loginAndNavigateT
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToCategoriesFromBottomNavBar
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToProfileFromBottomNavBar
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToSettingsFromBottomNavBar
+import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToSimilarUsersFromBottomNavBar
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToStatements
+import xelagurd.socialdating.client.AndroidNavigationTestUtils.setContentToAppNavHost
+import xelagurd.socialdating.client.AndroidTestUtils.assertBackStackDepth
 import xelagurd.socialdating.client.AndroidTestUtils.assertCurrentRouteName
+import xelagurd.socialdating.client.AndroidTestUtils.assertRouteInBackStack
 import xelagurd.socialdating.client.AndroidTestUtils.getCurrentRoute
 import xelagurd.socialdating.client.MainActivity
-import xelagurd.socialdating.client.ui.navigation.AppNavHost
+import xelagurd.socialdating.client.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
 import xelagurd.socialdating.client.ui.navigation.SettingsDestination
+import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
 import xelagurd.socialdating.client.ui.navigation.StatementsDestination
 
 @HiltAndroidTest
@@ -37,24 +40,16 @@ class CategoriesScreenNavigationTest {
     fun setup() {
         hiltRule.inject()
 
-        composeTestRule.activity.setContent {
-            navController = TestNavHostController(composeTestRule.activity).apply {
-                navigatorProvider.addNavigator(ComposeNavigator())
-            }
-            AppNavHost(navController)
-        }
-
-        composeTestRule.runOnIdle {
-            assert(::navController.isInitialized)
-        }
+        navController = composeTestRule.setContentToAppNavHost()
     }
 
     @Test
-    fun appNavHost_clickCategory_navigatesToStatements() {
+    fun appNavHost_clickCategory_navigatesToStatementsScreenWithCategoriesInBackStack() {
         composeTestRule.navigateToStatements()
 
         navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
-        //navController.assertBackStackDepth(?)
+        navController.assertRouteInBackStack(CategoriesDestination.route)
+        //navController.assertBackStackDepth(4)
     }
 
     @Test
@@ -65,24 +60,36 @@ class CategoriesScreenNavigationTest {
         val currentRoute = navController.getCurrentRoute()
 
         assertEquals(previousRoute, currentRoute)
-        //navController.assertBackStackDepth(?)
+        //navController.assertBackStackDepth(3)
     }
 
     @Test
-    fun appNavHost_navigateToProfile_navigatesToProfile() {
+    fun appNavHost_navigateToProfile_navigatesToProfileScreenWithCategoriesInBackStack() {
         composeTestRule.loginAndNavigateToCategories()
         composeTestRule.navigateToProfileFromBottomNavBar()
 
         navController.assertCurrentRouteName(ProfileDestination.routeWithArgs)
-        //navController.assertBackStackDepth(?)
+        navController.assertRouteInBackStack(CategoriesDestination.route)
+        //navController.assertBackStackDepth(4)
     }
 
     @Test
-    fun appNavHost_navigateToSettings_navigatesToSettings() {
+    fun appNavHost_navigateToSimilarUsers_navigatesToSimilarUsersScreenWithCategoriesInBackStack() {
+        composeTestRule.loginAndNavigateToCategories()
+        composeTestRule.navigateToSimilarUsersFromBottomNavBar()
+
+        navController.assertCurrentRouteName(SimilarUsersDestination.routeWithArgs)
+        navController.assertRouteInBackStack(CategoriesDestination.route)
+        //navController.assertBackStackDepth(4)
+    }
+
+    @Test
+    fun appNavHost_navigateToSettings_navigatesToSettingsScreenWithCategoriesInBackStack() {
         composeTestRule.loginAndNavigateToCategories()
         composeTestRule.navigateToSettingsFromBottomNavBar()
 
         navController.assertCurrentRouteName(SettingsDestination.route)
-        //navController.assertBackStackDepth(?)
+        navController.assertRouteInBackStack(CategoriesDestination.route)
+        //navController.assertBackStackDepth(4)
     }
 }

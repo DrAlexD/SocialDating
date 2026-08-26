@@ -3,6 +3,7 @@ package xelagurd.socialdating.client.test
 import java.io.IOException
 import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -26,15 +27,19 @@ import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
-import xelagurd.socialdating.client.TestUtils.mockkList
 import xelagurd.socialdating.client.data.PreferencesRepository
+import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserDefiningThemesRepository
 import xelagurd.socialdating.client.data.model.Category
+import xelagurd.socialdating.client.data.model.DataUtils.toUserCategoriesWithData
+import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesWithData
 import xelagurd.socialdating.client.data.model.DefiningTheme
+import xelagurd.socialdating.client.data.model.UserCategory
+import xelagurd.socialdating.client.data.model.UserDefiningTheme
 import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
 import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
@@ -65,28 +70,61 @@ class ProfileStatisticsViewModelTest {
     private val commonLocalRepository = mockk<CommonLocalRepository>()
 
     private lateinit var viewModel: ProfileStatisticsViewModel
-    private lateinit var categoriesFlow: MutableStateFlow<List<Category>>
-    private lateinit var definingThemesFlow: MutableStateFlow<List<DefiningTheme>>
     private lateinit var userCategoriesFlow: MutableStateFlow<List<UserCategoryWithData>>
     private lateinit var userDefiningThemesFlow: MutableStateFlow<List<UserDefiningThemeWithData>>
     private val profileStatisticsUiState
         get() = viewModel.uiState.value
 
     private val userId = Random.nextInt()
-    private val anotherUserId = userId
+    private var anotherUserId = userId
+
+    private val savedCategories = listOf(Category(id = 1, name = "Category1"))
+    private val missingCategories = listOf(Category(id = 2, name = "Category2"))
+    private val savedDefiningThemes = listOf(
+        DefiningTheme(
+            id = 1,
+            name = "DefiningTheme1",
+            fromOpinion = "No",
+            toOpinion = "Yes",
+            categoryId = 1,
+            numberInCategory = 1
+        )
+    )
+    private val missingDefiningThemes = listOf(
+        DefiningTheme(
+            id = 2,
+            name = "DefiningTheme2",
+            fromOpinion = "No",
+            toOpinion = "Yes",
+            categoryId = 2,
+            numberInCategory = 1
+        )
+    )
+    private val remoteUserCategories = listOf(
+        UserCategory(id = 1, interest = 10, userId = userId, categoryId = 1),
+        UserCategory(id = 2, interest = 20, userId = userId, categoryId = 2)
+    )
+    private val remoteUserDefiningThemes = listOf(
+        UserDefiningTheme(id = 1, value = 10, interest = 10, userId = userId, definingThemeId = 1),
+        UserDefiningTheme(id = 2, value = 20, interest = 20, userId = userId, definingThemeId = 2)
+    )
+    private val allCategories = savedCategories + missingCategories
+    private val allDefiningThemes = savedDefiningThemes + missingDefiningThemes
+
     private val isOfflineModeFlow = flowOf(false)
+    private var categoriesFlow: Flow<List<Category>> = flowOf(allCategories)
+    private var definingThemesFlow: Flow<List<DefiningTheme>> = flowOf(allDefiningThemes)
 
     @Before
     fun setup() {
-        categoriesFlow = MutableStateFlow(mockkList(relaxed = true))
-        definingThemesFlow = MutableStateFlow(mockkList(relaxed = true))
-        userCategoriesFlow = MutableStateFlow(mockkList())
-        userDefiningThemesFlow = MutableStateFlow(mockkList(relaxed = true))
-
-        mockGeneralMethods()
+        userCategoriesFlow = MutableStateFlow(remoteUserCategories.toUserCategoriesWithData(allCategories))
+        userDefiningThemesFlow =
+            MutableStateFlow(remoteUserDefiningThemes.toUserDefiningThemesWithData(allDefiningThemes))
     }
 
     private fun initViewModel() {
+        mockGeneralMethods()
+
         viewModel = ProfileStatisticsViewModel(
             context,
             savedStateHandle,
@@ -110,7 +148,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkStateWithInternet() = runTest {
+    fun profileStatisticsViewModel_withInternet_successStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -140,7 +178,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkStateWithEmptyData() = runTest {
+    fun profileStatisticsViewModel_withEmptyRemoteUserDefiningThemes_successStatus() = runTest {
         mockEmptyData()
 
         initViewModel()
@@ -166,7 +204,34 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkStateWithoutInternet() = runTest {
+    fun profileStatisticsViewModel_withEmptyRemoteUserCategories_successStatus() = runTest {
+        mockEmptyUserCategories()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
+
+        verify(exactly = 1) { localUserCategoriesRepository.getUserCategories(any()) }
+        verify(exactly = 1) { localUserDefiningThemesRepository.getUserDefiningThemes(any()) }
+        coVerify(exactly = 1) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
+        coVerify(exactly = 1) { remoteUserCategoriesRepository.getUserCategories(any()) }
+        confirmVerified(
+            localUserCategoriesRepository,
+            remoteUserCategoriesRepository,
+            localUserDefiningThemesRepository,
+            remoteUserDefiningThemesRepository,
+            localCategoriesRepository,
+            remoteCategoriesRepository,
+            localDefiningThemesRepository,
+            remoteDefiningThemesRepository,
+            commonLocalRepository
+        )
+    }
+
+    @Test
+    fun profileStatisticsViewModel_withoutInternet_errorStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -192,7 +257,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkRefreshedSuccessStateWithoutInternet() = runTest {
+    fun profileStatisticsViewModel_refreshWithoutInternetAfterSuccess_errorStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -227,7 +292,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkRefreshedErrorStateWithInternet() = runTest {
+    fun profileStatisticsViewModel_refreshWithInternetAfterError_successStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -262,7 +327,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkRefreshedSuccessStateWithInternet() = runTest {
+    fun profileStatisticsViewModel_refreshWithInternetAfterSuccess_successStatus() = runTest {
         mockDataWithInternet()
 
         initViewModel()
@@ -295,7 +360,7 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
-    fun profileStatisticsViewModel_checkRefreshedErrorStateWithoutInternet() = runTest {
+    fun profileStatisticsViewModel_refreshWithoutInternetAfterError_errorStatus() = runTest {
         mockDataWithoutInternet()
 
         initViewModel()
@@ -323,6 +388,107 @@ class ProfileStatisticsViewModelTest {
         )
     }
 
+    @Test
+    fun profileStatisticsViewModel_withMissingLocalDataAndInternet_successStatus() = runTest {
+        mockMissingLocalData()
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
+
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(missingDefiningThemes.map { it.id }) }
+        coVerify(exactly = 1) { remoteCategoriesRepository.getCategories(missingCategories.map { it.id }) }
+        coVerify(exactly = 1) { commonLocalRepository.updateProfileStatisticsScreenData(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun profileStatisticsViewModel_withMissingDefiningThemesAndWithoutInternet_errorStatus() = runTest {
+        mockMissingLocalData()
+        mockDataWithInternet()
+        mockMissingDefiningThemesWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.ERROR(), profileStatisticsUiState.dataRequestStatus)
+
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 0) { remoteCategoriesRepository.getCategories(any()) }
+        coVerify(exactly = 0) { commonLocalRepository.updateProfileStatisticsScreenData(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun profileStatisticsViewModel_withMissingCategoriesAndWithoutInternet_errorStatus() = runTest {
+        mockMissingLocalData()
+        mockDataWithInternet()
+        mockMissingCategoriesWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.ERROR(), profileStatisticsUiState.dataRequestStatus)
+
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+        coVerify(exactly = 1) { remoteCategoriesRepository.getCategories(any()) }
+        coVerify(exactly = 0) { commonLocalRepository.updateProfileStatisticsScreenData(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun profileStatisticsViewModel_anotherUserWithMissingLocalDataAndInternet_successStatus() = runTest {
+        anotherUserId = userId + 1
+        mockMissingLocalData()
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
+        assertEquals(FakeData.detailedSimilarUser, profileStatisticsUiState.entitiesMask)
+        assertEquals(remoteUserCategories.toUserCategoriesWithData(allCategories), profileStatisticsUiState.entities)
+
+        coVerify(exactly = 1) { remoteUserCategoriesRepository.getDetailedSimilarUser(any(), any()) }
+        coVerify(exactly = 1) { commonLocalRepository.updateProfileStatisticsScreenData(any(), any()) }
+    }
+
+    @Test
+    fun profileStatisticsViewModel_anotherUserWithInternet_successStatus() = runTest {
+        anotherUserId = userId + 1
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
+        assertEquals(FakeData.detailedSimilarUser, profileStatisticsUiState.entitiesMask)
+        assertEquals(remoteUserCategories.toUserCategoriesWithData(allCategories), profileStatisticsUiState.entities)
+
+        coVerify(exactly = 1) { remoteUserCategoriesRepository.getDetailedSimilarUser(any(), any()) }
+        coVerify(exactly = 1) { commonLocalRepository.updateProfileStatisticsScreenData(any(), any()) }
+    }
+
+    @Test
+    fun profileStatisticsViewModel_anotherUserWithEmptyRemoteDetailedSimilarUser_successStatus() = runTest {
+        anotherUserId = userId + 1
+        mockDataWithInternet()
+        mockEmptyDetailedSimilarUser()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
+
+        coVerify(exactly = 1) { remoteUserCategoriesRepository.getDetailedSimilarUser(any(), any()) }
+        coVerify(exactly = 0) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
+    }
+
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(ProfileStatisticsDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(ProfileStatisticsDestination.anotherUserId) } returns anotherUserId
@@ -333,11 +499,21 @@ class ProfileStatisticsViewModelTest {
         every { localUserDefiningThemesRepository.getUserDefiningThemes(any()) } returns userDefiningThemesFlow
     }
 
+    private fun mockMissingLocalData() {
+        categoriesFlow = flowOf(savedCategories)
+        definingThemesFlow = flowOf(savedDefiningThemes)
+    }
+
     private fun mockDataWithInternet() {
+        coEvery { remoteUserCategoriesRepository.getDetailedSimilarUser(any(), any()) } returns
+                Response.success(FakeData.detailedSimilarUser)
         coEvery { remoteUserCategoriesRepository.getUserCategories(any()) } returns
-                Response.success(mockkList(relaxed = true))
+                Response.success(remoteUserCategories)
         coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) } returns
-                Response.success(mockkList(relaxed = true))
+                Response.success(remoteUserDefiningThemes)
+        coEvery { remoteCategoriesRepository.getCategories(any()) } returns Response.success(missingCategories)
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any()) } returns
+                Response.success(missingDefiningThemes)
 
         coEvery { commonLocalRepository.updateProfileStatisticsScreenData(any(), any(), any(), any()) } just Runs
     }
@@ -346,7 +522,25 @@ class ProfileStatisticsViewModelTest {
         coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) } returns Response.success(null)
     }
 
+    private fun mockEmptyUserCategories() {
+        coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) } returns
+                Response.success(remoteUserDefiningThemes)
+        coEvery { remoteUserCategoriesRepository.getUserCategories(any()) } returns Response.success(null)
+    }
+
+    private fun mockEmptyDetailedSimilarUser() {
+        coEvery { remoteUserCategoriesRepository.getDetailedSimilarUser(any(), any()) } returns Response.success(null)
+    }
+
     private fun mockDataWithoutInternet() {
         coEvery { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) } throws IOException()
+    }
+
+    private fun mockMissingDefiningThemesWithoutInternet() {
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any()) } throws IOException()
+    }
+
+    private fun mockMissingCategoriesWithoutInternet() {
+        coEvery { remoteCategoriesRepository.getCategories(any()) } throws IOException()
     }
 }

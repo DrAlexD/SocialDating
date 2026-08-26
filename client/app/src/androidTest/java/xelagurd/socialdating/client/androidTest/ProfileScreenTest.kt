@@ -1,25 +1,29 @@
 package xelagurd.socialdating.client.androidTest
 
-import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextIdWithColon
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
+import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.ui.screen.ProfileScreenComponent
 import xelagurd.socialdating.client.ui.state.ProfileUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
-import xelagurd.socialdating.client.ui.theme.AppTheme
 
 @HiltAndroidTest
 class ProfileScreenTest {
@@ -37,79 +41,30 @@ class ProfileScreenTest {
     private val user = FakeData.users[0]
 
     @Test
-    fun profileScreen_loadingStateAndEmptyData_loadingIndicator() {
-        val profileUiState = ProfileUiState()
-
-        setContentToProfileBody(profileUiState)
+    fun profileScreen_defaultParameters_loadingIndicator() {
+        composeTestRule.setContentToScreen {
+            ProfileScreenComponent()
+        }
 
         composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
-    fun profileScreen_errorStateAndEmptyData_errorText() {
-        val errorText = FakeData.ERROR_TEXT
-        val profileUiState = ProfileUiState(
-            dataRequestStatus = RequestStatus.ERROR(errorText)
-        )
+    fun profileScreen_recomposition_loadingIndicator() {
+        composeTestRule.setContentToScreenAndRecompose {
+            ProfileScreenComponent(profileUiState = ProfileUiState())
+        }
 
-        setContentToProfileBody(profileUiState)
-
-        composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
-    fun profileScreen_failureStateAndEmptyData_failureText() {
-        val failureText = FakeData.FAILURE_TEXT
-        val profileUiState = ProfileUiState(
-            dataRequestStatus = RequestStatus.FAILURE(failureText)
-        )
-
-        setContentToProfileBody(profileUiState)
-
-        composeTestRule.onNodeWithText(failureText).assertIsDisplayed()
-    }
-
-    @Test
-    fun profileScreen_loadingStateAndData_displayedData() {
-        val profileUiState = ProfileUiState(
-            entity = user,
-            dataRequestStatus = RequestStatus.LOADING
-        )
-
-        assertDataIsDisplayed(profileUiState)
-    }
-
-    @Test
-    fun profileScreen_errorStateAndData_displayedData() {
-        val profileUiState = ProfileUiState(
-            entity = user,
-            dataRequestStatus = RequestStatus.ERROR()
-        )
-
-        assertDataIsDisplayed(profileUiState)
-    }
-
-    @Test
-    fun profileScreen_failureStateAndData_displayedData() {
-        val profileUiState = ProfileUiState(
-            entity = user,
-            dataRequestStatus = RequestStatus.FAILURE()
-        )
-
-        assertDataIsDisplayed(profileUiState)
-    }
-
-    @Test
-    fun profileScreen_successStateAndData_displayedData() {
+    fun profileScreen_data_displayedData() {
         val profileUiState = ProfileUiState(
             entity = user,
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
-        assertDataIsDisplayed(profileUiState)
-    }
-
-    private fun assertDataIsDisplayed(profileUiState: ProfileUiState) {
         setContentToProfileBody(profileUiState)
 
         composeTestRule.onNodeWithTextIdWithColon(R.string.username).assertIsDisplayed()
@@ -127,13 +82,49 @@ class ProfileScreenTest {
         composeTestRule.onNodeWithTextId(R.string.open_profile_statistics).checkEnabledButton()
     }
 
+    @Test
+    fun profileScreen_anotherUser_notSelectedProfileNavigationItem() {
+        val profileUiState = ProfileUiState(
+            userId = user.id,
+            anotherUserId = user.id + 1,
+            entity = user,
+            dataRequestStatus = RequestStatus.SUCCESS
+        )
+
+        setContentToProfileBody(profileUiState)
+
+        composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsNotSelected()
+    }
+
+    @Test
+    fun profileScreen_allActions_calledAllActions() {
+        var clickedUserId = -1
+        var isRefreshClicked = false
+        val profileUiState = ProfileUiState(
+            entity = user,
+            dataRequestStatus = RequestStatus.SUCCESS
+        )
+
+        composeTestRule.setContentToScreen {
+            ProfileScreenComponent(
+                profileUiState = profileUiState,
+                onProfileStatisticsClick = { clickedUserId = it },
+                refreshAction = { isRefreshClicked = true }
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.open_profile_statistics).checkButtonAndClick()
+        assertEquals(user.id, clickedUserId)
+
+        composeTestRule.onNodeWithTextId(R.string.online).checkButtonAndClick()
+        assertTrue(isRefreshClicked)
+    }
+
     private fun setContentToProfileBody(profileUiState: ProfileUiState) {
-        composeTestRule.activity.setContent {
-            AppTheme {
-                ProfileScreenComponent(
-                    profileUiState = profileUiState
-                )
-            }
+        composeTestRule.setContentToScreen {
+            ProfileScreenComponent(
+                profileUiState = profileUiState
+            )
         }
     }
 }
