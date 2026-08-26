@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        api-level: [ 35, 36 ]
+        api-level: [ 34, 35 ]
         profile: [ small_phone, medium_phone ]
       fail-fast: false
 
@@ -81,7 +81,7 @@ jobs:
           working-directory: client
           script: |
             chmod +x gradlew
-            ./gradlew connectedAndroidTest
+            ./gradlew connectedDebugAndroidTest
 
       - name: Upload Instrumented tests report
         if: failure()

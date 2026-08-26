@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.dagger.hilt.android)
+    jacoco
 }
 
 kotlin {
@@ -22,12 +23,12 @@ kotlin {
 
 android {
     namespace = "xelagurd.socialdating.client"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "xelagurd.socialdating.client"
-        minSdk = 35
-        targetSdk = 36
+        minSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -46,6 +47,7 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/api/v1/\"")
+            enableAndroidTestCoverage = true
         }
         release {
             signingConfig = signingConfigs.getByName("release")
@@ -77,6 +79,45 @@ android {
 
     lint {
         baseline = file("lint-baseline.xml")
+    }
+}
+
+tasks.register<JacocoReport>("createInstrumentedCoverageReport") {
+    group = "verification"
+    description = "Builds the instrumented test coverage report into tests-coverage/reports/instrumented."
+    dependsOn("connectedDebugAndroidTest")
+
+    val excludedClasses = listOf(
+        "**/BuildConfig.class",
+        "**/*Hilt_*.class",
+        "**/*Factory*.class",
+        "**/*_HiltModules*.class",
+        "hilt_aggregated_deps/**",
+        "dagger/hilt/**",
+        "**/*_Impl*.class",
+        "**/*ComposableSingletons*.class",
+    )
+
+    classDirectories.setFrom(
+        fileTree(layout.buildDirectory.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")) {
+            exclude(excludedClasses)
+        },
+        fileTree(layout.buildDirectory.dir("intermediates/javac/debug/compileDebugJavaWithJavac/classes")) {
+            exclude(excludedClasses)
+        },
+    )
+    sourceDirectories.setFrom(files("src/main/java"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) {
+            include("outputs/code_coverage/debugAndroidTest/connected/**/*.ec")
+        }
+    )
+
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        html.outputLocation.set(rootProject.layout.projectDirectory.dir("tests-coverage/reports/instrumented"))
+        xml.outputLocation.set(rootProject.layout.projectDirectory.file("tests-coverage/reports/instrumented/report.xml"))
     }
 }
 

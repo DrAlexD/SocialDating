@@ -81,14 +81,14 @@ jobs:
 
       - name: Check health of containers
         run: |
-          chmod +x check_containers_health.sh
-          ./check_containers_health.sh
+          chmod +x scripts/wait_containers_health.sh
+          ./scripts/wait_containers_health.sh
 
       - name: Log unhealthy containers
         if: failure()
         run: |
-          chmod +x log_unhealthy_containers.sh
-          ./log_unhealthy_containers.sh
+          chmod +x scripts/log_unhealthy_containers.sh
+          ./scripts/log_unhealthy_containers.sh
 
       - name: Run Integration tests
         run: |
