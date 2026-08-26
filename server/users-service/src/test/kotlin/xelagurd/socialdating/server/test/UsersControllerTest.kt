@@ -19,6 +19,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.controller.UsersController
 import xelagurd.socialdating.server.service.UsersService
+import xelagurd.socialdating.server.utils.TestUtils.mockkList
+import xelagurd.socialdating.server.utils.TestUtils.nextIntList
+import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @WebMvcTest(UsersController::class)
 @Import(NoSecurityConfig::class)
@@ -29,6 +32,7 @@ class UsersControllerTest(@param:Autowired private val mockMvc: MockMvc) {
     private lateinit var usersService: UsersService
 
     private val userId = Random.nextInt()
+    private val userIds = Random.nextIntList()
 
     @Test
     fun getUser_existData_ok() {
@@ -44,4 +48,43 @@ class UsersControllerTest(@param:Autowired private val mockMvc: MockMvc) {
         confirmVerified(usersService)
     }
 
+    @Test
+    fun getUser_noData_noContent() {
+        every { usersService.getUser(any()) } returns null
+
+        mockMvc.perform(
+            get("/users/$userId")
+        )
+            .andExpect(status().isNoContent)
+
+        verify(exactly = 1) { usersService.getUser(any()) }
+        confirmVerified(usersService)
+    }
+
+    @Test
+    fun getUsers_existData_ok() {
+        every { usersService.getUsers(any()) } returns mockkList(relaxed = true)
+
+        mockMvc.perform(
+            get("/users?userIds=${userIds.toRequestParams()}")
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+
+        verify(exactly = 1) { usersService.getUsers(userIds) }
+        confirmVerified(usersService)
+    }
+
+    @Test
+    fun getUsers_noData_noContent() {
+        every { usersService.getUsers(any()) } returns emptyList()
+
+        mockMvc.perform(
+            get("/users?userIds=${userIds.toRequestParams()}")
+        )
+            .andExpect(status().isNoContent)
+
+        verify(exactly = 1) { usersService.getUsers(userIds) }
+        confirmVerified(usersService)
+    }
 }

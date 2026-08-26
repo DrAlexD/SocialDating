@@ -11,7 +11,7 @@ import xelagurd.socialdating.server.repository.UserCategoriesRepository
 
 @Profile("(dev | local) & !test")
 @Configuration
-class DevelopmentConfig {
+class CategoriesDevelopmentConfig {
 
     @Bean
     fun dataLoader(

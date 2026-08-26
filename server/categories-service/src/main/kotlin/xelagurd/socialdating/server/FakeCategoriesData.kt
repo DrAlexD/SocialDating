@@ -80,4 +80,7 @@ object FakeCategoriesData {
     fun List<Category>.filterByIds(categoryIds: List<Int>) =
         this.filter { it.id in categoryIds }
 
+    fun List<UserCategory>.filterByUserId(userId: Int) =
+        this.filter { it.userId == userId }
+
 }

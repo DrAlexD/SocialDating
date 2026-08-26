@@ -7,8 +7,10 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -16,6 +18,7 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.controller.StatementsController
 import xelagurd.socialdating.server.service.StatementsService
 import xelagurd.socialdating.server.utils.TestUtils.mockkList
@@ -30,8 +33,12 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
     @MockkBean
     private lateinit var statementsService: StatementsService
 
+    private val objectMapper = jacksonObjectMapper()
+
     private val userId = Random.nextInt()
     private val definingThemeIds = Random.nextIntList()
+    private val statementDetails = FakeStatementsData.statementsDetails[0]
+    private val statement = FakeStatementsData.statements[0]
 
     @Test
     fun getStatements_existData_ok() {
@@ -48,4 +55,19 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
         confirmVerified(statementsService)
     }
 
+    @Test
+    fun addStatement_validData_created() {
+        every { statementsService.addStatement(any()) } returns statement
+
+        mockMvc.perform(
+            post("/statements")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(statementDetails))
+        )
+            .andExpect(status().isCreated)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+
+        verify(exactly = 1) { statementsService.addStatement(any()) }
+        confirmVerified(statementsService)
+    }
 }
