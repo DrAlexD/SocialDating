@@ -45,7 +45,8 @@ Spring Boot microservices, entry point is `gateway-service/` (Spring Cloud Gatew
 
 **Security** — JWT Bearer tokens issued by `users-service` (with auth exception handling)
 
-**Inter-service communication** — Kafka async events (producers/consumers in `service/` layer)
+**Inter-service communication** — Kafka async events (producers/consumers in `service/` layer) and synchronous
+OpenFeign calls (clients in `client/` layer, auth headers are propagated by `AuthForwardingInterceptor`)
 
 **Database** — single PostgreSQL instance `social_dating_db`, separate schemas per service:
 

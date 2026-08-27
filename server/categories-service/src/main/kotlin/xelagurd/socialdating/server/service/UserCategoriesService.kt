@@ -4,6 +4,7 @@ import java.lang.Long.numberOfTrailingZeros
 import kotlin.math.min
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import xelagurd.socialdating.server.client.UsersServiceClient
 import xelagurd.socialdating.server.model.DefaultDataProperties.OPPOSITE_CATEGORIES_NUMBER
 import xelagurd.socialdating.server.model.DefaultDataProperties.SIMILAR_CATEGORIES_NUMBER
 import xelagurd.socialdating.server.model.UserCategory
@@ -12,6 +13,7 @@ import xelagurd.socialdating.server.model.additional.DetailedSimilarDefiningThem
 import xelagurd.socialdating.server.model.additional.DetailedSimilarUser
 import xelagurd.socialdating.server.model.additional.SimilarCategory
 import xelagurd.socialdating.server.model.additional.SimilarUser
+import xelagurd.socialdating.server.model.additional.SimilarUserWithData
 import xelagurd.socialdating.server.model.enums.SimilarityType.Companion.fromSimilarityDiff
 import xelagurd.socialdating.server.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.server.model.enums.SimilarityType.SIMILAR
@@ -21,7 +23,8 @@ import xelagurd.socialdating.server.utils.SecurityUtils.checkCurrentUserAuth
 
 @Service
 class UserCategoriesService(
-    private val userCategoriesRepository: UserCategoriesRepository
+    private val userCategoriesRepository: UserCategoriesRepository,
+    private val usersServiceClient: UsersServiceClient
 ) {
 
     fun getUserCategories(userId: Int) =
@@ -37,7 +40,7 @@ class UserCategoriesService(
     fun getSimilarUsers(
         currentUserId: Int,
         categoryIds: List<Int>? = null
-    ): List<SimilarUser> {
+    ): List<SimilarUserWithData> {
         checkCurrentUserAuth(currentUserId)
 
         val currentUserCategoriesById = userCategoriesRepository
@@ -47,7 +50,7 @@ class UserCategoriesService(
         val anotherUsersCategories = userCategoriesRepository
             .findAnotherUsersCategories(currentUserId, null, currentUserCategoriesById.keys.toList())
 
-        return anotherUsersCategories
+        val similarUsers = anotherUsersCategories
             .groupBy { it.userId }
             .mapNotNull { (anotherUserId, anotherUserCategories) ->
                 val (similarNumberUser, oppositeNumberUser, categoriesWithSimilarity) =
@@ -71,6 +74,14 @@ class UserCategoriesService(
                 } else null
             }
             .sortedByDescending { it.differenceNumber }
+
+        if (similarUsers.isEmpty()) return emptyList()
+
+        val usersById = usersServiceClient
+            .getUsers(similarUsers.map { it.id })
+            .associateBy { it.id }
+
+        return similarUsers.mapNotNull { it.toSimilarUserWithData(usersById[it.id]) }
     }
 
     @Transactional(readOnly = true)

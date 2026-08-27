@@ -19,7 +19,6 @@ import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecomp
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.model.DataUtils.toSimilarUsersWithData
 import xelagurd.socialdating.client.ui.screen.SimilarUsersScreenComponent
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.SimilarUsersUiState
@@ -37,7 +36,7 @@ class SimilarUsersScreenTest {
         hiltRule.inject()
     }
 
-    private val similarUsers = FakeData.similarUsers.toSimilarUsersWithData(FakeData.users)
+    private val similarUsers = FakeData.similarUsers
     private val similarUser = similarUsers[0]
 
     @Test

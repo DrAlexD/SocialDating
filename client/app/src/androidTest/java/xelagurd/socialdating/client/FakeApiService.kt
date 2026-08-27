@@ -9,17 +9,14 @@ import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
-import xelagurd.socialdating.client.data.model.additional.SimilarUser
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.details.StatementDetails
+import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
 import xelagurd.socialdating.client.data.remote.ApiService
 
 class FakeApiService : ApiService {
     override suspend fun getUser(userId: Int): Response<User> =
         Response.success(FakeData.mainUser)
-
-    override suspend fun getUsers(userIds: List<Int>): Response<List<User>> =
-        Response.success(FakeData.users)
 
     override suspend fun getCategories(categoryIds: List<Int>?): Response<List<Category>> =
         Response.success(FakeData.categories)
@@ -53,7 +50,7 @@ class FakeApiService : ApiService {
     override suspend fun getSimilarUsers(
         currentUserId: Int,
         categoryIds: List<Int>?
-    ): Response<List<SimilarUser>> =
+    ): Response<List<SimilarUserWithData>> =
         Response.success(FakeData.similarUsers)
 
     override suspend fun getDetailedSimilarUser(

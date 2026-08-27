@@ -11,6 +11,9 @@ plugins {
 dependencies {
     implementation(project(":common"))
 
+    implementation(libs.spring.cloud.openfeign)
+    implementation(platform(libs.spring.cloud.dependencies))
+
     implementation(libs.spring.kafka)
 
     developmentOnly(libs.spring.boot.devtools)

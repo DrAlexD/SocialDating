@@ -19,14 +19,13 @@ import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.fake.FakeData.TEST_TIMEOUT_MILLIS
-import xelagurd.socialdating.client.data.model.DataUtils.toSimilarUsersWithData
 import xelagurd.socialdating.client.ui.navigation.AppNavHost
 
 typealias MainComposeTestRule = AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>
 
 object AndroidNavigationTestUtils {
 
-    private val similarUser = FakeData.similarUsers.toSimilarUsersWithData(FakeData.users)[0]
+    private val similarUser = FakeData.similarUsers[0]
     private val similarUserNameWithAge = "${similarUser.name}, ${similarUser.age}"
 
     private val bottomNavBarItemIds = listOf(

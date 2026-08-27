@@ -23,9 +23,7 @@ import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.model.DataUtils.toSimilarUsersWithData
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
-import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.viewmodel.SimilarUsersViewModel
@@ -40,7 +38,6 @@ class SimilarUsersViewModelTest {
     private val savedStateHandle = mockk<SavedStateHandle>()
     private val preferencesRepository = mockk<PreferencesRepository>()
     private val remoteUserCategoriesRepository = mockk<RemoteUserCategoriesRepository>()
-    private val remoteUsersRepository = mockk<RemoteUsersRepository>()
 
     private lateinit var viewModel: SimilarUsersViewModel
     private val similarUsersUiState
@@ -49,7 +46,7 @@ class SimilarUsersViewModelTest {
     private val userId = Random.nextInt()
     private val isOfflineModeFlow = flowOf(false)
 
-    private val similarUsersWithData = FakeData.similarUsers.toSimilarUsersWithData(FakeData.users)
+    private val similarUsers = FakeData.similarUsers
 
     private fun initViewModel() {
         mockGeneralMethods()
@@ -58,8 +55,7 @@ class SimilarUsersViewModelTest {
             context,
             savedStateHandle,
             preferencesRepository,
-            remoteUserCategoriesRepository,
-            remoteUsersRepository
+            remoteUserCategoriesRepository
         )
     }
 
@@ -78,11 +74,10 @@ class SimilarUsersViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, similarUsersUiState.dataRequestStatus)
-        assertEquals(similarUsersWithData, similarUsersUiState.entities)
+        assertEquals(similarUsers, similarUsersUiState.entities)
 
         coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) }
-        coVerify(exactly = 1) { remoteUsersRepository.getUsers(any()) }
-        confirmVerified(remoteUserCategoriesRepository, remoteUsersRepository)
+        confirmVerified(remoteUserCategoriesRepository)
     }
 
     @Test
@@ -97,23 +92,7 @@ class SimilarUsersViewModelTest {
         assertEquals(listOf<Nothing>(), similarUsersUiState.entities)
 
         coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) }
-        confirmVerified(remoteUserCategoriesRepository, remoteUsersRepository)
-    }
-
-    @Test
-    fun similarUsersViewModel_withEmptyRemoteUsers_successStatusWithoutSimilarUsers() = runTest {
-        mockEmptyUsers()
-
-        initViewModel()
-        setupUiStateCollecting()
-        advanceUntilIdle()
-
-        assertEquals(RequestStatus.SUCCESS, similarUsersUiState.dataRequestStatus)
-        assertEquals(listOf<Nothing>(), similarUsersUiState.entities)
-
-        coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) }
-        coVerify(exactly = 1) { remoteUsersRepository.getUsers(any()) }
-        confirmVerified(remoteUserCategoriesRepository, remoteUsersRepository)
+        confirmVerified(remoteUserCategoriesRepository)
     }
 
     @Test
@@ -127,7 +106,7 @@ class SimilarUsersViewModelTest {
         assertEquals(RequestStatus.ERROR(), similarUsersUiState.dataRequestStatus)
 
         coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) }
-        confirmVerified(remoteUserCategoriesRepository, remoteUsersRepository)
+        confirmVerified(remoteUserCategoriesRepository)
     }
 
     @Test
@@ -146,8 +125,7 @@ class SimilarUsersViewModelTest {
         assertEquals(RequestStatus.SUCCESS, similarUsersUiState.dataRequestStatus)
 
         coVerify(exactly = 2) { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) }
-        coVerify(exactly = 1) { remoteUsersRepository.getUsers(any()) }
-        confirmVerified(remoteUserCategoriesRepository, remoteUsersRepository)
+        confirmVerified(remoteUserCategoriesRepository)
     }
 
     @Test
@@ -166,8 +144,7 @@ class SimilarUsersViewModelTest {
         assertEquals(RequestStatus.ERROR(), similarUsersUiState.dataRequestStatus)
 
         coVerify(exactly = 2) { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) }
-        coVerify(exactly = 1) { remoteUsersRepository.getUsers(any()) }
-        confirmVerified(remoteUserCategoriesRepository, remoteUsersRepository)
+        confirmVerified(remoteUserCategoriesRepository)
     }
 
     private fun mockGeneralMethods() {
@@ -177,18 +154,11 @@ class SimilarUsersViewModelTest {
 
     private fun mockDataWithInternet() {
         coEvery { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) } returns
-                Response.success(FakeData.similarUsers)
-        coEvery { remoteUsersRepository.getUsers(any()) } returns Response.success(FakeData.users)
+                Response.success(similarUsers)
     }
 
     private fun mockEmptySimilarUsers() {
         coEvery { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) } returns Response.success(null)
-    }
-
-    private fun mockEmptyUsers() {
-        coEvery { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) } returns
-                Response.success(FakeData.similarUsers)
-        coEvery { remoteUsersRepository.getUsers(any()) } returns Response.success(null)
     }
 
     private fun mockDataWithoutInternet() {

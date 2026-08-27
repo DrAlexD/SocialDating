@@ -13,16 +13,13 @@ import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
-import xelagurd.socialdating.client.data.model.additional.SimilarUser
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.details.StatementDetails
+import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
 
 interface ApiService {
     @GET("users/{id}")
     suspend fun getUser(@Path("id") userId: Int): Response<User>
-
-    @GET("users")
-    suspend fun getUsers(@Query("userIds") userIds: List<Int>): Response<List<User>>
 
     @GET("categories")
     suspend fun getCategories(@Query("categoryIds") categoryIds: List<Int>?): Response<List<Category>>
@@ -57,7 +54,7 @@ interface ApiService {
     suspend fun getSimilarUsers(
         @Query("currentUserId") currentUserId: Int,
         @Query("categoryIds") categoryIds: List<Int>?
-    ): Response<List<SimilarUser>>
+    ): Response<List<SimilarUserWithData>>
 
     @GET("categories/users/detailed-similar-user")
     suspend fun getDetailedSimilarUser(
