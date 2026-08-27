@@ -17,7 +17,7 @@ import xelagurd.socialdating.server.model.enums.Purpose
 import xelagurd.socialdating.server.model.enums.Role
 import xelagurd.socialdating.server.repository.UsersRepository
 
-@ActiveProfiles("dev", "test")
+@ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UsersRepositoryTest(

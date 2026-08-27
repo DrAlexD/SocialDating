@@ -11,6 +11,6 @@ mkdir -p "$LOG_DIR"
 for name in gateway-service users-service categories-service defining-themes-service statements-service; do
   info "Starting $name..."
   java -javaagent:tests-coverage/kover-jvm-agent.jar=file:tests-coverage/agent.args \
-    -jar "$name/build/libs/$name.jar" --spring.profiles.active=dev,local \
+    -jar "$name/build/libs/$name.jar" --spring.profiles.active=local \
     >"$LOG_DIR/$name.log" 2>&1 &
 done

@@ -14,7 +14,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.repository.DefiningThemesRepository
 
-@ActiveProfiles("dev", "test")
+@ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class DefiningThemesRepositoryTest(

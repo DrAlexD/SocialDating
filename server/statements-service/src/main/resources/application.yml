@@ -1,3 +1,35 @@
+server:
+  port: ${services.statements.port}
+
+management:
+  health:
+    kafka:
+      enabled: true
+
+security:
+  whitelist:
+    - /actuator/health
+    - /actuator/shutdown
+    - /statements/v3/api-docs
+
+springdoc:
+  api-docs:
+    path: /statements/v3/api-docs
+
 spring:
   config:
     import: classpath:application-common.yml
+  application:
+    name: statements-service
+  datasource:
+    hikari:
+      connection-init-sql: set search_path to statements_schema
+  jpa:
+    properties:
+      hibernate:
+        default_schema: statements_schema
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

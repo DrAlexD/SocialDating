@@ -13,7 +13,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.repository.CategoriesRepository
 
-@ActiveProfiles("dev", "test")
+@ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class CategoriesRepositoryTest(

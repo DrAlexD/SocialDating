@@ -7,13 +7,6 @@ management:
       exposure:
         include: health,shutdown
 
-security:
-  whitelist:
-    - /users/auth/**
-    - /actuator/health
-    - /actuator/shutdown
-    - /users/v3/api-docs
-
 spring:
   config:
     import:
@@ -21,3 +14,15 @@ spring:
       - optional:file:.env
   datasource:
     url: jdbc:postgresql://localhost:5433/social_dating_db
+
+services:
+  gateway:
+    host: localhost
+  users:
+    host: localhost
+  categories:
+    host: localhost
+  defining-themes:
+    host: localhost
+  statements:
+    host: localhost

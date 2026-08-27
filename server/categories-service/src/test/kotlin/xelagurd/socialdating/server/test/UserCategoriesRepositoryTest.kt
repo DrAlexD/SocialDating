@@ -17,7 +17,7 @@ import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.repository.CategoriesRepository
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
 
-@ActiveProfiles("dev", "test")
+@ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserCategoriesRepositoryTest(

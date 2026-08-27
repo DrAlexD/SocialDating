@@ -11,8 +11,6 @@ management:
       enabled: true
 
 spring:
-  profiles:
-    active: dev
   datasource:
     url: jdbc:postgresql://postgres:5432/social_dating_db
     username: ${POSTGRES_USER}
@@ -25,3 +23,20 @@ spring:
   sql:
     init:
       mode: always
+
+services:
+  gateway:
+    host: gateway-service
+    port: 8080
+  users:
+    host: users-service
+    port: 8010
+  categories:
+    host: categories-service
+    port: 8020
+  defining-themes:
+    host: defining-themes-service
+    port: 8030
+  statements:
+    host: statements-service
+    port: 8040

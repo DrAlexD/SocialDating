@@ -9,7 +9,7 @@ import xelagurd.socialdating.server.FakeStatementsData.toUserStatementsWithNullI
 import xelagurd.socialdating.server.repository.StatementsRepository
 import xelagurd.socialdating.server.repository.UserStatementsRepository
 
-@Profile("(dev | local) & !test")
+@Profile("!test")
 @Configuration
 class StatementsDevelopmentConfig {
 

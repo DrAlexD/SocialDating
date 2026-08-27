@@ -1,3 +1,41 @@
+server:
+  port: ${services.categories.port}
+
+management:
+  health:
+    kafka:
+      enabled: true
+
+security:
+  whitelist:
+    - /actuator/health
+    - /actuator/shutdown
+    - /categories/v3/api-docs
+
+springdoc:
+  api-docs:
+    path: /categories/v3/api-docs
+
 spring:
   config:
     import: classpath:application-common.yml
+  application:
+    name: categories-service
+  datasource:
+    hikari:
+      connection-init-sql: set search_path to categories_schema
+  jpa:
+    properties:
+      hibernate:
+        default_schema: categories_schema
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: categories-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "xelagurd.socialdating.server.**"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

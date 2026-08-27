@@ -9,7 +9,7 @@ import xelagurd.socialdating.server.FakeCategoriesData.toUserCategoriesWithNullI
 import xelagurd.socialdating.server.repository.CategoriesRepository
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
 
-@Profile("(dev | local) & !test")
+@Profile("!test")
 @Configuration
 class CategoriesDevelopmentConfig {
 
