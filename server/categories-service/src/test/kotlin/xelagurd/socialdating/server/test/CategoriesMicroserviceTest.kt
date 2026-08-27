@@ -32,7 +32,7 @@ import xelagurd.socialdating.server.utils.TestUtils.readObject
 import xelagurd.socialdating.server.utils.TestUtils.readObjectFromJsonString
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
-@ActiveProfiles("dev", "test")
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(NoSecurityConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

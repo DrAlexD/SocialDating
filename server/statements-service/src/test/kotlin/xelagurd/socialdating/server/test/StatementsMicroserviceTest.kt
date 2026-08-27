@@ -28,7 +28,7 @@ import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINT
 import xelagurd.socialdating.server.repository.UserStatementsRepository
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
-@ActiveProfiles("dev", "test")
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(NoSecurityConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

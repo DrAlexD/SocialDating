@@ -1,6 +1,5 @@
-spring:
-  profiles:
-    active: dev
+server:
+  port: ${services.gateway.port}
 
 management:
   endpoints:
@@ -10,3 +9,77 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+  health:
+    kafka:
+      enabled: true
+
+security:
+  whitelist:
+    - /api/v1/users/auth/**
+    - /api/v1/users/v3/api-docs
+    - /api/v1/categories/v3/api-docs
+    - /api/v1/defining-themes/v3/api-docs
+    - /api/v1/statements/v3/api-docs
+
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+  cloud:
+    gateway:
+      routes:
+        - id: users-service
+          uri: http://${services.users.host}:${services.users.port}
+          predicates:
+            - Path=/api/v1/users/**
+          filters:
+            - StripPrefix=2
+
+        - id: categories-service
+          uri: http://${services.categories.host}:${services.categories.port}
+          predicates:
+            - Path=/api/v1/categories/**
+          filters:
+            - StripPrefix=2
+
+        - id: defining-themes-service
+          uri: http://${services.defining-themes.host}:${services.defining-themes.port}
+          predicates:
+            - Path=/api/v1/defining-themes/**
+          filters:
+            - StripPrefix=2
+
+        - id: statements-service
+          uri: http://${services.statements.host}:${services.statements.port}
+          predicates:
+            - Path=/api/v1/statements/**
+          filters:
+            - StripPrefix=2
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: users-service
+        url: /api/v1/users/v3/api-docs
+      - name: categories-service
+        url: /api/v1/categories/v3/api-docs
+      - name: defining-themes-service
+        url: /api/v1/defining-themes/v3/api-docs
+      - name: statements-service
+        url: /api/v1/statements/v3/api-docs
+
+services:
+  gateway:
+    host: gateway-service
+    port: 8080
+  users:
+    host: users-service
+    port: 8010
+  categories:
+    host: categories-service
+    port: 8020
+  defining-themes:
+    host: defining-themes-service
+    port: 8030
+  statements:
+    host: statements-service
+    port: 8040
