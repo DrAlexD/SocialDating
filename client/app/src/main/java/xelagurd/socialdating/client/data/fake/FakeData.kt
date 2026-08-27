@@ -10,7 +10,6 @@ import xelagurd.socialdating.client.data.model.additional.DetailedSimilarCategor
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarDefiningTheme
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
 import xelagurd.socialdating.client.data.model.additional.SimilarCategory
-import xelagurd.socialdating.client.data.model.additional.SimilarUser
 import xelagurd.socialdating.client.data.model.enums.Gender.MALE
 import xelagurd.socialdating.client.data.model.enums.Purpose.ALL_AT_ONCE
 import xelagurd.socialdating.client.data.model.enums.Purpose.FRIENDS
@@ -19,6 +18,7 @@ import xelagurd.socialdating.client.data.model.enums.Role.ADMIN
 import xelagurd.socialdating.client.data.model.enums.Role.USER
 import xelagurd.socialdating.client.data.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.client.data.model.enums.SimilarityType.SIMILAR
+import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
 import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.form.RegistrationFormData
 import xelagurd.socialdating.client.ui.form.StatementFormData
@@ -389,9 +389,16 @@ object FakeData {
         id = 66, text = "NewStatement66", isSupportDefiningTheme = true, definingThemeId = 1, creatorUserId = 1
     )
 
+    private val similarUser = users[1]
+
     val similarUsers = listOf(
-        SimilarUser(
-            id = 2,
+        SimilarUserWithData(
+            id = similarUser.id,
+            name = similarUser.name,
+            gender = similarUser.gender,
+            age = similarUser.age,
+            city = similarUser.city,
+            purpose = similarUser.purpose,
             similarNumber = 3,
             oppositeNumber = 1,
             similarCategories = listOf(

@@ -19,6 +19,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.controller.UserCategoriesController
 import xelagurd.socialdating.server.model.additional.DetailedSimilarUser
+import xelagurd.socialdating.server.model.additional.SimilarUserWithData
+import xelagurd.socialdating.server.model.enums.Gender.MALE
+import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.service.UserCategoriesService
 import xelagurd.socialdating.server.utils.TestUtils.mockkList
 
@@ -49,7 +52,20 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     @Test
     fun getSimilarUsers_existData_ok() {
-        every { userCategoriesService.getSimilarUsers(any(), any()) } returns mockkList(relaxed = true)
+        every { userCategoriesService.getSimilarUsers(any(), any()) } returns listOf(
+            SimilarUserWithData(
+                id = anotherUserId,
+                name = "User",
+                gender = MALE,
+                age = 27,
+                city = "City",
+                purpose = FRIENDS,
+                similarNumber = 3,
+                oppositeNumber = 1,
+                similarCategories = emptyList(),
+                oppositeCategories = emptyList()
+            )
+        )
 
         mockMvc.perform(
             get("/categories/users/similar-users?currentUserId=$userId")

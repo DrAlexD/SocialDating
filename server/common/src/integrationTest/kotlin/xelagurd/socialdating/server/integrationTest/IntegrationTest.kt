@@ -143,6 +143,31 @@ class IntegrationTest {
         }
     }
 
+    @Order(5)
+    @Test
+    fun getSimilarUsers_afterReactions_returnsSimilarUserWithDataFromUsersService() {
+        val response = restTemplate.getWithToken(
+            user,
+            "$GATEWAY_URL/categories/users/similar-users?currentUserId=${user.id}",
+            String::class.java
+        )
+        assertEquals(HttpStatus.OK, response.statusCode)
+
+        val responseSimilarUser = readArrayFromJsonString(response.body!!)
+            .firstOrNull { it["id"] == admin.id }
+        assertNotNull(responseSimilarUser)
+
+        assertEquals(similarDefiningThemesNumber, responseSimilarUser["similarNumber"])
+        assertEquals(oppositeDefiningThemesNumber, responseSimilarUser["oppositeNumber"])
+
+        // the user data is collected by categories-service from users-service
+        assertEquals(admin.data["name"], responseSimilarUser["name"])
+        assertEquals(admin.data["gender"], responseSimilarUser["gender"])
+        assertEquals(admin.data["age"], responseSimilarUser["age"])
+        assertEquals(admin.data["city"], responseSimilarUser["city"])
+        assertEquals(admin.data["purpose"], responseSimilarUser["purpose"])
+    }
+
     private fun loginUser(): AuthorizedUser {
         val request = mapOf(
             "username" to ADMIN_USERNAME,
@@ -360,7 +385,7 @@ class IntegrationTest {
         val responseUser = readObject("user")
         assertNotNull(responseUser["id"])
 
-        return AuthorizedUser(responseUser["id"] as Int, this["accessToken"] as String)
+        return AuthorizedUser(responseUser["id"] as Int, this["accessToken"] as String, responseUser)
     }
 
     private fun Map<String, Any>.readDefiningThemesSimilarity() =
@@ -402,7 +427,7 @@ class IntegrationTest {
         return exchange(url, HttpMethod.POST, HttpEntity(body, headers), responseType)
     }
 
-    private data class AuthorizedUser(val id: Int, val accessToken: String)
+    private data class AuthorizedUser(val id: Int, val accessToken: String, val data: Map<String, Any>)
 
     companion object {
         private const val ADMIN_USERNAME = "username1"

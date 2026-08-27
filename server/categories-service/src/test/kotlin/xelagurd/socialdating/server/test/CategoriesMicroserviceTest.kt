@@ -13,6 +13,8 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ActiveProfiles
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -24,9 +26,14 @@ import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.FakeCategoriesData.filterByIds
 import xelagurd.socialdating.server.FakeCategoriesData.filterByUserId
 import xelagurd.socialdating.server.FakeCategoriesData.toUserCategoriesWithNullIds
+import xelagurd.socialdating.server.client.UsersServiceClient
 import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.model.UserCategory
+import xelagurd.socialdating.server.model.additional.UserData
+import xelagurd.socialdating.server.model.enums.Gender.MALE
+import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
+import xelagurd.socialdating.server.security.AuthHeaders
 import xelagurd.socialdating.server.utils.TestUtils.readArrayFromJsonString
 import xelagurd.socialdating.server.utils.TestUtils.readObject
 import xelagurd.socialdating.server.utils.TestUtils.readObjectFromJsonString
@@ -42,9 +49,21 @@ class CategoriesMicroserviceTest(
     @param:Autowired val userCategoriesRepository: UserCategoriesRepository
 ) {
 
+    @MockkBean
+    private lateinit var usersServiceClient: UsersServiceClient
+
     private val currentUserId = 1
     private val anotherUserId = 2
     private val categoryIds = listOf(1, 2)
+
+    private val anotherUser = UserData(
+        id = anotherUserId,
+        name = "RemoteUser2",
+        gender = MALE,
+        age = 27,
+        city = "RemoteCity",
+        purpose = FRIENDS
+    )
 
     private val categoriesDetails = FakeCategoriesData.categoriesDetails
     private val categories = FakeCategoriesData.categories.take(categoriesDetails.size)
@@ -108,6 +127,8 @@ class CategoriesMicroserviceTest(
 
     @Test
     fun getSimilarUsers_existData_returnsOnlySimilarUsers() {
+        every { usersServiceClient.getUsers(listOf(anotherUserId)) } returns listOf(anotherUser)
+
         val response = restTemplate.getWithAuth(
             currentUserId,
             "/categories/users/similar-users?currentUserId=$currentUserId",
@@ -121,6 +142,11 @@ class CategoriesMicroserviceTest(
 
         val responseSimilarUser = responseSimilarUsers.single()
         assertEquals(anotherUserId, responseSimilarUser["id"])
+        assertEquals(anotherUser.name, responseSimilarUser["name"])
+        assertEquals(anotherUser.gender.name, responseSimilarUser["gender"])
+        assertEquals(anotherUser.age, responseSimilarUser["age"])
+        assertEquals(anotherUser.city, responseSimilarUser["city"])
+        assertEquals(anotherUser.purpose.name, responseSimilarUser["purpose"])
         assertEquals(3, responseSimilarUser["similarNumber"])
         assertEquals(1, responseSimilarUser["oppositeNumber"])
         assertEquals(
@@ -184,8 +210,8 @@ class CategoriesMicroserviceTest(
         responseType: Class<T>
     ): ResponseEntity<T> {
         val headers = HttpHeaders()
-        headers.set("X-Auth-UserId", userId.toString())
-        headers.set("X-Auth-Role", "USER")
+        headers.set(AuthHeaders.USER_ID, userId.toString())
+        headers.set(AuthHeaders.ROLE, "USER")
         return exchange(url, HttpMethod.GET, HttpEntity<Void>(headers), responseType)
     }
 

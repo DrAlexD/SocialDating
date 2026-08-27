@@ -19,7 +19,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeCategoriesData
+import xelagurd.socialdating.server.client.UsersServiceClient
 import xelagurd.socialdating.server.model.UserCategory
+import xelagurd.socialdating.server.model.additional.UserData
+import xelagurd.socialdating.server.model.enums.Gender.MALE
+import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.model.enums.SimilarityType.EQUAL
 import xelagurd.socialdating.server.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.server.model.enums.SimilarityType.SIMILAR
@@ -32,6 +36,9 @@ class UserCategoriesServiceUnitTest {
 
     @MockK
     private lateinit var userCategoriesRepository: UserCategoriesRepository
+
+    @MockK
+    private lateinit var usersServiceClient: UsersServiceClient
 
     @InjectMockKs
     private lateinit var userCategoriesService: UserCategoriesService
@@ -57,6 +64,13 @@ class UserCategoriesServiceUnitTest {
         maintained: Array<Long>? = null,
         notMaintained: Array<Long>? = null
     ) = CategoryWithData(id, name, maintained, notMaintained)
+
+    private fun userData(
+        id: Int,
+        name: String = "User$id",
+        age: Int = 20 + id,
+        city: String = "City$id"
+    ) = UserData(id, name, MALE, age, city, FRIENDS)
 
     private fun userCategory(
         userId: Int,
@@ -112,7 +126,8 @@ class UserCategoriesServiceUnitTest {
 
         verify(exactly = 0) { userCategoriesRepository.findCurrentUserCategories(any(), any()) }
         verify(exactly = 0) { userCategoriesRepository.findAnotherUsersCategories(any(), any(), any()) }
-        confirmVerified(userCategoriesRepository)
+        verify(exactly = 0) { usersServiceClient.getUsers(any()) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
     }
 
     @Test
@@ -141,6 +156,8 @@ class UserCategoriesServiceUnitTest {
             userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1, 2, 3))
         } returns anotherUsersCategories
 
+        every { usersServiceClient.getUsers(listOf(10, 20)) } returns listOf(userData(20), userData(10))
+
         val result = userCategoriesService.getSimilarUsers(currentUserId)
 
         assertEquals(listOf(10, 20), result.map { it.id })
@@ -148,13 +165,44 @@ class UserCategoriesServiceUnitTest {
         val similarUser10 = result[0]
         assertEquals(3, similarUser10.similarNumber)
         assertEquals(0, similarUser10.oppositeNumber)
-        assertEquals(3, similarUser10.differenceNumber)
+        assertEquals("User10", similarUser10.name)
+        assertEquals(30, similarUser10.age)
+        assertEquals("City10", similarUser10.city)
         assertEquals(setOf("Category1", "Category2"), similarUser10.similarCategories.map { it.name }.toSet())
         assertTrue(similarUser10.oppositeCategories.isEmpty())
 
         verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) }
         verify(exactly = 1) { userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1, 2, 3)) }
-        confirmVerified(userCategoriesRepository)
+        verify(exactly = 1) { usersServiceClient.getUsers(listOf(10, 20)) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
+    }
+
+    @Test
+    fun getSimilarUsers_withoutUsersData_returnsOnlyUsersWithData() {
+        setAuthenticatedUser(currentUserId)
+
+        val currentUserCategories = listOf(categoryData(id = 1, maintained = arrayOf(0b0011L)))
+        every { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) } returns currentUserCategories
+
+        val anotherUsersCategories = listOf(
+            userCategory(userId = 10, categoryId = 1, maintained = arrayOf(0b0011L)),  // similar 2
+            userCategory(userId = 20, categoryId = 1, maintained = arrayOf(0b0001L))   // similar 1
+        )
+        every {
+            userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1))
+        } returns anotherUsersCategories
+
+        // users-service knows nothing about user 20
+        every { usersServiceClient.getUsers(listOf(10, 20)) } returns listOf(userData(10))
+
+        val result = userCategoriesService.getSimilarUsers(currentUserId)
+
+        assertEquals(listOf(10), result.map { it.id })
+
+        verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) }
+        verify(exactly = 1) { userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1)) }
+        verify(exactly = 1) { usersServiceClient.getUsers(listOf(10, 20)) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
     }
 
     @Test
@@ -181,13 +229,14 @@ class UserCategoriesServiceUnitTest {
             userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1, 2, 3, 4, 5))
         } returns anotherUsersCategories
 
+        every { usersServiceClient.getUsers(listOf(10)) } returns listOf(userData(10))
+
         val result = userCategoriesService.getSimilarUsers(currentUserId)
 
         assertEquals(1, result.size)
         val similarUser = result.single()
         assertEquals(6, similarUser.similarNumber)
         assertEquals(2, similarUser.oppositeNumber)
-        assertEquals(4, similarUser.differenceNumber)
         // SIMILAR_CATEGORIES_NUMBER = 2, only the top 2 of 3 similar categories are kept, sorted descending
         assertEquals(listOf(3, 2), similarUser.similarCategories.map { it.differenceNumber })
         // OPPOSITE_CATEGORIES_NUMBER = 2
@@ -198,7 +247,8 @@ class UserCategoriesServiceUnitTest {
         verify(exactly = 1) {
             userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1, 2, 3, 4, 5))
         }
-        confirmVerified(userCategoriesRepository)
+        verify(exactly = 1) { usersServiceClient.getUsers(listOf(10)) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
     }
 
     @Test
@@ -217,7 +267,8 @@ class UserCategoriesServiceUnitTest {
 
         verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, categoryIds) }
         verify(exactly = 1) { userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, emptyList()) }
-        confirmVerified(userCategoriesRepository)
+        verify(exactly = 0) { usersServiceClient.getUsers(any()) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
     }
 
     @Test

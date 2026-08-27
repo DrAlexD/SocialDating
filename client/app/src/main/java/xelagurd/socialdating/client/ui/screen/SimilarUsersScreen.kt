@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.model.DataUtils.toSimilarUsersWithData
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_MAINTAIN
@@ -194,7 +193,7 @@ private fun CityWithPurpose(city: String, purpose: Purpose) {
 private fun SimilarUsersComponentDataPreview() {
     AppTheme {
         SimilarUsersScreenComponent(
-            similarUsersUiState = SimilarUsersUiState(entities = FakeData.similarUsers.toSimilarUsersWithData(FakeData.users))
+            similarUsersUiState = SimilarUsersUiState(entities = FakeData.similarUsers)
         )
     }
 }
@@ -204,7 +203,7 @@ private fun SimilarUsersComponentDataPreview() {
 private fun SimilarUsersComponentDataRuPreview() {
     AppTheme {
         SimilarUsersScreenComponent(
-            similarUsersUiState = SimilarUsersUiState(entities = FakeData.similarUsers.toSimilarUsersWithData(FakeData.users))
+            similarUsersUiState = SimilarUsersUiState(entities = FakeData.similarUsers)
         )
     }
 }

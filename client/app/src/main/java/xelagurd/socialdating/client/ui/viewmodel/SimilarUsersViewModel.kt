@@ -19,11 +19,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
-import xelagurd.socialdating.client.data.model.DataUtils.toSimilarUsersWithData
 import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
-import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.SimilarUsersUiState
@@ -34,8 +32,7 @@ class SimilarUsersViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val preferencesRepository: PreferencesRepository,
-    private val remoteUserCategoriesRepository: RemoteUserCategoriesRepository,
-    private val remoteUsersRepository: RemoteUsersRepository
+    private val remoteUserCategoriesRepository: RemoteUserCategoriesRepository
 ) : ViewModel() {
 
     private val userId: Int = checkNotNull(savedStateHandle[SimilarUsersDestination.userId])
@@ -61,37 +58,24 @@ class SimilarUsersViewModel @Inject constructor(
             getSimilarUsers()
         } else {
             dataRequestStatusFlow.update { RequestStatus.LOADING }
-            similarUsersFlow.update { FakeData.similarUsers.toSimilarUsersWithData(FakeData.users) }
+            similarUsersFlow.update { FakeData.similarUsers }
             dataRequestStatusFlow.update { RequestStatus.SUCCESS }
         }
     }
 
     fun getSimilarUsers() {
         viewModelScope.launch {
-            var globalStatus: RequestStatus = RequestStatus.LOADING
+            dataRequestStatusFlow.update { RequestStatus.LOADING }
 
-            dataRequestStatusFlow.update { globalStatus }
-
-            val (remoteSimilarUsers, statusSimilarUsers) = safeApiCall(context) {
+            val (remoteSimilarUsers, status) = safeApiCall(context) {
                 remoteUserCategoriesRepository.getSimilarUsers(userId)
             }
 
             if (remoteSimilarUsers != null) {
-                val neededUserIds = remoteSimilarUsers.map { it.id }
-                val (remoteUsers, statusUsers) = safeApiCall(context) {
-                    remoteUsersRepository.getUsers(neededUserIds)
-                }
-
-                if (remoteUsers != null) {
-                    similarUsersFlow.update { remoteSimilarUsers.toSimilarUsersWithData(remoteUsers) }
-                }
-
-                globalStatus = statusUsers
-            } else {
-                globalStatus = statusSimilarUsers
+                similarUsersFlow.update { remoteSimilarUsers }
             }
 
-            dataRequestStatusFlow.update { globalStatus }
+            dataRequestStatusFlow.update { status }
         }
     }
 }

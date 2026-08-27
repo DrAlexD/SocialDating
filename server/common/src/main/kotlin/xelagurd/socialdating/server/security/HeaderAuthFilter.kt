@@ -17,8 +17,8 @@ class HeaderAuthFilter : OncePerRequestFilter() {
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val userId = request.getHeader("X-Auth-UserId")
-        val role = request.getHeader("X-Auth-Role")
+        val userId = request.getHeader(AuthHeaders.USER_ID)
+        val role = request.getHeader(AuthHeaders.ROLE)
 
         if (userId != null && role != null) {
             val authority = SimpleGrantedAuthority("ROLE_$role")
