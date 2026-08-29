@@ -86,7 +86,7 @@ class ProfileStatisticsViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = ProfileStatisticsUiState()
+        initialValue = ProfileStatisticsUiState(userId = userId, anotherUserId = anotherUserId)
     )
 
     init {

@@ -1,7 +1,6 @@
 package xelagurd.socialdating.client.androidTest
 
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -55,19 +54,6 @@ class BottomBarTest {
         }
 
         composeTestRule.onNodeWithTagId(R.string.nav_settings).assertIsSelected()
-        composeTestRule.onNodeWithTagId(R.string.nav_categories).assertIsNotSelected()
-    }
-
-    @Test
-    fun bottomBar_anotherUser_withoutSelectedItem() {
-        composeTestRule.setContentToScreen {
-            AppBottomNavigationBar(
-                currentTopLevelRoute = CategoriesDestination.topLevelRoute,
-                isCurrentUser = false
-            )
-        }
-
-        composeTestRule.onNodeWithTagId(R.string.nav_categories).assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.nav_categories).assertIsNotSelected()
     }
 }

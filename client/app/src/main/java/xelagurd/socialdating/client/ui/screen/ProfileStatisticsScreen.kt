@@ -48,6 +48,7 @@ import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
 import xelagurd.socialdating.client.ui.AppTopBar
 import xelagurd.socialdating.client.ui.navigation.ProfileStatisticsDestination
+import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
 import xelagurd.socialdating.client.ui.state.ProfileStatisticsUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.theme.AppTheme
@@ -89,8 +90,10 @@ fun ProfileStatisticsScreenComponent(
         },
         bottomBar = {
             AppBottomNavigationBar(
-                currentTopLevelRoute = ProfileStatisticsDestination.topLevelRoute,
-                isCurrentUser = profileStatisticsUiState.userId == profileStatisticsUiState.anotherUserId
+                currentTopLevelRoute = when (profileStatisticsUiState.anotherUserId) {
+                    profileStatisticsUiState.userId -> ProfileStatisticsDestination.topLevelRoute
+                    else -> SimilarUsersDestination.topLevelRoute
+                }
             )
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
