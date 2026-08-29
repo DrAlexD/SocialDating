@@ -91,6 +91,18 @@ object FakeData {
         )
     )
 
+    val similarUserCategories = listOf(
+        UserCategory(
+            id = 4, interest = 30, userId = 2, categoryId = 1
+        ),
+        UserCategory(
+            id = 5, interest = 45, userId = 2, categoryId = 2
+        ),
+        UserCategory(
+            id = 6, interest = 25, userId = 2, categoryId = 3
+        )
+    )
+
     val definingThemes = listOf(
         DefiningTheme(
             id = 1,
@@ -219,6 +231,14 @@ object FakeData {
         UserDefiningTheme(id = 2, value = 80, interest = 25, userId = 1, definingThemeId = 2),
         UserDefiningTheme(id = 3, value = 9, interest = 25, userId = 1, definingThemeId = 8),
         UserDefiningTheme(id = 4, value = 0, interest = 25, userId = 1, definingThemeId = 11)
+    )
+
+    val similarUserDefiningThemes = listOf(
+        UserDefiningTheme(id = 5, value = 78, interest = 30, userId = 2, definingThemeId = 1),
+        UserDefiningTheme(id = 6, value = 92, interest = 30, userId = 2, definingThemeId = 2),
+        UserDefiningTheme(id = 7, value = 45, interest = 45, userId = 2, definingThemeId = 3),
+        UserDefiningTheme(id = 8, value = 88, interest = 45, userId = 2, definingThemeId = 8),
+        UserDefiningTheme(id = 9, value = 15, interest = 25, userId = 2, definingThemeId = 11)
     )
 
     val statementsWithDefiningThemes = listOf(
