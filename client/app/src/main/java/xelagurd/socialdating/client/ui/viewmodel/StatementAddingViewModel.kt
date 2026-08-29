@@ -17,6 +17,7 @@ import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.model.Statement
+import xelagurd.socialdating.client.data.model.StatementDefiningTheme
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.client.ui.form.StatementFormData
@@ -79,7 +80,10 @@ class StatementAddingViewModel @Inject constructor(
                 }
 
                 if (statement != null) {
-                    localStatementsRepository.insertStatements(listOf(statement))
+                    localStatementsRepository.insertStatements(listOf(statement.toStatement()))
+                    localStatementsRepository.insertStatementDefiningThemes(
+                        statement.toStatementDefiningThemes()
+                    )
                 }
 
                 _uiState.update { it.copy(actionRequestStatus = status) }
@@ -92,11 +96,14 @@ class StatementAddingViewModel @Inject constructor(
                         Statement(
                             id = newId,
                             text = statementFormDetails.text,
-                            isSupportDefiningTheme = statementFormDetails.isSupportDefiningTheme!!,
-                            definingThemeId = statementFormDetails.definingThemeId!!,
                             creatorUserId = statementFormDetails.creatorUserId!!
                         )
                     )
+                )
+                localStatementsRepository.insertStatementDefiningThemes(
+                    statementFormDetails.definingThemes.keys.map {
+                        StatementDefiningTheme(statementId = newId, definingThemeId = it)
+                    }
                 )
                 _uiState.update { it.copy(actionRequestStatus = RequestStatus.SUCCESS) }
             }

@@ -2,7 +2,8 @@ package xelagurd.socialdating.server
 
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.common.UserDefiningThemeUpdateDetails
+import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_NO_MAINTAIN
 
@@ -153,12 +154,11 @@ object FakeDefiningThemesData {
         UserDefiningTheme(id = 12, value = 95, interest = 25, userId = 3, definingThemeId = 11)
     )
 
-    val userDefiningThemeUpdateDetails =
-        UserDefiningThemeUpdateDetails(
+    val userDefiningThemesUpdateDetails =
+        UserDefiningThemesUpdateDetails(
             userId = 1,
-            definingThemeId = 1,
             reactionType = FULL_NO_MAINTAIN,
-            isSupportDefiningTheme = true
+            definingThemes = listOf(DefiningThemeReactionDetails(1, true))
         )
 
     fun List<DefiningTheme>.toDefiningThemesWithNullIds() =

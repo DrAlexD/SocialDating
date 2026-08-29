@@ -41,15 +41,10 @@ class UserCategoriesRepositoryTest(
 
         userCategoriesRepository.saveAllAndFlush(
             listOf(
-                // current user (1) with maintained data
                 UserCategory(interest = 50, userId = 1, categoryId = category1.id!!, maintained = arrayOf(3L)),
-                // current user (1) with notMaintained data
                 UserCategory(interest = 25, userId = 1, categoryId = category2.id!!, notMaintained = arrayOf(4L)),
-                // another user (2) with maintained data in category1
                 UserCategory(interest = 50, userId = 2, categoryId = category1.id!!, maintained = arrayOf(1L)),
-                // another user (2) without any maintained/notMaintained data (should be filtered out)
                 UserCategory(interest = 25, userId = 2, categoryId = category2.id!!),
-                // another user (3) with notMaintained data in category1
                 UserCategory(interest = 25, userId = 3, categoryId = category1.id!!, notMaintained = arrayOf(2L))
             )
         )
@@ -88,7 +83,6 @@ class UserCategoriesRepositoryTest(
 
         assertEquals(2, result.size)
         assertEquals(setOf(category1.id, category2.id), result.map { it.id }.toSet())
-        // left join with categories provides names
         assertEquals(setOf("Category1", "Category2"), result.map { it.name }.toSet())
     }
 
@@ -146,7 +140,6 @@ class UserCategoriesRepositoryTest(
             categoryIds = listOf(category2.id!!)
         )
 
-        // no other user has data in category2
         assertTrue(result.isEmpty())
     }
 

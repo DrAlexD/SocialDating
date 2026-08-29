@@ -28,6 +28,7 @@ import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.ui.screen.AppDataChoosingList
 import xelagurd.socialdating.client.ui.screen.AppDataList
+import xelagurd.socialdating.client.ui.screen.AppDataMultiChoosingList
 import xelagurd.socialdating.client.ui.screen.AppEntityCard
 import xelagurd.socialdating.client.ui.screen.AppExpandedEntityCard
 import xelagurd.socialdating.client.ui.screen.AppLargeBodyText
@@ -41,6 +42,7 @@ import xelagurd.socialdating.client.ui.screen.AppMediumTitleText
 import xelagurd.socialdating.client.ui.screen.AppSmallBodyText
 import xelagurd.socialdating.client.ui.screen.AppSmallTitleText
 import xelagurd.socialdating.client.ui.screen.AppTextField
+import xelagurd.socialdating.client.ui.screen.AppYesNoRadioGroup
 import xelagurd.socialdating.client.ui.screen.stringResourceWithColon
 
 @HiltAndroidTest
@@ -249,6 +251,41 @@ class ScreenComponentsTest {
     }
 
     @Test
+    fun appDataMultiChoosingList_chosenEntities_displayedAllDataWithChosenMarks() {
+        composeTestRule.setContentToScreen {
+            AppDataMultiChoosingList(
+                entities = categories,
+                chosenEntityIds = setOf(categories[0].id),
+                maxHeight = MAX_HEIGHT_DP.dp
+            ) { entity, isChosen ->
+                AppLargeTitleText(text = (entity as Category).name + if (isChosen) CHOSEN_MARK else "")
+            }
+        }
+
+        composeTestRule.onNodeWithText(categories[0].name + CHOSEN_MARK).assertIsDisplayed()
+        composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
+    }
+
+    @Test
+    fun appYesNoRadioGroup_click_calledSelectAction() {
+        var selectedValue: Boolean? = null
+
+        composeTestRule.setContentToScreen {
+            AppYesNoRadioGroup(
+                isSelectedYes = null,
+                onSelect = { selectedValue = it },
+                testTagSuffix = TEST_TAG_SUFFIX
+            )
+        }
+
+        composeTestRule.onNodeWithTagId(R.string.yes, TEST_TAG_SUFFIX).checkButtonAndClick()
+        assertEquals(true, selectedValue)
+
+        composeTestRule.onNodeWithTagId(R.string.no, TEST_TAG_SUFFIX).checkButtonAndClick()
+        assertEquals(false, selectedValue)
+    }
+
+    @Test
     fun appList_entities_displayedAllData() {
         composeTestRule.setContentToScreen {
             AppList(entities = categories) {
@@ -316,6 +353,8 @@ class ScreenComponentsTest {
     private companion object {
         const val CATEGORIES_COUNT = 3
         const val MAX_HEIGHT_DP = 300
+        const val CHOSEN_MARK = " (chosen)"
+        const val TEST_TAG_SUFFIX = "1"
         const val EXPANDED_TEXT = "Expanded"
         const val SMALL_BODY_TEXT = "Small body"
         const val MEDIUM_BODY_TEXT = "Medium body"

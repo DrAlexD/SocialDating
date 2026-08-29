@@ -6,6 +6,12 @@ val envProps = Properties().apply {
 
 fun prop(key: String) = envProps[key] as String?
 
+val instrumentedCoverageReportTaskName = "createInstrumentedCoverageReport"
+
+val isInstrumentedCoverageEnabled = gradle.startParameter.taskNames.any {
+    it.substringAfterLast(":") == instrumentedCoverageReportTaskName
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.plugin.compose)
@@ -47,7 +53,7 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/api/v1/\"")
-            enableAndroidTestCoverage = true
+            enableAndroidTestCoverage = isInstrumentedCoverageEnabled
         }
         release {
             signingConfig = signingConfigs.getByName("release")
@@ -77,12 +83,16 @@ android {
         }
     }
 
+    testOptions {
+        animationsDisabled = true
+    }
+
     lint {
         baseline = file("lint-baseline.xml")
     }
 }
 
-tasks.register<JacocoReport>("createInstrumentedCoverageReport") {
+tasks.register<JacocoReport>(instrumentedCoverageReportTaskName) {
     group = "verification"
     description = "Builds the instrumented test coverage report into tests-coverage/reports/instrumented."
     dependsOn("connectedDebugAndroidTest")

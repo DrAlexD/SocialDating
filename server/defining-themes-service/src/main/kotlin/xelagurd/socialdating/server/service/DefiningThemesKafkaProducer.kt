@@ -2,17 +2,26 @@ package xelagurd.socialdating.server.service
 
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
-import xelagurd.socialdating.server.model.common.MaintainedListUpdateDetails
+import io.github.oshai.kotlinlogging.KotlinLogging
+import xelagurd.socialdating.server.model.common.UserCategoriesUpdateDetails
 
 @Service
 class DefiningThemesKafkaProducer(
-    private val kafkaTemplate: KafkaTemplate<String, MaintainedListUpdateDetails>
+    private val kafkaTemplate: KafkaTemplate<String, UserCategoriesUpdateDetails>
 ) {
+    val logger = KotlinLogging.logger { }
 
-    fun updateMaintainedList(maintainedListUpdateDetails: MaintainedListUpdateDetails) {
+    fun updateUserCategories(userCategoriesUpdateDetails: UserCategoriesUpdateDetails) {
         kafkaTemplate.send(
-            "update-maintained-list-on-statement-reaction",
-            maintainedListUpdateDetails
-        )
+            "update-user-categories-on-statement-reaction",
+            userCategoriesUpdateDetails.userId.toString(),
+            userCategoriesUpdateDetails
+        ).whenComplete { _, exception ->
+            if (exception != null) {
+                logger.error(exception) {
+                    "Failed to send user categories update of user ${userCategoriesUpdateDetails.userId}"
+                }
+            }
+        }
     }
 }

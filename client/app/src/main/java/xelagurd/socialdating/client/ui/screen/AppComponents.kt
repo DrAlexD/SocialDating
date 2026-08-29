@@ -64,6 +64,29 @@ fun DataChoosingListComponent(
 }
 
 @Composable
+fun DataMultiChoosingListComponent(
+    dataListUiState: DataListUiState,
+    chosenEntityIds: Set<Int>,
+    maxHeight: Dp,
+    listModifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    card: @Composable (DataEntity, Boolean) -> Unit
+) {
+    DataComponent(
+        dataRequestUiState = dataListUiState
+    ) {
+        AppDataMultiChoosingList(
+            entities = dataListUiState.entities,
+            chosenEntityIds = chosenEntityIds,
+            maxHeight = maxHeight,
+            modifier = listModifier,
+            contentPadding = contentPadding,
+            card = card
+        )
+    }
+}
+
+@Composable
 fun DataEntityComponent(
     dataEntityUiState: DataEntityUiState,
     contentPadding: PaddingValues = PaddingValues(0.dp),

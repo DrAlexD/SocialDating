@@ -10,10 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import xelagurd.socialdating.server.repository.UsersRepository
 
-/**
- * Provides the authentication beans of [xelagurd.socialdating.server.security.AuthSecurityConfig],
- * which is disabled in the test profile.
- */
 @TestConfiguration
 class AuthTestConfig(
     private val usersRepository: UsersRepository

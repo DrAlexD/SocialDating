@@ -4,6 +4,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import xelagurd.socialdating.client.data.local.dao.StatementsDao
 import xelagurd.socialdating.client.data.model.Statement
+import xelagurd.socialdating.client.data.model.StatementDefiningTheme
 
 @Singleton
 class LocalStatementsRepository @Inject constructor(
@@ -17,6 +18,9 @@ class LocalStatementsRepository @Inject constructor(
 
     suspend fun insertStatements(statements: List<Statement>) =
         statementsDao.insertStatements(statements)
+
+    suspend fun insertStatementDefiningThemes(statementDefiningThemes: List<StatementDefiningTheme>) =
+        statementsDao.insertStatementDefiningThemes(statementDefiningThemes)
 
     suspend fun deleteStatement(statement: Statement) =
         statementsDao.deleteStatement(statement)

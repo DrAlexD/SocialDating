@@ -25,6 +25,7 @@ import xelagurd.socialdating.client.ui.screen.AppLargeTitleText
 import xelagurd.socialdating.client.ui.screen.AppMediumTextCard
 import xelagurd.socialdating.client.ui.screen.ComponentWithActionRequestStatus
 import xelagurd.socialdating.client.ui.screen.DataChoosingListComponent
+import xelagurd.socialdating.client.ui.screen.DataMultiChoosingListComponent
 import xelagurd.socialdating.client.ui.screen.DataEntityComponent
 import xelagurd.socialdating.client.ui.screen.DataListComponent
 import xelagurd.socialdating.client.ui.state.CategoriesUiState
@@ -160,6 +161,27 @@ class AppComponentsTest {
     }
 
     @Test
+    fun dataMultiChoosingListComponent_loadingStateAndEmptyData_loadingIndicator() {
+        setContentToDataMultiChoosingListComponent(
+            StatementAddingUiState(dataRequestStatus = RequestStatus.LOADING),
+            chosenEntityIds = setOf()
+        )
+
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+    }
+
+    @Test
+    fun dataMultiChoosingListComponent_chosenEntities_displayedAllData() {
+        setContentToDataMultiChoosingListComponent(
+            StatementAddingUiState(entities = definingThemes, dataRequestStatus = RequestStatus.SUCCESS),
+            chosenEntityIds = setOf(definingThemes[0].id)
+        )
+
+        composeTestRule.onNodeWithText(definingThemes[0].name).assertIsDisplayed()
+        composeTestRule.onNodeWithText(definingThemes[1].name).assertIsDisplayed()
+    }
+
+    @Test
     fun componentWithActionRequestStatus_undefinedState_onlyContent() {
         val isSuccess = setContentToComponentWithActionRequestStatus(RequestStatus.UNDEFINED)
 
@@ -227,6 +249,25 @@ class AppComponentsTest {
             DataChoosingListComponent(
                 dataListUiState = statementAddingUiState,
                 chosenEntityId = chosenEntityId,
+                maxHeight = MAX_HEIGHT_DP.dp
+            ) { entity, isHasBorder ->
+                AppMediumTextCard(
+                    text = (entity as DefiningTheme).name,
+                    onClick = {},
+                    isHasBorder = isHasBorder
+                )
+            }
+        }
+    }
+
+    private fun setContentToDataMultiChoosingListComponent(
+        statementAddingUiState: StatementAddingUiState,
+        chosenEntityIds: Set<Int>
+    ) {
+        composeTestRule.setContentToScreen {
+            DataMultiChoosingListComponent(
+                dataListUiState = statementAddingUiState,
+                chosenEntityIds = chosenEntityIds,
                 maxHeight = MAX_HEIGHT_DP.dp
             ) { entity, isHasBorder ->
                 AppMediumTextCard(

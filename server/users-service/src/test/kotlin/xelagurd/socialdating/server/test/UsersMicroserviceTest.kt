@@ -51,8 +51,6 @@ class UsersMicroserviceTest(
     private val users = FakeUsersData.users
     private val userIds = users.take(2).mapNotNull { it.id }
 
-    // the database contains only the fake users and the one created by registerUser(),
-    // and ids are generated sequentially, so any bigger id is guaranteed to be missing
     private val existingUsersNumber = users.size + 1
     private val missingUserId = Random.nextInt(existingUsersNumber + 1, Int.MAX_VALUE)
     private val missingUserIds = Random.nextIntList(from = existingUsersNumber + 1)
@@ -182,7 +180,6 @@ class UsersMicroserviceTest(
         return responseAuth
     }
 
-    // password and email are not serialized, so they are not expected in the response
     private fun assertUser(expected: User, responseUser: Map<String, Any>) {
         assertEquals(expected.id, responseUser["id"])
         assertEquals(expected.name, responseUser["name"])

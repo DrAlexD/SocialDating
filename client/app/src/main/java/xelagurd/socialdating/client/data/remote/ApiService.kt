@@ -8,12 +8,12 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefiningTheme
-import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
+import xelagurd.socialdating.client.data.model.additional.StatementWithDefiningThemes
 import xelagurd.socialdating.client.data.model.details.StatementDetails
 import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
 
@@ -40,10 +40,10 @@ interface ApiService {
     suspend fun getStatements(
         @Query("currentUserId") currentUserId: Int,
         @Query("definingThemeIds") definingThemeIds: List<Int>
-    ): Response<List<Statement>>
+    ): Response<List<StatementWithDefiningThemes>>
 
     @POST("statements")
-    suspend fun addStatement(@Body statementDetails: StatementDetails): Response<Statement>
+    suspend fun addStatement(@Body statementDetails: StatementDetails): Response<StatementWithDefiningThemes>
 
     @POST("statements/users/reaction")
     suspend fun processStatementReaction(

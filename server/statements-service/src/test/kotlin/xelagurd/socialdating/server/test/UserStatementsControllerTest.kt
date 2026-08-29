@@ -35,10 +35,7 @@ class UserStatementsControllerTest(@param:Autowired private val mockMvc: MockMvc
     private val statementReactionDetails = StatementReactionDetails(
         userId = 1,
         statementId = 2,
-        categoryId = 3,
-        definingThemeId = 4,
-        reactionType = StatementReactionType.FULL_MAINTAIN,
-        isSupportDefiningTheme = true
+        reactionType = StatementReactionType.FULL_MAINTAIN
     )
 
     @Test

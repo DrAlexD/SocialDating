@@ -192,7 +192,6 @@ class UserCategoriesServiceUnitTest {
             userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1))
         } returns anotherUsersCategories
 
-        // users-service knows nothing about user 20
         every { usersServiceClient.getUsers(listOf(10, 20)) } returns listOf(userData(10))
 
         val result = userCategoriesService.getSimilarUsers(currentUserId)

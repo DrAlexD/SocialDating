@@ -113,7 +113,6 @@ class CategoriesMicroserviceTest(
 
     @Test
     fun getUserCategories_existData_ok() {
-        // maintained and notMaintained lists are not serialized, so they are not expected in the response
         val expected = userCategories.filterByUserId(currentUserId)
             .map { UserCategory(id = it.id, interest = it.interest, userId = it.userId, categoryId = it.categoryId) }
         val response = restTemplate.getForEntity(

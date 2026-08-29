@@ -38,7 +38,7 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
     private val userId = Random.nextInt()
     private val definingThemeIds = Random.nextIntList()
     private val statementDetails = FakeStatementsData.statementsDetails[0]
-    private val statement = FakeStatementsData.statements[0]
+    private val statement = FakeStatementsData.statementsWithDefiningThemes[0]
 
     @Test
     fun getStatements_existData_ok() {
@@ -68,6 +68,19 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
 
         verify(exactly = 1) { statementsService.addStatement(any()) }
+        confirmVerified(statementsService)
+    }
+
+    @Test
+    fun addStatement_withoutDefiningThemes_badRequest() {
+        mockMvc.perform(
+            post("/statements")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(statementDetails.copy(definingThemes = listOf())))
+        )
+            .andExpect(status().isBadRequest)
+
+        verify(exactly = 0) { statementsService.addStatement(any()) }
         confirmVerified(statementsService)
     }
 }

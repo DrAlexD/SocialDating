@@ -4,12 +4,12 @@ import retrofit2.Response
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefiningTheme
-import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
 import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
+import xelagurd.socialdating.client.data.model.additional.StatementWithDefiningThemes
 import xelagurd.socialdating.client.data.model.details.StatementDetails
 import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
 import xelagurd.socialdating.client.data.remote.ApiService
@@ -36,10 +36,12 @@ class FakeApiService : ApiService {
     override suspend fun getStatements(
         currentUserId: Int,
         definingThemeIds: List<Int>
-    ): Response<List<Statement>> =
-        Response.success(FakeData.statements)
+    ): Response<List<StatementWithDefiningThemes>> =
+        Response.success(FakeData.statementsWithDefiningThemes)
 
-    override suspend fun addStatement(statementDetails: StatementDetails): Response<Statement> =
+    override suspend fun addStatement(
+        statementDetails: StatementDetails
+    ): Response<StatementWithDefiningThemes> =
         Response.success(FakeData.newStatement)
 
     override suspend fun processStatementReaction(

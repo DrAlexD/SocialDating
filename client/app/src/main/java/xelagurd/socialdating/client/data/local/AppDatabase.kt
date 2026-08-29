@@ -12,6 +12,7 @@ import xelagurd.socialdating.client.data.local.dao.UsersDao
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.Statement
+import xelagurd.socialdating.client.data.model.StatementDefiningTheme
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
@@ -21,6 +22,7 @@ import xelagurd.socialdating.client.data.model.UserDefiningTheme
         Category::class,
         DefiningTheme::class,
         Statement::class,
+        StatementDefiningTheme::class,
         User::class,
         UserCategory::class,
         UserDefiningTheme::class

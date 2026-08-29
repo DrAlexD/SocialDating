@@ -2,9 +2,7 @@ package xelagurd.socialdating.server.model.common
 
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType
 
-data class MaintainedListUpdateDetails(
-    val userId: Int,
-    val categoryId: Int,
+data class MaintainedListUpdate(
     val updateType: MaintainedListUpdateType,
     val numberInCategory: Int
 )

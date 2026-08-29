@@ -2,14 +2,15 @@ package xelagurd.socialdating.client.data.fake
 
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefiningTheme
-import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
+import xelagurd.socialdating.client.data.model.additional.DefiningThemeReactionDetails
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarCategory
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarDefiningTheme
 import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
 import xelagurd.socialdating.client.data.model.additional.SimilarCategory
+import xelagurd.socialdating.client.data.model.additional.StatementWithDefiningThemes
 import xelagurd.socialdating.client.data.model.enums.Gender.MALE
 import xelagurd.socialdating.client.data.model.enums.Purpose.ALL_AT_ONCE
 import xelagurd.socialdating.client.data.model.enums.Purpose.FRIENDS
@@ -220,143 +221,192 @@ object FakeData {
         UserDefiningTheme(id = 4, value = 0, interest = 25, userId = 1, definingThemeId = 11)
     )
 
-    val statements = listOf(
-        Statement(
-            id = 6, text = "Statement6", isSupportDefiningTheme = true, definingThemeId = 1, creatorUserId = 1
+    val statementsWithDefiningThemes = listOf(
+        StatementWithDefiningThemes(
+            id = 6, text = "Statement6", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(1, true))
         ),
-        Statement(
-            id = 7, text = "Statement7", isSupportDefiningTheme = true, definingThemeId = 1, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 7, text = "Statement7", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(1, true))
         ),
-        Statement(
-            id = 8, text = "Statement8", isSupportDefiningTheme = true, definingThemeId = 1, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 8, text = "Statement8", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(1, true))
         ),
-        Statement(
-            id = 9, text = "Statement9", isSupportDefiningTheme = true, definingThemeId = 1, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 9, text = "Statement9", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(1, true))
         ),
-        Statement(
-            id = 10, text = "Statement10", isSupportDefiningTheme = true, definingThemeId = 1, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 10, text = "Statement10", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(1, true))
         ),
-        Statement(
-            id = 16, text = "Statement16", isSupportDefiningTheme = true, definingThemeId = 2, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 16, text = "Statement16", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(2, true))
         ),
-        Statement(
-            id = 17, text = "Statement17", isSupportDefiningTheme = true, definingThemeId = 2, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 17, text = "Statement17", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(2, true))
         ),
-        Statement(
-            id = 18, text = "Statement18", isSupportDefiningTheme = true, definingThemeId = 2, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 18, text = "Statement18", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(2, true))
         ),
-        Statement(
-            id = 19, text = "Statement19", isSupportDefiningTheme = true, definingThemeId = 2, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 19, text = "Statement19", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(2, true))
         ),
-        Statement(
-            id = 20, text = "Statement20", isSupportDefiningTheme = true, definingThemeId = 2, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 20, text = "Statement20", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(2, true))
         ),
-        Statement(
-            id = 21, text = "Statement21", isSupportDefiningTheme = true, definingThemeId = 5, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 21, text = "Statement21", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(5, true), DefiningThemeReactionDetails(8, false))
         ),
-        Statement(
-            id = 22, text = "Statement22", isSupportDefiningTheme = true, definingThemeId = 5, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 22, text = "Statement22", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(5, true))
         ),
-        Statement(
-            id = 23, text = "Statement23", isSupportDefiningTheme = true, definingThemeId = 5, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 23, text = "Statement23", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(5, true))
         ),
-        Statement(
-            id = 24, text = "Statement24", isSupportDefiningTheme = true, definingThemeId = 5, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 24, text = "Statement24", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(5, true))
         ),
-        Statement(
-            id = 25, text = "Statement25", isSupportDefiningTheme = true, definingThemeId = 5, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 25, text = "Statement25", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(5, true))
         ),
-        Statement(
-            id = 31, text = "Statement31", isSupportDefiningTheme = true, definingThemeId = 8, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 31, text = "Statement31", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(8, true))
         ),
-        Statement(
-            id = 32, text = "Statement32", isSupportDefiningTheme = true, definingThemeId = 8, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 32, text = "Statement32", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(8, true))
         ),
-        Statement(
-            id = 33, text = "Statement33", isSupportDefiningTheme = true, definingThemeId = 8, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 33, text = "Statement33", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(8, true))
         ),
-        Statement(
-            id = 34, text = "Statement34", isSupportDefiningTheme = true, definingThemeId = 8, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 34, text = "Statement34", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(8, true))
         ),
-        Statement(
-            id = 35, text = "Statement35", isSupportDefiningTheme = true, definingThemeId = 8, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 35, text = "Statement35", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(8, true))
         ),
-        Statement(
-            id = 36, text = "Statement36", isSupportDefiningTheme = true, definingThemeId = 9, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 36, text = "Statement36", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
         ),
-        Statement(
-            id = 37, text = "Statement37", isSupportDefiningTheme = true, definingThemeId = 9, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 37, text = "Statement37", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
         ),
-        Statement(
-            id = 38, text = "Statement38", isSupportDefiningTheme = true, definingThemeId = 9, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 38, text = "Statement38", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
         ),
-        Statement(
-            id = 39, text = "Statement39", isSupportDefiningTheme = true, definingThemeId = 9, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 39, text = "Statement39", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
         ),
-        Statement(
-            id = 40, text = "Statement40", isSupportDefiningTheme = true, definingThemeId = 9, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 40, text = "Statement40", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
         ),
-        Statement(
-            id = 41, text = "Statement41", isSupportDefiningTheme = true, definingThemeId = 9, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 41, text = "Statement41", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
         ),
-        Statement(
-            id = 42, text = "Statement42", isSupportDefiningTheme = true, definingThemeId = 9, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 42, text = "Statement42", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
         ),
-        Statement(
-            id = 43, text = "Statement43", isSupportDefiningTheme = true, definingThemeId = 9, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 43, text = "Statement43", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
         ),
-        Statement(
-            id = 44, text = "Statement44", isSupportDefiningTheme = true, definingThemeId = 9, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 44, text = "Statement44", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
         ),
-        Statement(
-            id = 45, text = "Statement45", isSupportDefiningTheme = true, definingThemeId = 9, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 45, text = "Statement45", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
         ),
-        Statement(
-            id = 51, text = "Statement51", isSupportDefiningTheme = true, definingThemeId = 11, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 51, text = "Statement51", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(11, true))
         ),
-        Statement(
-            id = 52, text = "Statement52", isSupportDefiningTheme = true, definingThemeId = 11, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 52, text = "Statement52", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(11, true))
         ),
-        Statement(
-            id = 53, text = "Statement53", isSupportDefiningTheme = true, definingThemeId = 11, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 53, text = "Statement53", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(11, true))
         ),
-        Statement(
-            id = 54, text = "Statement54", isSupportDefiningTheme = true, definingThemeId = 11, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 54, text = "Statement54", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(11, true))
         ),
-        Statement(
-            id = 55, text = "Statement55", isSupportDefiningTheme = true, definingThemeId = 11, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 55, text = "Statement55", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(11, true))
         ),
-        Statement(
-            id = 56, text = "Statement56", isSupportDefiningTheme = true, definingThemeId = 12, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 56, text = "Statement56", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
         ),
-        Statement(
-            id = 57, text = "Statement57", isSupportDefiningTheme = true, definingThemeId = 12, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 57, text = "Statement57", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
         ),
-        Statement(
-            id = 58, text = "Statement58", isSupportDefiningTheme = true, definingThemeId = 12, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 58, text = "Statement58", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
         ),
-        Statement(
-            id = 59, text = "Statement59", isSupportDefiningTheme = true, definingThemeId = 12, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 59, text = "Statement59", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
         ),
-        Statement(
-            id = 60, text = "Statement60", isSupportDefiningTheme = true, definingThemeId = 12, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 60, text = "Statement60", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
         ),
-        Statement(
-            id = 61, text = "Statement61", isSupportDefiningTheme = true, definingThemeId = 12, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 61, text = "Statement61", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
         ),
-        Statement(
-            id = 62, text = "Statement62", isSupportDefiningTheme = true, definingThemeId = 12, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 62, text = "Statement62", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
         ),
-        Statement(
-            id = 63, text = "Statement63", isSupportDefiningTheme = true, definingThemeId = 12, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 63, text = "Statement63", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
         ),
-        Statement(
-            id = 64, text = "Statement64", isSupportDefiningTheme = true, definingThemeId = 12, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 64, text = "Statement64", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
         ),
-        Statement(
-            id = 65, text = "Statement65", isSupportDefiningTheme = true, definingThemeId = 12, creatorUserId = 1
+        StatementWithDefiningThemes(
+            id = 65, text = "Statement65", creatorUserId = 1,
+            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
         )
     )
+
+    val statements = statementsWithDefiningThemes.map { it.toStatement() }
+
+    val statementDefiningThemes = statementsWithDefiningThemes.flatMap { it.toStatementDefiningThemes() }
 
     val mainUser = users[0]
     val mainCategory = categories[0]
@@ -380,13 +430,13 @@ object FakeData {
 
     val statementFormData = StatementFormData(
         text = mainStatement.text,
-        isSupportDefiningTheme = mainStatement.isSupportDefiningTheme,
-        definingThemeId = mainStatement.definingThemeId,
+        definingThemes = mapOf(mainDefiningTheme.id to true, definingThemes[1].id to false),
         creatorUserId = mainStatement.creatorUserId
     )
 
-    val newStatement = Statement(
-        id = 66, text = "NewStatement66", isSupportDefiningTheme = true, definingThemeId = 1, creatorUserId = 1
+    val newStatement = StatementWithDefiningThemes(
+        id = 66, text = "NewStatement66", creatorUserId = 1,
+        definingThemes = listOf(DefiningThemeReactionDetails(1, true))
     )
 
     private val similarUser = users[1]

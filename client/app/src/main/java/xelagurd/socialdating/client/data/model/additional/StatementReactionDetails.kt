@@ -7,8 +7,5 @@ import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 data class StatementReactionDetails(
     val userId: Int,
     val statementId: Int,
-    val categoryId: Int,
-    val definingThemeId: Int,
-    val reactionType: StatementReactionType,
-    val isSupportDefiningTheme: Boolean
+    val reactionType: StatementReactionType
 )

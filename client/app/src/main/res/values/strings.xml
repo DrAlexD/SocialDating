@@ -46,8 +46,8 @@
     <string name="all_at_once">All at once</string>
     <string name="add_statement">Add statement</string>
     <string name="statement_text">Statement text</string>
-    <string name="defining_theme">Defining theme</string>
-    <string name="is_support_defining_theme">Does statement support defining theme?</string>
+    <string name="defining_themes">Defining themes</string>
+    <string name="is_support_defining_theme">Does statement support each chosen defining theme?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="failed_add_statement">Failed to add statement</string>
