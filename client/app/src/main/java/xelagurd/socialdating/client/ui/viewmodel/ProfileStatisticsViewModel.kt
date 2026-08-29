@@ -96,9 +96,11 @@ class ProfileStatisticsViewModel @Inject constructor(
             dataRequestStatusFlow.update { RequestStatus.LOADING }
             detailedSimilarUserFlow.update { FakeData.detailedSimilarUser }
             userDefiningThemesStateFlow.update {
-                FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)
+                FakeData.similarUserDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)
             }
-            userCategoriesStateFlow.update { FakeData.userCategories.toUserCategoriesWithData(FakeData.categories) }
+            userCategoriesStateFlow.update {
+                FakeData.similarUserCategories.toUserCategoriesWithData(FakeData.categories)
+            }
             dataRequestStatusFlow.update { RequestStatus.SUCCESS }
         } else {
             dataRequestStatusFlow.update { RequestStatus.SUCCESS }
