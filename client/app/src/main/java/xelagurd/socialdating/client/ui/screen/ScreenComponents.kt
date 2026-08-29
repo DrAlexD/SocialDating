@@ -21,6 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -57,6 +58,18 @@ fun AppLoadingIndicator(
         modifier = modifier
             .padding(dimensionResource(R.dimen.padding_16dp))
             .testTag(stringResource(R.string.loading))
+    )
+}
+
+@Composable
+fun AppLinearProgressIndicator(
+    progress: () -> Float,
+    modifier: Modifier = Modifier
+) {
+    LinearProgressIndicator(
+        progress = progress,
+        drawStopIndicator = {},
+        modifier = modifier.testTag(stringResource(R.string.progress_indicator))
     )
 }
 

@@ -15,7 +15,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -222,9 +220,8 @@ private fun UserDefiningThemeDetailsBody(
             text = userDefiningTheme.definingThemeFromOpinion,
             overrideModifier = Modifier.padding(end = dimensionResource(R.dimen.padding_8dp))
         )
-        LinearProgressIndicator(
-            progress = { userDefiningTheme.value.toFloat() / 100 },
-            modifier = Modifier.testTag(stringResource(R.string.progress_indicator))
+        AppLinearProgressIndicator(
+            progress = { userDefiningTheme.value.toFloat() / 100 }
         )
         AppSmallTitleText(
             text = userDefiningTheme.definingThemeToOpinion,
