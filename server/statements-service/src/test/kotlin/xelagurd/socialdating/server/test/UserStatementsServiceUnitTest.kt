@@ -13,10 +13,13 @@ import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.model.UserStatement
 import xelagurd.socialdating.server.model.additional.StatementReactionDetails
-import xelagurd.socialdating.server.model.common.UserCategoryUpdateDetails
+import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType
+import xelagurd.socialdating.server.repository.StatementDefiningThemesRepository
 import xelagurd.socialdating.server.repository.UserStatementsRepository
 import xelagurd.socialdating.server.service.StatementsKafkaProducer
 import xelagurd.socialdating.server.service.UserStatementsService
@@ -28,6 +31,9 @@ class UserStatementsServiceUnitTest {
     private lateinit var userStatementsRepository: UserStatementsRepository
 
     @MockK
+    private lateinit var statementDefiningThemesRepository: StatementDefiningThemesRepository
+
+    @MockK
     private lateinit var kafkaProducer: StatementsKafkaProducer
 
     @InjectMockKs
@@ -35,19 +41,25 @@ class UserStatementsServiceUnitTest {
 
     private val statementReactionDetails = StatementReactionDetails(
         userId = 1,
-        statementId = 2,
-        categoryId = 3,
-        definingThemeId = 4,
-        reactionType = StatementReactionType.FULL_MAINTAIN,
-        isSupportDefiningTheme = true
+        statementId = 5,
+        reactionType = StatementReactionType.FULL_MAINTAIN
     )
+
+    private val statementDefiningThemes = FakeStatementsData.statementDefiningThemes
+        .filter { it.statementId == statementReactionDetails.statementId }
+    private val expectedDefiningThemes = listOf(
+        DefiningThemeReactionDetails(1, true),
+        DefiningThemeReactionDetails(2, false)
+    )
+
     private val userStatementSlot = slot<UserStatement>()
-    private val updateDetailsSlot = slot<UserCategoryUpdateDetails>()
+    private val updateDetailsSlot = slot<UserDefiningThemesUpdateDetails>()
 
     @Test
-    fun processStatementReaction_validData_savesUserStatementAndProducesEvent() {
+    fun processStatementReaction_validData_savesUserStatementAndProducesEventWithAllDefiningThemes() {
+        every { statementDefiningThemesRepository.findAllByStatementId(any()) } returns statementDefiningThemes
         every { userStatementsRepository.save(capture(userStatementSlot)) } returns mockk()
-        every { kafkaProducer.updateUserCategory(capture(updateDetailsSlot)) } just Runs
+        every { kafkaProducer.updateUserDefiningThemes(capture(updateDetailsSlot)) } just Runs
 
         userStatementsService.processStatementReaction(statementReactionDetails)
 
@@ -58,14 +70,15 @@ class UserStatementsServiceUnitTest {
         }
         with(updateDetailsSlot.captured) {
             assertEquals(statementReactionDetails.userId, userId)
-            assertEquals(statementReactionDetails.categoryId, categoryId)
-            assertEquals(statementReactionDetails.definingThemeId, definingThemeId)
             assertEquals(statementReactionDetails.reactionType, reactionType)
-            assertEquals(statementReactionDetails.isSupportDefiningTheme, isSupportDefiningTheme)
+            assertEquals(expectedDefiningThemes, definingThemes)
         }
 
+        verify(exactly = 1) {
+            statementDefiningThemesRepository.findAllByStatementId(statementReactionDetails.statementId)
+        }
         verify(exactly = 1) { userStatementsRepository.save(any()) }
-        verify(exactly = 1) { kafkaProducer.updateUserCategory(any()) }
-        confirmVerified(userStatementsRepository, kafkaProducer)
+        verify(exactly = 1) { kafkaProducer.updateUserDefiningThemes(any()) }
+        confirmVerified(userStatementsRepository, statementDefiningThemesRepository, kafkaProducer)
     }
 }

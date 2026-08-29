@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,7 @@ import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -277,6 +279,62 @@ inline fun AppDataChoosingList(
                 card = { card(it, false) }
             )
         }
+    }
+}
+
+@Composable
+inline fun AppDataMultiChoosingList(
+    entities: List<DataEntity>,
+    chosenEntityIds: Set<Int>,
+    maxHeight: Dp,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    crossinline card: @Composable (DataEntity, Boolean) -> Unit
+) {
+    AppDataList(
+        entities = entities,
+        modifier = modifier.heightIn(Dp.Unspecified, maxHeight),
+        contentPadding = contentPadding,
+        card = { card(it, chosenEntityIds.contains(it.id)) }
+    )
+}
+
+@Composable
+fun AppYesNoRadioGroup(
+    isSelectedYes: Boolean?,
+    onSelect: (Boolean) -> Unit,
+    testTagSuffix: String = ""
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        RadioButton(
+            selected = isSelectedYes == true,
+            onClick = { onSelect(true) },
+            modifier = Modifier.testTag(stringResource(R.string.yes) + testTagSuffix)
+        )
+        AppMediumTitleText(
+            text = stringResource(R.string.yes),
+            overrideModifier = Modifier.padding(
+                top = dimensionResource(R.dimen.padding_8dp),
+                bottom = dimensionResource(R.dimen.padding_8dp),
+                end = dimensionResource(R.dimen.padding_8dp)
+            )
+        )
+        RadioButton(
+            selected = isSelectedYes == false,
+            onClick = { onSelect(false) },
+            modifier = Modifier.testTag(stringResource(R.string.no) + testTagSuffix)
+        )
+        AppMediumTitleText(
+            text = stringResource(R.string.no),
+            overrideModifier = Modifier.padding(
+                top = dimensionResource(R.dimen.padding_8dp),
+                bottom = dimensionResource(R.dimen.padding_8dp),
+                end = dimensionResource(R.dimen.padding_8dp)
+            )
+        )
     }
 }
 

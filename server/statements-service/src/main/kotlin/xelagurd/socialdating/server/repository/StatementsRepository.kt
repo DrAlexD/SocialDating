@@ -7,10 +7,12 @@ import xelagurd.socialdating.server.model.Statement
 interface StatementsRepository : JpaRepository<Statement, Int> {
     @Query(
         """
-        select stm.*
+        select distinct stm.*
         from statements stm
+        join statement_defining_themes sdt on stm.id = sdt.statement_id
         left join user_statements ustm on stm.id = ustm.statement_id and ustm.user_id = :currentUserId
-        where defining_theme_id in (:definingThemeIds) and ustm.id is null
+        where sdt.defining_theme_id in (:definingThemeIds) and ustm.id is null
+        order by stm.id
         """,
         nativeQuery = true
     )

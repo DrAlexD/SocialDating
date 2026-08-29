@@ -75,9 +75,10 @@ object AndroidTestUtils {
         onNodeWithContentDescription(activity.getString(id))
 
     fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithTagId(
-        @StringRes id: Int
+        @StringRes id: Int,
+        suffix: String = ""
     ) =
-        onNodeWithTag(activity.getString(id))
+        onNodeWithTag(activity.getString(id) + suffix)
 
     fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithTextId(
         @StringRes id: Int

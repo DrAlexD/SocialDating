@@ -116,7 +116,7 @@ object AndroidNavigationTestUtils {
     fun MainComposeTestRule.addStatementAndNavigateToStatementsScreen() {
         onNodeWithTextId(R.string.statement_text).checkTextFieldAndInput(FakeData.newStatement.text)
         onNodeWithText(FakeData.mainDefiningTheme.name).checkButtonAndClick()
-        onNodeWithTagId(R.string.yes).checkButtonAndClick()
+        onNodeWithTagId(R.string.yes, FakeData.mainDefiningTheme.id.toString()).checkButtonAndClick()
 
         onNodeWithTextId(R.string.add_statement).checkButtonAndClick()
         waitUntil(TEST_TIMEOUT_MILLIS) {

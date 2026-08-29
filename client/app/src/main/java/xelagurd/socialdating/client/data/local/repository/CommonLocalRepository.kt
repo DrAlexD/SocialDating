@@ -6,7 +6,7 @@ import androidx.room.Transaction
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefiningTheme
-import xelagurd.socialdating.client.data.model.Statement
+import xelagurd.socialdating.client.data.model.additional.StatementWithDefiningThemes
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
 
@@ -24,12 +24,15 @@ class CommonLocalRepository @Inject constructor(
     suspend fun updateStatementsScreenData(
         definingThemes: List<DefiningTheme>,
         categoryId: Int,
-        statements: List<Statement>
+        statements: List<StatementWithDefiningThemes>
     ) {
         definingThemesRepository.insertDefiningThemes(definingThemes)
 
         statementsRepository.deleteStatements(categoryId)
-        statementsRepository.insertStatements(statements)
+        statementsRepository.insertStatements(statements.map { it.toStatement() })
+        statementsRepository.insertStatementDefiningThemes(
+            statements.flatMap { it.toStatementDefiningThemes() }
+        )
     }
 
     @Transaction
@@ -71,5 +74,6 @@ class CommonLocalRepository @Inject constructor(
         userCategoriesRepository.insertUserCategories(FakeData.userCategories)
         userDefiningThemesRepository.insertUserDefiningThemes(FakeData.userDefiningThemes)
         statementsRepository.insertStatements(FakeData.statements)
+        statementsRepository.insertStatementDefiningThemes(FakeData.statementDefiningThemes)
     }
 }

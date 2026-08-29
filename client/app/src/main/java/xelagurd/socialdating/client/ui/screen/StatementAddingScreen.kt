@@ -2,11 +2,8 @@ package xelagurd.socialdating.client.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -14,8 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -105,61 +100,19 @@ private inline fun StatementDetailsBody(
             onValueChange = { onValueChange(statementFormData.copy(text = it)) },
             label = stringResource(R.string.statement_text)
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_8dp))
-        ) {
-            AppMediumTitleText(text = stringResourceWithColon(R.string.defining_theme))
-            DataChoosingListComponent(
-                dataListUiState = statementAddingUiState,
-                chosenEntityId = statementFormData.definingThemeId,
-                maxHeight = LocalConfiguration.current.screenHeightDp.dp / 4
-            ) { entity, isHasBorder ->
-                AppMediumTextCard(
-                    text = (entity as DefiningTheme).name,
-                    onClick = {
-                        onValueChange(
-                            statementFormData.copy(
-                                definingThemeId = entity.id
-                                    .takeIf { statementFormData.definingThemeId == null }
-                            )
-                        )
-                    },
-                    isHasBorder = isHasBorder
-                )
-            }
-        }
+        AppMediumTitleText(text = stringResourceWithColon(R.string.defining_themes))
         AppMediumTitleText(text = stringResource(R.string.is_support_defining_theme))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            RadioButton(
-                selected = statementFormData.isSupportDefiningTheme == true,
-                onClick = { onValueChange(statementFormData.copy(isSupportDefiningTheme = true)) },
-                modifier = Modifier.testTag(stringResource(R.string.yes))
-            )
-            AppMediumTitleText(
-                text = stringResource(R.string.yes),
-                overrideModifier = Modifier.padding(
-                    top = dimensionResource(R.dimen.padding_8dp),
-                    bottom = dimensionResource(R.dimen.padding_8dp),
-                    end = dimensionResource(R.dimen.padding_8dp)
-                )
-            )
-            RadioButton(
-                selected = statementFormData.isSupportDefiningTheme == false,
-                onClick = { onValueChange(statementFormData.copy(isSupportDefiningTheme = false)) },
-                modifier = Modifier.testTag(stringResource(R.string.no))
-            )
-            AppMediumTitleText(
-                text = stringResource(R.string.no),
-                overrideModifier = Modifier.padding(
-                    top = dimensionResource(R.dimen.padding_8dp),
-                    bottom = dimensionResource(R.dimen.padding_8dp),
-                    end = dimensionResource(R.dimen.padding_8dp)
-                )
+        DataMultiChoosingListComponent(
+            dataListUiState = statementAddingUiState,
+            chosenEntityIds = statementFormData.definingThemes.keys,
+            maxHeight = LocalConfiguration.current.screenHeightDp.dp / 3
+        ) { entity, isChosen ->
+            DefiningThemeChoosingCard(
+                definingTheme = entity as DefiningTheme,
+                isChosen = isChosen,
+                isSupportDefiningTheme = statementFormData.definingThemes[entity.id],
+                onDefiningThemeClick = { onValueChange(statementFormData.toggleDefiningTheme(entity.id)) },
+                onOpinionClick = { onValueChange(statementFormData.updateDefiningThemeOpinion(entity.id, it)) }
             )
         }
         AppLargeTextCard(
@@ -170,14 +123,38 @@ private inline fun StatementDetailsBody(
     }
 }
 
+@Composable
+private inline fun DefiningThemeChoosingCard(
+    definingTheme: DefiningTheme,
+    isChosen: Boolean,
+    isSupportDefiningTheme: Boolean?,
+    crossinline onDefiningThemeClick: () -> Unit,
+    crossinline onOpinionClick: (Boolean) -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        AppMediumTextCard(
+            text = definingTheme.name,
+            onClick = { onDefiningThemeClick() },
+            isHasBorder = isChosen
+        )
+        if (isChosen) {
+            AppYesNoRadioGroup(
+                isSelectedYes = isSupportDefiningTheme,
+                onSelect = { onOpinionClick(it) },
+                testTagSuffix = definingTheme.id.toString()
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementAddingComponentWithoutChosenDefiningThemePreview() {
+private fun StatementAddingComponentWithoutChosenDefiningThemesPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
                 entities = FakeData.definingThemes,
-                formData = FakeData.statementFormData.copy(definingThemeId = null)
+                formData = FakeData.statementFormData.copy(definingThemes = mapOf())
             )
         )
     }
@@ -185,12 +162,12 @@ private fun StatementAddingComponentWithoutChosenDefiningThemePreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
 @Composable
-private fun StatementAddingComponentWithoutChosenDefiningThemeRuPreview() {
+private fun StatementAddingComponentWithoutChosenDefiningThemesRuPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
                 entities = FakeData.definingThemes,
-                formData = FakeData.statementFormData.copy(definingThemeId = null)
+                formData = FakeData.statementFormData.copy(definingThemes = mapOf())
             )
         )
     }
@@ -198,12 +175,27 @@ private fun StatementAddingComponentWithoutChosenDefiningThemeRuPreview() {
 
 @Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
 @Composable
-private fun StatementAddingComponentWithChosenDefiningThemePreview() {
+private fun StatementAddingComponentWithChosenDefiningThemesPreview() {
     AppTheme {
         StatementAddingScreenComponent(
             statementAddingUiState = StatementAddingUiState(
                 entities = FakeData.definingThemes,
                 formData = FakeData.statementFormData
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
+@Composable
+private fun StatementAddingComponentWithoutChosenOpinionPreview() {
+    AppTheme {
+        StatementAddingScreenComponent(
+            statementAddingUiState = StatementAddingUiState(
+                entities = FakeData.definingThemes,
+                formData = FakeData.statementFormData.copy(
+                    definingThemes = mapOf(FakeData.mainDefiningTheme.id to null)
+                )
             )
         )
     }

@@ -76,8 +76,9 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           profile: ${{ matrix.profile }}
+          target: aosp_atd
           arch: x86_64
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none
+          emulator-options: -no-window -gpu swiftshader_indirect -accel on -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -no-metrics
           working-directory: client
           script: |
             chmod +x gradlew

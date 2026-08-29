@@ -12,7 +12,7 @@ import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
     tableName = "user_defining_themes",
     foreignKeys = [
         ForeignKey(
-            entity = Category::class,
+            entity = DefiningTheme::class,
             parentColumns = ["id"],
             childColumns = ["definingThemeId"]
         ),

@@ -5,6 +5,7 @@ import kotlin.random.nextInt
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_INTEREST_STEP
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_COEFFICIENT
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_HIGH_BORDER
@@ -14,12 +15,15 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_V
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.common.MaintainedListUpdateDetails
-import xelagurd.socialdating.server.model.common.UserDefiningThemeUpdateDetails
+import xelagurd.socialdating.server.model.common.CategoryUpdateDetails
+import xelagurd.socialdating.server.model.common.MaintainedListUpdate
+import xelagurd.socialdating.server.model.common.UserCategoriesUpdateDetails
+import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_NOT_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.INCREASE_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.INCREASE_NOT_MAINTAINED
+import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_NO_MAINTAIN
 import xelagurd.socialdating.server.model.enums.StatementReactionType.NOT_SURE
@@ -34,52 +38,67 @@ class DefiningThemesKafkaConsumer(
     private val definingThemesKafkaProducer: DefiningThemesKafkaProducer
 ) {
 
-    @KafkaListener(topics = ["update-user-defining-theme-on-statement-reaction"], groupId = "defining-themes-group")
-    fun updateUserDefiningTheme(updateDetails: UserDefiningThemeUpdateDetails) {
-        val userDefiningTheme = userDefiningThemesService
-            .getUserDefiningTheme(updateDetails.userId, updateDetails.definingThemeId)
+    @Transactional
+    @KafkaListener(topics = ["update-user-defining-themes-on-statement-reaction"], groupId = "defining-themes-group")
+    fun updateUserDefiningThemes(updateDetails: UserDefiningThemesUpdateDetails) {
+        val definingThemesById = definingThemesService
+            .getDefiningThemes(definingThemeIds = updateDetails.definingThemes.map { it.definingThemeId })
+            .associateBy { it.id!! }
 
-        val diff = calculateDiff(updateDetails)
+        val maintainedListUpdatesByCategoryId = linkedMapOf<Int, MutableList<MaintainedListUpdate>>()
 
-        val updatedUserDefiningTheme = userDefiningTheme?.copy(
-            value = (userDefiningTheme.value + diff).coerceIn(PERCENT_MIN, PERCENT_MAX),
-            interest = (userDefiningTheme.interest + DEFINING_THEME_INTEREST_STEP).coerceIn(PERCENT_MIN, PERCENT_MAX)
-        )
-            ?: UserDefiningTheme(
-                value = DEFINING_THEME_VALUE_INITIAL + diff,
-                userId = updateDetails.userId,
-                definingThemeId = updateDetails.definingThemeId
+        updateDetails.definingThemes.forEach { definingThemeReaction ->
+            val userDefiningTheme = userDefiningThemesService
+                .getUserDefiningTheme(updateDetails.userId, definingThemeReaction.definingThemeId)
+
+            val diff = calculateDiff(updateDetails.reactionType, definingThemeReaction.isSupportDefiningTheme)
+
+            val updatedUserDefiningTheme = userDefiningTheme?.copy(
+                value = (userDefiningTheme.value + diff).coerceIn(PERCENT_MIN, PERCENT_MAX),
+                interest = (userDefiningTheme.interest + DEFINING_THEME_INTEREST_STEP).coerceIn(PERCENT_MIN, PERCENT_MAX)
             )
+                ?: UserDefiningTheme(
+                    value = DEFINING_THEME_VALUE_INITIAL + diff,
+                    userId = updateDetails.userId,
+                    definingThemeId = definingThemeReaction.definingThemeId
+                )
 
-        userDefiningThemesService.addUserDefiningTheme(updatedUserDefiningTheme)
+            userDefiningThemesService.addUserDefiningTheme(updatedUserDefiningTheme)
 
-        updateMaintainedListIfNeeded(userDefiningTheme, updateDetails, diff)
-    }
+            val definingTheme = definingThemesById[definingThemeReaction.definingThemeId] ?: return@forEach
+            val maintainedListUpdates = maintainedListUpdatesByCategoryId
+                .getOrPut(definingTheme.categoryId) { mutableListOf() }
 
-    private fun updateMaintainedListIfNeeded(
-        userDefiningTheme: UserDefiningTheme?,
-        updateDetails: UserDefiningThemeUpdateDetails,
-        diff: Int
-    ) {
-        userDefiningTheme?.value?.let {
-            determineUpdateType(it, diff)?.let {
-                val definingTheme = definingThemesService.getDefiningTheme(updateDetails.definingThemeId)
-                    ?: return
-
-                definingThemesKafkaProducer.updateMaintainedList(
-                    MaintainedListUpdateDetails(
-                        userId = updateDetails.userId,
-                        categoryId = definingTheme.categoryId,
+            userDefiningTheme?.value?.let { value ->
+                determineUpdateType(value, diff)?.let {
+                    maintainedListUpdates += MaintainedListUpdate(
                         updateType = it,
                         numberInCategory = definingTheme.numberInCategory
                     )
-                )
+                }
             }
         }
+
+        if (maintainedListUpdatesByCategoryId.isEmpty()) return
+
+        definingThemesKafkaProducer.updateUserCategories(
+            UserCategoriesUpdateDetails(
+                userId = updateDetails.userId,
+                categories = maintainedListUpdatesByCategoryId.map { (categoryId, maintainedListUpdates) ->
+                    CategoryUpdateDetails(
+                        categoryId = categoryId,
+                        maintainedListUpdates = maintainedListUpdates
+                    )
+                }
+            )
+        )
     }
 
-    private fun calculateDiff(updateDetails: UserDefiningThemeUpdateDetails): Int {
-        val diff = when (updateDetails.reactionType) {
+    private fun calculateDiff(
+        reactionType: StatementReactionType,
+        isSupportDefiningTheme: Boolean
+    ): Int {
+        val diff = when (reactionType) {
             FULL_NO_MAINTAIN -> -DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT
             PART_NO_MAINTAIN -> -DEFINING_THEME_VALUE_STEP
             NOT_SURE -> Random.nextInt(-1..1)
@@ -87,7 +106,7 @@ class DefiningThemesKafkaConsumer(
             FULL_MAINTAIN -> DEFINING_THEME_VALUE_STEP * DEFINING_THEME_VALUE_COEFFICIENT
         }
 
-        return if (updateDetails.isSupportDefiningTheme) diff else -diff
+        return if (isSupportDefiningTheme) diff else -diff
     }
 
     private fun determineUpdateType(value: Int, diff: Int) =

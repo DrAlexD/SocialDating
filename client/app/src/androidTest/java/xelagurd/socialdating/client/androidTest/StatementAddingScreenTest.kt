@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -25,6 +26,7 @@ import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecomp
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.ui.form.StatementFormData
 import xelagurd.socialdating.client.ui.screen.StatementAddingScreenComponent
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -45,6 +47,10 @@ class StatementAddingScreenTest {
 
     private val definingThemes = FakeData.definingThemes
     private val statementFormData = FakeData.statementFormData
+
+    private val chosenDefiningTheme = definingThemes[0]
+    private val anotherChosenDefiningTheme = definingThemes[1]
+    private val notChosenDefiningTheme = definingThemes[2]
 
     @Test
     fun statementAddingScreen_defaultParameters_displayedContentWithDisabledButton() {
@@ -67,89 +73,117 @@ class StatementAddingScreenTest {
     }
 
     @Test
-    fun statementAddingScreen_validFormData_displayedContentWithEnabledButton() {
+    fun statementAddingScreen_validFormData_displayedOpinionOfEveryChosenDefiningThemeWithEnabledButton() {
         composeTestRule.setContentToScreen {
             StatementAddingScreenComponent(
-                statementAddingUiState = StatementAddingUiState(
-                    dataRequestStatus = RequestStatus.SUCCESS,
-                    entities = definingThemes,
-                    formData = statementFormData
-                )
+                statementAddingUiState = statementAddingUiState(statementFormData)
             )
         }
 
         assertContentIsDisplayed()
+        assertOpinionIsDisplayed(chosenDefiningTheme)
+        assertOpinionIsDisplayed(anotherChosenDefiningTheme)
+        assertOpinionIsNotDisplayed(notChosenDefiningTheme)
+
         composeTestRule.onNodeWithTextId(R.string.add_statement).checkEnabledButton()
     }
 
     @Test
-    fun statementAddingScreen_allActionsWithoutAddStatement_calledAllActions() {
+    fun statementAddingScreen_notChosenDefiningThemeClick_choseItWithoutOpinion() {
         var changedFormData: StatementFormData? = null
         var isNavigateUpClicked = false
 
         composeTestRule.setContentToScreen {
             StatementAddingScreenComponent(
-                statementAddingUiState = StatementAddingUiState(
-                    dataRequestStatus = RequestStatus.SUCCESS,
-                    entities = definingThemes,
-                    formData = statementFormData.copy(definingThemeId = null)
+                statementAddingUiState = statementAddingUiState(
+                    statementFormData.copy(definingThemes = mapOf())
                 ),
-                onSuccessStatementAdding = {},
                 onNavigateUp = { isNavigateUpClicked = true },
-                onValueChange = { changedFormData = it },
-                onStatementAddingClick = {}
+                onValueChange = { changedFormData = it }
             )
         }
+
+        composeTestRule.onNodeWithTextId(R.string.add_statement).checkDisabledButton()
 
         composeTestRule.onNodeWithTextId(R.string.statement_text).checkTextFieldAndInput(INPUT_TEXT)
         assertEquals(true, changedFormData?.text?.contains(INPUT_TEXT))
 
-        composeTestRule.onNodeWithText(definingThemes[0].name).checkButtonAndClick()
-        assertEquals(definingThemes[0].id, changedFormData?.definingThemeId)
-
-        composeTestRule.onNodeWithTagId(R.string.yes).checkButtonAndClick()
-        assertEquals(true, changedFormData?.isSupportDefiningTheme)
-
-        composeTestRule.onNodeWithTagId(R.string.no).checkButtonAndClick()
-        assertEquals(false, changedFormData?.isSupportDefiningTheme)
+        composeTestRule.onNodeWithText(notChosenDefiningTheme.name).checkButtonAndClick()
+        assertEquals(mapOf(notChosenDefiningTheme.id to null), changedFormData?.definingThemes)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).checkButtonAndClick()
         assertTrue(isNavigateUpClicked)
     }
 
     @Test
-    fun statementAddingScreen_chosenDefiningThemeClick_clearedDefiningThemeAndCalledAddStatement() {
+    fun statementAddingScreen_chosenDefiningThemeOpinionClick_updatedOnlyItsOpinion() {
         var changedFormData: StatementFormData? = null
         var isStatementAddingClicked = false
 
         composeTestRule.setContentToScreen {
             StatementAddingScreenComponent(
-                statementAddingUiState = StatementAddingUiState(
-                    dataRequestStatus = RequestStatus.SUCCESS,
-                    entities = definingThemes,
-                    formData = statementFormData
-                ),
-                onSuccessStatementAdding = {},
-                onNavigateUp = {},
+                statementAddingUiState = statementAddingUiState(statementFormData),
                 onValueChange = { changedFormData = it },
                 onStatementAddingClick = { isStatementAddingClicked = true }
             )
         }
 
-        composeTestRule.onNodeWithText(definingThemes[0].name).checkButtonAndClick()
-        assertEquals(null, changedFormData?.definingThemeId)
+        composeTestRule
+            .onNodeWithTagId(R.string.no, chosenDefiningTheme.id.toString())
+            .checkButtonAndClick()
+        assertEquals(false, changedFormData?.definingThemes?.get(chosenDefiningTheme.id))
+        assertEquals(
+            statementFormData.definingThemes[anotherChosenDefiningTheme.id],
+            changedFormData?.definingThemes?.get(anotherChosenDefiningTheme.id)
+        )
+
+        composeTestRule
+            .onNodeWithTagId(R.string.yes, chosenDefiningTheme.id.toString())
+            .checkButtonAndClick()
+        assertEquals(true, changedFormData?.definingThemes?.get(chosenDefiningTheme.id))
 
         composeTestRule.onNodeWithTextId(R.string.add_statement).checkButtonAndClick()
         assertTrue(isStatementAddingClicked)
     }
 
+    @Test
+    fun statementAddingScreen_chosenDefiningThemeClick_removedOnlyIt() {
+        var changedFormData: StatementFormData? = null
+
+        composeTestRule.setContentToScreen {
+            StatementAddingScreenComponent(
+                statementAddingUiState = statementAddingUiState(statementFormData),
+                onValueChange = { changedFormData = it }
+            )
+        }
+
+        composeTestRule.onNodeWithText(chosenDefiningTheme.name).checkButtonAndClick()
+
+        assertFalse(changedFormData?.definingThemes?.containsKey(chosenDefiningTheme.id) ?: true)
+        assertTrue(changedFormData?.definingThemes?.containsKey(anotherChosenDefiningTheme.id) ?: false)
+    }
+
+    private fun statementAddingUiState(formData: StatementFormData) =
+        StatementAddingUiState(
+            entities = definingThemes,
+            dataRequestStatus = RequestStatus.SUCCESS,
+            formData = formData
+        )
+
     private fun assertContentIsDisplayed() {
         composeTestRule.onNodeWithTextId(R.string.statement_text).checkTextField()
 
-        composeTestRule.onNodeWithTextIdWithColon(R.string.defining_theme).assertIsDisplayed()
-
+        composeTestRule.onNodeWithTextIdWithColon(R.string.defining_themes).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.is_support_defining_theme).assertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.yes).assertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.no).assertIsDisplayed()
+    }
+
+    private fun assertOpinionIsDisplayed(definingTheme: DefiningTheme) {
+        composeTestRule.onNodeWithTagId(R.string.yes, definingTheme.id.toString()).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.no, definingTheme.id.toString()).assertIsDisplayed()
+    }
+
+    private fun assertOpinionIsNotDisplayed(definingTheme: DefiningTheme) {
+        composeTestRule.onNodeWithTagId(R.string.yes, definingTheme.id.toString()).assertDoesNotExist()
+        composeTestRule.onNodeWithTagId(R.string.no, definingTheme.id.toString()).assertDoesNotExist()
     }
 }

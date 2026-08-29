@@ -87,6 +87,7 @@ class StatementAddingViewModelTest {
         verify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes(any()) }
         coVerify(exactly = 1) { remoteStatementsRepository.addStatement(any()) }
         coVerify(exactly = 1) { localStatementsRepository.insertStatements(any()) }
+        coVerify(exactly = 1) { localStatementsRepository.insertStatementDefiningThemes(any()) }
         confirmVerified(localDefiningThemesRepository, localStatementsRepository, remoteStatementsRepository)
     }
 
@@ -134,6 +135,7 @@ class StatementAddingViewModelTest {
         verify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes(any()) }
         coVerify(exactly = 2) { remoteStatementsRepository.addStatement(any()) }
         coVerify(exactly = 1) { localStatementsRepository.insertStatements(any()) }
+        coVerify(exactly = 1) { localStatementsRepository.insertStatementDefiningThemes(any()) }
         confirmVerified(localDefiningThemesRepository, localStatementsRepository, remoteStatementsRepository)
     }
 
@@ -153,6 +155,7 @@ class StatementAddingViewModelTest {
         verify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes(any()) }
         coVerify(exactly = 2) { remoteStatementsRepository.addStatement(any()) }
         coVerify(exactly = 1) { localStatementsRepository.insertStatements(any()) }
+        coVerify(exactly = 1) { localStatementsRepository.insertStatementDefiningThemes(any()) }
         confirmVerified(localDefiningThemesRepository, localStatementsRepository, remoteStatementsRepository)
     }
 
@@ -164,8 +167,10 @@ class StatementAddingViewModelTest {
     }
 
     private fun mockDataWithInternet() {
-        coEvery { remoteStatementsRepository.addStatement(any()) } returns Response.success(mockk())
+        coEvery { remoteStatementsRepository.addStatement(any()) } returns
+                Response.success(FakeData.newStatement)
         coEvery { localStatementsRepository.insertStatements(any()) } just Runs
+        coEvery { localStatementsRepository.insertStatementDefiningThemes(any()) } just Runs
     }
 
     private fun mockWrongData() {

@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import xelagurd.socialdating.client.data.model.Statement
+import xelagurd.socialdating.client.data.model.StatementDefiningTheme
 
 @Dao
 interface StatementsDao {
@@ -16,10 +17,11 @@ interface StatementsDao {
 
     @Query(
         """
-        select stm.*
+        select distinct stm.*
         from statements stm
-        join defining_themes dt on stm.definingThemeId = dt.id
-        where categoryId = :categoryId
+        join statement_defining_themes sdt on stm.id = sdt.statementId
+        join defining_themes dt on sdt.definingThemeId = dt.id
+        where dt.categoryId = :categoryId
         """
     )
     fun getStatements(categoryId: Int): Flow<List<Statement>>
@@ -27,10 +29,18 @@ interface StatementsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStatements(statements: List<Statement>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertStatementDefiningThemes(statementDefiningThemes: List<StatementDefiningTheme>)
+
     @Query(
         """
         delete from statements
-        where definingThemeId in (select id from defining_themes where categoryId = :categoryId)
+        where id in (
+            select sdt.statementId
+            from statement_defining_themes sdt
+            join defining_themes dt on sdt.definingThemeId = dt.id
+            where dt.categoryId = :categoryId
+        )
         """
     )
     suspend fun deleteStatements(categoryId: Int)

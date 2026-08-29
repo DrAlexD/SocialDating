@@ -113,10 +113,7 @@ class StatementsViewModel @Inject constructor(
                         StatementReactionDetails(
                             userId = userId,
                             statementId = statement.id,
-                            categoryId = categoryId,
-                            definingThemeId = statement.definingThemeId,
-                            reactionType = reactionType,
-                            isSupportDefiningTheme = statement.isSupportDefiningTheme
+                            reactionType = reactionType
                         )
                     )
                 }

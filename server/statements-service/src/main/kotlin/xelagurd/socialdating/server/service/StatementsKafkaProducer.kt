@@ -2,17 +2,26 @@ package xelagurd.socialdating.server.service
 
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
-import xelagurd.socialdating.server.model.common.UserCategoryUpdateDetails
+import io.github.oshai.kotlinlogging.KotlinLogging
+import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
 
 @Service
 class StatementsKafkaProducer(
-    private val kafkaTemplate: KafkaTemplate<String, UserCategoryUpdateDetails>
+    private val kafkaTemplate: KafkaTemplate<String, UserDefiningThemesUpdateDetails>
 ) {
+    val logger = KotlinLogging.logger { }
 
-    fun updateUserCategory(userCategoryUpdateDetails: UserCategoryUpdateDetails) {
+    fun updateUserDefiningThemes(userDefiningThemesUpdateDetails: UserDefiningThemesUpdateDetails) {
         kafkaTemplate.send(
-            "update-user-category-on-statement-reaction",
-            userCategoryUpdateDetails
-        )
+            "update-user-defining-themes-on-statement-reaction",
+            userDefiningThemesUpdateDetails.userId.toString(),
+            userDefiningThemesUpdateDetails
+        ).whenComplete { _, exception ->
+            if (exception != null) {
+                logger.error(exception) {
+                    "Failed to send defining themes update of user ${userDefiningThemesUpdateDetails.userId}"
+                }
+            }
+        }
     }
 }

@@ -3,7 +3,6 @@ package xelagurd.socialdating.server.service
 import java.lang.Long.numberOfTrailingZeros
 import kotlin.math.min
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import xelagurd.socialdating.server.client.UsersServiceClient
 import xelagurd.socialdating.server.model.DefaultDataProperties.OPPOSITE_CATEGORIES_NUMBER
 import xelagurd.socialdating.server.model.DefaultDataProperties.SIMILAR_CATEGORIES_NUMBER
@@ -36,7 +35,6 @@ class UserCategoriesService(
     fun getUserCategory(userId: Int, categoryId: Int) =
         userCategoriesRepository.findByUserIdAndCategoryId(userId, categoryId)
 
-    @Transactional(readOnly = true)
     fun getSimilarUsers(
         currentUserId: Int,
         categoryIds: List<Int>? = null
@@ -84,7 +82,6 @@ class UserCategoriesService(
         return similarUsers.mapNotNull { it.toSimilarUserWithData(usersById[it.id]) }
     }
 
-    @Transactional(readOnly = true)
     fun getDetailedSimilarUser(
         currentUserId: Int,
         anotherUserId: Int

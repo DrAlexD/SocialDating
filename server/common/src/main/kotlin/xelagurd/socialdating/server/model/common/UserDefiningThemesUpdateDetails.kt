@@ -2,9 +2,8 @@ package xelagurd.socialdating.server.model.common
 
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 
-data class UserDefiningThemeUpdateDetails(
+data class UserDefiningThemesUpdateDetails(
     val userId: Int,
-    val definingThemeId: Int,
     val reactionType: StatementReactionType,
-    val isSupportDefiningTheme: Boolean
+    val definingThemes: List<DefiningThemeReactionDetails>
 )

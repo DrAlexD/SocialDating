@@ -32,8 +32,8 @@ import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 /**
  * Covers the only flow that spans several microservices: a statement reaction is saved by statements-service
- * and then, through the chain of Kafka events, updates the user category in categories-service,
- * the user defining theme in defining-themes-service and finally the maintained lists in categories-service.
+ * and then, through the chain of Kafka events, updates the user defining themes in defining-themes-service
+ * and finally the interest and the maintained lists of every affected user category in categories-service.
  *
  * Everything that is handled by a single microservice is covered by the corresponding *MicroserviceTest.
  */
@@ -42,11 +42,9 @@ import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 class IntegrationTest {
     private val restTemplate = TestRestTemplate()
 
-    // the test is run against a long living server, so all the created data must be named uniquely;
-    // a random number could repeat between runs, while the current time never does
+    // the test is run against a long living server, so all the created data must be named uniquely
     private val uniqueNumber = System.currentTimeMillis()
 
-    // reactions of both users on every defining theme of the created category:
     // the same reaction types make the users similar, the different ones make them opposite
     private val adminReactionTypes = listOf(FULL_MAINTAIN, FULL_MAINTAIN, FULL_NO_MAINTAIN)
     private val userReactionTypes = listOf(FULL_MAINTAIN, FULL_MAINTAIN, FULL_MAINTAIN)
@@ -68,18 +66,36 @@ class IntegrationTest {
 
     private var categoryId = -1
     private val definingThemeIds = mutableListOf<Int>()
+    private val allDefiningThemeIds
+        get() = definingThemeIds + extraDefiningThemeId + anotherCategoryDefiningThemeId
     private val statementIds = mutableMapOf<Int, List<Int>>()
+
+    private var extraDefiningThemeId = -1
+    private var anotherCategoryId = -1
+    private var anotherCategoryDefiningThemeId = -1
+    private var multiThemeStatementId = -1
 
     @BeforeAll
     fun initializeData() {
         admin = loginUser()
         user = registerUser()
 
-        categoryId = addCategory()
-        repeat(definingThemesNumber) { definingThemeIds += addDefiningTheme(it + 1) }
+        categoryId = addCategory("TestRemoteCategory$uniqueNumber")
+        repeat(definingThemesNumber) { definingThemeIds += addDefiningTheme(categoryId, it + 1) }
         definingThemeIds.forEach { definingThemeId ->
-            statementIds[definingThemeId] = List(statementsNumber) { addStatement(definingThemeId, it + 1) }
+            statementIds[definingThemeId] = List(statementsNumber) {
+                addStatement("TestRemoteStatement${uniqueNumber}_${definingThemeId}_${it + 1}", definingThemeId to true)
+            }
         }
+
+        extraDefiningThemeId = addDefiningTheme(categoryId, definingThemesNumber + 1)
+        anotherCategoryId = addCategory("TestRemoteAnotherCategory$uniqueNumber")
+        anotherCategoryDefiningThemeId = addDefiningTheme(anotherCategoryId, 1)
+        multiThemeStatementId = addStatement(
+            "TestRemoteMultiThemeStatement$uniqueNumber",
+            extraDefiningThemeId to true,
+            anotherCategoryDefiningThemeId to false
+        )
     }
 
     @Order(1)
@@ -91,16 +107,42 @@ class IntegrationTest {
 
     @Order(2)
     @Test
-    fun getUserCategories_afterReactions_increasedInterest() {
-        val expectedInterest = CATEGORY_INTEREST_STEP * definingThemesNumber * statementsNumber
-
+    fun processStatementReaction_statementWithSeveralDefiningThemes_updatesEveryOfThem() {
         listOf(admin, user).forEach { authorizedUser ->
-            val responseUserCategory = getUserCategory(authorizedUser)
-            assertEquals(expectedInterest, responseUserCategory["interest"])
+            processStatementReaction(authorizedUser, multiThemeStatementId, FULL_MAINTAIN)
+
+            awaitAssertion {
+                assertEquals(
+                    DEFINING_THEME_VALUE_INITIAL + definingThemeValueDiff,
+                    getUserDefiningTheme(authorizedUser, extraDefiningThemeId)["value"]
+                )
+                assertEquals(
+                    DEFINING_THEME_VALUE_INITIAL - definingThemeValueDiff,
+                    getUserDefiningTheme(authorizedUser, anotherCategoryDefiningThemeId)["value"]
+                )
+            }
         }
     }
 
     @Order(3)
+    @Test
+    fun getUserCategories_afterReactions_increasedInterest() {
+        // every reaction increases the interest of each affected category by a single step,
+        // no matter how many defining themes of that category are affected
+        val expectedInterest = CATEGORY_INTEREST_STEP * (definingThemesNumber * statementsNumber + 1)
+
+        listOf(admin, user).forEach { authorizedUser ->
+            awaitAssertion {
+                assertEquals(expectedInterest, getUserCategory(authorizedUser, categoryId)["interest"])
+                assertEquals(
+                    CATEGORY_INTEREST_STEP,
+                    getUserCategory(authorizedUser, anotherCategoryId)["interest"]
+                )
+            }
+        }
+    }
+
+    @Order(4)
     @Test
     fun getStatements_afterReactions_noContent() {
         listOf(admin, user).forEach { authorizedUser ->
@@ -108,7 +150,7 @@ class IntegrationTest {
         }
     }
 
-    @Order(4)
+    @Order(5)
     @Test
     fun getDetailedSimilarUser_afterReactions_returnsSimilarityFromMaintainedLists() {
         val expectedDefiningThemesSimilarity = adminReactionTypes
@@ -143,7 +185,7 @@ class IntegrationTest {
         }
     }
 
-    @Order(5)
+    @Order(6)
     @Test
     fun getSimilarUsers_afterReactions_returnsSimilarUserWithDataFromUsersService() {
         val response = restTemplate.getWithToken(
@@ -160,7 +202,6 @@ class IntegrationTest {
         assertEquals(similarDefiningThemesNumber, responseSimilarUser["similarNumber"])
         assertEquals(oppositeDefiningThemesNumber, responseSimilarUser["oppositeNumber"])
 
-        // the user data is collected by categories-service from users-service
         assertEquals(admin.data["name"], responseSimilarUser["name"])
         assertEquals(admin.data["gender"], responseSimilarUser["gender"])
         assertEquals(admin.data["age"], responseSimilarUser["age"])
@@ -214,9 +255,9 @@ class IntegrationTest {
         return responseAuth.toAuthorizedUser()
     }
 
-    private fun addCategory(): Int {
+    private fun addCategory(name: String): Int {
         val request = mapOf(
-            "name" to "TestRemoteCategory$uniqueNumber"
+            "name" to name
         )
         val response = restTemplate.postWithToken(
             admin,
@@ -233,9 +274,9 @@ class IntegrationTest {
         return responseCategory["id"] as Int
     }
 
-    private fun addDefiningTheme(numberInCategory: Int): Int {
+    private fun addDefiningTheme(categoryId: Int, numberInCategory: Int): Int {
         val request = mapOf(
-            "name" to "TestRemoteDefiningTheme${uniqueNumber}_$numberInCategory",
+            "name" to "TestRemoteDefiningTheme${uniqueNumber}_${categoryId}_$numberInCategory",
             "fromOpinion" to "No",
             "toOpinion" to "Yes",
             "categoryId" to categoryId
@@ -254,17 +295,21 @@ class IntegrationTest {
         assertEquals(request["fromOpinion"], responseDefiningTheme["fromOpinion"])
         assertEquals(request["toOpinion"], responseDefiningTheme["toOpinion"])
         assertEquals(categoryId, responseDefiningTheme["categoryId"])
-        // the category is created by this test, so the numbers in category are assigned in order of creation
         assertEquals(numberInCategory, responseDefiningTheme["numberInCategory"])
 
         return responseDefiningTheme["id"] as Int
     }
 
-    private fun addStatement(definingThemeId: Int, number: Int): Int {
+    private fun addStatement(text: String, vararg definingThemes: Pair<Int, Boolean>): Int {
+        val requestDefiningThemes = definingThemes.map { (definingThemeId, isSupportDefiningTheme) ->
+            mapOf(
+                "definingThemeId" to definingThemeId,
+                "isSupportDefiningTheme" to isSupportDefiningTheme
+            )
+        }
         val request = mapOf(
-            "text" to "TestRemoteStatement${uniqueNumber}_${definingThemeId}_$number",
-            "isSupportDefiningTheme" to true,
-            "definingThemeId" to definingThemeId,
+            "text" to text,
+            "definingThemes" to requestDefiningThemes,
             "creatorUserId" to admin.id
         )
         val response = restTemplate.postWithToken(
@@ -278,8 +323,7 @@ class IntegrationTest {
         val responseStatement = readObjectFromJsonString(response.body!!)
         assertNotNull(responseStatement["id"])
         assertEquals(request["text"], responseStatement["text"])
-        assertEquals(request["isSupportDefiningTheme"], responseStatement["isSupportDefiningTheme"])
-        assertEquals(definingThemeId, responseStatement["definingThemeId"])
+        assertEquals(requestDefiningThemes, responseStatement["definingThemes"])
         assertEquals(admin.id, responseStatement["creatorUserId"])
 
         return responseStatement["id"] as Int
@@ -293,7 +337,7 @@ class IntegrationTest {
             val reactionType = reactionTypes[definingThemeIndex]
 
             statementIds.getValue(definingThemeId).forEachIndexed { statementIndex, statementId ->
-                processStatementReaction(authorizedUser, statementId, definingThemeId, reactionType)
+                processStatementReaction(authorizedUser, statementId, reactionType)
 
                 // the next reaction is sent only after the current one is processed by all the microservices
                 awaitAssertion {
@@ -314,16 +358,12 @@ class IntegrationTest {
     private fun processStatementReaction(
         authorizedUser: AuthorizedUser,
         statementId: Int,
-        definingThemeId: Int,
         reactionType: StatementReactionType
     ) {
         val request = mapOf(
             "userId" to authorizedUser.id,
             "statementId" to statementId,
-            "categoryId" to categoryId,
-            "definingThemeId" to definingThemeId,
-            "reactionType" to reactionType.name,
-            "isSupportDefiningTheme" to true
+            "reactionType" to reactionType.name
         )
         val response = restTemplate.postWithToken(
             authorizedUser,
@@ -338,11 +378,12 @@ class IntegrationTest {
         restTemplate.getWithToken(
             authorizedUser,
             "$GATEWAY_URL/statements" +
-                    "?currentUserId=${authorizedUser.id}&definingThemeIds=${definingThemeIds.toRequestParams()}",
+                    "?currentUserId=${authorizedUser.id}" +
+                    "&definingThemeIds=${allDefiningThemeIds.toRequestParams()}",
             String::class.java
         )
 
-    private fun getUserCategory(authorizedUser: AuthorizedUser): Map<String, Any> {
+    private fun getUserCategory(authorizedUser: AuthorizedUser, categoryId: Int): Map<String, Any> {
         val response = restTemplate.getWithToken(
             authorizedUser,
             "$GATEWAY_URL/categories/users?userId=${authorizedUser.id}",
