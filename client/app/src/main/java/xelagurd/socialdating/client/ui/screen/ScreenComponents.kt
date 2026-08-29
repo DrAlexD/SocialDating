@@ -250,10 +250,12 @@ inline fun AppDataList(
     entities: List<DataEntity>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     crossinline card: @Composable (DataEntity) -> Unit
 ) {
     LazyColumn(
         contentPadding = contentPadding,
+        horizontalAlignment = horizontalAlignment,
         modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_8dp))
     ) {
         items(items = entities, key = { it.id }) {
@@ -308,6 +310,7 @@ inline fun AppDataMultiChoosingList(
         entities = entities,
         modifier = modifier.heightIn(Dp.Unspecified, maxHeight),
         contentPadding = contentPadding,
+        horizontalAlignment = Alignment.CenterHorizontally,
         card = { card(it, chosenEntityIds.contains(it.id)) }
     )
 }
