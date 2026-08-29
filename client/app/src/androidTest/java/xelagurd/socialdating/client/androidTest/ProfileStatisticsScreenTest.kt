@@ -3,6 +3,7 @@ package xelagurd.socialdating.client.androidTest
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -134,7 +135,7 @@ class ProfileStatisticsScreenTest {
     }
 
     @Test
-    fun profileStatisticsScreen_anotherUser_notSelectedProfileNavigationItem() {
+    fun profileStatisticsScreen_anotherUser_selectedSimilarUsersNavigationItem() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
             userId = FakeData.mainUser.id,
             anotherUserId = FakeData.mainUser.id + 1,
@@ -144,7 +145,23 @@ class ProfileStatisticsScreenTest {
 
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
+        composeTestRule.onNodeWithTagId(R.string.nav_similar_users).assertIsSelected()
         composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsNotSelected()
+    }
+
+    @Test
+    fun profileStatisticsScreen_currentUser_selectedProfileNavigationItem() {
+        val profileStatisticsUiState = ProfileStatisticsUiState(
+            userId = FakeData.mainUser.id,
+            anotherUserId = FakeData.mainUser.id,
+            entities = listOf(userCategoryWithData),
+            dataRequestStatus = RequestStatus.SUCCESS
+        )
+
+        setContentToProfileStatisticsBody(profileStatisticsUiState)
+
+        composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsSelected()
+        composeTestRule.onNodeWithTagId(R.string.nav_similar_users).assertIsNotSelected()
     }
 
     @Test

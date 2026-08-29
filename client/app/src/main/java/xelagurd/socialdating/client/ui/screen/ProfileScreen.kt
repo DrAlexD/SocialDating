@@ -27,6 +27,7 @@ import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
 import xelagurd.socialdating.client.ui.AppTopBar
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
+import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
 import xelagurd.socialdating.client.ui.state.ProfileUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.theme.AppTheme
@@ -67,8 +68,10 @@ fun ProfileScreenComponent(
         },
         bottomBar = {
             AppBottomNavigationBar(
-                currentTopLevelRoute = ProfileDestination.topLevelRoute,
-                isCurrentUser = profileUiState.userId == profileUiState.anotherUserId
+                currentTopLevelRoute = when (profileUiState.anotherUserId) {
+                    profileUiState.userId -> ProfileDestination.topLevelRoute
+                    else -> SimilarUsersDestination.topLevelRoute
+                }
             )
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)

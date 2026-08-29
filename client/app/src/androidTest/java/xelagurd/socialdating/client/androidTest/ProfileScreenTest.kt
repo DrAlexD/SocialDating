@@ -2,6 +2,7 @@ package xelagurd.socialdating.client.androidTest
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -83,7 +84,7 @@ class ProfileScreenTest {
     }
 
     @Test
-    fun profileScreen_anotherUser_notSelectedProfileNavigationItem() {
+    fun profileScreen_anotherUser_selectedSimilarUsersNavigationItem() {
         val profileUiState = ProfileUiState(
             userId = user.id,
             anotherUserId = user.id + 1,
@@ -93,7 +94,23 @@ class ProfileScreenTest {
 
         setContentToProfileBody(profileUiState)
 
+        composeTestRule.onNodeWithTagId(R.string.nav_similar_users).assertIsSelected()
         composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsNotSelected()
+    }
+
+    @Test
+    fun profileScreen_currentUser_selectedProfileNavigationItem() {
+        val profileUiState = ProfileUiState(
+            userId = user.id,
+            anotherUserId = user.id,
+            entity = user,
+            dataRequestStatus = RequestStatus.SUCCESS
+        )
+
+        setContentToProfileBody(profileUiState)
+
+        composeTestRule.onNodeWithTagId(R.string.nav_profile).assertIsSelected()
+        composeTestRule.onNodeWithTagId(R.string.nav_similar_users).assertIsNotSelected()
     }
 
     @Test
