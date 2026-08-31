@@ -5,6 +5,11 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.ID_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.PERCENT_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.PERCENT_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidId
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidPercent
 import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 
 @Serializable
@@ -34,6 +39,13 @@ data class UserDefiningTheme(
     val userId: Int,
     val definingThemeId: Int
 ) : DataEntity {
+    init {
+        require(value.isValidPercent()) { "Value must be between $PERCENT_MIN and $PERCENT_MAX" }
+        require(interest.isValidPercent()) { "Interest must be between $PERCENT_MIN and $PERCENT_MAX" }
+        require(userId.isValidId()) { "UserId must be at least $ID_MIN" }
+        require(definingThemeId.isValidId()) { "DefiningThemeId must be at least $ID_MIN" }
+    }
+
     fun toUserDefiningThemeWithData(definingTheme: DefiningTheme?) =
         definingTheme?.let {
             UserDefiningThemeWithData(

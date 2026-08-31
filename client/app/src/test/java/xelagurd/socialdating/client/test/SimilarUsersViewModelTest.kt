@@ -20,6 +20,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
@@ -43,7 +44,7 @@ class SimilarUsersViewModelTest {
     private val similarUsersUiState
         get() = viewModel.uiState.value
 
-    private val userId = Random.nextInt()
+    private val userId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
     private val isOfflineModeFlow = flowOf(false)
 
     private val similarUsers = FakeData.similarUsers

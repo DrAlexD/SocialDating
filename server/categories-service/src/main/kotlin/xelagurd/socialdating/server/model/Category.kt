@@ -6,15 +6,27 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
+import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_NAME_LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_NAME_LENGTH_MIN
 
 @Entity(name = "categories")
-@Table(name = "categories")
+@Table(
+    name = "categories",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_name", columnNames = ["name"])
+    ]
+)
 class Category(
     @field:Id
     @field:GeneratedValue(GenerationType.IDENTITY)
     var id: Int? = null,
 
-    @field:Column(unique = true)
+    @field:Column(
+        nullable = false,
+        columnDefinition = "varchar($CATEGORY_NAME_LENGTH_MAX) " +
+                "check (length(trim(name)) between $CATEGORY_NAME_LENGTH_MIN and $CATEGORY_NAME_LENGTH_MAX)"
+    )
     var name: String
 ) {
     override fun equals(other: Any?): Boolean {

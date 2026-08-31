@@ -26,6 +26,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
@@ -75,7 +76,7 @@ class ProfileStatisticsViewModelTest {
     private val profileStatisticsUiState
         get() = viewModel.uiState.value
 
-    private val userId = Random.nextInt()
+    private val userId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
     private var anotherUserId = userId
 
     private val savedCategories = listOf(Category(id = 1, name = "Category1"))

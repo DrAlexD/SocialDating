@@ -1,5 +1,9 @@
 package xelagurd.socialdating.client.ui.form
 
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidId
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidText
 import xelagurd.socialdating.client.data.model.additional.DefiningThemeReactionDetails
 import xelagurd.socialdating.client.data.model.details.StatementDetails
 
@@ -9,8 +13,9 @@ data class StatementFormData(
     val creatorUserId: Int? = null
 ) : FormData {
     val isValid
-        get() = text.isNotBlank() && definingThemes.isNotEmpty()
-                && definingThemes.values.all { it != null } && creatorUserId != null
+        get() = text.isValidText(STATEMENT_TEXT_LENGTH_MIN, STATEMENT_TEXT_LENGTH_MAX) && definingThemes.isNotEmpty()
+                && definingThemes.values.all { it != null } && definingThemes.keys.all { it.isValidId() }
+                && creatorUserId != null && creatorUserId.isValidId()
 
     fun toggleDefiningTheme(definingThemeId: Int) =
         copy(

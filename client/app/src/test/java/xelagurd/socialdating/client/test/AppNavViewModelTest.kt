@@ -14,6 +14,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.ui.navigation.AppNavViewModel
@@ -29,7 +30,7 @@ class AppNavViewModelTest {
     private lateinit var viewModel: AppNavViewModel
     private lateinit var currentUserIdFlow: MutableStateFlow<Int>
 
-    private val currentUserId = Random.nextInt()
+    private val currentUserId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
 
     @Before
     fun setup() {

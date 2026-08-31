@@ -1,6 +1,14 @@
 package xelagurd.socialdating.client.ui.form
 
-import androidx.core.text.isDigitsOnly
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.CITY_LENGTH_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.CITY_LENGTH_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.NAME_LENGTH_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.NAME_LENGTH_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidAge
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidEmail
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidPassword
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidText
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidUsername
 import xelagurd.socialdating.client.data.model.details.RegistrationDetails
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
@@ -17,9 +25,10 @@ data class RegistrationFormData(
     val purpose: Purpose? = null
 ) : FormData {
     val isValid
-        get() = name.isNotBlank() && gender != null && username.isNotBlank() && password.isNotBlank() &&
-                repeatedPassword.isNotBlank() && password == repeatedPassword && age.isNotBlank() &&
-                age.isDigitsOnly() && city.isNotBlank() && purpose != null
+        get() = name.isValidText(NAME_LENGTH_MIN, NAME_LENGTH_MAX) && gender != null &&
+                username.isValidUsername() && password.isValidPassword() &&
+                password == repeatedPassword && (email.isBlank() || email.isValidEmail()) && age.isValidAge() &&
+                city.isValidText(CITY_LENGTH_MIN, CITY_LENGTH_MAX) && purpose != null
 
     fun toLoginFormData() =
         LoginFormData(

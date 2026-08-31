@@ -2,8 +2,10 @@ package xelagurd.socialdating.server.service
 
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_STEP
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
@@ -23,7 +25,7 @@ class CategoriesKafkaConsumer(
 
     @Transactional
     @KafkaListener(topics = ["update-user-categories-on-statement-reaction"], groupId = "categories-group")
-    fun updateUserCategories(updateDetails: UserCategoriesUpdateDetails) {
+    fun updateUserCategories(@Payload @Valid updateDetails: UserCategoriesUpdateDetails) {
         updateDetails.categories.forEach { categoryUpdateDetails ->
             val userCategory = userCategoriesService
                 .getUserCategory(updateDetails.userId, categoryUpdateDetails.categoryId)

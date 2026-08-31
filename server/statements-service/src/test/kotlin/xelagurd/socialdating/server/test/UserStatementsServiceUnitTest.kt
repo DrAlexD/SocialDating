@@ -1,5 +1,8 @@
 package xelagurd.socialdating.server.test
 
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import io.mockk.Runs
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -10,7 +13,9 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeStatementsData
@@ -55,8 +60,31 @@ class UserStatementsServiceUnitTest {
     private val userStatementSlot = slot<UserStatement>()
     private val updateDetailsSlot = slot<UserDefiningThemesUpdateDetails>()
 
+    @AfterEach
+    fun clearSecurityContext() {
+        SecurityContextHolder.clearContext()
+    }
+
+    private fun setAuthenticatedUser(userId: Int) {
+        val authentication = mockk<Authentication>()
+        every { authentication.principal } returns userId
+        SecurityContextHolder.getContext().authentication = authentication
+    }
+
+    @Test
+    fun processStatementReaction_anotherUser_throwsAccessDenied() {
+        setAuthenticatedUser(statementReactionDetails.userId + 1)
+
+        assertThrows(AccessDeniedException::class.java) {
+            userStatementsService.processStatementReaction(statementReactionDetails)
+        }
+
+        confirmVerified(userStatementsRepository, statementDefiningThemesRepository, kafkaProducer)
+    }
+
     @Test
     fun processStatementReaction_validData_savesUserStatementAndProducesEventWithAllDefiningThemes() {
+        setAuthenticatedUser(statementReactionDetails.userId)
         every { statementDefiningThemesRepository.findAllByStatementId(any()) } returns statementDefiningThemes
         every { userStatementsRepository.save(capture(userStatementSlot)) } returns mockk()
         every { kafkaProducer.updateUserDefiningThemes(capture(updateDetailsSlot)) } just Runs

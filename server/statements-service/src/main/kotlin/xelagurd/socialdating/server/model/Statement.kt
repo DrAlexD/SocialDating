@@ -6,18 +6,32 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
+import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MIN
 import xelagurd.socialdating.server.model.additional.StatementWithDefiningThemes
 
 @Entity(name = "statements")
-@Table(name = "statements")
+@Table(
+    name = "statements",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_text", columnNames = ["text"])
+    ]
+)
 class Statement(
     @field:Id
     @field:GeneratedValue(GenerationType.IDENTITY)
     var id: Int? = null,
 
-    @field:Column(unique = true)
+    @field:Column(
+        nullable = false,
+        columnDefinition = "varchar($STATEMENT_TEXT_LENGTH_MAX) " +
+                "check (length(trim(text)) between $STATEMENT_TEXT_LENGTH_MIN and $STATEMENT_TEXT_LENGTH_MAX)"
+    )
     var text: String,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (creator_user_id >= $ID_MIN)")
     var creatorUserId: Int
 ) {
 

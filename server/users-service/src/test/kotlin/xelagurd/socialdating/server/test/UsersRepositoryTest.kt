@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.PostgreSQLContainer
+import xelagurd.socialdating.server.FakeUsersData
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
@@ -33,7 +34,7 @@ class UsersRepositoryTest(
             name = name,
             gender = Gender.MALE,
             username = username,
-            password = "password",
+            password = FakeUsersData.users[0].password,
             email = email,
             age = 25,
             city = "city",

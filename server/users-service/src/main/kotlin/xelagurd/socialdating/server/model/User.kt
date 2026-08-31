@@ -11,47 +11,99 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.CITY_LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.CITY_LENGTH_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.EMAIL_LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.EMAIL_LENGTH_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.EMAIL_PATTERN
+import xelagurd.socialdating.server.model.DefaultDataProperties.NAME_LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.NAME_LENGTH_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.PASSWORD_HASH_LENGTH
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_LENGTH_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_PATTERN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USER_ACTIVITY_INITIAL
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
 import xelagurd.socialdating.server.model.enums.Role
 
 @Entity(name = "users")
-@Table(name = "users")
+@Table(
+    name = "users",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_username", columnNames = ["username"]),
+        UniqueConstraint(name = "uk_email", columnNames = ["email"])
+    ]
+)
 class User(
     @field:Id
     @field:GeneratedValue(GenerationType.IDENTITY)
     var id: Int? = null,
 
+    @field:Column(
+        nullable = false,
+        columnDefinition = "varchar($NAME_LENGTH_MAX) " +
+                "check (length(trim(name)) between $NAME_LENGTH_MIN and $NAME_LENGTH_MAX)"
+    )
     var name: String,
 
     @field:Enumerated(EnumType.STRING)
+    @field:Column(nullable = false)
     var gender: Gender,
 
-    @field:Column(unique = true)
+    @field:Column(
+        nullable = false,
+        columnDefinition = "varchar($USERNAME_LENGTH_MAX) " +
+                "check (length(username) between $USERNAME_LENGTH_MIN and $USERNAME_LENGTH_MAX " +
+                "and username ~ '$USERNAME_PATTERN')"
+    )
     @JvmField
     final var username: String,
 
     @field:JsonIgnore
+    @field:Column(
+        nullable = false,
+        columnDefinition = "varchar($PASSWORD_HASH_LENGTH) " +
+                "check (length(password) = $PASSWORD_HASH_LENGTH)"
+    )
     @JvmField
     final var password: String,
 
     @field:JsonIgnore
+    @field:Column(
+        columnDefinition = "varchar($EMAIL_LENGTH_MAX) " +
+                "check (email is null or (length(trim(email)) between $EMAIL_LENGTH_MIN and $EMAIL_LENGTH_MAX " +
+                "and email ~ '$EMAIL_PATTERN'))"
+    )
     var email: String?,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (age between $AGE_MIN and $AGE_MAX)")
     var age: Int,
 
+    @field:Column(
+        nullable = false,
+        columnDefinition = "varchar($CITY_LENGTH_MAX) " +
+                "check (length(trim(city)) between $CITY_LENGTH_MIN and $CITY_LENGTH_MAX)"
+    )
     var city: String,
 
     @field:Enumerated(EnumType.STRING)
+    @field:Column(nullable = false)
     var purpose: Purpose,
 
-    @field:Column(columnDefinition = "integer check (activity between $PERCENT_MIN and $PERCENT_MAX)")
+    @field:Column(
+        nullable = false,
+        columnDefinition = "integer check (activity between $PERCENT_MIN and $PERCENT_MAX)"
+    )
     var activity: Int = USER_ACTIVITY_INITIAL,
 
     @field:Enumerated(EnumType.STRING)
+    @field:Column(nullable = false)
     val role: Role
 ) : UserDetails {
     @JsonIgnore
