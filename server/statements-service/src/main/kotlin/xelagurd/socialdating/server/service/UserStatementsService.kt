@@ -5,6 +5,7 @@ import xelagurd.socialdating.server.model.additional.StatementReactionDetails
 import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.repository.StatementDefiningThemesRepository
 import xelagurd.socialdating.server.repository.UserStatementsRepository
+import xelagurd.socialdating.server.utils.SecurityUtils.checkCurrentUserAuth
 
 @Service
 class UserStatementsService(
@@ -14,6 +15,8 @@ class UserStatementsService(
 ) {
 
     fun processStatementReaction(statementReactionDetails: StatementReactionDetails) {
+        checkCurrentUserAuth(statementReactionDetails.userId)
+
         val definingThemes = statementDefiningThemesRepository
             .findAllByStatementId(statementReactionDetails.statementId)
 

@@ -5,17 +5,18 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.Index
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_INTEREST_STEP
+import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 
 @Entity(name = "user_defining_themes")
 @Table(
     name = "user_defining_themes",
-    indexes = [
-        Index(columnList = "defining_theme_id, user_id", unique = true)
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_defining_theme_id__user_id", columnNames = ["defining_theme_id", "user_id"])
     ]
 )
 class UserDefiningTheme(
@@ -25,15 +26,21 @@ class UserDefiningTheme(
 
     @field:Column(
         name = "udt_value",
+        nullable = false,
         columnDefinition = "integer check (udt_value between $PERCENT_MIN and $PERCENT_MAX)"
     )
     var value: Int,
 
-    @field:Column(columnDefinition = "integer check (interest between $PERCENT_MIN and $PERCENT_MAX)")
+    @field:Column(
+        nullable = false,
+        columnDefinition = "integer check (interest between $PERCENT_MIN and $PERCENT_MAX)"
+    )
     var interest: Int = DEFINING_THEME_INTEREST_STEP,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (user_id >= $ID_MIN)")
     var userId: Int,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (defining_theme_id >= $ID_MIN)")
     var definingThemeId: Int
 ) {
 

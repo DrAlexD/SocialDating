@@ -1,18 +1,23 @@
 package xelagurd.socialdating.server.model
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.Index
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
+import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
 
 @Entity(name = "statement_defining_themes")
 @Table(
     name = "statement_defining_themes",
-    indexes = [
-        Index(columnList = "statement_id, defining_theme_id", unique = true)
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "uk_statement_id__defining_theme_id",
+            columnNames = ["statement_id", "defining_theme_id"]
+        )
     ]
 )
 class StatementDefiningTheme(
@@ -20,10 +25,13 @@ class StatementDefiningTheme(
     @field:GeneratedValue(GenerationType.IDENTITY)
     var id: Int? = null,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (statement_id >= $ID_MIN)")
     var statementId: Int,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (defining_theme_id >= $ID_MIN)")
     var definingThemeId: Int,
 
+    @field:Column(nullable = false)
     var isSupportDefiningTheme: Boolean
 ) {
 

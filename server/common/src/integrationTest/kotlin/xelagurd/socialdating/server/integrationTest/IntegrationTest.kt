@@ -230,13 +230,13 @@ class IntegrationTest {
     private fun registerUser(): AuthorizedUser {
         val request = mapOf(
             "name" to "Alexander",
-            "gender" to 0, // MALE
-            "username" to "username$uniqueNumber",
-            "password" to "password$uniqueNumber",
+            "gender" to "MALE",
+            "username" to "user$uniqueNumber",
+            "password" to "pass$uniqueNumber",
             "email" to "email$uniqueNumber@gmail.com",
             "age" to 26,
             "city" to "Moscow",
-            "purpose" to 2 // ALL_AT_ONCE
+            "purpose" to "ALL_AT_ONCE"
         )
         val response = restTemplate.postForEntity(
             "$GATEWAY_URL/users/auth/register",

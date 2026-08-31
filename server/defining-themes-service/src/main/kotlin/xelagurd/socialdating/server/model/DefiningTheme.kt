@@ -5,14 +5,23 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.Index
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
+import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_NAME_LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_NAME_LENGTH_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.OPINION_LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.OPINION_LENGTH_MIN
 
 @Entity(name = "defining_themes")
 @Table(
     name = "defining_themes",
-    indexes = [
-        Index(columnList = "category_id, number_in_category", unique = true)
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_name", columnNames = ["name"]),
+        UniqueConstraint(
+            name = "uk_category_id__number_in_category",
+            columnNames = ["category_id", "number_in_category"]
+        )
     ]
 )
 class DefiningTheme(
@@ -20,15 +29,32 @@ class DefiningTheme(
     @field:GeneratedValue(GenerationType.IDENTITY)
     var id: Int? = null,
 
-    @field:Column(unique = true)
+    @field:Column(
+        nullable = false,
+        columnDefinition = "varchar($DEFINING_THEME_NAME_LENGTH_MAX) " +
+                "check (length(trim(name)) between $DEFINING_THEME_NAME_LENGTH_MIN " +
+                "and $DEFINING_THEME_NAME_LENGTH_MAX)"
+    )
     var name: String,
 
+    @field:Column(
+        nullable = false,
+        columnDefinition = "varchar($OPINION_LENGTH_MAX) " +
+                "check (length(trim(from_opinion)) between $OPINION_LENGTH_MIN and $OPINION_LENGTH_MAX)"
+    )
     var fromOpinion: String,
 
+    @field:Column(
+        nullable = false,
+        columnDefinition = "varchar($OPINION_LENGTH_MAX) " +
+                "check (length(trim(to_opinion)) between $OPINION_LENGTH_MIN and $OPINION_LENGTH_MAX)"
+    )
     var toOpinion: String,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (category_id >= $ID_MIN)")
     var categoryId: Int,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (number_in_category >= $ID_MIN)")
     var numberInCategory: Int
 ) {
     override fun equals(other: Any?): Boolean {

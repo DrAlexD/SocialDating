@@ -1,5 +1,7 @@
 package xelagurd.socialdating.client.ui.form
 
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidPassword
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidUsername
 import xelagurd.socialdating.client.data.model.details.LoginDetails
 
 data class LoginFormData(
@@ -7,7 +9,7 @@ data class LoginFormData(
     val password: String = ""
 ) : FormData {
     val isValid
-        get() = username.isNotBlank() && password.isNotBlank()
+        get() = username.isValidUsername() && password.isValidPassword()
 
     fun toLoginDetails() =
         LoginDetails(

@@ -1,20 +1,22 @@
 package xelagurd.socialdating.server.model
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.Index
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
+import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 
 @Entity(name = "user_statements")
 @Table(
     name = "user_statements",
-    indexes = [
-        Index(columnList = "statement_id, user_id", unique = true)
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_statement_id__user_id", columnNames = ["statement_id", "user_id"])
     ]
 )
 class UserStatement(
@@ -23,10 +25,13 @@ class UserStatement(
     var id: Int? = null,
 
     @field:Enumerated(EnumType.STRING)
+    @field:Column(nullable = false)
     var reactionType: StatementReactionType,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (user_id >= $ID_MIN)")
     var userId: Int,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (statement_id >= $ID_MIN)")
     var statementId: Int
 ) {
     override fun equals(other: Any?): Boolean {

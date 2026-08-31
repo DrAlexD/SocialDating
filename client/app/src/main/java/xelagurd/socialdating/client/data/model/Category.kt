@@ -4,6 +4,9 @@ import kotlinx.serialization.Serializable
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.CATEGORY_NAME_LENGTH_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.CATEGORY_NAME_LENGTH_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidText
 
 @Serializable
 @Entity(
@@ -16,4 +19,10 @@ data class Category(
     @PrimaryKey
     override val id: Int,
     val name: String
-) : DataEntity
+) : DataEntity {
+    init {
+        require(name.isValidText(CATEGORY_NAME_LENGTH_MIN, CATEGORY_NAME_LENGTH_MAX)) {
+            "Name length must be between $CATEGORY_NAME_LENGTH_MIN and $CATEGORY_NAME_LENGTH_MAX"
+        }
+    }
+}

@@ -1,18 +1,17 @@
 package xelagurd.socialdating.server.model.details
 
 import jakarta.validation.Valid
-import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Positive
-import jakarta.validation.constraints.Size
-import xelagurd.socialdating.server.model.DefaultDataProperties.LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MIN
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.StatementDefiningTheme
 import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.validation.TrimmedSize
 
 data class StatementDetails(
-    @field:NotBlank
-    @field:Size(max = LENGTH_MAX)
+    @field:TrimmedSize(min = STATEMENT_TEXT_LENGTH_MIN, max = STATEMENT_TEXT_LENGTH_MAX)
     val text: String,
 
     @field:NotEmpty

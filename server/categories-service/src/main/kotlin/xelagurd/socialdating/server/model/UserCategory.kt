@@ -6,19 +6,20 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.Index
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_STEP
+import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 
 @Entity(name = "user_categories")
 @Table(
     name = "user_categories",
-    indexes = [
-        Index(columnList = "category_id, user_id", unique = true)
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_category_id__user_id", columnNames = ["category_id", "user_id"])
     ]
 )
 class UserCategory(
@@ -26,21 +27,32 @@ class UserCategory(
     @field:GeneratedValue(GenerationType.IDENTITY)
     var id: Int? = null,
 
-    @field:Column(columnDefinition = "integer check (interest between $PERCENT_MIN and $PERCENT_MAX)")
+    @field:Column(
+        nullable = false,
+        columnDefinition = "integer check (interest between $PERCENT_MIN and $PERCENT_MAX)"
+    )
     var interest: Int = CATEGORY_INTEREST_STEP,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (user_id >= $ID_MIN)")
     var userId: Int,
 
+    @field:Column(nullable = false, columnDefinition = "integer check (category_id >= $ID_MIN)")
     var categoryId: Int,
 
     @field:JsonIgnore
     @field:JdbcTypeCode(SqlTypes.ARRAY)
-    @field:Column(columnDefinition = "bigint[]")
+    @field:Column(
+        columnDefinition = "bigint[] " +
+                "check (maintained is null or array_position(maintained, null) is null)"
+    )
     var maintained: Array<Long>? = null,
 
     @field:JsonIgnore
     @field:JdbcTypeCode(SqlTypes.ARRAY)
-    @field:Column(columnDefinition = "bigint[]")
+    @field:Column(
+        columnDefinition = "bigint[] " +
+                "check (not_maintained is null or array_position(not_maintained, null) is null)"
+    )
     var notMaintained: Array<Long>? = null
 ) {
 

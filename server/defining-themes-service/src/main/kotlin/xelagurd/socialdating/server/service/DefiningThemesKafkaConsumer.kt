@@ -4,8 +4,10 @@ import kotlin.random.Random
 import kotlin.random.nextInt
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_INTEREST_STEP
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_COEFFICIENT
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_HIGH_BORDER
@@ -40,7 +42,7 @@ class DefiningThemesKafkaConsumer(
 
     @Transactional
     @KafkaListener(topics = ["update-user-defining-themes-on-statement-reaction"], groupId = "defining-themes-group")
-    fun updateUserDefiningThemes(updateDetails: UserDefiningThemesUpdateDetails) {
+    fun updateUserDefiningThemes(@Payload @Valid updateDetails: UserDefiningThemesUpdateDetails) {
         val definingThemesById = definingThemesService
             .getDefiningThemes(definingThemeIds = updateDetails.definingThemes.map { it.definingThemeId })
             .associateBy { it.id!! }
@@ -58,7 +60,7 @@ class DefiningThemesKafkaConsumer(
                 interest = (userDefiningTheme.interest + DEFINING_THEME_INTEREST_STEP).coerceIn(PERCENT_MIN, PERCENT_MAX)
             )
                 ?: UserDefiningTheme(
-                    value = DEFINING_THEME_VALUE_INITIAL + diff,
+                    value = (DEFINING_THEME_VALUE_INITIAL + diff).coerceIn(PERCENT_MIN, PERCENT_MAX),
                     userId = updateDetails.userId,
                     definingThemeId = definingThemeReaction.definingThemeId
                 )
