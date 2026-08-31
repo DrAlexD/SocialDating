@@ -3,6 +3,7 @@ package xelagurd.socialdating.client.androidTest
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertEquals
@@ -26,6 +27,8 @@ import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecomp
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.ui.form.StatementFormData
 import xelagurd.socialdating.client.ui.screen.StatementAddingScreenComponent
@@ -86,6 +89,27 @@ class StatementAddingScreenTest {
         assertOpinionIsNotDisplayed(notChosenDefiningTheme)
 
         composeTestRule.onNodeWithTextId(R.string.add_statement).checkEnabledButton()
+    }
+
+    @Test
+    fun statementAddingScreen_invalidFormData_displayedErrorWithDisabledButton() {
+        val invalidFormData = statementFormData.copy(text = "T")
+
+        composeTestRule.setContentToScreen {
+            StatementAddingScreenComponent(
+                statementAddingUiState = statementAddingUiState(invalidFormData)
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTextId(
+                R.string.error_length,
+                STATEMENT_TEXT_LENGTH_MIN,
+                STATEMENT_TEXT_LENGTH_MAX
+            )
+            .performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.add_statement)
+            .performScrollTo().checkDisabledButton()
     }
 
     @Test

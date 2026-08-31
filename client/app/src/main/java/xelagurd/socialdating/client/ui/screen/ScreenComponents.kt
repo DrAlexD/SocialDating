@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.model.DataEntity
+import xelagurd.socialdating.client.ui.form.FormFieldError
 
 @Composable
 @ReadOnlyComposable
@@ -227,7 +228,8 @@ fun AppTextField(
     textModifier: Modifier = Modifier,
     singleLine: Boolean = true,
     isPassword: Boolean = false,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    error: FormFieldError? = null
 ) {
     TextField(
         value = value,
@@ -237,6 +239,14 @@ fun AppTextField(
                 text = label,
                 overrideModifier = textModifier
             )
+        },
+        isError = error != null,
+        supportingText = error?.let {
+            {
+                AppSmallBodyText(
+                    text = stringResource(it.messageRes, *it.formatArgs.toTypedArray())
+                )
+            }
         },
         singleLine = singleLine,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,

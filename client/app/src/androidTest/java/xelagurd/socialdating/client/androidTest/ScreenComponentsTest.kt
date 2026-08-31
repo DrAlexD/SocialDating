@@ -26,6 +26,9 @@ import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Category
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MIN
+import xelagurd.socialdating.client.ui.form.FormFieldError
 import xelagurd.socialdating.client.ui.screen.AppDataChoosingList
 import xelagurd.socialdating.client.ui.screen.AppDataList
 import xelagurd.socialdating.client.ui.screen.AppDataMultiChoosingList
@@ -206,6 +209,25 @@ class ScreenComponentsTest {
         composeTestRule.onNodeWithTextId(R.string.password).checkTextFieldAndInput(INPUT_TEXT)
 
         assertEquals(INPUT_TEXT, changedValue)
+    }
+
+    @Test
+    fun appTextField_error_displayedErrorMessage() {
+        composeTestRule.setContentToScreen {
+            AppTextField(
+                value = INPUT_TEXT,
+                onValueChange = {},
+                label = composeTestRule.activity.getString(R.string.username),
+                error = FormFieldError(
+                    R.string.error_length,
+                    listOf(USERNAME_LENGTH_MIN, USERNAME_LENGTH_MAX)
+                )
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTextId(R.string.error_length, USERNAME_LENGTH_MIN, USERNAME_LENGTH_MAX)
+            .assertIsDisplayed()
     }
 
     @Test

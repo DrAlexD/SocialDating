@@ -2,6 +2,7 @@ package xelagurd.socialdating.client.androidTest
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.performScrollTo
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertEquals
@@ -24,6 +25,8 @@ import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecomp
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
 import xelagurd.socialdating.client.ui.form.RegistrationFormData
@@ -75,6 +78,32 @@ class RegistrationScreenTest {
 
         assertContentIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.register).checkEnabledButton()
+    }
+
+    @Test
+    fun registrationScreen_invalidFormData_displayedErrorsWithDisabledButton() {
+        val invalidFormData = registrationFormData.copy(
+            username = "user name",
+            repeatedPassword = "otherPassword",
+            email = "email1gmail.com",
+            age = (AGE_MIN - 1).toString()
+        )
+
+        composeTestRule.setContentToScreen {
+            RegistrationScreenComponent(
+                registrationUiState = RegistrationUiState(formData = invalidFormData)
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.error_username_format)
+            .performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.error_email_format)
+            .performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.error_age, AGE_MIN, AGE_MAX)
+            .performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.error_repeated_password)
+            .performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.register).performScrollTo().checkDisabledButton()
     }
 
     @Test

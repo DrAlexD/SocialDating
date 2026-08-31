@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -95,10 +97,12 @@ private inline fun RegistrationDetailsBody(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.Center
         ) {
             AppTextField(
@@ -107,7 +111,8 @@ private inline fun RegistrationDetailsBody(
                 label = stringResource(R.string.username),
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_4dp))
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp)),
+                error = registrationFormData.usernameError
             )
             AppTextField(
                 value = registrationFormData.name,
@@ -115,7 +120,8 @@ private inline fun RegistrationDetailsBody(
                 label = stringResource(R.string.name),
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_4dp))
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp)),
+                error = registrationFormData.nameError
             )
         }
         Row(
@@ -145,10 +151,11 @@ private inline fun RegistrationDetailsBody(
             onValueChange = { onValueChange(registrationFormData.copy(email = it)) },
             label = stringResource(R.string.email_optional),
             overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp)),
-            keyboardType = KeyboardType.Email
+            keyboardType = KeyboardType.Email,
+            error = registrationFormData.emailError
         )
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.Center
         ) {
             AppTextField(
@@ -158,7 +165,8 @@ private inline fun RegistrationDetailsBody(
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_4dp))
                     .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp)),
-                keyboardType = KeyboardType.Number
+                keyboardType = KeyboardType.Number,
+                error = registrationFormData.ageError
             )
             AppTextField(
                 value = registrationFormData.city,
@@ -166,7 +174,8 @@ private inline fun RegistrationDetailsBody(
                 label = stringResource(R.string.city),
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_4dp))
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp))
+                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp)),
+                error = registrationFormData.cityError
             )
         }
         Row(
@@ -202,7 +211,7 @@ private inline fun RegistrationDetailsBody(
             }
         }
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.Center
         ) {
             AppTextField(
@@ -212,7 +221,8 @@ private inline fun RegistrationDetailsBody(
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_4dp))
                     .width(TextFieldDefaults.MinWidth / 2 + 35.dp),
-                isPassword = true
+                isPassword = true,
+                error = registrationFormData.passwordError
             )
             AppTextField(
                 value = registrationFormData.repeatedPassword,
@@ -221,7 +231,8 @@ private inline fun RegistrationDetailsBody(
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_4dp))
                     .width(TextFieldDefaults.MinWidth / 2 + 35.dp),
-                isPassword = true
+                isPassword = true,
+                error = registrationFormData.repeatedPasswordError
             )
         }
         AppLargeTextCard(
@@ -256,6 +267,23 @@ private fun RegistrationComponentFullFormRuPreview() {
     AppTheme {
         RegistrationScreenComponent(
             registrationUiState = RegistrationUiState(formData = FakeData.registrationFormData)
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
+@Composable
+private fun RegistrationComponentInvalidFormPreview() {
+    AppTheme {
+        RegistrationScreenComponent(
+            registrationUiState = RegistrationUiState(
+                formData = FakeData.registrationFormData.copy(
+                    username = "user name",
+                    repeatedPassword = "otherPassword",
+                    email = "email1gmail.com",
+                    age = "5"
+                )
+            )
         )
     }
 }

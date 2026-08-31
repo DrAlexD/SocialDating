@@ -12,6 +12,12 @@ import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidUser
 import xelagurd.socialdating.client.data.model.details.RegistrationDetails
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
+import xelagurd.socialdating.client.ui.form.FormFieldErrors.ageError
+import xelagurd.socialdating.client.ui.form.FormFieldErrors.emailError
+import xelagurd.socialdating.client.ui.form.FormFieldErrors.passwordError
+import xelagurd.socialdating.client.ui.form.FormFieldErrors.repeatedPasswordError
+import xelagurd.socialdating.client.ui.form.FormFieldErrors.textError
+import xelagurd.socialdating.client.ui.form.FormFieldErrors.usernameError
 
 data class RegistrationFormData(
     val name: String = "",
@@ -29,6 +35,27 @@ data class RegistrationFormData(
                 username.isValidUsername() && password.isValidPassword() &&
                 password == repeatedPassword && (email.isBlank() || email.isValidEmail()) && age.isValidAge() &&
                 city.isValidText(CITY_LENGTH_MIN, CITY_LENGTH_MAX) && purpose != null
+
+    val nameError
+        get() = name.textError(NAME_LENGTH_MIN, NAME_LENGTH_MAX)
+
+    val usernameError
+        get() = username.usernameError()
+
+    val passwordError
+        get() = password.passwordError()
+
+    val repeatedPasswordError
+        get() = repeatedPassword.repeatedPasswordError(password)
+
+    val emailError
+        get() = email.emailError()
+
+    val ageError
+        get() = age.ageError()
+
+    val cityError
+        get() = city.textError(CITY_LENGTH_MIN, CITY_LENGTH_MAX)
 
     fun toLoginFormData() =
         LoginFormData(

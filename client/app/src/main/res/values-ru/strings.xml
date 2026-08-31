@@ -49,4 +49,9 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="failed_add_statement">Не удалось добавить высказывание</string>
+    <string name="error_length">От %1$d до %2$d символов</string>
+    <string name="error_username_format">Только латинские буквы, цифры и _</string>
+    <string name="error_email_format">Некорректный формат email</string>
+    <string name="error_repeated_password">Пароли не совпадают</string>
+    <string name="error_age">От %1$d до %2$d лет</string>
 </resources>

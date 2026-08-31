@@ -2,9 +2,14 @@ package xelagurd.socialdating.client.test
 
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
+import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MIN
+import xelagurd.socialdating.client.ui.form.FormFieldError
 
 class StatementFormDataTest {
 
@@ -13,6 +18,11 @@ class StatementFormDataTest {
     private val notChosenDefiningThemeId = FakeData.definingThemes
         .first { !statementFormData.definingThemes.containsKey(it.id) }
         .id
+
+    private val textLengthError = FormFieldError(
+        R.string.error_length,
+        listOf(STATEMENT_TEXT_LENGTH_MIN, STATEMENT_TEXT_LENGTH_MAX)
+    )
 
     @Test
     fun statementFormData_allData_isValid() {
@@ -96,5 +106,29 @@ class StatementFormDataTest {
             statementFormData.definingThemes,
             statementDetails.definingThemes.associate { it.definingThemeId to it.isSupportDefiningTheme }
         )
+    }
+
+    @Test
+    fun statementFormData_allData_hasNoTextError() {
+        assertNull(statementFormData.textError)
+    }
+
+    @Test
+    fun statementFormData_emptyText_hasNoTextError() {
+        assertNull(statementFormData.copy(text = "").textError)
+    }
+
+    @Test
+    fun statementFormData_shortText_hasLengthError() {
+        val formData = statementFormData.copy(text = "a".repeat(STATEMENT_TEXT_LENGTH_MIN - 1))
+
+        assertEquals(textLengthError, formData.textError)
+    }
+
+    @Test
+    fun statementFormData_longText_hasLengthError() {
+        val formData = statementFormData.copy(text = "a".repeat(STATEMENT_TEXT_LENGTH_MAX + 1))
+
+        assertEquals(textLengthError, formData.textError)
     }
 }
