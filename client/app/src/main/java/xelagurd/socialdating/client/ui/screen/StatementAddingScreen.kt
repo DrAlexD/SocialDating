@@ -3,6 +3,8 @@ package xelagurd.socialdating.client.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -93,12 +95,15 @@ private inline fun StatementDetailsBody(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
         AppTextField(
             value = statementFormData.text,
             onValueChange = { onValueChange(statementFormData.copy(text = it)) },
-            label = stringResource(R.string.statement_text)
+            label = stringResource(R.string.statement_text),
+            error = statementFormData.textError
         )
         AppMediumTitleText(text = stringResourceWithColon(R.string.defining_themes))
         AppMediumTitleText(text = stringResource(R.string.is_support_defining_theme))
@@ -196,6 +201,19 @@ private fun StatementAddingComponentWithoutChosenOpinionPreview() {
                 formData = FakeData.statementFormData.copy(
                     definingThemes = mapOf(FakeData.mainDefiningTheme.id to null)
                 )
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
+@Composable
+private fun StatementAddingComponentInvalidFormPreview() {
+    AppTheme {
+        StatementAddingScreenComponent(
+            statementAddingUiState = StatementAddingUiState(
+                entities = FakeData.definingThemes,
+                formData = FakeData.statementFormData.copy(text = "T")
             )
         )
     }

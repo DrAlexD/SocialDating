@@ -96,13 +96,15 @@ private inline fun LoginDetailsBody(
         AppTextField(
             value = loginFormData.username,
             onValueChange = { onValueChange(loginFormData.copy(username = it)) },
-            label = stringResource(R.string.username)
+            label = stringResource(R.string.username),
+            error = loginFormData.usernameError
         )
         AppTextField(
             value = loginFormData.password,
             onValueChange = { onValueChange(loginFormData.copy(password = it)) },
             label = stringResource(R.string.password),
-            isPassword = true
+            isPassword = true,
+            error = loginFormData.passwordError
         )
         AppLargeTextCard(
             isEnabled = loginFormData.isValid && actionRequestStatus.isAllowedActionRefresh(),
@@ -149,6 +151,18 @@ private fun LoginComponentFullFormRuPreview() {
     AppTheme {
         LoginScreenComponent(
             loginUiState = LoginUiState(formData = FakeData.loginFormData)
+        )
+    }
+}
+
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true)
+@Composable
+private fun LoginComponentInvalidFormPreview() {
+    AppTheme {
+        LoginScreenComponent(
+            loginUiState = LoginUiState(
+                formData = FakeData.loginFormData.copy(username = "user name", password = "pass")
+            )
         )
     }
 }

@@ -40,10 +40,14 @@ object DefaultDataProperties {
 
     fun String.isValidPassword() = length in PASSWORD_LENGTH_MIN..PASSWORD_LENGTH_MAX
 
-    fun String.isValidUsername() =
-        isValidText(USERNAME_LENGTH_MIN, USERNAME_LENGTH_MAX) && usernameRegex.matches(this)
+    fun String.isValidUsernameFormat() = usernameRegex.matches(this)
 
-    fun String.isValidEmail() = isValidText(EMAIL_LENGTH_MIN, EMAIL_LENGTH_MAX) && emailRegex.matches(this)
+    fun String.isValidUsername() =
+        isValidText(USERNAME_LENGTH_MIN, USERNAME_LENGTH_MAX) && isValidUsernameFormat()
+
+    fun String.isValidEmailFormat() = emailRegex.matches(this)
+
+    fun String.isValidEmail() = isValidText(EMAIL_LENGTH_MIN, EMAIL_LENGTH_MAX) && isValidEmailFormat()
 
     fun String.isValidAge() = toIntOrNull()?.isValidAge() == true
 

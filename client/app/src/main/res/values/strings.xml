@@ -51,4 +51,9 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="failed_add_statement">Failed to add statement</string>
+    <string name="error_length">From %1$d to %2$d characters</string>
+    <string name="error_username_format">Only latin letters, digits and _</string>
+    <string name="error_email_format">Incorrect email format</string>
+    <string name="error_repeated_password">Passwords don\'t match</string>
+    <string name="error_age">From %1$d to %2$d years</string>
 </resources>
