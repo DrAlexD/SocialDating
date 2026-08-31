@@ -38,7 +38,6 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 androidx-ui = { module = "androidx.compose.ui:ui" }
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
-androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
@@ -58,7 +57,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 [bundles]
-androidx-compose = ["androidx-material3", "androidx-ui-graphics", "androidx-ui", "androidx-ui-text-google-fonts", "androidx-ui-tooling-preview"]
+androidx-compose = ["androidx-material3", "androidx-ui-graphics", "androidx-ui", "androidx-ui-tooling-preview"]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
