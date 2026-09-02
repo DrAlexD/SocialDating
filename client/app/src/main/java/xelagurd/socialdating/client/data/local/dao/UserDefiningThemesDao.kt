@@ -20,10 +20,12 @@ interface UserDefiningThemesDao {
                dt.name as definingThemeName,
                dt.fromOpinion as definingThemeFromOpinion,
                dt.toOpinion as definingThemeToOpinion,
-               dt.numberInCategory as definingThemeNumberInCategory
+               dt.numberInCategory as definingThemeNumberInCategory,
+               dt.orderNumber as definingThemeOrderNumber
         from user_defining_themes udt
         join defining_themes dt on udt.definingThemeId = dt.id
         where userId = :userId
+        order by dt.orderNumber, dt.numberInCategory
         """
     )
     fun getUserDefiningThemes(userId: Int): Flow<List<UserDefiningThemeWithData>>

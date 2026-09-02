@@ -9,11 +9,15 @@ object DataUtils {
 
     fun List<UserCategory>.toUserCategoriesWithData(categories: List<Category>): List<UserCategoryWithData> {
         val categoriesById = categories.associateBy { it.id }
-        return this.mapNotNull { it.toUserCategoryWithData(categoriesById[it.categoryId]) }
+        return this
+            .mapNotNull { it.toUserCategoryWithData(categoriesById[it.categoryId]) }
+            .sortedWith(compareBy({ it.categoryOrderNumber }, { it.categoryId }))
     }
 
     fun List<UserDefiningTheme>.toUserDefiningThemesWithData(definingThemes: List<DefiningTheme>): List<UserDefiningThemeWithData> {
         val definingThemesById = definingThemes.associateBy { it.id }
-        return this.mapNotNull { it.toUserDefiningThemeWithData(definingThemesById[it.definingThemeId]) }
+        return this
+            .mapNotNull { it.toUserDefiningThemeWithData(definingThemesById[it.definingThemeId]) }
+            .sortedWith(compareBy({ it.definingThemeOrderNumber }, { it.definingThemeNumberInCategory }))
     }
 }

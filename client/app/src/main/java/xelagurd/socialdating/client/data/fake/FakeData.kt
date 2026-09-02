@@ -62,21 +62,21 @@ object FakeData {
     )
 
     val categories = listOf(
-        Category(id = 1, name = "Category1"),
-        Category(id = 2, name = "Category2"),
-        Category(id = 3, name = "Category3"),
-        Category(id = 4, name = "Category4"),
-        Category(id = 5, name = "Category5"),
-        Category(id = 6, name = "Category6"),
-        Category(id = 7, name = "Category7"),
-        Category(id = 8, name = "Category8"),
-        Category(id = 9, name = "Category9"),
-        Category(id = 10, name = "Category10"),
-        Category(id = 11, name = "Category11"),
-        Category(id = 12, name = "Category12"),
-        Category(id = 13, name = "Category13"),
-        Category(id = 14, name = "Category14"),
-        Category(id = 15, name = "Category15")
+        Category(id = 1, name = "Category1", orderNumber = 1),
+        Category(id = 2, name = "Category2", orderNumber = 2),
+        Category(id = 3, name = "Category3", orderNumber = 3),
+        Category(id = 4, name = "Category4", orderNumber = 4),
+        Category(id = 5, name = "Category5", orderNumber = 5),
+        Category(id = 6, name = "Category6", orderNumber = 6),
+        Category(id = 7, name = "Category7", orderNumber = 7),
+        Category(id = 8, name = "Category8", orderNumber = 8),
+        Category(id = 9, name = "Category9", orderNumber = 9),
+        Category(id = 10, name = "Category10", orderNumber = 10),
+        Category(id = 11, name = "Category11", orderNumber = 11),
+        Category(id = 12, name = "Category12", orderNumber = 12),
+        Category(id = 13, name = "Category13", orderNumber = 13),
+        Category(id = 14, name = "Category14", orderNumber = 14),
+        Category(id = 15, name = "Category15", orderNumber = 15)
     )
 
     val userCategories = listOf(
@@ -110,7 +110,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 1,
-            numberInCategory = 1
+            numberInCategory = 1,
+            orderNumber = 1
         ),
         DefiningTheme(
             id = 2,
@@ -118,7 +119,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 1,
-            numberInCategory = 2
+            numberInCategory = 2,
+            orderNumber = 2
         ),
         DefiningTheme(
             id = 3,
@@ -126,7 +128,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 2,
-            numberInCategory = 1
+            numberInCategory = 1,
+            orderNumber = 1
         ),
         DefiningTheme(
             id = 4,
@@ -134,7 +137,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 2,
-            numberInCategory = 2
+            numberInCategory = 2,
+            orderNumber = 2
         ),
         DefiningTheme(
             id = 5,
@@ -142,7 +146,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 1,
-            numberInCategory = 3
+            numberInCategory = 3,
+            orderNumber = 3
         ),
         DefiningTheme(
             id = 6,
@@ -150,7 +155,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 1,
-            numberInCategory = 4
+            numberInCategory = 4,
+            orderNumber = 4
         ),
         DefiningTheme(
             id = 7,
@@ -158,7 +164,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 1,
-            numberInCategory = 5
+            numberInCategory = 5,
+            orderNumber = 5
         ),
         DefiningTheme(
             id = 8,
@@ -166,7 +173,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 2,
-            numberInCategory = 3
+            numberInCategory = 3,
+            orderNumber = 3
         ),
         DefiningTheme(
             id = 9,
@@ -174,7 +182,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 2,
-            numberInCategory = 4
+            numberInCategory = 4,
+            orderNumber = 4
         ),
         DefiningTheme(
             id = 10,
@@ -182,7 +191,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 2,
-            numberInCategory = 5
+            numberInCategory = 5,
+            orderNumber = 5
         ),
         DefiningTheme(
             id = 11,
@@ -190,7 +200,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 3,
-            numberInCategory = 1
+            numberInCategory = 1,
+            orderNumber = 1
         ),
         DefiningTheme(
             id = 12,
@@ -198,7 +209,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 3,
-            numberInCategory = 2
+            numberInCategory = 2,
+            orderNumber = 2
         ),
         DefiningTheme(
             id = 13,
@@ -206,7 +218,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 3,
-            numberInCategory = 3
+            numberInCategory = 3,
+            orderNumber = 3
         ),
         DefiningTheme(
             id = 14,
@@ -214,7 +227,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 3,
-            numberInCategory = 4
+            numberInCategory = 4,
+            orderNumber = 4
         ),
         DefiningTheme(
             id = 15,
@@ -222,7 +236,8 @@ object FakeData {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 3,
-            numberInCategory = 5
+            numberInCategory = 5,
+            orderNumber = 5
         )
     )
 

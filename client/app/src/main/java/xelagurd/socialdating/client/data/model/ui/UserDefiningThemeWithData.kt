@@ -11,5 +11,6 @@ data class UserDefiningThemeWithData(
     val definingThemeName: String,
     val definingThemeFromOpinion: String,
     val definingThemeToOpinion: String,
-    val definingThemeNumberInCategory: Int
+    val definingThemeNumberInCategory: Int,
+    val definingThemeOrderNumber: Int
 ) : DataEntity
