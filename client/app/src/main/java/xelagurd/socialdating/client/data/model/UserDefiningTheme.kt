@@ -57,7 +57,8 @@ data class UserDefiningTheme(
                 definingThemeName = it.name,
                 definingThemeFromOpinion = it.fromOpinion,
                 definingThemeToOpinion = it.toOpinion,
-                definingThemeNumberInCategory = it.numberInCategory
+                definingThemeNumberInCategory = it.numberInCategory,
+                definingThemeOrderNumber = it.orderNumber
             )
         }
 }

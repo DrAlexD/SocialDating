@@ -28,9 +28,9 @@ class CategoriesRepositoryTest(
     fun seedData() {
         val saved = categoriesRepository.saveAllAndFlush(
             listOf(
-                Category(name = "Category1"),
-                Category(name = "Category2"),
-                Category(name = "Category3")
+                Category(name = "Category1", orderNumber = 1),
+                Category(name = "Category2", orderNumber = 2),
+                Category(name = "Category3", orderNumber = 3)
             )
         )
         category1 = saved[0]

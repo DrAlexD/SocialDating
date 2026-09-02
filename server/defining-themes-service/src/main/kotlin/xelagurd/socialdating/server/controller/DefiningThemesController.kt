@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
+import xelagurd.socialdating.server.model.details.DefiningThemeOrderDetails
 import xelagurd.socialdating.server.security.AdminAccess
 import xelagurd.socialdating.server.security.BearerAuth
 import xelagurd.socialdating.server.service.DefiningThemesService
@@ -35,4 +36,10 @@ class DefiningThemesController(
     @ResponseStatus(HttpStatus.CREATED)
     fun addDefiningTheme(@RequestBody @Valid definingThemeDetails: DefiningThemeDetails) =
         definingThemesService.addDefiningTheme(definingThemeDetails)
+
+    @BearerAuth
+    @AdminAccess
+    @PostMapping("/order")
+    fun moveDefiningTheme(@RequestBody @Valid definingThemeOrderDetails: DefiningThemeOrderDetails) =
+        definingThemesService.moveDefiningTheme(definingThemeOrderDetails)
 }

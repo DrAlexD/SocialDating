@@ -16,10 +16,12 @@ interface UserCategoriesDao {
                uc.interest,
                uc.userId,
                uc.categoryId,
-               c.name as categoryName
+               c.name as categoryName,
+               c.orderNumber as categoryOrderNumber
         from user_categories uc
         join categories c on uc.categoryId = c.id
         where userId = :userId
+        order by c.orderNumber, c.id
         """
     )
     fun getUserCategories(userId: Int): Flow<List<UserCategoryWithData>>

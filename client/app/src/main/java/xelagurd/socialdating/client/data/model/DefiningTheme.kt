@@ -35,7 +35,8 @@ data class DefiningTheme(
     val fromOpinion: String,
     val toOpinion: String,
     val categoryId: Int,
-    val numberInCategory: Int
+    val numberInCategory: Int,
+    val orderNumber: Int
 ) : DataEntity {
     init {
         require(name.isValidText(DEFINING_THEME_NAME_LENGTH_MIN, DEFINING_THEME_NAME_LENGTH_MAX)) {
@@ -49,5 +50,6 @@ data class DefiningTheme(
         }
         require(categoryId.isValidId()) { "CategoryId must be at least $ID_MIN" }
         require(numberInCategory.isValidId()) { "NumberInCategory must be at least $ID_MIN" }
+        require(orderNumber.isValidId()) { "OrderNumber must be at least $ID_MIN" }
     }
 }

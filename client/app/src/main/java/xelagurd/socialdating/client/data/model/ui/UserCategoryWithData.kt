@@ -7,5 +7,6 @@ data class UserCategoryWithData(
     val interest: Int,
     val userId: Int,
     val categoryId: Int,
-    val categoryName: String
+    val categoryName: String,
+    val categoryOrderNumber: Int
 ) : DataEntity

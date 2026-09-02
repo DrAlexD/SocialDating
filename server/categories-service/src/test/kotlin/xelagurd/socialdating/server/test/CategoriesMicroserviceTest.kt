@@ -30,6 +30,7 @@ import xelagurd.socialdating.server.client.UsersServiceClient
 import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.additional.UserData
+import xelagurd.socialdating.server.model.details.CategoryOrderDetails
 import xelagurd.socialdating.server.model.enums.Gender.MALE
 import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
@@ -192,6 +193,67 @@ class CategoriesMicroserviceTest(
         assertEquals(1, responseCategory3["similarNumber"])
         assertEquals(0, responseCategory3["oppositeNumber"])
         assertEquals(mapOf("1" to "SIMILAR"), responseCategory3.readDefiningThemesSimilarity())
+    }
+
+    @Test
+    fun moveCategory_backwards_shiftsJumpedOverCategoriesForward() {
+        val movedCategoryId = categories[3].id!!
+
+        moveCategory(movedCategoryId, 2)
+        // 1, 2, 3, 4, 5 -> 1, 3, 4, 2, 5
+        assertEquals(listOf(1, 3, 4, 2, 5), getOrderNumbersByCategoryId())
+
+        moveCategory(movedCategoryId, 4)
+        assertEquals(listOf(1, 2, 3, 4, 5), getOrderNumbersByCategoryId())
+    }
+
+    @Test
+    fun moveCategory_forwards_shiftsJumpedOverCategoriesBackward() {
+        val movedCategoryId = categories[0].id!!
+
+        moveCategory(movedCategoryId, 3)
+        // 1, 2, 3, 4, 5 -> 3, 1, 2, 4, 5
+        assertEquals(listOf(3, 1, 2, 4, 5), getOrderNumbersByCategoryId())
+
+        moveCategory(movedCategoryId, 1)
+        assertEquals(listOf(1, 2, 3, 4, 5), getOrderNumbersByCategoryId())
+    }
+
+    @Test
+    fun moveCategory_sameOrderNumber_keepsOrder() {
+        moveCategory(categories[2].id!!, 3)
+
+        assertEquals(listOf(1, 2, 3, 4, 5), getOrderNumbersByCategoryId())
+    }
+
+    @Test
+    fun moveCategory_orderNumberAboveMax_badRequest() {
+        val response = restTemplate.postForEntity(
+            "/categories/order",
+            CategoryOrderDetails(categoryId = categories[0].id!!, orderNumber = categories.size + 1),
+            String::class.java
+        )
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+        assertEquals(listOf(1, 2, 3, 4, 5), getOrderNumbersByCategoryId())
+    }
+
+    private fun moveCategory(categoryId: Int, orderNumber: Int) {
+        val response = restTemplate.postForEntity(
+            "/categories/order",
+            CategoryOrderDetails(categoryId = categoryId, orderNumber = orderNumber),
+            Category::class.java
+        )
+
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertEquals(orderNumber, response.body!!.orderNumber)
+    }
+
+    private fun getOrderNumbersByCategoryId(): List<Int> {
+        val response = restTemplate.getForEntity("/categories", Array<Category>::class.java)
+        assertEquals(HttpStatus.OK, response.statusCode)
+
+        return response.body!!.sortedBy { it.id }.map { it.orderNumber }
     }
 
     private fun Map<String, Any>.readCategoriesWithDifference(key: String) =
