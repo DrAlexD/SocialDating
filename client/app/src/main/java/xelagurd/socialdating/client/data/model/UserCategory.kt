@@ -51,7 +51,8 @@ data class UserCategory(
                 interest = interest,
                 userId = userId,
                 categoryId = categoryId,
-                categoryName = it.name
+                categoryName = it.name,
+                categoryOrderNumber = it.orderNumber
             )
         }
 }

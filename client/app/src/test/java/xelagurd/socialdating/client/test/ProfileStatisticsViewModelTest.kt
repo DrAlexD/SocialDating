@@ -79,8 +79,8 @@ class ProfileStatisticsViewModelTest {
     private val userId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
     private var anotherUserId = userId
 
-    private val savedCategories = listOf(Category(id = 1, name = "Category1"))
-    private val missingCategories = listOf(Category(id = 2, name = "Category2"))
+    private val savedCategories = listOf(Category(id = 1, name = "Category1", orderNumber = 1))
+    private val missingCategories = listOf(Category(id = 2, name = "Category2", orderNumber = 2))
     private val savedDefiningThemes = listOf(
         DefiningTheme(
             id = 1,
@@ -88,7 +88,8 @@ class ProfileStatisticsViewModelTest {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 1,
-            numberInCategory = 1
+            numberInCategory = 1,
+            orderNumber = 1
         )
     )
     private val missingDefiningThemes = listOf(
@@ -98,7 +99,8 @@ class ProfileStatisticsViewModelTest {
             fromOpinion = "No",
             toOpinion = "Yes",
             categoryId = 2,
-            numberInCategory = 1
+            numberInCategory = 1,
+            orderNumber = 1
         )
     )
     private val remoteUserCategories = listOf(

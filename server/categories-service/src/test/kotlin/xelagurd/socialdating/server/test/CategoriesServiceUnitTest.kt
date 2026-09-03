@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.model.Category
+import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.repository.CategoriesRepository
 import xelagurd.socialdating.server.service.CategoriesService
 import xelagurd.socialdating.server.utils.TestUtils.nextIntList
@@ -56,13 +57,31 @@ class CategoriesServiceUnitTest {
     }
 
     @Test
-    fun addCategory_validData_savesMappedCategory() {
+    fun addCategory_validData_savesMappedCategoryWithNextOrderNumber() {
+        val maxOrderNumber = 5
+        every { categoriesRepository.findMaxOrderNumber() } returns maxOrderNumber
         every { categoriesRepository.save(capture(categorySlot)) } answers { categorySlot.captured }
 
         categoriesService.addCategory(categoryDetails)
 
         assertEquals(categoryDetails.name, categorySlot.captured.name)
+        assertEquals(maxOrderNumber + 1, categorySlot.captured.orderNumber)
 
+        verify(exactly = 1) { categoriesRepository.findMaxOrderNumber() }
+        verify(exactly = 1) { categoriesRepository.save(any()) }
+        confirmVerified(categoriesRepository)
+    }
+
+    @Test
+    fun addCategory_emptyTable_savesMappedCategoryWithFirstOrderNumber() {
+        every { categoriesRepository.findMaxOrderNumber() } returns null
+        every { categoriesRepository.save(capture(categorySlot)) } answers { categorySlot.captured }
+
+        categoriesService.addCategory(categoryDetails)
+
+        assertEquals(ID_MIN, categorySlot.captured.orderNumber)
+
+        verify(exactly = 1) { categoriesRepository.findMaxOrderNumber() }
         verify(exactly = 1) { categoriesRepository.save(any()) }
         confirmVerified(categoriesRepository)
     }
