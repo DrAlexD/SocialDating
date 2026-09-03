@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -17,7 +16,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -133,16 +131,10 @@ private inline fun RegistrationDetailsBody(
                 overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
             )
             Gender.entries.forEach {
-                RadioButton(
-                    selected = registrationFormData.gender == it,
-                    onClick = { onValueChange(registrationFormData.copy(gender = it)) },
-                    modifier = Modifier.testTag(stringResource(it.descriptionRes))
-                )
-                AppMediumTitleText(
-                    text = stringResource(it.descriptionRes),
-                    overrideModifier = Modifier.padding(
-                        end = dimensionResource(R.dimen.padding_4dp)
-                    )
+                AppRadioOption(
+                    descriptionRes = it.descriptionRes,
+                    isSelected = registrationFormData.gender == it,
+                    onSelect = { onValueChange(registrationFormData.copy(gender = it)) }
                 )
             }
         }
@@ -191,22 +183,11 @@ private inline fun RegistrationDetailsBody(
                 verticalArrangement = Arrangement.Center
             ) {
                 Purpose.entries.forEach {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        RadioButton(
-                            selected = registrationFormData.purpose == it,
-                            onClick = { onValueChange(registrationFormData.copy(purpose = it)) },
-                            modifier = Modifier.testTag(stringResource(it.descriptionRes))
-                        )
-                        AppMediumTitleText(
-                            text = stringResource(it.descriptionRes),
-                            overrideModifier = Modifier.padding(
-                                end = dimensionResource(R.dimen.padding_4dp)
-                            )
-                        )
-                    }
+                    AppRadioOption(
+                        descriptionRes = it.descriptionRes,
+                        isSelected = registrationFormData.purpose == it,
+                        onSelect = { onValueChange(registrationFormData.copy(purpose = it)) }
+                    )
                 }
             }
         }

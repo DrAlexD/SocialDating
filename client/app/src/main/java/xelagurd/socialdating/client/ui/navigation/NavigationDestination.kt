@@ -19,6 +19,8 @@ data class TopLevelDestination(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
     @param:StringRes
+    val labelRes: Int,
+    @param:StringRes
     val contentDescription: Int
 )
 

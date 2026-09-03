@@ -8,6 +8,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import xelagurd.socialdating.client.data.model.enums.ThemeMode
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -86,12 +87,20 @@ private val darkScheme = darkColorScheme(
 )
 
 @Composable
+fun ThemeMode.isDarkTheme() = when (this) {
+    ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    ThemeMode.LIGHT -> false
+    ThemeMode.DARK -> true
+}
+
+@Composable
 fun AppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
+    val darkTheme = themeMode.isDarkTheme()
     val colorScheme = when {
         dynamicColor && darkTheme -> dynamicDarkColorScheme(context)
         dynamicColor -> dynamicLightColorScheme(context)

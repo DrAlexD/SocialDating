@@ -118,7 +118,9 @@ MVVM + Repository pattern, Jetpack Compose UI, Dagger Hilt DI (`AppModule`).
 - Two Retrofit instances — one without auth (login/register), one with
 - `AuthInterceptor` — injects JWT into Retrofit requests, refreshes access token
 - `AccountManager` — wraps `CredentialManager`, manages credentials
-- `PreferencesRepository` — wraps `DataStore`, stores access + refresh JWT tokens
+- `PreferencesRepository` — wraps `DataStore`, stores access + refresh JWT tokens and chosen theme mode
+- `AppLocaleManager` — wraps platform `LocaleManager`, applies chosen app language (locale config is generated
+  by AGP from `values-*` folders)
 
 **Testing:**
 

@@ -14,6 +14,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
+import xelagurd.socialdating.client.data.model.enums.AppLanguage
+import xelagurd.socialdating.client.data.model.enums.ThemeMode
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
 import xelagurd.socialdating.client.ui.AppTopBar
 import xelagurd.socialdating.client.ui.navigation.SettingsDestination
@@ -32,6 +34,8 @@ fun SettingsScreen(
     SettingsScreenComponent(
         settingsUiState = settingsUiState,
         onSuccessLogout = onSuccessLogout,
+        onThemeModeSelect = settingsViewModel::updateThemeMode,
+        onLanguageSelect = settingsViewModel::updateLanguage,
         onLogoutClick = settingsViewModel::logout
     )
 }
@@ -41,6 +45,8 @@ fun SettingsScreen(
 fun SettingsScreenComponent(
     settingsUiState: SettingsUiState = SettingsUiState(),
     onSuccessLogout: () -> Unit = {},
+    onThemeModeSelect: (ThemeMode) -> Unit = {},
+    onLanguageSelect: (AppLanguage) -> Unit = {},
     onLogoutClick: () -> Unit = {}
 ) {
     Scaffold(
@@ -61,6 +67,9 @@ fun SettingsScreenComponent(
             contentPadding = innerPadding
         ) {
             SettingsDetailsBody(
+                settingsUiState = settingsUiState,
+                onThemeModeSelect = onThemeModeSelect,
+                onLanguageSelect = onLanguageSelect,
                 onLogoutClick = onLogoutClick
             )
         }
@@ -69,6 +78,9 @@ fun SettingsScreenComponent(
 
 @Composable
 private fun SettingsDetailsBody(
+    settingsUiState: SettingsUiState,
+    onThemeModeSelect: (ThemeMode) -> Unit,
+    onLanguageSelect: (AppLanguage) -> Unit,
     onLogoutClick: () -> Unit
 ) {
     Column(
@@ -76,6 +88,20 @@ private fun SettingsDetailsBody(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier.fillMaxSize()
     ) {
+        SettingChoosingComponent(
+            titleRes = R.string.theme,
+            options = ThemeMode.entries,
+            selectedOption = settingsUiState.themeMode,
+            onSelect = onThemeModeSelect,
+            optionDescriptionRes = { it.descriptionRes }
+        )
+        SettingChoosingComponent(
+            titleRes = R.string.language,
+            options = AppLanguage.entries,
+            selectedOption = settingsUiState.language,
+            onSelect = onLanguageSelect,
+            optionDescriptionRes = { it.descriptionRes }
+        )
         AppLargeTextCard(
             text = stringResource(R.string.logout),
             onClick = onLogoutClick
@@ -88,5 +114,18 @@ private fun SettingsDetailsBody(
 private fun SettingsComponentPreview() {
     AppTheme {
         SettingsScreenComponent()
+    }
+}
+
+@Preview(showBackground = true, device = "id:medium_phone", showSystemUi = true, locale = "ru")
+@Composable
+private fun SettingsComponentRuPreview() {
+    AppTheme(themeMode = ThemeMode.DARK) {
+        SettingsScreenComponent(
+            settingsUiState = SettingsUiState(
+                themeMode = ThemeMode.DARK,
+                language = AppLanguage.RUSSIAN
+            )
+        )
     }
 }

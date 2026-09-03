@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import xelagurd.socialdating.client.data.model.enums.ThemeMode
 
 @Singleton
 class PreferencesRepository @Inject constructor(
@@ -18,6 +19,7 @@ class PreferencesRepository @Inject constructor(
     val accessToken = dataStore.data.map { it[ACCESS_TOKEN] ?: ACCESS_TOKEN_DEFAULT }
     val refreshToken = dataStore.data.map { it[REFRESH_TOKEN] ?: REFRESH_TOKEN_DEFAULT }
     val isOfflineMode = dataStore.data.map { it[IS_OFFLINE_MODE] ?: IS_OFFLINE_MODE_DEFAULT }
+    val themeMode = dataStore.data.map { ThemeMode.fromName(it[THEME_MODE]) }
 
     suspend fun saveCurrentUserId(currentUserId: Int) {
         dataStore.edit { it[CURRENT_USER_ID] = currentUserId }
@@ -35,6 +37,10 @@ class PreferencesRepository @Inject constructor(
         dataStore.edit { it[IS_OFFLINE_MODE] = isOfflineMode }
     }
 
+    suspend fun saveThemeMode(themeMode: ThemeMode) {
+        dataStore.edit { it[THEME_MODE] = themeMode.name }
+    }
+
     suspend fun clearPreferences() {
         dataStore.edit {
             it[CURRENT_USER_ID] = CURRENT_USER_ID_DEFAULT
@@ -49,6 +55,7 @@ class PreferencesRepository @Inject constructor(
         private val ACCESS_TOKEN = stringPreferencesKey("access_token")
         private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
         private val IS_OFFLINE_MODE = booleanPreferencesKey("is_offline_mode")
+        private val THEME_MODE = stringPreferencesKey("theme_mode")
         const val CURRENT_USER_ID_DEFAULT = -1
         const val ACCESS_TOKEN_DEFAULT = ""
         const val REFRESH_TOKEN_DEFAULT = ""
