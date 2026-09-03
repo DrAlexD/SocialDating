@@ -7,13 +7,16 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextIdWithColon
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
@@ -21,6 +24,7 @@ import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.User
+import xelagurd.socialdating.client.data.model.enums.ThemeMode
 import xelagurd.socialdating.client.ui.screen.AppLargeTitleText
 import xelagurd.socialdating.client.ui.screen.AppMediumTextCard
 import xelagurd.socialdating.client.ui.screen.ComponentWithActionRequestStatus
@@ -28,6 +32,7 @@ import xelagurd.socialdating.client.ui.screen.DataChoosingListComponent
 import xelagurd.socialdating.client.ui.screen.DataMultiChoosingListComponent
 import xelagurd.socialdating.client.ui.screen.DataEntityComponent
 import xelagurd.socialdating.client.ui.screen.DataListComponent
+import xelagurd.socialdating.client.ui.screen.SettingChoosingComponent
 import xelagurd.socialdating.client.ui.state.CategoriesUiState
 import xelagurd.socialdating.client.ui.state.ProfileUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -276,6 +281,41 @@ class AppComponentsTest {
                     isHasBorder = isHasBorder
                 )
             }
+        }
+    }
+
+    @Test
+    fun settingChoosingComponent_themeModes_displayedTitleWithAllOptions() {
+        setContentToSettingChoosingComponent { }
+
+        composeTestRule.onNodeWithTextIdWithColon(R.string.theme).assertIsDisplayed()
+        ThemeMode.entries.forEach {
+            composeTestRule.onNodeWithTextId(it.descriptionRes).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun settingChoosingComponent_click_calledSelectAction() {
+        var selectedThemeMode: ThemeMode? = null
+
+        setContentToSettingChoosingComponent { selectedThemeMode = it }
+
+        composeTestRule
+            .onNodeWithTagId(R.string.theme_dark, composeTestRule.activity.getString(R.string.theme))
+            .checkButtonAndClick()
+
+        assertEquals(ThemeMode.DARK, selectedThemeMode)
+    }
+
+    private fun setContentToSettingChoosingComponent(onSelect: (ThemeMode) -> Unit) {
+        composeTestRule.setContentToScreen {
+            SettingChoosingComponent(
+                titleRes = R.string.theme,
+                options = ThemeMode.entries,
+                selectedOption = ThemeMode.SYSTEM,
+                onSelect = onSelect,
+                optionDescriptionRes = { it.descriptionRes }
+            )
         }
     }
 

@@ -5,12 +5,15 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -331,33 +335,66 @@ fun AppYesNoRadioGroup(
     onSelect: (Boolean) -> Unit,
     testTagSuffix: String = ""
 ) {
+    AppRadioGroup(
+        options = listOf(true, false),
+        selectedOption = isSelectedYes,
+        onSelect = onSelect,
+        optionDescriptionRes = { if (it) R.string.yes else R.string.no },
+        testTagSuffix = testTagSuffix
+    )
+}
+
+@Composable
+fun <T> AppRadioGroup(
+    options: List<T>,
+    selectedOption: T?,
+    onSelect: (T) -> Unit,
+    optionDescriptionRes: (T) -> Int,
+    testTagSuffix: String = ""
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        options.forEach { option ->
+            AppRadioOption(
+                descriptionRes = optionDescriptionRes(option),
+                isSelected = selectedOption == option,
+                onSelect = { onSelect(option) },
+                testTagSuffix = testTagSuffix
+            )
+        }
+    }
+}
+
+@Composable
+fun AppRadioOption(
+    @StringRes descriptionRes: Int,
+    isSelected: Boolean,
+    onSelect: () -> Unit,
+    testTagSuffix: String = ""
+) {
+    val description = stringResource(descriptionRes)
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        modifier = Modifier
+            .selectable(
+                selected = isSelected,
+                onClick = onSelect,
+                role = Role.RadioButton
+            )
+            .padding(vertical = dimensionResource(R.dimen.padding_8dp))
+            .testTag(description + testTagSuffix)
     ) {
         RadioButton(
-            selected = isSelectedYes == true,
-            onClick = { onSelect(true) },
-            modifier = Modifier.testTag(stringResource(R.string.yes) + testTagSuffix)
+            selected = isSelected,
+            onClick = null
         )
         AppMediumTitleText(
-            text = stringResource(R.string.yes),
+            text = description,
             overrideModifier = Modifier.padding(
-                top = dimensionResource(R.dimen.padding_8dp),
-                bottom = dimensionResource(R.dimen.padding_8dp),
-                end = dimensionResource(R.dimen.padding_8dp)
-            )
-        )
-        RadioButton(
-            selected = isSelectedYes == false,
-            onClick = { onSelect(false) },
-            modifier = Modifier.testTag(stringResource(R.string.no) + testTagSuffix)
-        )
-        AppMediumTitleText(
-            text = stringResource(R.string.no),
-            overrideModifier = Modifier.padding(
-                top = dimensionResource(R.dimen.padding_8dp),
-                bottom = dimensionResource(R.dimen.padding_8dp),
+                start = dimensionResource(R.dimen.padding_8dp),
                 end = dimensionResource(R.dimen.padding_8dp)
             )
         )

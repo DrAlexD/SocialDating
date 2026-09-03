@@ -207,6 +207,7 @@ fun initializeTopLevelDestinations(navController: NavHostController) {
             navigateTo = { navigateTo(ProfileDestination.topLevelRoute) },
             selectedIcon = Icons.Default.AccountCircle,
             unselectedIcon = Icons.Outlined.AccountCircle,
+            labelRes = R.string.profile,
             contentDescription = R.string.nav_profile
         ),
         TopLevelDestination(
@@ -214,6 +215,7 @@ fun initializeTopLevelDestinations(navController: NavHostController) {
             navigateTo = { navigateTo(CategoriesDestination.topLevelRoute) },
             selectedIcon = Icons.Default.Home,
             unselectedIcon = Icons.Outlined.Home,
+            labelRes = R.string.categories,
             contentDescription = R.string.nav_categories
         ),
         TopLevelDestination(
@@ -221,6 +223,7 @@ fun initializeTopLevelDestinations(navController: NavHostController) {
             navigateTo = { navigateTo(SimilarUsersDestination.topLevelRoute) },
             selectedIcon = Icons.Default.Face,
             unselectedIcon = Icons.Outlined.Face,
+            labelRes = R.string.similar_users,
             contentDescription = R.string.nav_similar_users
         ),
         TopLevelDestination(
@@ -228,6 +231,7 @@ fun initializeTopLevelDestinations(navController: NavHostController) {
             navigateTo = { navigateTo(SettingsDestination.topLevelRoute) },
             selectedIcon = Icons.Default.Settings,
             unselectedIcon = Icons.Outlined.Settings,
+            labelRes = R.string.settings,
             contentDescription = R.string.nav_settings
         )
     )

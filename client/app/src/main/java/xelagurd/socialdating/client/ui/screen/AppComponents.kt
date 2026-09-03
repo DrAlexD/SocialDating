@@ -1,5 +1,6 @@
 package xelagurd.socialdating.client.ui.screen
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -178,5 +180,28 @@ private inline fun ActionRequestStatusComponent(
             is RequestStatus.ERROR -> AppLargeTitleText(actionRequestStatus.errorText)
             RequestStatus.SUCCESS -> onSuccess()
         }
+    }
+}
+
+@Composable
+fun <T> SettingChoosingComponent(
+    @StringRes titleRes: Int,
+    options: List<T>,
+    selectedOption: T?,
+    onSelect: (T) -> Unit,
+    optionDescriptionRes: (T) -> Int
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(dimensionResource(R.dimen.padding_8dp))
+    ) {
+        AppLargeTitleText(text = stringResourceWithColon(titleRes))
+        AppRadioGroup(
+            options = options,
+            selectedOption = selectedOption,
+            onSelect = onSelect,
+            optionDescriptionRes = optionDescriptionRes,
+            testTagSuffix = stringResource(titleRes)
+        )
     }
 }

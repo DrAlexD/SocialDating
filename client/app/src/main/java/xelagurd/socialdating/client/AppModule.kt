@@ -3,6 +3,8 @@ package xelagurd.socialdating.client
 import javax.inject.Named
 import javax.inject.Singleton
 import kotlinx.serialization.json.Json
+import android.app.LocaleManager
+import android.app.UiModeManager
 import android.content.Context
 import androidx.credentials.CredentialManager
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
@@ -31,6 +33,16 @@ object AppModule {
     fun provideDataStore(@ApplicationContext context: Context) = PreferenceDataStoreFactory.create {
         context.preferencesDataStoreFile("social-dating-app")
     }
+
+    @Provides
+    @Singleton
+    fun provideLocaleManager(@ApplicationContext context: Context): LocaleManager =
+        context.getSystemService(LocaleManager::class.java)
+
+    @Provides
+    @Singleton
+    fun provideUiModeManager(@ApplicationContext context: Context): UiModeManager =
+        context.getSystemService(UiModeManager::class.java)
 
     @Provides
     @Singleton

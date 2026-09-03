@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -13,6 +14,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -23,9 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import xelagurd.socialdating.client.R
@@ -37,6 +41,8 @@ import xelagurd.socialdating.client.ui.navigation.topLevelDestinations
 import xelagurd.socialdating.client.ui.screen.AppMediumTitleText
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.theme.AppTheme
+
+private const val LABEL_MAX_LINES = 2
 
 @Composable
 fun SocialDatingApp() {
@@ -109,6 +115,10 @@ fun AppBottomNavigationBar(
     currentTopLevelRoute: String,
     modifier: Modifier = Modifier
 ) {
+    val labelHeight = with(LocalDensity.current) {
+        MaterialTheme.typography.labelMedium.lineHeight.toDp() * LABEL_MAX_LINES
+    }
+
     NavigationBar(
         modifier = modifier
     ) {
@@ -121,7 +131,18 @@ fun AppBottomNavigationBar(
                         contentDescription = stringResource(item.contentDescription)
                     )
                 },
-                label = { Text(item.navigationDestination.route) },
+                label = {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.height(labelHeight)
+                    ) {
+                        Text(
+                            text = stringResource(item.labelRes),
+                            textAlign = TextAlign.Center,
+                            maxLines = LABEL_MAX_LINES
+                        )
+                    }
+                },
                 selected = isSelectedRoute,
                 onClick = item.navigateTo,
                 modifier = Modifier.testTag(stringResource(item.contentDescription))

@@ -2,6 +2,8 @@ package xelagurd.socialdating.client
 
 import java.util.UUID
 import javax.inject.Singleton
+import android.app.LocaleManager
+import android.app.UiModeManager
 import android.content.Context
 import androidx.credentials.CredentialManager
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
@@ -28,6 +30,16 @@ object TestAppModule {
     fun provideDataStore(@ApplicationContext context: Context) = PreferenceDataStoreFactory.create {
         context.preferencesDataStoreFile("social-dating-app-test-${UUID.randomUUID()}")
     }
+
+    @Provides
+    @Singleton
+    fun provideLocaleManager(@ApplicationContext context: Context): LocaleManager =
+        context.getSystemService(LocaleManager::class.java)
+
+    @Provides
+    @Singleton
+    fun provideUiModeManager(@ApplicationContext context: Context): UiModeManager =
+        context.getSystemService(UiModeManager::class.java)
 
     @Provides
     @Singleton

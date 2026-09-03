@@ -28,6 +28,7 @@ import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MIN
+import xelagurd.socialdating.client.data.model.enums.ThemeMode
 import xelagurd.socialdating.client.ui.form.FormFieldError
 import xelagurd.socialdating.client.ui.screen.AppDataChoosingList
 import xelagurd.socialdating.client.ui.screen.AppDataList
@@ -42,6 +43,7 @@ import xelagurd.socialdating.client.ui.screen.AppLoadingIndicator
 import xelagurd.socialdating.client.ui.screen.AppMediumBodyText
 import xelagurd.socialdating.client.ui.screen.AppMediumTextCard
 import xelagurd.socialdating.client.ui.screen.AppMediumTitleText
+import xelagurd.socialdating.client.ui.screen.AppRadioGroup
 import xelagurd.socialdating.client.ui.screen.AppSmallBodyText
 import xelagurd.socialdating.client.ui.screen.AppSmallTitleText
 import xelagurd.socialdating.client.ui.screen.AppTextField
@@ -308,6 +310,28 @@ class ScreenComponentsTest {
     }
 
     @Test
+    fun appRadioGroup_options_displayedAllOptions() {
+        setContentToAppRadioGroup { }
+
+        ThemeMode.entries.forEach {
+            composeTestRule.onNodeWithTextId(it.descriptionRes).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun appRadioGroup_click_calledSelectAction() {
+        var selectedThemeMode: ThemeMode? = null
+
+        setContentToAppRadioGroup { selectedThemeMode = it }
+
+        composeTestRule.onNodeWithTagId(R.string.theme_dark, TEST_TAG_SUFFIX).checkButtonAndClick()
+        assertEquals(ThemeMode.DARK, selectedThemeMode)
+
+        composeTestRule.onNodeWithTagId(R.string.theme_light, TEST_TAG_SUFFIX).checkButtonAndClick()
+        assertEquals(ThemeMode.LIGHT, selectedThemeMode)
+    }
+
+    @Test
     fun appList_entities_displayedAllData() {
         composeTestRule.setContentToScreen {
             AppList(entities = categories) {
@@ -364,6 +388,18 @@ class ScreenComponentsTest {
         composeTestRule.onNodeWithText(SMALL_TITLE_TEXT).assertIsDisplayed()
         composeTestRule.onNodeWithText(MEDIUM_TITLE_TEXT).assertIsDisplayed()
         composeTestRule.onNodeWithText(LARGE_TITLE_TEXT).assertIsDisplayed()
+    }
+
+    private fun setContentToAppRadioGroup(onSelect: (ThemeMode) -> Unit) {
+        composeTestRule.setContentToScreen {
+            AppRadioGroup(
+                options = ThemeMode.entries,
+                selectedOption = ThemeMode.SYSTEM,
+                onSelect = onSelect,
+                optionDescriptionRes = { it.descriptionRes },
+                testTagSuffix = TEST_TAG_SUFFIX
+            )
+        }
     }
 
     private fun assertAllCategoriesAreDisplayed() {
