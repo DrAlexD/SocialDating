@@ -14,21 +14,21 @@ object FakeCategoriesData {
     )
 
     val categories = listOf(
-        Category(id = 1, name = "RemoteCategory1"),
-        Category(id = 2, name = "RemoteCategory2"),
-        Category(id = 3, name = "RemoteCategory3"),
-        Category(id = 4, name = "RemoteCategory4"),
-        Category(id = 5, name = "RemoteCategory5"),
-        Category(id = 6, name = "RemoteCategory6"),
-        Category(id = 7, name = "RemoteCategory7"),
-        Category(id = 8, name = "RemoteCategory8"),
-        Category(id = 9, name = "RemoteCategory9"),
-        Category(id = 10, name = "RemoteCategory10"),
-        Category(id = 11, name = "RemoteCategory11"),
-        Category(id = 12, name = "RemoteCategory12"),
-        Category(id = 13, name = "RemoteCategory13"),
-        Category(id = 14, name = "RemoteCategory14"),
-        Category(id = 15, name = "RemoteCategory15")
+        Category(id = 1, name = "RemoteCategory1", orderNumber = 1),
+        Category(id = 2, name = "RemoteCategory2", orderNumber = 2),
+        Category(id = 3, name = "RemoteCategory3", orderNumber = 3),
+        Category(id = 4, name = "RemoteCategory4", orderNumber = 4),
+        Category(id = 5, name = "RemoteCategory5", orderNumber = 5),
+        Category(id = 6, name = "RemoteCategory6", orderNumber = 6),
+        Category(id = 7, name = "RemoteCategory7", orderNumber = 7),
+        Category(id = 8, name = "RemoteCategory8", orderNumber = 8),
+        Category(id = 9, name = "RemoteCategory9", orderNumber = 9),
+        Category(id = 10, name = "RemoteCategory10", orderNumber = 10),
+        Category(id = 11, name = "RemoteCategory11", orderNumber = 11),
+        Category(id = 12, name = "RemoteCategory12", orderNumber = 12),
+        Category(id = 13, name = "RemoteCategory13", orderNumber = 13),
+        Category(id = 14, name = "RemoteCategory14", orderNumber = 14),
+        Category(id = 15, name = "RemoteCategory15", orderNumber = 15)
     )
 
     val userCategories = listOf(
@@ -63,7 +63,7 @@ object FakeCategoriesData {
 
     fun List<Category>.toCategoriesWithNullIds() =
         this.map {
-            Category(name = it.name)
+            Category(name = it.name, orderNumber = it.orderNumber)
         }
 
     fun List<UserCategory>.toUserCategoriesWithNullIds() =

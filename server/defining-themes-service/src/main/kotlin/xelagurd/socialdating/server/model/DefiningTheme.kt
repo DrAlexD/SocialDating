@@ -21,6 +21,10 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.OPINION_LENGTH_M
         UniqueConstraint(
             name = "uk_category_id__number_in_category",
             columnNames = ["category_id", "number_in_category"]
+        ),
+        UniqueConstraint(
+            name = "uk_category_id__order_number",
+            columnNames = ["category_id", "order_number"]
         )
     ]
 )
@@ -55,7 +59,10 @@ class DefiningTheme(
     var categoryId: Int,
 
     @field:Column(nullable = false, columnDefinition = "integer check (number_in_category >= $ID_MIN)")
-    var numberInCategory: Int
+    var numberInCategory: Int,
+
+    @field:Column(nullable = false, columnDefinition = "integer check (order_number >= $ID_MIN)")
+    var orderNumber: Int = numberInCategory
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -66,6 +73,7 @@ class DefiningTheme(
         if (id != other.id) return false
         if (categoryId != other.categoryId) return false
         if (numberInCategory != other.numberInCategory) return false
+        if (orderNumber != other.orderNumber) return false
         if (name != other.name) return false
         if (fromOpinion != other.fromOpinion) return false
         if (toOpinion != other.toOpinion) return false
@@ -77,6 +85,7 @@ class DefiningTheme(
         var result = id ?: 0
         result = 31 * result + categoryId
         result = 31 * result + numberInCategory
+        result = 31 * result + orderNumber
         result = 31 * result + name.hashCode()
         result = 31 * result + fromOpinion.hashCode()
         result = 31 * result + toOpinion.hashCode()

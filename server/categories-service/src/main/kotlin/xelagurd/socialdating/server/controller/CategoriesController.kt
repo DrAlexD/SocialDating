@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import jakarta.validation.Valid
 import xelagurd.socialdating.server.model.details.CategoryDetails
+import xelagurd.socialdating.server.model.details.CategoryOrderDetails
 import xelagurd.socialdating.server.security.AdminAccess
 import xelagurd.socialdating.server.security.BearerAuth
 import xelagurd.socialdating.server.service.CategoriesService
@@ -32,4 +33,10 @@ class CategoriesController(
     @ResponseStatus(HttpStatus.CREATED)
     fun addCategory(@RequestBody @Valid categoryDetails: CategoryDetails) =
         categoriesService.addCategory(categoryDetails)
+
+    @BearerAuth
+    @AdminAccess
+    @PostMapping("/order")
+    fun moveCategory(@RequestBody @Valid categoryOrderDetails: CategoryOrderDetails) =
+        categoriesService.moveCategory(categoryOrderDetails)
 }

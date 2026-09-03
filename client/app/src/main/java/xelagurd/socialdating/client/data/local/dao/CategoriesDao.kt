@@ -9,7 +9,7 @@ import xelagurd.socialdating.client.data.model.Category
 
 @Dao
 interface CategoriesDao {
-    @Query("select * from categories")
+    @Query("select * from categories order by orderNumber, id")
     fun getCategories(): Flow<List<Category>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

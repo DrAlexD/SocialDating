@@ -9,7 +9,14 @@ import xelagurd.socialdating.client.data.model.DefiningTheme
 
 @Dao
 interface DefiningThemesDao {
-    @Query("select * from defining_themes where :categoryId is null or categoryId = :categoryId")
+    @Query(
+        """
+        select *
+        from defining_themes
+        where :categoryId is null or categoryId = :categoryId
+        order by orderNumber, numberInCategory
+        """
+    )
     fun getDefiningThemes(categoryId: Int?): Flow<List<DefiningTheme>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
