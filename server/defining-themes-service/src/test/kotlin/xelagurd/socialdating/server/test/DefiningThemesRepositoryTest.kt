@@ -27,9 +27,12 @@ class DefiningThemesRepositoryTest(
 
     private fun definingTheme(name: String, categoryId: Int, numberInCategory: Int) =
         DefiningTheme(
-            name = name,
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = name,
+            nameRu = "Русская$name",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = categoryId,
             numberInCategory = numberInCategory
         )

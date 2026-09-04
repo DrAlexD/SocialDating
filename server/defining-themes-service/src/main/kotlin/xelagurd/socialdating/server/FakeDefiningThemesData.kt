@@ -5,139 +5,227 @@ import xelagurd.socialdating.server.model.UserDefiningTheme
 import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
 import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
+import xelagurd.socialdating.server.model.enums.AppLanguage.ENGLISH
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_NO_MAINTAIN
 
 object FakeDefiningThemesData {
     val definingThemesDetails = listOf(
-        DefiningThemeDetails(name = "RemoteDefiningTheme1", fromOpinion = "No", toOpinion = "Yes", categoryId = 1),
-        DefiningThemeDetails(name = "RemoteDefiningTheme2", fromOpinion = "No", toOpinion = "Yes", categoryId = 1),
-        DefiningThemeDetails(name = "RemoteDefiningTheme3", fromOpinion = "No", toOpinion = "Yes", categoryId = 2),
-        DefiningThemeDetails(name = "RemoteDefiningTheme4", fromOpinion = "No", toOpinion = "Yes", categoryId = 2),
-        DefiningThemeDetails(name = "RemoteDefiningTheme5", fromOpinion = "No", toOpinion = "Yes", categoryId = 1)
+        DefiningThemeDetails(
+            nameEn = "RemoteDefiningTheme1",
+            nameRu = "УдалённаяОпределяющаяТема1",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
+            categoryId = 1
+        ),
+        DefiningThemeDetails(
+            nameEn = "RemoteDefiningTheme2",
+            nameRu = "УдалённаяОпределяющаяТема2",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
+            categoryId = 1
+        ),
+        DefiningThemeDetails(
+            nameEn = "RemoteDefiningTheme3",
+            nameRu = "УдалённаяОпределяющаяТема3",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
+            categoryId = 2
+        ),
+        DefiningThemeDetails(
+            nameEn = "RemoteDefiningTheme4",
+            nameRu = "УдалённаяОпределяющаяТема4",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
+            categoryId = 2
+        ),
+        DefiningThemeDetails(
+            nameEn = "RemoteDefiningTheme5",
+            nameRu = "УдалённаяОпределяющаяТема5",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
+            categoryId = 1
+        )
     )
 
     val definingThemes = listOf(
         DefiningTheme(
             id = 1,
-            name = "RemoteDefiningTheme1",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme1",
+            nameRu = "УдалённаяОпределяющаяТема1",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 1,
             numberInCategory = 1
         ),
         DefiningTheme(
             id = 2,
-            name = "RemoteDefiningTheme2",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme2",
+            nameRu = "УдалённаяОпределяющаяТема2",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 1,
             numberInCategory = 2
         ),
         DefiningTheme(
             id = 3,
-            name = "RemoteDefiningTheme3",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme3",
+            nameRu = "УдалённаяОпределяющаяТема3",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 2,
             numberInCategory = 1
         ),
         DefiningTheme(
             id = 4,
-            name = "RemoteDefiningTheme4",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme4",
+            nameRu = "УдалённаяОпределяющаяТема4",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 2,
             numberInCategory = 2
         ),
         DefiningTheme(
             id = 5,
-            name = "RemoteDefiningTheme5",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme5",
+            nameRu = "УдалённаяОпределяющаяТема5",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 1,
             numberInCategory = 3
         ),
         DefiningTheme(
             id = 6,
-            name = "RemoteDefiningTheme6",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme6",
+            nameRu = "УдалённаяОпределяющаяТема6",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 1,
             numberInCategory = 4
         ),
         DefiningTheme(
             id = 7,
-            name = "RemoteDefiningTheme7",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme7",
+            nameRu = "УдалённаяОпределяющаяТема7",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 1,
             numberInCategory = 5
         ),
         DefiningTheme(
             id = 8,
-            name = "RemoteDefiningTheme8",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme8",
+            nameRu = "УдалённаяОпределяющаяТема8",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 2,
             numberInCategory = 3
         ),
         DefiningTheme(
             id = 9,
-            name = "RemoteDefiningTheme9",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme9",
+            nameRu = "УдалённаяОпределяющаяТема9",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 2,
             numberInCategory = 4
         ),
         DefiningTheme(
             id = 10,
-            name = "RemoteDefiningTheme10",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme10",
+            nameRu = "УдалённаяОпределяющаяТема10",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 2,
             numberInCategory = 5
         ),
         DefiningTheme(
             id = 11,
-            name = "RemoteDefiningTheme11",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme11",
+            nameRu = "УдалённаяОпределяющаяТема11",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 3,
             numberInCategory = 1
         ),
         DefiningTheme(
             id = 12,
-            name = "RemoteDefiningTheme12",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme12",
+            nameRu = "УдалённаяОпределяющаяТема12",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 3,
             numberInCategory = 2
         ),
         DefiningTheme(
             id = 13,
-            name = "RemoteDefiningTheme13",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme13",
+            nameRu = "УдалённаяОпределяющаяТема13",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 3,
             numberInCategory = 3
         ),
         DefiningTheme(
             id = 14,
-            name = "RemoteDefiningTheme14",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme14",
+            nameRu = "УдалённаяОпределяющаяТема14",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 3,
             numberInCategory = 4
         ),
         DefiningTheme(
             id = 15,
-            name = "RemoteDefiningTheme15",
-            fromOpinion = "No",
-            toOpinion = "Yes",
+            nameEn = "RemoteDefiningTheme15",
+            nameRu = "УдалённаяОпределяющаяТема15",
+            fromOpinionEn = "No",
+            fromOpinionRu = "Нет",
+            toOpinionEn = "Yes",
+            toOpinionRu = "Да",
             categoryId = 3,
             numberInCategory = 5
         )
     )
+
+    val definingThemeResponses = definingThemes.map { it.toDefiningThemeResponse(ENGLISH) }
 
     val userDefiningThemes = listOf(
         UserDefiningTheme(id = 1, value = 85, interest = 25, userId = 1, definingThemeId = 1),
@@ -164,9 +252,12 @@ object FakeDefiningThemesData {
     fun List<DefiningTheme>.toDefiningThemesWithNullIds() =
         this.map {
             DefiningTheme(
-                name = it.name,
-                fromOpinion = it.fromOpinion,
-                toOpinion = it.toOpinion,
+                nameEn = it.nameEn,
+                nameRu = it.nameRu,
+                fromOpinionEn = it.fromOpinionEn,
+                fromOpinionRu = it.fromOpinionRu,
+                toOpinionEn = it.toOpinionEn,
+                toOpinionRu = it.toOpinionRu,
                 categoryId = it.categoryId,
                 numberInCategory = it.numberInCategory
             )

@@ -14,6 +14,7 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -119,7 +120,8 @@ class StatementsServiceUnitTest {
         val result = statementsService.addStatement(statementDetails)
 
         with(statementSlot.captured) {
-            assertEquals(statementDetails.text, text)
+            assertEquals(statementDetails.text, textEn)
+            assertNull(textRu)
             assertEquals(statementDetails.creatorUserId, creatorUserId)
         }
         assertEquals(statementDetails.definingThemes.size, definingThemesSlot.captured.size)

@@ -1,12 +1,13 @@
 package xelagurd.socialdating.server.service
 
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.BadCredentialsException
-import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import xelagurd.socialdating.server.exception.ExpiredTokenException
+import xelagurd.socialdating.server.exception.InvalidDataException
+import xelagurd.socialdating.server.exception.InvalidTokenException
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.additional.AuthResponse
 import xelagurd.socialdating.server.model.details.LoginDetails
@@ -36,16 +37,16 @@ class AuthService(
         val accessToken = jwtUtils.generateAccessToken(user.username, user.role, user.id!!)
         val refreshToken = jwtUtils.generateRefreshToken(user.username)
 
-        return AuthResponse(user, accessToken, refreshToken)
+        return AuthResponse(user.toUserResponse(), accessToken, refreshToken)
     }
 
     fun registerUser(registrationDetails: RegistrationDetails): AuthResponse {
         if (usersRepository.findByUsername(registrationDetails.username) != null) {
-            throw IllegalArgumentException("User with this username already exists")
+            throw InvalidDataException("error.user.usernameAlreadyExists")
         }
 
         if (registrationDetails.email != null && usersRepository.findByEmail(registrationDetails.email) != null) {
-            throw IllegalArgumentException("User with this email already exists")
+            throw InvalidDataException("error.user.emailAlreadyExists")
         }
 
         val user = usersRepository.save(registrationDetails.toUser(passwordEncoder))
@@ -53,16 +54,16 @@ class AuthService(
         val accessToken = jwtUtils.generateAccessToken(user.username, user.role, user.id!!)
         val refreshToken = jwtUtils.generateRefreshToken(user.username)
 
-        return AuthResponse(user, accessToken, refreshToken)
+        return AuthResponse(user.toUserResponse(), accessToken, refreshToken)
     }
 
     fun refreshToken(refreshTokenDetails: RefreshTokenDetails): AuthResponse {
         if (!jwtUtils.isRefreshToken(refreshTokenDetails.refreshToken)) {
-            throw BadCredentialsException("Token is not a valid refresh token")
+            throw InvalidTokenException()
         }
 
         if (!jwtUtils.isRefreshTokenValid(refreshTokenDetails.refreshToken)) {
-            throw CredentialsExpiredException("Expired refresh token")
+            throw ExpiredTokenException()
         }
 
         val claims = jwtUtils.getClaims(refreshTokenDetails.refreshToken)
@@ -74,6 +75,6 @@ class AuthService(
         val accessToken = jwtUtils.generateAccessToken(user.username, user.role, user.id!!)
         val refreshToken = jwtUtils.generateRefreshToken(user.username)
 
-        return AuthResponse(user, accessToken, refreshToken)
+        return AuthResponse(user.toUserResponse(), accessToken, refreshToken)
     }
 }

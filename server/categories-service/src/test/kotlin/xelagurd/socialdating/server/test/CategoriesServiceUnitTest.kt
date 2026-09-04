@@ -29,6 +29,7 @@ class CategoriesServiceUnitTest {
 
     private val categoryIds = Random.nextIntList()
     private val categories = FakeCategoriesData.categories
+    private val categoryResponses = FakeCategoriesData.categoryResponses
     private val categoryDetails = FakeCategoriesData.categoriesDetails[0]
     private val categorySlot = slot<Category>()
 
@@ -38,7 +39,7 @@ class CategoriesServiceUnitTest {
 
         val result = categoriesService.getCategories(categoryIds)
 
-        assertEquals(categories, result)
+        assertEquals(categoryResponses, result)
 
         verify(exactly = 1) { categoriesRepository.findAllByIds(categoryIds) }
         confirmVerified(categoriesRepository)
@@ -50,7 +51,7 @@ class CategoriesServiceUnitTest {
 
         val result = categoriesService.getCategories()
 
-        assertEquals(categories, result)
+        assertEquals(categoryResponses, result)
 
         verify(exactly = 1) { categoriesRepository.findAllByIds(null) }
         confirmVerified(categoriesRepository)
@@ -60,11 +61,12 @@ class CategoriesServiceUnitTest {
     fun addCategory_validData_savesMappedCategoryWithNextOrderNumber() {
         val maxOrderNumber = 5
         every { categoriesRepository.findMaxOrderNumber() } returns maxOrderNumber
-        every { categoriesRepository.save(capture(categorySlot)) } answers { categorySlot.captured }
+        every { categoriesRepository.save(capture(categorySlot)) } answers { categorySlot.captured.apply { id = 1 } }
 
         categoriesService.addCategory(categoryDetails)
 
-        assertEquals(categoryDetails.name, categorySlot.captured.name)
+        assertEquals(categoryDetails.nameEn, categorySlot.captured.nameEn)
+        assertEquals(categoryDetails.nameRu, categorySlot.captured.nameRu)
         assertEquals(maxOrderNumber + 1, categorySlot.captured.orderNumber)
 
         verify(exactly = 1) { categoriesRepository.findMaxOrderNumber() }
@@ -75,7 +77,7 @@ class CategoriesServiceUnitTest {
     @Test
     fun addCategory_emptyTable_savesMappedCategoryWithFirstOrderNumber() {
         every { categoriesRepository.findMaxOrderNumber() } returns null
-        every { categoriesRepository.save(capture(categorySlot)) } answers { categorySlot.captured }
+        every { categoriesRepository.save(capture(categorySlot)) } answers { categorySlot.captured.apply { id = 1 } }
 
         categoriesService.addCategory(categoryDetails)
 

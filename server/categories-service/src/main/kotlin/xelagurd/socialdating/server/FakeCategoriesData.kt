@@ -3,33 +3,36 @@ package xelagurd.socialdating.server
 import xelagurd.socialdating.server.model.Category
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.details.CategoryDetails
+import xelagurd.socialdating.server.model.enums.AppLanguage.ENGLISH
 
 object FakeCategoriesData {
     val categoriesDetails = listOf(
-        CategoryDetails(name = "RemoteCategory1"),
-        CategoryDetails(name = "RemoteCategory2"),
-        CategoryDetails(name = "RemoteCategory3"),
-        CategoryDetails(name = "RemoteCategory4"),
-        CategoryDetails(name = "RemoteCategory5")
+        CategoryDetails(nameEn = "RemoteCategory1", nameRu = "УдалённаяКатегория1"),
+        CategoryDetails(nameEn = "RemoteCategory2", nameRu = "УдалённаяКатегория2"),
+        CategoryDetails(nameEn = "RemoteCategory3", nameRu = "УдалённаяКатегория3"),
+        CategoryDetails(nameEn = "RemoteCategory4", nameRu = "УдалённаяКатегория4"),
+        CategoryDetails(nameEn = "RemoteCategory5", nameRu = "УдалённаяКатегория5")
     )
 
     val categories = listOf(
-        Category(id = 1, name = "RemoteCategory1", orderNumber = 1),
-        Category(id = 2, name = "RemoteCategory2", orderNumber = 2),
-        Category(id = 3, name = "RemoteCategory3", orderNumber = 3),
-        Category(id = 4, name = "RemoteCategory4", orderNumber = 4),
-        Category(id = 5, name = "RemoteCategory5", orderNumber = 5),
-        Category(id = 6, name = "RemoteCategory6", orderNumber = 6),
-        Category(id = 7, name = "RemoteCategory7", orderNumber = 7),
-        Category(id = 8, name = "RemoteCategory8", orderNumber = 8),
-        Category(id = 9, name = "RemoteCategory9", orderNumber = 9),
-        Category(id = 10, name = "RemoteCategory10", orderNumber = 10),
-        Category(id = 11, name = "RemoteCategory11", orderNumber = 11),
-        Category(id = 12, name = "RemoteCategory12", orderNumber = 12),
-        Category(id = 13, name = "RemoteCategory13", orderNumber = 13),
-        Category(id = 14, name = "RemoteCategory14", orderNumber = 14),
-        Category(id = 15, name = "RemoteCategory15", orderNumber = 15)
+        Category(id = 1, nameEn = "RemoteCategory1", nameRu = "УдалённаяКатегория1", orderNumber = 1),
+        Category(id = 2, nameEn = "RemoteCategory2", nameRu = "УдалённаяКатегория2", orderNumber = 2),
+        Category(id = 3, nameEn = "RemoteCategory3", nameRu = "УдалённаяКатегория3", orderNumber = 3),
+        Category(id = 4, nameEn = "RemoteCategory4", nameRu = "УдалённаяКатегория4", orderNumber = 4),
+        Category(id = 5, nameEn = "RemoteCategory5", nameRu = "УдалённаяКатегория5", orderNumber = 5),
+        Category(id = 6, nameEn = "RemoteCategory6", nameRu = "УдалённаяКатегория6", orderNumber = 6),
+        Category(id = 7, nameEn = "RemoteCategory7", nameRu = "УдалённаяКатегория7", orderNumber = 7),
+        Category(id = 8, nameEn = "RemoteCategory8", nameRu = "УдалённаяКатегория8", orderNumber = 8),
+        Category(id = 9, nameEn = "RemoteCategory9", nameRu = "УдалённаяКатегория9", orderNumber = 9),
+        Category(id = 10, nameEn = "RemoteCategory10", nameRu = "УдалённаяКатегория10", orderNumber = 10),
+        Category(id = 11, nameEn = "RemoteCategory11", nameRu = "УдалённаяКатегория11", orderNumber = 11),
+        Category(id = 12, nameEn = "RemoteCategory12", nameRu = "УдалённаяКатегория12", orderNumber = 12),
+        Category(id = 13, nameEn = "RemoteCategory13", nameRu = "УдалённаяКатегория13", orderNumber = 13),
+        Category(id = 14, nameEn = "RemoteCategory14", nameRu = "УдалённаяКатегория14", orderNumber = 14),
+        Category(id = 15, nameEn = "RemoteCategory15", nameRu = "УдалённаяКатегория15", orderNumber = 15)
     )
+
+    val categoryResponses = categories.map { it.toCategoryResponse(ENGLISH) }
 
     val userCategories = listOf(
         UserCategory(
@@ -63,7 +66,7 @@ object FakeCategoriesData {
 
     fun List<Category>.toCategoriesWithNullIds() =
         this.map {
-            Category(name = it.name, orderNumber = it.orderNumber)
+            Category(nameEn = it.nameEn, nameRu = it.nameRu, orderNumber = it.orderNumber)
         }
 
     fun List<UserCategory>.toUserCategoriesWithNullIds() =

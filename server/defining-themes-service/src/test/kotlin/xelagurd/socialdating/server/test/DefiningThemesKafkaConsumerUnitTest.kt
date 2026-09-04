@@ -50,10 +50,10 @@ class DefiningThemesKafkaConsumerUnitTest {
     @InjectMockKs
     private lateinit var definingThemesKafkaConsumer: DefiningThemesKafkaConsumer
 
-    private val definingTheme = FakeDefiningThemesData.definingThemes[0]
+    private val definingTheme = FakeDefiningThemesData.definingThemeResponses[0]
     private val baseUserDefiningTheme = FakeDefiningThemesData.userDefiningThemes[0]
 
-    private val anotherCategoryDefiningTheme = FakeDefiningThemesData.definingThemes[7]
+    private val anotherCategoryDefiningTheme = FakeDefiningThemesData.definingThemeResponses[7]
     private val anotherCategoryUserDefiningTheme = FakeDefiningThemesData.userDefiningThemes[2]
 
     private val userDefiningThemeSlot = slot<UserDefiningTheme>()

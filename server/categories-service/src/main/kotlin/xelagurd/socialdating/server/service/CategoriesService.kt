@@ -5,10 +5,12 @@ import kotlin.math.min
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import xelagurd.socialdating.server.model.Category
+import xelagurd.socialdating.server.exception.InvalidDataException
 import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
+import xelagurd.socialdating.server.model.additional.CategoryResponse
 import xelagurd.socialdating.server.model.details.CategoryDetails
 import xelagurd.socialdating.server.model.details.CategoryOrderDetails
+import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.repository.CategoriesRepository
 
 @Service
@@ -16,31 +18,34 @@ class CategoriesService(
     private val categoriesRepository: CategoriesRepository
 ) {
 
-    fun getCategories(categoryIds: List<Int>? = null) =
-        categoriesRepository.findAllByIds(categoryIds)
+    fun getCategories(categoryIds: List<Int>? = null): List<CategoryResponse> {
+        val language = AppLanguage.current()
 
-    fun addCategory(categoryDetails: CategoryDetails): Category {
+        return categoriesRepository.findAllByIds(categoryIds).map { it.toCategoryResponse(language) }
+    }
+
+    fun addCategory(categoryDetails: CategoryDetails): CategoryResponse {
         val orderNumber = categoriesRepository.findMaxOrderNumber()?.plus(1)
 
-        return categoriesRepository.save(categoryDetails.toCategory(orderNumber))
+        return categoriesRepository.save(categoryDetails.toCategory(orderNumber)).toCategoryResponse()
     }
 
     @Transactional
-    fun moveCategory(categoryOrderDetails: CategoryOrderDetails): Category {
+    fun moveCategory(categoryOrderDetails: CategoryOrderDetails): CategoryResponse {
         val categoryId = categoryOrderDetails.categoryId
         val targetOrderNumber = categoryOrderDetails.orderNumber
 
         val category = categoriesRepository.findByIdOrNull(categoryId)
-            ?: throw IllegalArgumentException("Category with id $categoryId is not found")
+            ?: throw InvalidDataException("error.category.notFound", categoryId)
 
         val maxOrderNumber = categoriesRepository.findMaxOrderNumber() ?: category.orderNumber
 
         if (targetOrderNumber > maxOrderNumber) {
-            throw IllegalArgumentException("OrderNumber must be between $ID_MIN and $maxOrderNumber")
+            throw InvalidDataException("error.orderNumber.outOfRange", ID_MIN, maxOrderNumber)
         }
 
         val currentOrderNumber = category.orderNumber
-        if (targetOrderNumber == currentOrderNumber) return category
+        if (targetOrderNumber == currentOrderNumber) return category.toCategoryResponse()
 
         val lowOrderNumber = min(currentOrderNumber, targetOrderNumber)
         val highOrderNumber = max(currentOrderNumber, targetOrderNumber)
@@ -60,7 +65,7 @@ class CategoriesService(
             step = if (targetOrderNumber < currentOrderNumber) 1 else -1
         )
 
-        return categoriesRepository.findByIdOrNull(categoryId)!!
+        return categoriesRepository.findByIdOrNull(categoryId)!!.toCategoryResponse()
     }
 
     private companion object {

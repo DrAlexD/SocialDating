@@ -20,7 +20,8 @@ interface UserCategoriesRepository : JpaRepository<UserCategory, Int> {
                   and (maintained is not null or not_maintained is not null)
                   and (coalesce(:categoryIds) is null or category_id in (:categoryIds)))
         select uc.category_id as id,
-               c.name,
+               c.name_en,
+               c.name_ru,
                uc.maintained,
                uc.not_maintained
         from current_user_categories uc

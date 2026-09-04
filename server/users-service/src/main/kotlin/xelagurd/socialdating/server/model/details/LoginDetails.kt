@@ -12,7 +12,7 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_PATTERN
 data class LoginDetails(
     @field:NotBlank
     @field:Size(min = USERNAME_LENGTH_MIN, max = USERNAME_LENGTH_MAX)
-    @field:Pattern(regexp = USERNAME_PATTERN, message = "can contain only letters, numbers and underscores")
+    @field:Pattern(regexp = USERNAME_PATTERN, message = "{socialdating.validation.username}")
     val username: String,
 
     @field:NotBlank

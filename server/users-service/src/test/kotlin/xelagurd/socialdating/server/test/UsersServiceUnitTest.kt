@@ -30,6 +30,8 @@ class UsersServiceUnitTest {
     private val userIds = Random.nextIntList()
     private val users = FakeUsersData.users
     private val user = FakeUsersData.users[0]
+    private val userResponses = FakeUsersData.userResponses
+    private val userResponse = FakeUsersData.userResponses[0]
 
     @Test
     fun getUser_existData_returnsUser() {
@@ -37,7 +39,7 @@ class UsersServiceUnitTest {
 
         val result = usersService.getUser(userId)
 
-        assertEquals(user, result)
+        assertEquals(userResponse, result)
 
         verify(exactly = 1) { usersRepository.findById(userId) }
         confirmVerified(usersRepository)
@@ -61,7 +63,7 @@ class UsersServiceUnitTest {
 
         val result = usersService.getUsers(userIds)
 
-        assertEquals(users, result)
+        assertEquals(userResponses, result)
 
         verify(exactly = 1) { usersRepository.findAllByIdIn(userIds) }
         confirmVerified(usersRepository)

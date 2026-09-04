@@ -5,12 +5,14 @@ import org.springframework.cloud.gateway.filter.GlobalFilter
 import org.springframework.core.Ordered
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.util.AntPathMatcher
 import org.springframework.web.server.ServerWebExchange
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.jsonwebtoken.JwtException
 import reactor.core.publisher.Mono
+import xelagurd.socialdating.server.utils.GatewayLocalizedMessages
 
 @Component
 class JwtAuthFilter(
@@ -20,6 +22,8 @@ class JwtAuthFilter(
 
     val logger = KotlinLogging.logger { }
     val antPathMatcher = AntPathMatcher()
+
+    private val messages = GatewayLocalizedMessages()
 
     override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void> {
         val request = exchange.request
@@ -33,7 +37,7 @@ class JwtAuthFilter(
         val authHeader = request.headers.getFirst(HttpHeaders.AUTHORIZATION)
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             logger.error { "Missing or invalid Authorization header" }
-            return unauthorized(exchange, "Missing or invalid Authorization header")
+            return unauthorized(exchange, "error.auth.missingHeader")
         }
 
         return try {
@@ -42,12 +46,12 @@ class JwtAuthFilter(
 
             if (!jwtUtils.isAccessToken(token)) {
                 logger.error { "Token is not a valid access token" }
-                return unauthorized(exchange, "Token is not a valid access token")
+                return unauthorized(exchange, "error.auth.notAccessToken")
             }
 
             if (!jwtUtils.isAccessTokenValid(token)) {
                 logger.error { "Expired access token" }
-                return unauthorized(exchange, "Expired access token")
+                return unauthorized(exchange, "error.auth.expiredToken")
             }
 
             val userId = claims["userId"].toString()
@@ -63,16 +67,18 @@ class JwtAuthFilter(
             chain.filter(mutatedExchange)
         } catch (_: JwtException) {
             logger.error { "Invalid JWT token" }
-            unauthorized(exchange, "Invalid JWT token")
+            unauthorized(exchange, "error.auth.invalidToken")
         }
     }
 
     override fun getOrder() = -1
 
-    private fun unauthorized(exchange: ServerWebExchange, message: String): Mono<Void> {
+    private fun unauthorized(exchange: ServerWebExchange, messageKey: String): Mono<Void> {
         val response = exchange.response
         response.statusCode = HttpStatus.UNAUTHORIZED
+        response.headers.contentType = MediaType(MediaType.TEXT_PLAIN, Charsets.UTF_8)
 
+        val message = messages.get(messageKey, exchange.request.headers)
         val buffer = response.bufferFactory().wrap(message.toByteArray())
 
         return response.writeWith(Mono.just(buffer))

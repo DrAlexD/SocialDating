@@ -1,6 +1,7 @@
 package xelagurd.socialdating.server.model
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.hibernate.annotations.Check
 import org.springframework.security.core.userdetails.UserDetails
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Column
@@ -28,9 +29,12 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_LENGTH_
 import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_LENGTH_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_PATTERN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USER_ACTIVITY_INITIAL
+import xelagurd.socialdating.server.model.additional.UserResponse
+import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
 import xelagurd.socialdating.server.model.enums.Role
+import xelagurd.socialdating.server.utils.LocalizationUtils.localize
 
 @Entity(name = "users")
 @Table(
@@ -40,17 +44,24 @@ import xelagurd.socialdating.server.model.enums.Role
         UniqueConstraint(name = "uk_email", columnNames = ["email"])
     ]
 )
+@Check(name = "ck_name", constraints = "name_en is not null or name_ru is not null")
+@Check(name = "ck_city", constraints = "city_en is not null or city_ru is not null")
 class User(
     @field:Id
     @field:GeneratedValue(GenerationType.IDENTITY)
     var id: Int? = null,
 
     @field:Column(
-        nullable = false,
         columnDefinition = "varchar($NAME_LENGTH_MAX) " +
-                "check (length(trim(name)) between $NAME_LENGTH_MIN and $NAME_LENGTH_MAX)"
+                "check (length(trim(name_en)) between $NAME_LENGTH_MIN and $NAME_LENGTH_MAX)"
     )
-    var name: String,
+    var nameEn: String? = null,
+
+    @field:Column(
+        columnDefinition = "varchar($NAME_LENGTH_MAX) " +
+                "check (length(trim(name_ru)) between $NAME_LENGTH_MIN and $NAME_LENGTH_MAX)"
+    )
+    var nameRu: String? = null,
 
     @field:Enumerated(EnumType.STRING)
     @field:Column(nullable = false)
@@ -86,11 +97,16 @@ class User(
     var age: Int,
 
     @field:Column(
-        nullable = false,
         columnDefinition = "varchar($CITY_LENGTH_MAX) " +
-                "check (length(trim(city)) between $CITY_LENGTH_MIN and $CITY_LENGTH_MAX)"
+                "check (length(trim(city_en)) between $CITY_LENGTH_MIN and $CITY_LENGTH_MAX)"
     )
-    var city: String,
+    var cityEn: String? = null,
+
+    @field:Column(
+        columnDefinition = "varchar($CITY_LENGTH_MAX) " +
+                "check (length(trim(city_ru)) between $CITY_LENGTH_MIN and $CITY_LENGTH_MAX)"
+    )
+    var cityRu: String? = null,
 
     @field:Enumerated(EnumType.STRING)
     @field:Column(nullable = false)
@@ -106,6 +122,20 @@ class User(
     @field:Column(nullable = false)
     val role: Role
 ) : UserDetails {
+
+    fun toUserResponse(language: AppLanguage = AppLanguage.current()) =
+        UserResponse(
+            id = id!!,
+            name = localize(nameEn, nameRu, language),
+            gender = gender,
+            username = username,
+            age = age,
+            city = localize(cityEn, cityRu, language),
+            purpose = purpose,
+            activity = activity,
+            role = role
+        )
+
     @JsonIgnore
     override fun getAuthorities() = listOf(SimpleGrantedAuthority("ROLE_$role"))
 
@@ -140,12 +170,14 @@ class User(
         if (id != other.id) return false
         if (age != other.age) return false
         if (activity != other.activity) return false
-        if (name != other.name) return false
+        if (nameEn != other.nameEn) return false
+        if (nameRu != other.nameRu) return false
         if (gender != other.gender) return false
         if (username != other.username) return false
         if (password != other.password) return false
         if (email != other.email) return false
-        if (city != other.city) return false
+        if (cityEn != other.cityEn) return false
+        if (cityRu != other.cityRu) return false
         if (purpose != other.purpose) return false
         if (role != other.role) return false
 
@@ -156,12 +188,14 @@ class User(
         var result = id ?: 0
         result = 31 * result + age
         result = 31 * result + activity
-        result = 31 * result + name.hashCode()
+        result = 31 * result + nameEn.hashCode()
+        result = 31 * result + nameRu.hashCode()
         result = 31 * result + gender.hashCode()
         result = 31 * result + username.hashCode()
         result = 31 * result + password.hashCode()
         result = 31 * result + email.hashCode()
-        result = 31 * result + city.hashCode()
+        result = 31 * result + cityEn.hashCode()
+        result = 31 * result + cityRu.hashCode()
         result = 31 * result + purpose.hashCode()
         result = 31 * result + role.hashCode()
         return result

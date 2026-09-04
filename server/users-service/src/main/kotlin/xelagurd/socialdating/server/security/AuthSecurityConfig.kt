@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Profile
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import xelagurd.socialdating.server.exception.UserNotFoundException
 import xelagurd.socialdating.server.repository.UsersRepository
 
 @Profile("!test")
@@ -24,7 +24,7 @@ class AuthSecurityConfig(
     fun userDetailsService(): UserDetailsService =
         UserDetailsService { username ->
             usersRepository.findByUsername(username)
-                ?: throw UsernameNotFoundException("User didn't found by username: $username")
+                ?: throw UserNotFoundException(username)
         }
 
     @Bean

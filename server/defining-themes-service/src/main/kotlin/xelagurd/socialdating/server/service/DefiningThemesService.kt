@@ -5,10 +5,12 @@ import kotlin.math.min
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import xelagurd.socialdating.server.exception.InvalidDataException
 import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
-import xelagurd.socialdating.server.model.DefiningTheme
+import xelagurd.socialdating.server.model.additional.DefiningThemeResponse
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
 import xelagurd.socialdating.server.model.details.DefiningThemeOrderDetails
+import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.repository.DefiningThemesRepository
 
 @Service
@@ -19,36 +21,41 @@ class DefiningThemesService(
     fun getDefiningThemes(
         definingThemeIds: List<Int>? = null,
         categoryId: Int? = null
-    ) =
-        definingThemesRepository.findAllByIdsAndCategoryId(definingThemeIds, categoryId)
+    ): List<DefiningThemeResponse> {
+        val language = AppLanguage.current()
+
+        return definingThemesRepository.findAllByIdsAndCategoryId(definingThemeIds, categoryId)
+            .map { it.toDefiningThemeResponse(language) }
+    }
 
     fun getDefiningTheme(definingThemeId: Int) =
         definingThemesRepository.findByIdOrNull(definingThemeId)
 
-    fun addDefiningTheme(definingThemeDetails: DefiningThemeDetails): DefiningTheme {
+    fun addDefiningTheme(definingThemeDetails: DefiningThemeDetails): DefiningThemeResponse {
         val numberInCategory = definingThemesRepository.findMaxNumberInCategory(definingThemeDetails.categoryId)
             ?.plus(1)
         return definingThemesRepository.save(definingThemeDetails.toDefiningTheme(numberInCategory))
+            .toDefiningThemeResponse()
     }
 
     @Transactional
-    fun moveDefiningTheme(definingThemeOrderDetails: DefiningThemeOrderDetails): DefiningTheme {
+    fun moveDefiningTheme(definingThemeOrderDetails: DefiningThemeOrderDetails): DefiningThemeResponse {
         val definingThemeId = definingThemeOrderDetails.definingThemeId
         val targetOrderNumber = definingThemeOrderDetails.orderNumber
 
         val definingTheme = definingThemesRepository.findByIdOrNull(definingThemeId)
-            ?: throw IllegalArgumentException("DefiningTheme with id $definingThemeId is not found")
+            ?: throw InvalidDataException("error.definingTheme.notFound", definingThemeId)
 
         val categoryId = definingTheme.categoryId
         val maxOrderNumber = definingThemesRepository.findMaxOrderNumber(categoryId)
             ?: definingTheme.orderNumber
 
         if (targetOrderNumber > maxOrderNumber) {
-            throw IllegalArgumentException("OrderNumber must be between $ID_MIN and $maxOrderNumber")
+            throw InvalidDataException("error.orderNumber.outOfRange", ID_MIN, maxOrderNumber)
         }
 
         val currentOrderNumber = definingTheme.orderNumber
-        if (targetOrderNumber == currentOrderNumber) return definingTheme
+        if (targetOrderNumber == currentOrderNumber) return definingTheme.toDefiningThemeResponse()
 
         val lowOrderNumber = min(currentOrderNumber, targetOrderNumber)
         val highOrderNumber = max(currentOrderNumber, targetOrderNumber)
@@ -70,7 +77,7 @@ class DefiningThemesService(
             step = if (targetOrderNumber < currentOrderNumber) 1 else -1
         )
 
-        return definingThemesRepository.findByIdOrNull(definingThemeId)!!
+        return definingThemesRepository.findByIdOrNull(definingThemeId)!!.toDefiningThemeResponse()
     }
 
     private companion object {

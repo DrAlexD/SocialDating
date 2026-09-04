@@ -182,11 +182,11 @@ class UsersMicroserviceTest(
 
     private fun assertUser(expected: User, responseUser: Map<String, Any>) {
         assertEquals(expected.id, responseUser["id"])
-        assertEquals(expected.name, responseUser["name"])
+        assertEquals(expected.nameEn, responseUser["name"])
         assertEquals(expected.gender.name, responseUser["gender"])
         assertEquals(expected.username, responseUser["username"])
         assertEquals(expected.age, responseUser["age"])
-        assertEquals(expected.city, responseUser["city"])
+        assertEquals(expected.cityEn, responseUser["city"])
         assertEquals(expected.purpose.name, responseUser["purpose"])
         assertEquals(expected.activity, responseUser["activity"])
         assertEquals(expected.role.name, responseUser["role"])

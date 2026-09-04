@@ -2,8 +2,10 @@ package xelagurd.socialdating.server.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import xelagurd.socialdating.server.exception.InvalidDataException
 import xelagurd.socialdating.server.model.additional.StatementWithDefiningThemes
 import xelagurd.socialdating.server.model.details.StatementDetails
+import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.repository.StatementDefiningThemesRepository
 import xelagurd.socialdating.server.repository.StatementsRepository
 import xelagurd.socialdating.server.utils.SecurityUtils.checkCurrentUserAuth
@@ -21,12 +23,14 @@ class StatementsService(
 
         if (statements.isEmpty()) return emptyList()
 
+        val language = AppLanguage.current()
+
         val definingThemesByStatementId = statementDefiningThemesRepository
             .findAllByStatementIdIn(statements.map { it.id!! })
             .groupBy { it.statementId }
 
         return statements.map {
-            it.toStatementWithDefiningThemes(definingThemesByStatementId[it.id] ?: emptyList())
+            it.toStatementWithDefiningThemes(definingThemesByStatementId[it.id] ?: emptyList(), language)
         }
     }
 
@@ -35,7 +39,7 @@ class StatementsService(
         val definingThemeIds = statementDetails.definingThemes.map { it.definingThemeId }
 
         if (definingThemeIds.size != definingThemeIds.toSet().size) {
-            throw IllegalArgumentException("Statement has duplicated defining themes")
+            throw InvalidDataException("error.statement.duplicatedDefiningThemes")
         }
 
         val statement = statementsRepository.save(statementDetails.toStatement())

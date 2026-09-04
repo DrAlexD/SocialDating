@@ -13,6 +13,16 @@ class AppLocaleManager @Inject constructor(
 
     fun getAppLanguage() = AppLanguage.fromLanguageTag(localeManager.applicationLocales[0]?.language)
 
+    fun getRequestLanguage( ): String {
+        val applicationLocales = localeManager.applicationLocales
+
+        return if (applicationLocales.isEmpty) {
+            localeManager.systemLocales[0].language
+        } else {
+            applicationLocales[0].language
+        }
+    }
+
     fun setAppLanguage(appLanguage: AppLanguage) {
         localeManager.applicationLocales = if (appLanguage == AppLanguage.SYSTEM) {
             LocaleList.getEmptyLocaleList()
