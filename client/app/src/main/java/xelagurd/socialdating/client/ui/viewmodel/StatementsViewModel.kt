@@ -22,7 +22,7 @@ import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.data.model.Statement
-import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
+import xelagurd.socialdating.client.data.model.details.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository

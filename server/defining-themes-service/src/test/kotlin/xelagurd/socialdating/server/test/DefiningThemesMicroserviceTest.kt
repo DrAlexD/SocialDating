@@ -19,9 +19,9 @@ import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.FakeDefiningThemesData.filterByUserId
 import xelagurd.socialdating.server.FakeDefiningThemesData.toUserDefiningThemesWithNullIds
-import xelagurd.socialdating.server.model.additional.DefiningThemeResponse
-import xelagurd.socialdating.server.model.UserDefiningTheme
 import xelagurd.socialdating.server.model.details.DefiningThemeOrderDetails
+import xelagurd.socialdating.server.model.dto.DefiningThemeDto
+import xelagurd.socialdating.server.model.dto.UserDefiningThemeDto
 import xelagurd.socialdating.server.repository.UserDefiningThemesRepository
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
@@ -41,7 +41,7 @@ class DefiningThemesMicroserviceTest(
     private val definingThemeIds = listOf(1, 2)
 
     private val definingThemesDetails = FakeDefiningThemesData.definingThemesDetails
-    private val definingThemes = FakeDefiningThemesData.definingThemeResponses.take(definingThemesDetails.size)
+    private val definingThemeDtos = FakeDefiningThemesData.definingThemeDtos.take(definingThemesDetails.size)
     private val userDefiningThemes = FakeDefiningThemesData.userDefiningThemes
 
     @BeforeAll
@@ -56,19 +56,19 @@ class DefiningThemesMicroserviceTest(
             val response = restTemplate.postForEntity(
                 "/defining-themes",
                 definingThemeDetails,
-                DefiningThemeResponse::class.java
+                DefiningThemeDto::class.java
             )
             assertEquals(HttpStatus.CREATED, response.statusCode)
-            assertEquals(definingThemes[index], response.body!!)
+            assertEquals(definingThemeDtos[index], response.body!!)
         }
     }
 
     @Test
     fun getDefiningThemes_withCategoryId_ok() {
-        val expected = definingThemes.filter { it.categoryId == categoryId }
+        val expected = definingThemeDtos.filter { it.categoryId == categoryId }
         val response = restTemplate.getForEntity(
             "/defining-themes?categoryId=$categoryId",
-            Array<DefiningThemeResponse>::class.java
+            Array<DefiningThemeDto>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(expected.size, response.body!!.size)
@@ -77,10 +77,10 @@ class DefiningThemesMicroserviceTest(
 
     @Test
     fun getDefiningThemes_withIds_ok() {
-        val expected = definingThemes.filter { it.id in definingThemeIds }
+        val expected = definingThemeDtos.filter { it.id in definingThemeIds }
         val response = restTemplate.getForEntity(
             "/defining-themes?definingThemeIds=${definingThemeIds.toRequestParams()}",
-            Array<DefiningThemeResponse>::class.java
+            Array<DefiningThemeDto>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(expected.size, response.body!!.size)
@@ -89,10 +89,10 @@ class DefiningThemesMicroserviceTest(
 
     @Test
     fun getDefiningThemes_existData_ok() {
-        val expected = definingThemes.sortedWith(compareBy({ it.orderNumber }, { it.categoryId }))
+        val expected = definingThemeDtos.sortedWith(compareBy({ it.orderNumber }, { it.categoryId }))
         val response = restTemplate.getForEntity(
             "/defining-themes",
-            Array<DefiningThemeResponse>::class.java
+            Array<DefiningThemeDto>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(expected.size, response.body!!.size)
@@ -102,9 +102,10 @@ class DefiningThemesMicroserviceTest(
     @Test
     fun getUserDefiningThemes_existData_ok() {
         val expected = userDefiningThemes.filterByUserId(currentUserId)
+            .map { it.toUserDefiningThemeDto() }
         val response = restTemplate.getForEntity(
             "/defining-themes/users?userId=$currentUserId",
-            Array<UserDefiningTheme>::class.java
+            Array<UserDefiningThemeDto>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(expected.size, response.body!!.size)
@@ -113,7 +114,7 @@ class DefiningThemesMicroserviceTest(
 
     @Test
     fun moveDefiningTheme_backwards_shiftsJumpedOverThemesForwardInsideCategory() {
-        val movedDefiningThemeId = definingThemes.filter { it.categoryId == categoryId }.last().id
+        val movedDefiningThemeId = definingThemeDtos.filter { it.categoryId == categoryId }.last().id
 
         moveDefiningTheme(movedDefiningThemeId, 1)
         // 1, 2, 3 -> 2, 3, 1
@@ -126,7 +127,7 @@ class DefiningThemesMicroserviceTest(
 
     @Test
     fun moveDefiningTheme_forwards_shiftsJumpedOverThemesBackwardInsideCategory() {
-        val movedDefiningThemeId = definingThemes.filter { it.categoryId == categoryId }.first().id
+        val movedDefiningThemeId = definingThemeDtos.filter { it.categoryId == categoryId }.first().id
 
         moveDefiningTheme(movedDefiningThemeId, 3)
         // 1, 2, 3 -> 3, 1, 2
@@ -139,7 +140,7 @@ class DefiningThemesMicroserviceTest(
 
     @Test
     fun moveDefiningTheme_orderNumberAboveCategoryMax_badRequest() {
-        val definingThemesInCategory = definingThemes.filter { it.categoryId == categoryId }
+        val definingThemesInCategory = definingThemeDtos.filter { it.categoryId == categoryId }
         val response = restTemplate.postForEntity(
             "/defining-themes/order",
             DefiningThemeOrderDetails(
@@ -157,7 +158,7 @@ class DefiningThemesMicroserviceTest(
         val response = restTemplate.postForEntity(
             "/defining-themes/order",
             DefiningThemeOrderDetails(definingThemeId = definingThemeId, orderNumber = orderNumber),
-            DefiningThemeResponse::class.java
+            DefiningThemeDto::class.java
         )
 
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -167,7 +168,7 @@ class DefiningThemesMicroserviceTest(
     private fun getOrderNumbersByDefiningThemeId(categoryId: Int): List<Int> {
         val response = restTemplate.getForEntity(
             "/defining-themes?categoryId=$categoryId",
-            Array<DefiningThemeResponse>::class.java
+            Array<DefiningThemeDto>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
 

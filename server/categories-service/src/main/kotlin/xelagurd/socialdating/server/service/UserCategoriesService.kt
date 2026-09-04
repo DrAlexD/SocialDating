@@ -7,17 +7,18 @@ import xelagurd.socialdating.server.client.UsersServiceClient
 import xelagurd.socialdating.server.model.DefaultDataProperties.OPPOSITE_CATEGORIES_NUMBER
 import xelagurd.socialdating.server.model.DefaultDataProperties.SIMILAR_CATEGORIES_NUMBER
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.additional.DetailedSimilarCategory
-import xelagurd.socialdating.server.model.additional.DetailedSimilarDefiningTheme
-import xelagurd.socialdating.server.model.additional.DetailedSimilarUser
-import xelagurd.socialdating.server.model.additional.SimilarCategory
-import xelagurd.socialdating.server.model.additional.SimilarUser
-import xelagurd.socialdating.server.model.additional.SimilarUserWithData
+import xelagurd.socialdating.server.model.additional.SimilarUserData
+import xelagurd.socialdating.server.model.additional.UserCategoryData
+import xelagurd.socialdating.server.model.dto.DetailedSimilarCategoryDto
+import xelagurd.socialdating.server.model.dto.DetailedSimilarDefiningThemeDto
+import xelagurd.socialdating.server.model.dto.DetailedSimilarUserDto
+import xelagurd.socialdating.server.model.dto.SimilarCategoryDto
+import xelagurd.socialdating.server.model.dto.SimilarUserDto
+import xelagurd.socialdating.server.model.dto.UserCategoryDto
 import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.model.enums.SimilarityType.Companion.fromSimilarityDiff
 import xelagurd.socialdating.server.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.server.model.enums.SimilarityType.SIMILAR
-import xelagurd.socialdating.server.model.repository.CategoryWithData
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
 import xelagurd.socialdating.server.utils.SecurityUtils.checkCurrentUserAuth
 
@@ -27,8 +28,8 @@ class UserCategoriesService(
     private val usersServiceClient: UsersServiceClient
 ) {
 
-    fun getUserCategories(userId: Int) =
-        userCategoriesRepository.findAllByUserId(userId)
+    fun getUserCategories(userId: Int): List<UserCategoryDto> =
+        userCategoriesRepository.findAllByUserId(userId).map { it.toUserCategoryDto() }
 
     fun addUserCategory(userCategory: UserCategory) =
         userCategoriesRepository.save(userCategory)
@@ -39,7 +40,7 @@ class UserCategoriesService(
     fun getSimilarUsers(
         currentUserId: Int,
         categoryIds: List<Int>? = null
-    ): List<SimilarUserWithData> {
+    ): List<SimilarUserDto> {
         checkCurrentUserAuth(currentUserId)
 
         val language = AppLanguage.current()
@@ -58,7 +59,7 @@ class UserCategoriesService(
                     calculateUserSimilarity(currentUserCategoriesById, anotherUserCategories, language)
 
                 if (categoriesWithSimilarity.isNotEmpty() && similarNumberUser > oppositeNumberUser) {
-                    SimilarUser(
+                    SimilarUserData(
                         id = anotherUserId,
                         similarNumber = similarNumberUser,
                         oppositeNumber = oppositeNumberUser,
@@ -82,13 +83,13 @@ class UserCategoriesService(
             .getUsers(similarUsers.map { it.id })
             .associateBy { it.id }
 
-        return similarUsers.mapNotNull { it.toSimilarUserWithData(usersById[it.id]) }
+        return similarUsers.mapNotNull { it.toSimilarUserDto(usersById[it.id]) }
     }
 
     fun getDetailedSimilarUser(
         currentUserId: Int,
         anotherUserId: Int
-    ): DetailedSimilarUser {
+    ): DetailedSimilarUserDto {
         checkCurrentUserAuth(currentUserId)
 
         val currentUserCategoriesById = userCategoriesRepository
@@ -101,7 +102,7 @@ class UserCategoriesService(
         val (similarNumberUser, oppositeNumberUser, categoriesWithSimilarity) =
             calculateDetailedUserSimilarity(currentUserCategoriesById, anotherUserCategories)
 
-        return DetailedSimilarUser(
+        return DetailedSimilarUserDto(
             similarNumber = similarNumberUser,
             oppositeNumber = oppositeNumberUser,
             categories = categoriesWithSimilarity.associateBy { it.id }
@@ -109,11 +110,11 @@ class UserCategoriesService(
     }
 
     private fun calculateUserSimilarity(
-        currentUserCategoriesById: Map<Int, CategoryWithData>,
+        currentUserCategoriesById: Map<Int, UserCategoryData>,
         anotherUserCategories: List<UserCategory>,
         language: AppLanguage
-    ): Triple<Int, Int, List<SimilarCategory>> {
-        val categoriesWithSimilarity = mutableListOf<SimilarCategory>()
+    ): Triple<Int, Int, List<SimilarCategoryDto>> {
+        val categoriesWithSimilarity = mutableListOf<SimilarCategoryDto>()
         var similarNumberUser = 0
         var oppositeNumberUser = 0
 
@@ -127,7 +128,7 @@ class UserCategoriesService(
                 similarNumberUser += similarNumberCategory
                 oppositeNumberUser += oppositeNumberCategory
 
-                categoriesWithSimilarity += SimilarCategory(
+                categoriesWithSimilarity += SimilarCategoryDto(
                     name = currentUserCategory.getLocalizedName(language),
                     differenceNumber = similarNumberCategory - oppositeNumberCategory
                 )
@@ -138,16 +139,16 @@ class UserCategoriesService(
     }
 
     private fun calculateDetailedUserSimilarity(
-        currentUserCategoriesById: Map<Int, CategoryWithData>,
+        currentUserCategoriesById: Map<Int, UserCategoryData>,
         anotherUserCategories: List<UserCategory>
-    ): Triple<Int, Int, List<DetailedSimilarCategory>> {
-        val categoriesWithSimilarity = ArrayList<DetailedSimilarCategory>()
+    ): Triple<Int, Int, List<DetailedSimilarCategoryDto>> {
+        val categoriesWithSimilarity = ArrayList<DetailedSimilarCategoryDto>()
         var similarNumberUser = 0
         var oppositeNumberUser = 0
 
         for (anotherUserCategory in anotherUserCategories) {
             val currentUserCategory = currentUserCategoriesById[anotherUserCategory.categoryId]!!
-            val definingThemesWithSimilarity = mutableListOf<DetailedSimilarDefiningTheme>()
+            val definingThemesWithSimilarity = mutableListOf<DetailedSimilarDefiningThemeDto>()
 
             val (similarNumberCategory, oppositeNumberCategory) =
                 calculateCategorySimilarity(
@@ -161,7 +162,7 @@ class UserCategoriesService(
                 oppositeNumberUser += oppositeNumberCategory
                 val differenceNumberCategory = similarNumberCategory - oppositeNumberCategory
 
-                categoriesWithSimilarity += DetailedSimilarCategory(
+                categoriesWithSimilarity += DetailedSimilarCategoryDto(
                     id = currentUserCategory.id,
                     similarityType = fromSimilarityDiff(differenceNumberCategory),
                     similarNumber = similarNumberCategory,
@@ -176,9 +177,9 @@ class UserCategoriesService(
     }
 
     private fun calculateCategorySimilarity(
-        currentUserCategory: CategoryWithData,
+        currentUserCategory: UserCategoryData,
         anotherUserCategory: UserCategory,
-        definingThemesWithSimilarity: MutableList<DetailedSimilarDefiningTheme>? = null
+        definingThemesWithSimilarity: MutableList<DetailedSimilarDefiningThemeDto>? = null
     ): Pair<Int, Int> {
         var similarNumberCategory = 0
         var oppositeNumberCategory = 0
@@ -206,7 +207,7 @@ class UserCategoriesService(
                     definingThemesWithSimilarity?.addAll(
                         extractDefiningThemesIds(bitMask, bitsNumber, i)
                             .map {
-                                DetailedSimilarDefiningTheme(
+                                DetailedSimilarDefiningThemeDto(
                                     id = it,
                                     similarityType = if (isSimilar) SIMILAR else OPPOSITE
                                 )

@@ -2,7 +2,7 @@ package xelagurd.socialdating.server.service
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import xelagurd.socialdating.server.model.additional.UserResponse
+import xelagurd.socialdating.server.model.dto.UserDto
 import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.repository.UsersRepository
 
@@ -12,11 +12,11 @@ class UsersService(
 ) {
 
     fun getUser(userId: Int) =
-        usersRepository.findByIdOrNull(userId)?.toUserResponse()
+        usersRepository.findByIdOrNull(userId)?.toUserDto()
 
-    fun getUsers(userIds: List<Int>): List<UserResponse> {
+    fun getUsers(userIds: List<Int>): List<UserDto> {
         val language = AppLanguage.current()
 
-        return usersRepository.findAllByIdIn(userIds).map { it.toUserResponse(language) }
+        return usersRepository.findAllByIdIn(userIds).map { it.toUserDto(language) }
     }
 }

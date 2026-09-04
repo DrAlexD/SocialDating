@@ -1,6 +1,5 @@
 package xelagurd.socialdating.server.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -14,6 +13,7 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTERES
 import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
+import xelagurd.socialdating.server.model.dto.UserCategoryDto
 
 @Entity(name = "user_categories")
 @Table(
@@ -39,7 +39,6 @@ class UserCategory(
     @field:Column(nullable = false, columnDefinition = "integer check (category_id >= $ID_MIN)")
     var categoryId: Int,
 
-    @field:JsonIgnore
     @field:JdbcTypeCode(SqlTypes.ARRAY)
     @field:Column(
         columnDefinition = "bigint[] " +
@@ -47,7 +46,6 @@ class UserCategory(
     )
     var maintained: Array<Long>? = null,
 
-    @field:JsonIgnore
     @field:JdbcTypeCode(SqlTypes.ARRAY)
     @field:Column(
         columnDefinition = "bigint[] " +
@@ -55,6 +53,14 @@ class UserCategory(
     )
     var notMaintained: Array<Long>? = null
 ) {
+
+    fun toUserCategoryDto() =
+        UserCategoryDto(
+            id = id!!,
+            interest = interest,
+            userId = userId,
+            categoryId = categoryId
+        )
 
     fun copy(
         id: Int? = null,

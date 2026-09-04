@@ -29,7 +29,7 @@ class CategoriesServiceUnitTest {
 
     private val categoryIds = Random.nextIntList()
     private val categories = FakeCategoriesData.categories
-    private val categoryResponses = FakeCategoriesData.categoryResponses
+    private val categoryDtos = FakeCategoriesData.categoryDtos
     private val categoryDetails = FakeCategoriesData.categoriesDetails[0]
     private val categorySlot = slot<Category>()
 
@@ -39,7 +39,7 @@ class CategoriesServiceUnitTest {
 
         val result = categoriesService.getCategories(categoryIds)
 
-        assertEquals(categoryResponses, result)
+        assertEquals(categoryDtos, result)
 
         verify(exactly = 1) { categoriesRepository.findAllByIds(categoryIds) }
         confirmVerified(categoriesRepository)
@@ -51,7 +51,7 @@ class CategoriesServiceUnitTest {
 
         val result = categoriesService.getCategories()
 
-        assertEquals(categoryResponses, result)
+        assertEquals(categoryDtos, result)
 
         verify(exactly = 1) { categoriesRepository.findAllByIds(null) }
         confirmVerified(categoriesRepository)

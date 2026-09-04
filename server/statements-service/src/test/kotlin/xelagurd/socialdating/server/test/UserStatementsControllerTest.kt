@@ -18,7 +18,7 @@ import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.controller.UserStatementsController
-import xelagurd.socialdating.server.model.additional.StatementReactionDetails
+import xelagurd.socialdating.server.model.details.StatementReactionDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.service.UserStatementsService
 

@@ -3,7 +3,6 @@ package xelagurd.socialdating.server.model
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.hibernate.annotations.Check
 import org.springframework.security.core.userdetails.UserDetails
-import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -29,7 +28,7 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_LENGTH_
 import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_LENGTH_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_PATTERN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USER_ACTIVITY_INITIAL
-import xelagurd.socialdating.server.model.additional.UserResponse
+import xelagurd.socialdating.server.model.dto.UserDto
 import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
@@ -76,7 +75,6 @@ class User(
     @JvmField
     final var username: String,
 
-    @field:JsonIgnore
     @field:Column(
         nullable = false,
         columnDefinition = "varchar($PASSWORD_HASH_LENGTH) " +
@@ -85,7 +83,6 @@ class User(
     @JvmField
     final var password: String,
 
-    @field:JsonIgnore
     @field:Column(
         columnDefinition = "varchar($EMAIL_LENGTH_MAX) " +
                 "check (email is null or (length(trim(email)) between $EMAIL_LENGTH_MIN and $EMAIL_LENGTH_MAX " +
@@ -123,8 +120,8 @@ class User(
     val role: Role
 ) : UserDetails {
 
-    fun toUserResponse(language: AppLanguage = AppLanguage.current()) =
-        UserResponse(
+    fun toUserDto(language: AppLanguage = AppLanguage.current()) =
+        UserDto(
             id = id!!,
             name = localize(nameEn, nameRu, language),
             gender = gender,
@@ -136,7 +133,6 @@ class User(
             role = role
         )
 
-    @JsonIgnore
     override fun getAuthorities() = listOf(SimpleGrantedAuthority("ROLE_$role"))
 
     override fun getUsername() = username
@@ -149,16 +145,12 @@ class User(
         this.password = password
     }
 
-    @JsonIgnore
     override fun isAccountNonExpired() = true
 
-    @JsonIgnore
     override fun isAccountNonLocked() = true
 
-    @JsonIgnore
     override fun isCredentialsNonExpired() = true
 
-    @JsonIgnore
     override fun isEnabled() = true
 
     override fun equals(other: Any?): Boolean {

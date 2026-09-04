@@ -15,9 +15,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTEREST_STEP
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.common.CategoryUpdateDetails
-import xelagurd.socialdating.server.model.common.MaintainedListUpdate
-import xelagurd.socialdating.server.model.common.UserCategoriesUpdateDetails
+import xelagurd.socialdating.server.model.details.CategoryUpdateDetails
+import xelagurd.socialdating.server.model.details.MaintainedListUpdateDetails
+import xelagurd.socialdating.server.model.details.UserCategoriesUpdateDetails
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_NOT_MAINTAINED
@@ -50,7 +50,7 @@ class CategoriesKafkaConsumerUnitTest {
         notMaintained = notMaintained
     )
 
-    private fun updateDetails(vararg maintainedListUpdates: MaintainedListUpdate) =
+    private fun updateDetails(vararg maintainedListUpdates: MaintainedListUpdateDetails) =
         UserCategoriesUpdateDetails(
             userId = 1,
             categories = listOf(
@@ -64,7 +64,7 @@ class CategoriesKafkaConsumerUnitTest {
     private fun maintainedListUpdate(
         updateType: MaintainedListUpdateType,
         numberInCategory: Int
-    ) = MaintainedListUpdate(
+    ) = MaintainedListUpdateDetails(
         updateType = updateType,
         numberInCategory = numberInCategory
     )

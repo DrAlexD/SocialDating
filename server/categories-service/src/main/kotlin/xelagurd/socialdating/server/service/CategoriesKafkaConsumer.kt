@@ -10,8 +10,8 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_INTERES
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.common.MaintainedListUpdate
-import xelagurd.socialdating.server.model.common.UserCategoriesUpdateDetails
+import xelagurd.socialdating.server.model.details.MaintainedListUpdateDetails
+import xelagurd.socialdating.server.model.details.UserCategoriesUpdateDetails
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_NOT_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.INCREASE_MAINTAINED
@@ -54,7 +54,7 @@ class CategoriesKafkaConsumer(
 
     private fun updateList(
         list: Array<Long>?,
-        maintainedListUpdate: MaintainedListUpdate
+        maintainedListUpdate: MaintainedListUpdateDetails
     ): Array<Long> {
         val updatedList = list?.toMutableList() ?: mutableListOf()
 

@@ -10,8 +10,8 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
-import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
+import xelagurd.socialdating.server.model.details.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.details.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.server.service.StatementsKafkaProducer
 

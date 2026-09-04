@@ -21,7 +21,7 @@ import org.junit.Test
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
-import xelagurd.socialdating.client.data.model.additional.AuthResponse
+import xelagurd.socialdating.client.data.model.dto.AuthDto
 import xelagurd.socialdating.client.data.remote.ApiUtils.UNAUTHORIZED
 import xelagurd.socialdating.client.data.remote.AuthApiService
 import xelagurd.socialdating.client.data.remote.AuthInterceptor
@@ -45,7 +45,7 @@ class AuthInterceptorTest {
     private val refreshToken = "refreshToken"
     private val newRefreshToken = "newRefreshToken"
 
-    private val authResponse = AuthResponse(FakeData.users[0], newAccessToken, newRefreshToken)
+    private val authResponse = AuthDto(FakeData.users[0], newAccessToken, newRefreshToken)
 
     private val request = Request.Builder().url("http://localhost/").build()
     private val requests = mutableListOf<Request>()

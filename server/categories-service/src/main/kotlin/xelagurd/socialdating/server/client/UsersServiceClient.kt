@@ -3,7 +3,7 @@ package xelagurd.socialdating.server.client
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
-import xelagurd.socialdating.server.model.additional.UserData
+import xelagurd.socialdating.server.model.dto.UserDto
 
 @FeignClient(
     name = "users-service",
@@ -12,5 +12,5 @@ import xelagurd.socialdating.server.model.additional.UserData
 interface UsersServiceClient {
 
     @GetMapping("/users")
-    fun getUsers(@RequestParam userIds: List<Int>): List<UserData>
+    fun getUsers(@RequestParam userIds: List<Int>): List<UserDto>
 }

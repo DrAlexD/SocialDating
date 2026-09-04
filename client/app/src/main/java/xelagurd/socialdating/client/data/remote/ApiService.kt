@@ -11,11 +11,11 @@ import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
-import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
-import xelagurd.socialdating.client.data.model.additional.StatementWithDefiningThemes
 import xelagurd.socialdating.client.data.model.details.StatementDetails
-import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
+import xelagurd.socialdating.client.data.model.details.StatementReactionDetails
+import xelagurd.socialdating.client.data.model.dto.DetailedSimilarUserDto
+import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
+import xelagurd.socialdating.client.data.model.dto.StatementDto
 
 interface ApiService {
     @GET("users/{id}")
@@ -40,10 +40,10 @@ interface ApiService {
     suspend fun getStatements(
         @Query("currentUserId") currentUserId: Int,
         @Query("definingThemeIds") definingThemeIds: List<Int>
-    ): Response<List<StatementWithDefiningThemes>>
+    ): Response<List<StatementDto>>
 
     @POST("statements")
-    suspend fun addStatement(@Body statementDetails: StatementDetails): Response<StatementWithDefiningThemes>
+    suspend fun addStatement(@Body statementDetails: StatementDetails): Response<StatementDto>
 
     @POST("statements/users/reaction")
     suspend fun processStatementReaction(
@@ -54,11 +54,11 @@ interface ApiService {
     suspend fun getSimilarUsers(
         @Query("currentUserId") currentUserId: Int,
         @Query("categoryIds") categoryIds: List<Int>?
-    ): Response<List<SimilarUserWithData>>
+    ): Response<List<SimilarUserDto>>
 
     @GET("categories/users/detailed-similar-user")
     suspend fun getDetailedSimilarUser(
         @Query("currentUserId") currentUserId: Int,
         @Query("anotherUserId") anotherUserId: Int
-    ): Response<DetailedSimilarUser>
+    ): Response<DetailedSimilarUserDto>
 }

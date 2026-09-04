@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import xelagurd.socialdating.server.exception.InvalidDataException
 import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
-import xelagurd.socialdating.server.model.additional.CategoryResponse
 import xelagurd.socialdating.server.model.details.CategoryDetails
 import xelagurd.socialdating.server.model.details.CategoryOrderDetails
+import xelagurd.socialdating.server.model.dto.CategoryDto
 import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.repository.CategoriesRepository
 
@@ -18,20 +18,20 @@ class CategoriesService(
     private val categoriesRepository: CategoriesRepository
 ) {
 
-    fun getCategories(categoryIds: List<Int>? = null): List<CategoryResponse> {
+    fun getCategories(categoryIds: List<Int>? = null): List<CategoryDto> {
         val language = AppLanguage.current()
 
-        return categoriesRepository.findAllByIds(categoryIds).map { it.toCategoryResponse(language) }
+        return categoriesRepository.findAllByIds(categoryIds).map { it.toCategoryDto(language) }
     }
 
-    fun addCategory(categoryDetails: CategoryDetails): CategoryResponse {
+    fun addCategory(categoryDetails: CategoryDetails): CategoryDto {
         val orderNumber = categoriesRepository.findMaxOrderNumber()?.plus(1)
 
-        return categoriesRepository.save(categoryDetails.toCategory(orderNumber)).toCategoryResponse()
+        return categoriesRepository.save(categoryDetails.toCategory(orderNumber)).toCategoryDto()
     }
 
     @Transactional
-    fun moveCategory(categoryOrderDetails: CategoryOrderDetails): CategoryResponse {
+    fun moveCategory(categoryOrderDetails: CategoryOrderDetails): CategoryDto {
         val categoryId = categoryOrderDetails.categoryId
         val targetOrderNumber = categoryOrderDetails.orderNumber
 
@@ -45,7 +45,7 @@ class CategoriesService(
         }
 
         val currentOrderNumber = category.orderNumber
-        if (targetOrderNumber == currentOrderNumber) return category.toCategoryResponse()
+        if (targetOrderNumber == currentOrderNumber) return category.toCategoryDto()
 
         val lowOrderNumber = min(currentOrderNumber, targetOrderNumber)
         val highOrderNumber = max(currentOrderNumber, targetOrderNumber)
@@ -65,7 +65,7 @@ class CategoriesService(
             step = if (targetOrderNumber < currentOrderNumber) 1 else -1
         )
 
-        return categoriesRepository.findByIdOrNull(categoryId)!!.toCategoryResponse()
+        return categoriesRepository.findByIdOrNull(categoryId)!!.toCategoryDto()
     }
 
     private companion object {

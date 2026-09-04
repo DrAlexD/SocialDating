@@ -18,7 +18,6 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.controller.StatementsController
 import xelagurd.socialdating.server.service.StatementsService
@@ -36,10 +35,10 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     private val objectMapper = jacksonObjectMapper()
 
-    private val userId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
+    private val userId = Random.nextInt(1, Int.MAX_VALUE)
     private val definingThemeIds = Random.nextIntList()
     private val statementDetails = FakeStatementsData.statementsDetails[0]
-    private val statement = FakeStatementsData.statementsWithDefiningThemes[0]
+    private val statementDto = FakeStatementsData.statementDtos[0]
 
     @Test
     fun getStatements_existData_ok() {
@@ -58,7 +57,7 @@ class StatementsControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     @Test
     fun addStatement_validData_created() {
-        every { statementsService.addStatement(any()) } returns statement
+        every { statementsService.addStatement(any()) } returns statementDto
 
         mockMvc.perform(
             post("/statements")

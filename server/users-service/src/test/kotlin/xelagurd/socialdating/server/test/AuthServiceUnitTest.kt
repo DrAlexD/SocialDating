@@ -53,7 +53,7 @@ class AuthServiceUnitTest {
     private lateinit var authService: AuthService
 
     private val user = FakeUsersData.users[0]
-    private val userResponse = FakeUsersData.userResponses[0]
+    private val userDto = FakeUsersData.userDtos[0]
     private val accessToken = "accessToken"
     private val refreshToken = "refreshToken"
 
@@ -75,7 +75,7 @@ class AuthServiceUnitTest {
     }
 
     @Test
-    fun loginUser_validCredentials_returnsAuthResponse() {
+    fun loginUser_validCredentials_returnsAuthDto() {
         val authentication = mockk<Authentication>()
         every { authentication.principal } returns user
         every { authenticationManager.authenticate(any()) } returns authentication
@@ -83,7 +83,7 @@ class AuthServiceUnitTest {
 
         val result = authService.loginUser(LoginDetails(user.username, "password"))
 
-        assertEquals(userResponse, result.user)
+        assertEquals(userDto, result.user)
         assertEquals(accessToken, result.accessToken)
         assertEquals(refreshToken, result.refreshToken)
 
@@ -94,7 +94,7 @@ class AuthServiceUnitTest {
     }
 
     @Test
-    fun registerUser_newUser_savesAndReturnsAuthResponse() {
+    fun registerUser_newUser_savesAndReturnsAuthDto() {
         val registrationDetails = registrationDetails()
         val savedUserSlot = slot<User>()
         every { usersRepository.findByUsername(registrationDetails.username) } returns null
@@ -105,7 +105,7 @@ class AuthServiceUnitTest {
 
         val result = authService.registerUser(registrationDetails)
 
-        assertEquals(userResponse, result.user)
+        assertEquals(userDto, result.user)
         assertEquals(accessToken, result.accessToken)
         assertEquals(refreshToken, result.refreshToken)
         assertEquals("encodedPassword", savedUserSlot.captured.password)
@@ -127,7 +127,7 @@ class AuthServiceUnitTest {
 
         val result = authService.registerUser(registrationDetails)
 
-        assertEquals(userResponse, result.user)
+        assertEquals(userDto, result.user)
 
         verify(exactly = 1) { usersRepository.findByUsername(registrationDetails.username) }
         verify(exactly = 0) { usersRepository.findByEmail(any()) }
@@ -164,7 +164,7 @@ class AuthServiceUnitTest {
     }
 
     @Test
-    fun refreshToken_validToken_returnsAuthResponse() {
+    fun refreshToken_validToken_returnsAuthDto() {
         val refreshTokenDetails = RefreshTokenDetails("token")
         val claims = mockk<Claims>()
         every { jwtUtils.isRefreshToken(refreshTokenDetails.refreshToken) } returns true
@@ -176,7 +176,7 @@ class AuthServiceUnitTest {
 
         val result = authService.refreshToken(refreshTokenDetails)
 
-        assertEquals(userResponse, result.user)
+        assertEquals(userDto, result.user)
         assertEquals(accessToken, result.accessToken)
         assertEquals(refreshToken, result.refreshToken)
 

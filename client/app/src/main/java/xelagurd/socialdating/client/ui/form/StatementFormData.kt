@@ -4,7 +4,7 @@ import xelagurd.socialdating.client.data.model.DefaultDataProperties.STATEMENT_T
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidId
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidText
-import xelagurd.socialdating.client.data.model.additional.DefiningThemeReactionDetails
+import xelagurd.socialdating.client.data.model.details.DefiningThemeReactionDetails
 import xelagurd.socialdating.client.data.model.details.StatementDetails
 import xelagurd.socialdating.client.ui.form.FormFieldErrors.textError
 

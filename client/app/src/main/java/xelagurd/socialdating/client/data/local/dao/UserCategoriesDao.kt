@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import xelagurd.socialdating.client.data.model.UserCategory
-import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
+import xelagurd.socialdating.client.data.model.additional.UserCategoryData
 
 @Dao
 interface UserCategoriesDao {
@@ -24,7 +24,7 @@ interface UserCategoriesDao {
         order by c.orderNumber, c.id
         """
     )
-    fun getUserCategories(userId: Int): Flow<List<UserCategoryWithData>>
+    fun getUserCategories(userId: Int): Flow<List<UserCategoryData>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUserCategories(userCategories: List<UserCategory>)

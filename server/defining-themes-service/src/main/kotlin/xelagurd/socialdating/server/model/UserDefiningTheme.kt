@@ -11,6 +11,7 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_I
 import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
+import xelagurd.socialdating.server.model.dto.UserDefiningThemeDto
 
 @Entity(name = "user_defining_themes")
 @Table(
@@ -43,6 +44,15 @@ class UserDefiningTheme(
     @field:Column(nullable = false, columnDefinition = "integer check (defining_theme_id >= $ID_MIN)")
     var definingThemeId: Int
 ) {
+
+    fun toUserDefiningThemeDto() =
+        UserDefiningThemeDto(
+            id = id!!,
+            value = value,
+            interest = interest,
+            userId = userId,
+            definingThemeId = definingThemeId
+        )
 
     fun copy(
         id: Int? = null,

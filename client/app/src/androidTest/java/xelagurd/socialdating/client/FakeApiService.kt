@@ -7,11 +7,11 @@ import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
-import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
-import xelagurd.socialdating.client.data.model.additional.StatementWithDefiningThemes
 import xelagurd.socialdating.client.data.model.details.StatementDetails
-import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
+import xelagurd.socialdating.client.data.model.details.StatementReactionDetails
+import xelagurd.socialdating.client.data.model.dto.DetailedSimilarUserDto
+import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
+import xelagurd.socialdating.client.data.model.dto.StatementDto
 import xelagurd.socialdating.client.data.remote.ApiService
 
 class FakeApiService : ApiService {
@@ -36,12 +36,12 @@ class FakeApiService : ApiService {
     override suspend fun getStatements(
         currentUserId: Int,
         definingThemeIds: List<Int>
-    ): Response<List<StatementWithDefiningThemes>> =
-        Response.success(FakeData.statementsWithDefiningThemes)
+    ): Response<List<StatementDto>> =
+        Response.success(FakeData.statementDtos)
 
     override suspend fun addStatement(
         statementDetails: StatementDetails
-    ): Response<StatementWithDefiningThemes> =
+    ): Response<StatementDto> =
         Response.success(FakeData.newStatement)
 
     override suspend fun processStatementReaction(
@@ -52,12 +52,12 @@ class FakeApiService : ApiService {
     override suspend fun getSimilarUsers(
         currentUserId: Int,
         categoryIds: List<Int>?
-    ): Response<List<SimilarUserWithData>> =
+    ): Response<List<SimilarUserDto>> =
         Response.success(FakeData.similarUsers)
 
     override suspend fun getDetailedSimilarUser(
         currentUserId: Int,
         anotherUserId: Int
-    ): Response<DetailedSimilarUser> =
+    ): Response<DetailedSimilarUserDto> =
         Response.success(FakeData.detailedSimilarUser)
 }

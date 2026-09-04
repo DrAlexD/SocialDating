@@ -18,11 +18,11 @@ import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_INTEREST_STEP
 import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_VALUE_INITIAL
 import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.common.CategoryUpdateDetails
-import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
-import xelagurd.socialdating.server.model.common.MaintainedListUpdate
-import xelagurd.socialdating.server.model.common.UserCategoriesUpdateDetails
-import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
+import xelagurd.socialdating.server.model.details.CategoryUpdateDetails
+import xelagurd.socialdating.server.model.details.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.details.MaintainedListUpdateDetails
+import xelagurd.socialdating.server.model.details.UserCategoriesUpdateDetails
+import xelagurd.socialdating.server.model.details.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_MAINTAINED
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
@@ -50,14 +50,14 @@ class DefiningThemesKafkaConsumerUnitTest {
     @InjectMockKs
     private lateinit var definingThemesKafkaConsumer: DefiningThemesKafkaConsumer
 
-    private val definingTheme = FakeDefiningThemesData.definingThemeResponses[0]
+    private val definingTheme = FakeDefiningThemesData.definingThemeDtos[0]
     private val baseUserDefiningTheme = FakeDefiningThemesData.userDefiningThemes[0]
 
-    private val anotherCategoryDefiningTheme = FakeDefiningThemesData.definingThemeResponses[7]
+    private val anotherCategoryDefiningTheme = FakeDefiningThemesData.definingThemeDtos[7]
     private val anotherCategoryUserDefiningTheme = FakeDefiningThemesData.userDefiningThemes[2]
 
     private val userDefiningThemeSlot = slot<UserDefiningTheme>()
-    private val updateDetailsSlot = slot<UserCategoriesUpdateDetails>()
+    private val userCategoriesUpdateDetailsSlot = slot<UserCategoriesUpdateDetails>()
 
     private fun userDefiningTheme(value: Int) = baseUserDefiningTheme.copy(value = value)
 
@@ -76,7 +76,7 @@ class DefiningThemesKafkaConsumerUnitTest {
         every { definingThemesService.getDefiningThemes(any(), any()) } returns listOf(definingTheme)
         every { userDefiningThemesService.getUserDefiningTheme(any(), any()) } returns userDefiningTheme
         every { userDefiningThemesService.addUserDefiningTheme(capture(userDefiningThemeSlot)) } returns mockk()
-        every { definingThemesKafkaProducer.updateUserCategories(capture(updateDetailsSlot)) } just Runs
+        every { definingThemesKafkaProducer.updateUserCategories(capture(userCategoriesUpdateDetailsSlot)) } just Runs
     }
 
     private fun verifySingleThemeProcessed() {
@@ -144,7 +144,7 @@ class DefiningThemesKafkaConsumerUnitTest {
         assertEquals(80, userDefiningThemeSlot.captured.value)
         assertEquals(
             listOf(CategoryUpdateDetails(definingTheme.categoryId)),
-            updateDetailsSlot.captured.categories
+            userCategoriesUpdateDetailsSlot.captured.categories
         )
 
         verifySingleThemeProcessed()
@@ -158,8 +158,8 @@ class DefiningThemesKafkaConsumerUnitTest {
 
         assertEquals(55, userDefiningThemeSlot.captured.value)
         assertEquals(
-            listOf<MaintainedListUpdate>(),
-            updateDetailsSlot.captured.categories[0].maintainedListUpdates
+            listOf<MaintainedListUpdateDetails>(),
+            userCategoriesUpdateDetailsSlot.captured.categories[0].maintainedListUpdates
         )
 
         verifySingleThemeProcessed()
@@ -200,7 +200,7 @@ class DefiningThemesKafkaConsumerUnitTest {
         assertEquals(DEFINING_THEME_INTEREST_STEP, userDefiningThemeSlot.captured.interest)
         assertEquals(
             listOf(CategoryUpdateDetails(definingTheme.categoryId)),
-            updateDetailsSlot.captured.categories
+            userCategoriesUpdateDetailsSlot.captured.categories
         )
 
         verifySingleThemeProcessed()
@@ -236,7 +236,7 @@ class DefiningThemesKafkaConsumerUnitTest {
         every {
             userDefiningThemesService.addUserDefiningTheme(capture(updatedUserDefiningThemes))
         } returns mockk()
-        every { definingThemesKafkaProducer.updateUserCategories(capture(updateDetailsSlot)) } just Runs
+        every { definingThemesKafkaProducer.updateUserCategories(capture(userCategoriesUpdateDetailsSlot)) } just Runs
 
         definingThemesKafkaConsumer.updateUserDefiningThemes(
             UserDefiningThemesUpdateDetails(
@@ -256,12 +256,12 @@ class DefiningThemesKafkaConsumerUnitTest {
                 CategoryUpdateDetails(
                     categoryId = definingTheme.categoryId,
                     maintainedListUpdates = listOf(
-                        MaintainedListUpdate(DECREASE_MAINTAINED, definingTheme.numberInCategory)
+                        MaintainedListUpdateDetails(DECREASE_MAINTAINED, definingTheme.numberInCategory)
                     )
                 ),
                 CategoryUpdateDetails(categoryId = anotherCategoryDefiningTheme.categoryId)
             ),
-            updateDetailsSlot.captured.categories
+            userCategoriesUpdateDetailsSlot.captured.categories
         )
 
         verify(exactly = 1) { definingThemesService.getDefiningThemes(any(), any()) }

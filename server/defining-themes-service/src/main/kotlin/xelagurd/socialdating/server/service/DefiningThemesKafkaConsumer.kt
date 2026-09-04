@@ -17,10 +17,10 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_V
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
 import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.common.CategoryUpdateDetails
-import xelagurd.socialdating.server.model.common.MaintainedListUpdate
-import xelagurd.socialdating.server.model.common.UserCategoriesUpdateDetails
-import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
+import xelagurd.socialdating.server.model.details.CategoryUpdateDetails
+import xelagurd.socialdating.server.model.details.MaintainedListUpdateDetails
+import xelagurd.socialdating.server.model.details.UserCategoriesUpdateDetails
+import xelagurd.socialdating.server.model.details.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.DECREASE_NOT_MAINTAINED
 import xelagurd.socialdating.server.model.enums.MaintainedListUpdateType.INCREASE_MAINTAINED
@@ -47,7 +47,7 @@ class DefiningThemesKafkaConsumer(
             .getDefiningThemes(definingThemeIds = updateDetails.definingThemes.map { it.definingThemeId })
             .associateBy { it.id!! }
 
-        val maintainedListUpdatesByCategoryId = linkedMapOf<Int, MutableList<MaintainedListUpdate>>()
+        val maintainedListUpdatesByCategoryId = linkedMapOf<Int, MutableList<MaintainedListUpdateDetails>>()
 
         updateDetails.definingThemes.forEach { definingThemeReaction ->
             val userDefiningTheme = userDefiningThemesService
@@ -73,7 +73,7 @@ class DefiningThemesKafkaConsumer(
 
             userDefiningTheme?.value?.let { value ->
                 determineUpdateType(value, diff)?.let {
-                    maintainedListUpdates += MaintainedListUpdate(
+                    maintainedListUpdates += MaintainedListUpdateDetails(
                         updateType = it,
                         numberInCategory = definingTheme.numberInCategory
                     )

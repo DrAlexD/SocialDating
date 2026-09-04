@@ -10,7 +10,7 @@ import xelagurd.socialdating.client.data.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.PERCENT_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidId
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidPercent
-import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
+import xelagurd.socialdating.client.data.model.additional.UserCategoryData
 
 @Serializable
 @Entity(
@@ -44,9 +44,9 @@ data class UserCategory(
         require(categoryId.isValidId()) { "CategoryId must be at least $ID_MIN" }
     }
 
-    fun toUserCategoryWithData(category: Category?) =
+    fun toUserCategoryData(category: Category?) =
         category?.let {
-            UserCategoryWithData(
+            UserCategoryData(
                 id = id,
                 interest = interest,
                 userId = userId,

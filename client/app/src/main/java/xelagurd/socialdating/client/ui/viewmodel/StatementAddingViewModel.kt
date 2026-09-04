@@ -73,10 +73,10 @@ class StatementAddingViewModel @Inject constructor(
             if (!isOfflineMode) { // FixMe: remove after adding server hosting
                 _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
 
-                val statementFormDetails = uiState.value.formData
+                val statementFormData = uiState.value.formData
 
                 val (statement, status) = safeApiCall(context) {
-                    remoteStatementsRepository.addStatement(statementFormDetails.toStatementDetails())
+                    remoteStatementsRepository.addStatement(statementFormData.toStatementDetails())
                 }
 
                 if (statement != null) {
@@ -89,19 +89,19 @@ class StatementAddingViewModel @Inject constructor(
                 _uiState.update { it.copy(actionRequestStatus = status) }
             } else {
                 _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
-                val statementFormDetails = uiState.value.formData
+                val statementFormData = uiState.value.formData
                 val newId = (localStatementsRepository.getStatements().first().maxOfOrNull { it.id } ?: 0) + 1
                 localStatementsRepository.insertStatements(
                     listOf(
                         Statement(
                             id = newId,
-                            text = statementFormDetails.text,
-                            creatorUserId = statementFormDetails.creatorUserId!!
+                            text = statementFormData.text,
+                            creatorUserId = statementFormData.creatorUserId!!
                         )
                     )
                 )
                 localStatementsRepository.insertStatementDefiningThemes(
-                    statementFormDetails.definingThemes.keys.map {
+                    statementFormData.definingThemes.keys.map {
                         StatementDefiningTheme(statementId = newId, definingThemeId = it)
                     }
                 )

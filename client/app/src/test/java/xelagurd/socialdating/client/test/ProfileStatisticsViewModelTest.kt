@@ -26,7 +26,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
@@ -36,13 +35,13 @@ import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRep
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserDefiningThemesRepository
 import xelagurd.socialdating.client.data.model.Category
-import xelagurd.socialdating.client.data.model.DataUtils.toUserCategoriesWithData
-import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesWithData
+import xelagurd.socialdating.client.data.model.DataUtils.toUserCategoriesData
+import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesData
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
-import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.additional.UserCategoryData
+import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeData
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
@@ -71,12 +70,12 @@ class ProfileStatisticsViewModelTest {
     private val commonLocalRepository = mockk<CommonLocalRepository>()
 
     private lateinit var viewModel: ProfileStatisticsViewModel
-    private lateinit var userCategoriesFlow: MutableStateFlow<List<UserCategoryWithData>>
-    private lateinit var userDefiningThemesFlow: MutableStateFlow<List<UserDefiningThemeWithData>>
+    private lateinit var userCategoriesFlow: MutableStateFlow<List<UserCategoryData>>
+    private lateinit var userDefiningThemesFlow: MutableStateFlow<List<UserDefiningThemeData>>
     private val profileStatisticsUiState
         get() = viewModel.uiState.value
 
-    private val userId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
+    private val userId = Random.nextInt(1, Int.MAX_VALUE)
     private var anotherUserId = userId
 
     private val savedCategories = listOf(Category(id = 1, name = "Category1", orderNumber = 1))
@@ -120,9 +119,9 @@ class ProfileStatisticsViewModelTest {
 
     @Before
     fun setup() {
-        userCategoriesFlow = MutableStateFlow(remoteUserCategories.toUserCategoriesWithData(allCategories))
+        userCategoriesFlow = MutableStateFlow(remoteUserCategories.toUserCategoriesData(allCategories))
         userDefiningThemesFlow =
-            MutableStateFlow(remoteUserDefiningThemes.toUserDefiningThemesWithData(allDefiningThemes))
+            MutableStateFlow(remoteUserDefiningThemes.toUserDefiningThemesData(allDefiningThemes))
     }
 
     private fun initViewModel() {
@@ -453,7 +452,7 @@ class ProfileStatisticsViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
         assertEquals(FakeData.detailedSimilarUser, profileStatisticsUiState.entitiesMask)
-        assertEquals(remoteUserCategories.toUserCategoriesWithData(allCategories), profileStatisticsUiState.entities)
+        assertEquals(remoteUserCategories.toUserCategoriesData(allCategories), profileStatisticsUiState.entities)
 
         coVerify(exactly = 1) { remoteUserCategoriesRepository.getDetailedSimilarUser(any(), any()) }
         coVerify(exactly = 1) { commonLocalRepository.updateProfileStatisticsScreenData(any(), any()) }
@@ -470,7 +469,7 @@ class ProfileStatisticsViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
         assertEquals(FakeData.detailedSimilarUser, profileStatisticsUiState.entitiesMask)
-        assertEquals(remoteUserCategories.toUserCategoriesWithData(allCategories), profileStatisticsUiState.entities)
+        assertEquals(remoteUserCategories.toUserCategoriesData(allCategories), profileStatisticsUiState.entities)
 
         coVerify(exactly = 1) { remoteUserCategoriesRepository.getDetailedSimilarUser(any(), any()) }
         coVerify(exactly = 1) { commonLocalRepository.updateProfileStatisticsScreenData(any(), any()) }

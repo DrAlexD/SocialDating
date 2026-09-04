@@ -23,8 +23,8 @@ import org.junit.jupiter.api.TestMethodOrder
 import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.model.UserStatement
-import xelagurd.socialdating.server.model.additional.StatementWithDefiningThemes
-import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.details.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.dto.StatementDto
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.server.repository.UserStatementsRepository
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
@@ -43,10 +43,10 @@ class StatementsMicroserviceTest(
     private val definingThemeIds = listOf(1, 2)
 
     private val statementsDetails = FakeStatementsData.statementsDetails
-    private val statements = FakeStatementsData.statementsWithDefiningThemes.take(statementsDetails.size)
+    private val statementDtos = FakeStatementsData.statementDtos.take(statementsDetails.size)
 
     private val reactedStatementIds = listOf(3, 4)
-    private val unreactedStatements = statements.filterNot { it.id in reactedStatementIds }
+    private val unreactedStatements = statementDtos.filterNot { it.id in reactedStatementIds }
 
     @BeforeAll
     fun addUserStatements() {
@@ -64,10 +64,10 @@ class StatementsMicroserviceTest(
             val response = restTemplate.postForEntity(
                 "/statements",
                 statementDetails,
-                StatementWithDefiningThemes::class.java
+                StatementDto::class.java
             )
             assertEquals(HttpStatus.CREATED, response.statusCode)
-            assertEquals(statements[index], response.body!!)
+            assertEquals(statementDtos[index], response.body!!)
         }
     }
 
@@ -92,7 +92,7 @@ class StatementsMicroserviceTest(
         val response = restTemplate.getWithAuth(
             currentUserId,
             "/statements?currentUserId=$currentUserId&definingThemeIds=${definingThemeIds.toRequestParams()}",
-            Array<StatementWithDefiningThemes>::class.java
+            Array<StatementDto>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(unreactedStatements.size, response.body!!.size)

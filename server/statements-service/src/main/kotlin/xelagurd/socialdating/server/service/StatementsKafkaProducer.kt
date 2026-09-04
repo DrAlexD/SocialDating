@@ -3,7 +3,7 @@ package xelagurd.socialdating.server.service
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 import io.github.oshai.kotlinlogging.KotlinLogging
-import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
+import xelagurd.socialdating.server.model.details.UserDefiningThemesUpdateDetails
 
 @Service
 class StatementsKafkaProducer(

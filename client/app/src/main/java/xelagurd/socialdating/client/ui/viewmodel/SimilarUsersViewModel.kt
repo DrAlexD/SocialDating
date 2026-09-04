@@ -19,7 +19,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
-import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
+import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
@@ -39,7 +39,7 @@ class SimilarUsersViewModel @Inject constructor(
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
-    private val similarUsersFlow = MutableStateFlow<List<SimilarUserWithData>>(listOf())
+    private val similarUsersFlow = MutableStateFlow<List<SimilarUserDto>>(listOf())
 
     val uiState = combine(similarUsersFlow, dataRequestStatusFlow)
     { similarUsers, dataRequestStatus ->

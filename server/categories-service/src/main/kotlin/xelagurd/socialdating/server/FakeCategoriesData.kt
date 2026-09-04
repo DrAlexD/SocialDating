@@ -32,7 +32,7 @@ object FakeCategoriesData {
         Category(id = 15, nameEn = "RemoteCategory15", nameRu = "УдалённаяКатегория15", orderNumber = 15)
     )
 
-    val categoryResponses = categories.map { it.toCategoryResponse(ENGLISH) }
+    val categoryDtos = categories.map { it.toCategoryDto(ENGLISH) }
 
     val userCategories = listOf(
         UserCategory(
@@ -63,6 +63,8 @@ object FakeCategoriesData {
             id = 9, interest = 25, userId = 3, categoryId = 3, maintained = arrayOf(1)
         )
     )
+
+    val userCategoryDtos = userCategories.map { it.toUserCategoryDto() }
 
     fun List<Category>.toCategoriesWithNullIds() =
         this.map {

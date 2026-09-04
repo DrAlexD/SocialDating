@@ -10,7 +10,7 @@ import jakarta.persistence.UniqueConstraint
 import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_NAME_LENGTH_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.CATEGORY_NAME_LENGTH_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
-import xelagurd.socialdating.server.model.additional.CategoryResponse
+import xelagurd.socialdating.server.model.dto.CategoryDto
 import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.utils.LocalizationUtils.localize
 
@@ -46,8 +46,8 @@ class Category(
     var orderNumber: Int
 ) {
 
-    fun toCategoryResponse(language: AppLanguage = AppLanguage.current()) =
-        CategoryResponse(
+    fun toCategoryDto(language: AppLanguage = AppLanguage.current()) =
+        CategoryDto(
             id = id!!,
             name = localize(nameEn, nameRu, language),
             orderNumber = orderNumber
