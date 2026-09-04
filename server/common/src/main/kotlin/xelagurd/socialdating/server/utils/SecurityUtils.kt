@@ -1,7 +1,7 @@
 package xelagurd.socialdating.server.utils
 
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
+import xelagurd.socialdating.server.exception.ForbiddenDataException
 
 object SecurityUtils {
 
@@ -9,7 +9,7 @@ object SecurityUtils {
         val authenticatedUserId = SecurityContextHolder.getContext().authentication.principal as Int
 
         if (currentUserId != authenticatedUserId)
-            throw AccessDeniedException("Access denied due to request another user`s data")
+            throw ForbiddenDataException("error.accessDenied.anotherUser")
     }
 
 }

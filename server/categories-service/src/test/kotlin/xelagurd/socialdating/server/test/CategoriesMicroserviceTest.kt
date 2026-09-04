@@ -23,11 +23,10 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
 import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeCategoriesData
-import xelagurd.socialdating.server.FakeCategoriesData.filterByIds
 import xelagurd.socialdating.server.FakeCategoriesData.filterByUserId
 import xelagurd.socialdating.server.FakeCategoriesData.toUserCategoriesWithNullIds
 import xelagurd.socialdating.server.client.UsersServiceClient
-import xelagurd.socialdating.server.model.Category
+import xelagurd.socialdating.server.model.additional.CategoryResponse
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.additional.UserData
 import xelagurd.socialdating.server.model.details.CategoryOrderDetails
@@ -67,7 +66,7 @@ class CategoriesMicroserviceTest(
     )
 
     private val categoriesDetails = FakeCategoriesData.categoriesDetails
-    private val categories = FakeCategoriesData.categories.take(categoriesDetails.size)
+    private val categories = FakeCategoriesData.categoryResponses.take(categoriesDetails.size)
     private val userCategories = FakeCategoriesData.userCategories
 
     @BeforeAll
@@ -82,7 +81,7 @@ class CategoriesMicroserviceTest(
             val response = restTemplate.postForEntity(
                 "/categories",
                 categoryDetails,
-                Category::class.java
+                CategoryResponse::class.java
             )
             assertEquals(HttpStatus.CREATED, response.statusCode)
             assertEquals(categories[index], response.body!!)
@@ -93,7 +92,7 @@ class CategoriesMicroserviceTest(
     fun getCategories_existData_ok() {
         val response = restTemplate.getForEntity(
             "/categories",
-            Array<Category>::class.java
+            Array<CategoryResponse>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(categories.size, response.body!!.size)
@@ -102,10 +101,10 @@ class CategoriesMicroserviceTest(
 
     @Test
     fun getCategories_withIds_ok() {
-        val expected = categories.filterByIds(categoryIds)
+        val expected = categories.filter { it.id in categoryIds }
         val response = restTemplate.getForEntity(
             "/categories?categoryIds=${categoryIds.toRequestParams()}",
-            Array<Category>::class.java
+            Array<CategoryResponse>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(expected.size, response.body!!.size)
@@ -197,7 +196,7 @@ class CategoriesMicroserviceTest(
 
     @Test
     fun moveCategory_backwards_shiftsJumpedOverCategoriesForward() {
-        val movedCategoryId = categories[3].id!!
+        val movedCategoryId = categories[3].id
 
         moveCategory(movedCategoryId, 2)
         // 1, 2, 3, 4, 5 -> 1, 3, 4, 2, 5
@@ -209,7 +208,7 @@ class CategoriesMicroserviceTest(
 
     @Test
     fun moveCategory_forwards_shiftsJumpedOverCategoriesBackward() {
-        val movedCategoryId = categories[0].id!!
+        val movedCategoryId = categories[0].id
 
         moveCategory(movedCategoryId, 3)
         // 1, 2, 3, 4, 5 -> 3, 1, 2, 4, 5
@@ -221,7 +220,7 @@ class CategoriesMicroserviceTest(
 
     @Test
     fun moveCategory_sameOrderNumber_keepsOrder() {
-        moveCategory(categories[2].id!!, 3)
+        moveCategory(categories[2].id, 3)
 
         assertEquals(listOf(1, 2, 3, 4, 5), getOrderNumbersByCategoryId())
     }
@@ -230,7 +229,7 @@ class CategoriesMicroserviceTest(
     fun moveCategory_orderNumberAboveMax_badRequest() {
         val response = restTemplate.postForEntity(
             "/categories/order",
-            CategoryOrderDetails(categoryId = categories[0].id!!, orderNumber = categories.size + 1),
+            CategoryOrderDetails(categoryId = categories[0].id, orderNumber = categories.size + 1),
             String::class.java
         )
 
@@ -242,7 +241,7 @@ class CategoriesMicroserviceTest(
         val response = restTemplate.postForEntity(
             "/categories/order",
             CategoryOrderDetails(categoryId = categoryId, orderNumber = orderNumber),
-            Category::class.java
+            CategoryResponse::class.java
         )
 
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -250,7 +249,7 @@ class CategoriesMicroserviceTest(
     }
 
     private fun getOrderNumbersByCategoryId(): List<Int> {
-        val response = restTemplate.getForEntity("/categories", Array<Category>::class.java)
+        val response = restTemplate.getForEntity("/categories", Array<CategoryResponse>::class.java)
         assertEquals(HttpStatus.OK, response.statusCode)
 
         return response.body!!.sortedBy { it.id }.map { it.orderNumber }

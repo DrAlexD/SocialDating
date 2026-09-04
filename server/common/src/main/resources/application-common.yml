@@ -11,6 +11,8 @@ management:
       enabled: true
 
 spring:
+  web:
+    locale: en
   jackson:
     deserialization:
       fail-on-numbers-for-enums: true

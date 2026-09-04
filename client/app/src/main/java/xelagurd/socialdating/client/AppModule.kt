@@ -23,6 +23,7 @@ import xelagurd.socialdating.client.data.local.AppDatabase
 import xelagurd.socialdating.client.data.remote.ApiService
 import xelagurd.socialdating.client.data.remote.AuthApiService
 import xelagurd.socialdating.client.data.remote.AuthInterceptor
+import xelagurd.socialdating.client.data.remote.LanguageInterceptor
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -52,10 +53,19 @@ object AppModule {
     @Provides
     @Singleton
     @Named("auth")
-    fun provideAuthRetrofit(): Retrofit =
+    fun provideAuthOkHttpClient(languageInterceptor: LanguageInterceptor): OkHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(languageInterceptor)
+            .build()
+
+    @Provides
+    @Singleton
+    @Named("auth")
+    fun provideAuthRetrofit(@Named("auth") okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .client(okHttpClient)
             .build()
 
     @Provides
@@ -65,9 +75,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient =
+    fun provideOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        languageInterceptor: LanguageInterceptor
+    ): OkHttpClient =
         OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
+            .addInterceptor(languageInterceptor)
             .build()
 
     @Provides

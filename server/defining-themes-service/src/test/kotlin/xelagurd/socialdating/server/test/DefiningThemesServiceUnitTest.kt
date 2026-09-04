@@ -33,6 +33,7 @@ class DefiningThemesServiceUnitTest {
     private val categoryId = Random.nextInt(1, Int.MAX_VALUE)
     private val definingThemeIds = Random.nextIntList()
     private val definingThemes = FakeDefiningThemesData.definingThemes
+    private val definingThemeResponses = FakeDefiningThemesData.definingThemeResponses
     private val definingTheme = FakeDefiningThemesData.definingThemes[0]
     private val definingThemeDetails = FakeDefiningThemesData.definingThemesDetails[0]
     private val definingThemeSlot = slot<DefiningTheme>()
@@ -44,7 +45,7 @@ class DefiningThemesServiceUnitTest {
 
         val result = definingThemesService.getDefiningThemes(definingThemeIds, categoryId)
 
-        assertEquals(definingThemes, result)
+        assertEquals(definingThemeResponses, result)
 
         verify(exactly = 1) {
             definingThemesRepository.findAllByIdsAndCategoryId(definingThemeIds, categoryId)
@@ -79,15 +80,20 @@ class DefiningThemesServiceUnitTest {
     @Test
     fun addDefiningTheme_existingMaxNumber_incrementsNumberInCategory() {
         every { definingThemesRepository.findMaxNumberInCategory(any()) } returns maxNumberInCategory
-        every { definingThemesRepository.save(capture(definingThemeSlot)) } returns mockk()
+        every { definingThemesRepository.save(capture(definingThemeSlot)) } answers {
+            definingThemeSlot.captured.apply { id = 1 }
+        }
 
         definingThemesService.addDefiningTheme(definingThemeDetails)
 
         assertEquals(maxNumberInCategory + 1, definingThemeSlot.captured.numberInCategory)
         with(definingThemeSlot.captured) {
-            assertEquals(definingThemeDetails.name, name)
-            assertEquals(definingThemeDetails.fromOpinion, fromOpinion)
-            assertEquals(definingThemeDetails.toOpinion, toOpinion)
+            assertEquals(definingThemeDetails.nameEn, nameEn)
+            assertEquals(definingThemeDetails.nameRu, nameRu)
+            assertEquals(definingThemeDetails.fromOpinionEn, fromOpinionEn)
+            assertEquals(definingThemeDetails.fromOpinionRu, fromOpinionRu)
+            assertEquals(definingThemeDetails.toOpinionEn, toOpinionEn)
+            assertEquals(definingThemeDetails.toOpinionRu, toOpinionRu)
             assertEquals(definingThemeDetails.categoryId, categoryId)
         }
 
@@ -99,7 +105,9 @@ class DefiningThemesServiceUnitTest {
     @Test
     fun addDefiningTheme_noMaxNumber_setsNumberInCategoryToOne() {
         every { definingThemesRepository.findMaxNumberInCategory(any()) } returns null
-        every { definingThemesRepository.save(capture(definingThemeSlot)) } returns mockk()
+        every { definingThemesRepository.save(capture(definingThemeSlot)) } answers {
+            definingThemeSlot.captured.apply { id = 1 }
+        }
 
         definingThemesService.addDefiningTheme(definingThemeDetails)
 

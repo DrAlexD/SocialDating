@@ -40,7 +40,7 @@ class CategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     private val categoryIds = Random.nextIntList()
     private val categoryDetails = FakeCategoriesData.categoriesDetails[0]
-    private val category = FakeCategoriesData.categories[0]
+    private val category = FakeCategoriesData.categoryResponses[0]
 
     @Test
     fun getCategories_existData_ok() {
@@ -91,7 +91,7 @@ class CategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc) {
         mockMvc.perform(
             post("/categories")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(CategoryDetails(name = "")))
+                .content(objectMapper.writeValueAsString(CategoryDetails(nameEn = "", nameRu = "")))
         )
             .andExpect(status().isBadRequest)
 

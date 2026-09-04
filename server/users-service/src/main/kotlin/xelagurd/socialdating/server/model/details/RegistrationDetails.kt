@@ -24,6 +24,8 @@ import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
 import xelagurd.socialdating.server.model.enums.Role
+import xelagurd.socialdating.server.utils.LocalizationUtils.englishOrNull
+import xelagurd.socialdating.server.utils.LocalizationUtils.russianOrNull
 import xelagurd.socialdating.server.validation.TrimmedSize
 
 data class RegistrationDetails(
@@ -34,7 +36,7 @@ data class RegistrationDetails(
 
     @field:NotBlank
     @field:Size(min = USERNAME_LENGTH_MIN, max = USERNAME_LENGTH_MAX)
-    @field:Pattern(regexp = USERNAME_PATTERN, message = "can contain only letters, numbers and underscores")
+    @field:Pattern(regexp = USERNAME_PATTERN, message = "{socialdating.validation.username}")
     val username: String,
 
     @field:NotBlank
@@ -42,7 +44,7 @@ data class RegistrationDetails(
     val password: String,
 
     @field:TrimmedSize(min = EMAIL_LENGTH_MIN, max = EMAIL_LENGTH_MAX)
-    @field:Pattern(regexp = EMAIL_PATTERN, message = "must be a well-formed email address")
+    @field:Pattern(regexp = EMAIL_PATTERN, message = "{socialdating.validation.email}")
     val email: String?,
 
     @field:Min(AGE_MIN.toLong())
@@ -56,13 +58,15 @@ data class RegistrationDetails(
 ) {
     fun toUser(passwordEncoder: PasswordEncoder) =
         User(
-            name = name,
+            nameEn = englishOrNull(name),
+            nameRu = russianOrNull(name),
             gender = gender,
             username = username,
             password = passwordEncoder.encode(password),
             email = email,
             age = age,
-            city = city,
+            cityEn = englishOrNull(city),
+            cityRu = russianOrNull(city),
             purpose = purpose,
             role = Role.USER
         )

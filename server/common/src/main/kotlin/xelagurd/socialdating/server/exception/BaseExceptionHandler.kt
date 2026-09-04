@@ -17,10 +17,12 @@ import xelagurd.socialdating.server.utils.ExceptionUtils.getErrorPositionFromSta
 import xelagurd.socialdating.server.utils.ExceptionUtils.transformNotUniqueDataMessage
 import xelagurd.socialdating.server.utils.ExceptionUtils.transformWrongDataMessage
 import xelagurd.socialdating.server.utils.ExceptionUtils.transformWrongInputMessage
+import xelagurd.socialdating.server.utils.LocalizedMessages
 
 @RestControllerAdvice
 class BaseExceptionHandler {
     val logger = KotlinLogging.logger { }
+    private val messages = LocalizedMessages()
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -28,8 +30,8 @@ class BaseExceptionHandler {
         val fieldErrors = ex.bindingResult.fieldErrors.map { it.field to it.defaultMessage }
         val globalErrors = ex.bindingResult.globalErrors.map { it.objectName to it.defaultMessage }
 
-        val message = createWrongDataMessage(fieldErrors + globalErrors)
-            .ifEmpty { "Invalid data (wrong values)" }
+        val message = createWrongDataMessage(fieldErrors + globalErrors, messages)
+            .ifEmpty { messages.get("error.invalidData.wrongValues") }
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
         logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
         return message
@@ -38,8 +40,8 @@ class BaseExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleHttpMessageNotReadableException(ex: HttpMessageNotReadableException): String {
-        val message = (ex.cause as? MismatchedInputException)?.transformWrongInputMessage()
-            ?: "Invalid data (wrong format)"
+        val message = (ex.cause as? MismatchedInputException)?.transformWrongInputMessage(messages)
+            ?: messages.get("error.invalidData.wrongFormat")
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
         logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
         return message
@@ -48,7 +50,7 @@ class BaseExceptionHandler {
     @ExceptionHandler(TransactionSystemException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleTransactionSystemException(ex: TransactionSystemException): String {
-        val message = "Invalid data (empty or wrong values)"
+        val message = messages.get("error.invalidData.emptyOrWrongValues")
         val detailedMessage = ex.message ?: message
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
         logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $detailedMessage" }
@@ -59,9 +61,9 @@ class BaseExceptionHandler {
     fun handleDataIntegrityViolationException(ex: DataIntegrityViolationException): ResponseEntity<String> {
         val detailedMessage = ex.mostSpecificCause.message ?: ex.message
 
-        val (status, message) = when (val wrongDataMessage = detailedMessage?.transformWrongDataMessage()) {
-            null -> HttpStatus.CONFLICT to
-                    (detailedMessage?.transformNotUniqueDataMessage() ?: "Invalid data (not unique values)")
+        val (status, message) = when (val wrongDataMessage = detailedMessage?.transformWrongDataMessage(messages)) {
+            null -> HttpStatus.CONFLICT to (detailedMessage?.transformNotUniqueDataMessage(messages)
+                ?: messages.get("error.invalidData.notUniqueValues"))
 
             else -> HttpStatus.BAD_REQUEST to wrongDataMessage
         }
@@ -74,7 +76,10 @@ class BaseExceptionHandler {
     @ExceptionHandler(AccessDeniedException::class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     fun handleAccessDeniedException(ex: AccessDeniedException): String {
-        val message = ex.message ?: "Access denied"
+        val message = when (ex) {
+            is ForbiddenDataException -> messages.get(ex.messageKey)
+            else -> ex.message ?: messages.get("error.accessDenied")
+        }
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
         logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
         return message
@@ -83,7 +88,10 @@ class BaseExceptionHandler {
     @ExceptionHandler(IllegalArgumentException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleIllegalArgumentException(ex: IllegalArgumentException): String {
-        val message = ex.message ?: "Invalid argument"
+        val message = when (ex) {
+            is InvalidDataException -> messages.get(ex.messageKey, *ex.messageArgs)
+            else -> ex.message ?: messages.get("error.invalidArgument")
+        }
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
         logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $message" }
         return message
@@ -92,7 +100,7 @@ class BaseExceptionHandler {
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     fun handleGenericException(ex: Exception): String {
-        val message = "Unknown server error"
+        val message = messages.get("error.unknownServerError")
         val detailedMessage = ex.message ?: message
         val origin = getErrorPositionFromStackTrace(ex.stackTrace)
         logger.error { "Class: ${ex.javaClass.simpleName}, origin: $origin, message: $detailedMessage" }

@@ -13,7 +13,7 @@ import jakarta.validation.Payload
 annotation class TrimmedSize(
     val min: Int = 0,
     val max: Int = Int.MAX_VALUE,
-    val message: String = "must have size between {min} and {max} excluding leading and trailing spaces",
+    val message: String = "{socialdating.validation.trimmedSize}",
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<out Payload>> = []
 )

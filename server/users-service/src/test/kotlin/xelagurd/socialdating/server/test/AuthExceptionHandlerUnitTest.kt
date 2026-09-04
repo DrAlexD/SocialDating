@@ -26,10 +26,10 @@ class AuthExceptionHandlerUnitTest {
     }
 
     @Test
-    fun handleJwtException_withMessage_returnsMessage() {
-        val exception = JwtException("Invalid token")
+    fun handleJwtException_withMessage_hidesLibraryMessage() {
+        val exception = JwtException("JWT expired 2 minutes ago")
 
-        assertEquals("Invalid token", authExceptionHandler.handleJwtException(exception))
+        assertEquals("Invalid JWT token", authExceptionHandler.handleJwtException(exception))
     }
 
     @Test

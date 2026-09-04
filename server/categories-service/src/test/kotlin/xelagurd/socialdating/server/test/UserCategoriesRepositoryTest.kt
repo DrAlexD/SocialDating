@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.model.Category
+import xelagurd.socialdating.server.model.enums.AppLanguage.ENGLISH
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.repository.CategoriesRepository
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
@@ -32,8 +33,8 @@ class UserCategoriesRepositoryTest(
     fun seedData() {
         val savedCategories = categoriesRepository.saveAllAndFlush(
             listOf(
-                Category(name = "Category1", orderNumber = 1),
-                Category(name = "Category2", orderNumber = 2)
+                Category(nameEn = "Category1", nameRu = "Категория1", orderNumber = 1),
+                Category(nameEn = "Category2", nameRu = "Категория2", orderNumber = 2)
             )
         )
         category1 = savedCategories[0]
@@ -83,7 +84,7 @@ class UserCategoriesRepositoryTest(
 
         assertEquals(2, result.size)
         assertEquals(setOf(category1.id, category2.id), result.map { it.id }.toSet())
-        assertEquals(setOf("Category1", "Category2"), result.map { it.name }.toSet())
+        assertEquals(setOf("Category1", "Category2"), result.map { it.getLocalizedName(ENGLISH) }.toSet())
     }
 
     @Test

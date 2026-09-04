@@ -13,6 +13,7 @@ import xelagurd.socialdating.server.model.additional.DetailedSimilarUser
 import xelagurd.socialdating.server.model.additional.SimilarCategory
 import xelagurd.socialdating.server.model.additional.SimilarUser
 import xelagurd.socialdating.server.model.additional.SimilarUserWithData
+import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.model.enums.SimilarityType.Companion.fromSimilarityDiff
 import xelagurd.socialdating.server.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.server.model.enums.SimilarityType.SIMILAR
@@ -41,6 +42,8 @@ class UserCategoriesService(
     ): List<SimilarUserWithData> {
         checkCurrentUserAuth(currentUserId)
 
+        val language = AppLanguage.current()
+
         val currentUserCategoriesById = userCategoriesRepository
             .findCurrentUserCategories(currentUserId, categoryIds)
             .associateBy { it.id }
@@ -52,7 +55,7 @@ class UserCategoriesService(
             .groupBy { it.userId }
             .mapNotNull { (anotherUserId, anotherUserCategories) ->
                 val (similarNumberUser, oppositeNumberUser, categoriesWithSimilarity) =
-                    calculateUserSimilarity(currentUserCategoriesById, anotherUserCategories)
+                    calculateUserSimilarity(currentUserCategoriesById, anotherUserCategories, language)
 
                 if (categoriesWithSimilarity.isNotEmpty() && similarNumberUser > oppositeNumberUser) {
                     SimilarUser(
@@ -107,7 +110,8 @@ class UserCategoriesService(
 
     private fun calculateUserSimilarity(
         currentUserCategoriesById: Map<Int, CategoryWithData>,
-        anotherUserCategories: List<UserCategory>
+        anotherUserCategories: List<UserCategory>,
+        language: AppLanguage
     ): Triple<Int, Int, List<SimilarCategory>> {
         val categoriesWithSimilarity = mutableListOf<SimilarCategory>()
         var similarNumberUser = 0
@@ -124,7 +128,7 @@ class UserCategoriesService(
                 oppositeNumberUser += oppositeNumberCategory
 
                 categoriesWithSimilarity += SimilarCategory(
-                    name = currentUserCategory.name,
+                    name = currentUserCategory.getLocalizedName(language),
                     differenceNumber = similarNumberCategory - oppositeNumberCategory
                 )
             }

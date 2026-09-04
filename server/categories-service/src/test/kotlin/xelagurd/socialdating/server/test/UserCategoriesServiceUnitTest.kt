@@ -63,7 +63,7 @@ class UserCategoriesServiceUnitTest {
         name: String = "Category$id",
         maintained: Array<Long>? = null,
         notMaintained: Array<Long>? = null
-    ) = CategoryWithData(id, name, maintained, notMaintained)
+    ) = CategoryWithData(id, name, name, maintained, notMaintained)
 
     private fun userData(
         id: Int,

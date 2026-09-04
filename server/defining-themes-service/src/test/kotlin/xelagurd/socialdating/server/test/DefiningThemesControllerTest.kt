@@ -39,7 +39,7 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
     private val categoryId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
     private val definingThemeIds = Random.nextIntList()
     private val definingThemeDetails = FakeDefiningThemesData.definingThemesDetails[0]
-    private val definingTheme = FakeDefiningThemesData.definingThemes[0]
+    private val definingTheme = FakeDefiningThemesData.definingThemeResponses[0]
 
     @Test
     fun getDefiningThemes_existData_ok() {

@@ -1,9 +1,7 @@
 package xelagurd.socialdating.server.model.additional
 
-import xelagurd.socialdating.server.model.User
-
 data class AuthResponse(
-    val user: User,
+    val user: UserResponse,
     val accessToken: String,
     val refreshToken: String
 ) {

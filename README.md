@@ -46,7 +46,7 @@ Spring Boot microservices, entry point is `gateway-service/` (Spring Cloud Gatew
 **Security** — JWT Bearer tokens issued by `users-service` (with auth exception handling)
 
 **Inter-service communication** — Kafka async events (producers/consumers in `service/` layer) and synchronous OpenFeign
-calls (clients in `client/` layer, auth headers are propagated by `AuthForwardingInterceptor`)
+calls (clients in `client/` layer, auth headers and `Accept-Language` are propagated by `AuthForwardingInterceptor`)
 
 **Database** — single PostgreSQL instance `social_dating_db`, separate schemas per service:
 
@@ -58,6 +58,9 @@ calls (clients in `client/` layer, auth headers are propagated by `AuthForwardin
 | `statements_schema`      | `Statement`, `StatementDefiningTheme`, `UserStatement` |
 
 **Migrations** — no migration tool, Hibernate DDL auto is `create-drop`
+
+**Localization** — every displayed text field is stored in two columns, `*En` and `*Ru`. Error messages are
+localized too.
 
 **Testing:**
 
@@ -117,10 +120,11 @@ MVVM + Repository pattern, Jetpack Compose UI, Dagger Hilt DI (`AppModule`).
 
 - Two Retrofit instances — one without auth (login/register), one with
 - `AuthInterceptor` — injects JWT into Retrofit requests, refreshes access token
+- `LanguageInterceptor` — injects `Accept-Language` into Retrofit requests of both instances
 - `AccountManager` — wraps `CredentialManager`, manages credentials
 - `PreferencesRepository` — wraps `DataStore`, stores access + refresh JWT tokens and chosen theme mode
 - `AppLocaleManager` — wraps platform `LocaleManager`, applies chosen app language (locale config is generated
-  by AGP from `values-*` folders)
+  by AGP from `values-*` folders) and resolves the effective language for `LanguageInterceptor`
 
 **Testing:**
 

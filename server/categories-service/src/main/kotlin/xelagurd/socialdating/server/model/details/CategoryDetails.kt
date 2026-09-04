@@ -8,11 +8,15 @@ import xelagurd.socialdating.server.validation.TrimmedSize
 
 data class CategoryDetails(
     @field:TrimmedSize(min = CATEGORY_NAME_LENGTH_MIN, max = CATEGORY_NAME_LENGTH_MAX)
-    val name: String
+    val nameEn: String,
+
+    @field:TrimmedSize(min = CATEGORY_NAME_LENGTH_MIN, max = CATEGORY_NAME_LENGTH_MAX)
+    val nameRu: String
 ) {
     fun toCategory(orderNumber: Int?) =
         Category(
-            name = name,
+            nameEn = nameEn,
+            nameRu = nameRu,
             orderNumber = orderNumber ?: ID_MIN
         )
 }

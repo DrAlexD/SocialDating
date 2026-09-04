@@ -17,11 +17,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
 import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeDefiningThemesData
-import xelagurd.socialdating.server.FakeDefiningThemesData.filterByCategoryId
-import xelagurd.socialdating.server.FakeDefiningThemesData.filterByIds
 import xelagurd.socialdating.server.FakeDefiningThemesData.filterByUserId
 import xelagurd.socialdating.server.FakeDefiningThemesData.toUserDefiningThemesWithNullIds
-import xelagurd.socialdating.server.model.DefiningTheme
+import xelagurd.socialdating.server.model.additional.DefiningThemeResponse
 import xelagurd.socialdating.server.model.UserDefiningTheme
 import xelagurd.socialdating.server.model.details.DefiningThemeOrderDetails
 import xelagurd.socialdating.server.repository.UserDefiningThemesRepository
@@ -43,7 +41,7 @@ class DefiningThemesMicroserviceTest(
     private val definingThemeIds = listOf(1, 2)
 
     private val definingThemesDetails = FakeDefiningThemesData.definingThemesDetails
-    private val definingThemes = FakeDefiningThemesData.definingThemes.take(definingThemesDetails.size)
+    private val definingThemes = FakeDefiningThemesData.definingThemeResponses.take(definingThemesDetails.size)
     private val userDefiningThemes = FakeDefiningThemesData.userDefiningThemes
 
     @BeforeAll
@@ -58,7 +56,7 @@ class DefiningThemesMicroserviceTest(
             val response = restTemplate.postForEntity(
                 "/defining-themes",
                 definingThemeDetails,
-                DefiningTheme::class.java
+                DefiningThemeResponse::class.java
             )
             assertEquals(HttpStatus.CREATED, response.statusCode)
             assertEquals(definingThemes[index], response.body!!)
@@ -67,10 +65,10 @@ class DefiningThemesMicroserviceTest(
 
     @Test
     fun getDefiningThemes_withCategoryId_ok() {
-        val expected = definingThemes.filterByCategoryId(categoryId)
+        val expected = definingThemes.filter { it.categoryId == categoryId }
         val response = restTemplate.getForEntity(
             "/defining-themes?categoryId=$categoryId",
-            Array<DefiningTheme>::class.java
+            Array<DefiningThemeResponse>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(expected.size, response.body!!.size)
@@ -79,10 +77,10 @@ class DefiningThemesMicroserviceTest(
 
     @Test
     fun getDefiningThemes_withIds_ok() {
-        val expected = definingThemes.filterByIds(definingThemeIds)
+        val expected = definingThemes.filter { it.id in definingThemeIds }
         val response = restTemplate.getForEntity(
             "/defining-themes?definingThemeIds=${definingThemeIds.toRequestParams()}",
-            Array<DefiningTheme>::class.java
+            Array<DefiningThemeResponse>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(expected.size, response.body!!.size)
@@ -94,7 +92,7 @@ class DefiningThemesMicroserviceTest(
         val expected = definingThemes.sortedWith(compareBy({ it.orderNumber }, { it.categoryId }))
         val response = restTemplate.getForEntity(
             "/defining-themes",
-            Array<DefiningTheme>::class.java
+            Array<DefiningThemeResponse>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(expected.size, response.body!!.size)
@@ -115,7 +113,7 @@ class DefiningThemesMicroserviceTest(
 
     @Test
     fun moveDefiningTheme_backwards_shiftsJumpedOverThemesForwardInsideCategory() {
-        val movedDefiningThemeId = definingThemes.filterByCategoryId(categoryId).last().id!!
+        val movedDefiningThemeId = definingThemes.filter { it.categoryId == categoryId }.last().id
 
         moveDefiningTheme(movedDefiningThemeId, 1)
         // 1, 2, 3 -> 2, 3, 1
@@ -128,7 +126,7 @@ class DefiningThemesMicroserviceTest(
 
     @Test
     fun moveDefiningTheme_forwards_shiftsJumpedOverThemesBackwardInsideCategory() {
-        val movedDefiningThemeId = definingThemes.filterByCategoryId(categoryId).first().id!!
+        val movedDefiningThemeId = definingThemes.filter { it.categoryId == categoryId }.first().id
 
         moveDefiningTheme(movedDefiningThemeId, 3)
         // 1, 2, 3 -> 3, 1, 2
@@ -141,11 +139,11 @@ class DefiningThemesMicroserviceTest(
 
     @Test
     fun moveDefiningTheme_orderNumberAboveCategoryMax_badRequest() {
-        val definingThemesInCategory = definingThemes.filterByCategoryId(categoryId)
+        val definingThemesInCategory = definingThemes.filter { it.categoryId == categoryId }
         val response = restTemplate.postForEntity(
             "/defining-themes/order",
             DefiningThemeOrderDetails(
-                definingThemeId = definingThemesInCategory.first().id!!,
+                definingThemeId = definingThemesInCategory.first().id,
                 orderNumber = definingThemesInCategory.size + 1
             ),
             String::class.java
@@ -159,7 +157,7 @@ class DefiningThemesMicroserviceTest(
         val response = restTemplate.postForEntity(
             "/defining-themes/order",
             DefiningThemeOrderDetails(definingThemeId = definingThemeId, orderNumber = orderNumber),
-            DefiningTheme::class.java
+            DefiningThemeResponse::class.java
         )
 
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -169,7 +167,7 @@ class DefiningThemesMicroserviceTest(
     private fun getOrderNumbersByDefiningThemeId(categoryId: Int): List<Int> {
         val response = restTemplate.getForEntity(
             "/defining-themes?categoryId=$categoryId",
-            Array<DefiningTheme>::class.java
+            Array<DefiningThemeResponse>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
 

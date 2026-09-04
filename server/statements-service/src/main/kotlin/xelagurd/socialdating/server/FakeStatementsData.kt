@@ -5,6 +5,7 @@ import xelagurd.socialdating.server.model.StatementDefiningTheme
 import xelagurd.socialdating.server.model.UserStatement
 import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
 import xelagurd.socialdating.server.model.details.StatementDetails
+import xelagurd.socialdating.server.model.enums.AppLanguage.ENGLISH
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_NO_MAINTAIN
 import xelagurd.socialdating.server.model.enums.StatementReactionType.NOT_SURE
@@ -44,71 +45,71 @@ object FakeStatementsData {
     )
 
     val statements = listOf(
-        Statement(id = 1, text = "RemoteStatement1", creatorUserId = 1),
-        Statement(id = 2, text = "RemoteStatement2", creatorUserId = 1),
-        Statement(id = 3, text = "RemoteStatement3", creatorUserId = 1),
-        Statement(id = 4, text = "RemoteStatement4", creatorUserId = 1),
-        Statement(id = 5, text = "RemoteStatement5", creatorUserId = 1),
-        Statement(id = 6, text = "RemoteStatement6", creatorUserId = 1),
-        Statement(id = 7, text = "RemoteStatement7", creatorUserId = 1),
-        Statement(id = 8, text = "RemoteStatement8", creatorUserId = 1),
-        Statement(id = 9, text = "RemoteStatement9", creatorUserId = 1),
-        Statement(id = 10, text = "RemoteStatement10", creatorUserId = 1),
-        Statement(id = 11, text = "RemoteStatement11", creatorUserId = 1),
-        Statement(id = 12, text = "RemoteStatement12", creatorUserId = 1),
-        Statement(id = 13, text = "RemoteStatement13", creatorUserId = 1),
-        Statement(id = 14, text = "RemoteStatement14", creatorUserId = 1),
-        Statement(id = 15, text = "RemoteStatement15", creatorUserId = 1),
-        Statement(id = 16, text = "RemoteStatement16", creatorUserId = 1),
-        Statement(id = 17, text = "RemoteStatement17", creatorUserId = 1),
-        Statement(id = 18, text = "RemoteStatement18", creatorUserId = 1),
-        Statement(id = 19, text = "RemoteStatement19", creatorUserId = 1),
-        Statement(id = 20, text = "RemoteStatement20", creatorUserId = 1),
-        Statement(id = 21, text = "RemoteStatement21", creatorUserId = 1),
-        Statement(id = 22, text = "RemoteStatement22", creatorUserId = 1),
-        Statement(id = 23, text = "RemoteStatement23", creatorUserId = 1),
-        Statement(id = 24, text = "RemoteStatement24", creatorUserId = 1),
-        Statement(id = 25, text = "RemoteStatement25", creatorUserId = 1),
-        Statement(id = 26, text = "RemoteStatement26", creatorUserId = 1),
-        Statement(id = 27, text = "RemoteStatement27", creatorUserId = 1),
-        Statement(id = 28, text = "RemoteStatement28", creatorUserId = 1),
-        Statement(id = 29, text = "RemoteStatement29", creatorUserId = 1),
-        Statement(id = 30, text = "RemoteStatement30", creatorUserId = 1),
-        Statement(id = 31, text = "RemoteStatement31", creatorUserId = 1),
-        Statement(id = 32, text = "RemoteStatement32", creatorUserId = 1),
-        Statement(id = 33, text = "RemoteStatement33", creatorUserId = 1),
-        Statement(id = 34, text = "RemoteStatement34", creatorUserId = 1),
-        Statement(id = 35, text = "RemoteStatement35", creatorUserId = 1),
-        Statement(id = 36, text = "RemoteStatement36", creatorUserId = 1),
-        Statement(id = 37, text = "RemoteStatement37", creatorUserId = 1),
-        Statement(id = 38, text = "RemoteStatement38", creatorUserId = 1),
-        Statement(id = 39, text = "RemoteStatement39", creatorUserId = 1),
-        Statement(id = 40, text = "RemoteStatement40", creatorUserId = 1),
-        Statement(id = 41, text = "RemoteStatement41", creatorUserId = 1),
-        Statement(id = 42, text = "RemoteStatement42", creatorUserId = 1),
-        Statement(id = 43, text = "RemoteStatement43", creatorUserId = 1),
-        Statement(id = 44, text = "RemoteStatement44", creatorUserId = 1),
-        Statement(id = 45, text = "RemoteStatement45", creatorUserId = 1),
-        Statement(id = 46, text = "RemoteStatement46", creatorUserId = 1),
-        Statement(id = 47, text = "RemoteStatement47", creatorUserId = 1),
-        Statement(id = 48, text = "RemoteStatement48", creatorUserId = 1),
-        Statement(id = 49, text = "RemoteStatement49", creatorUserId = 1),
-        Statement(id = 50, text = "RemoteStatement50", creatorUserId = 1),
-        Statement(id = 51, text = "RemoteStatement51", creatorUserId = 1),
-        Statement(id = 52, text = "RemoteStatement52", creatorUserId = 1),
-        Statement(id = 53, text = "RemoteStatement53", creatorUserId = 1),
-        Statement(id = 54, text = "RemoteStatement54", creatorUserId = 1),
-        Statement(id = 55, text = "RemoteStatement55", creatorUserId = 1),
-        Statement(id = 56, text = "RemoteStatement56", creatorUserId = 1),
-        Statement(id = 57, text = "RemoteStatement57", creatorUserId = 1),
-        Statement(id = 58, text = "RemoteStatement58", creatorUserId = 1),
-        Statement(id = 59, text = "RemoteStatement59", creatorUserId = 1),
-        Statement(id = 60, text = "RemoteStatement60", creatorUserId = 1),
-        Statement(id = 61, text = "RemoteStatement61", creatorUserId = 1),
-        Statement(id = 62, text = "RemoteStatement62", creatorUserId = 1),
-        Statement(id = 63, text = "RemoteStatement63", creatorUserId = 1),
-        Statement(id = 64, text = "RemoteStatement64", creatorUserId = 1),
-        Statement(id = 65, text = "RemoteStatement65", creatorUserId = 1)
+        Statement(id = 1, textEn = "RemoteStatement1", textRu = "УдалённоеВысказывание1", creatorUserId = 1),
+        Statement(id = 2, textEn = "RemoteStatement2", textRu = "УдалённоеВысказывание2", creatorUserId = 1),
+        Statement(id = 3, textEn = "RemoteStatement3", textRu = "УдалённоеВысказывание3", creatorUserId = 1),
+        Statement(id = 4, textEn = "RemoteStatement4", textRu = "УдалённоеВысказывание4", creatorUserId = 1),
+        Statement(id = 5, textEn = "RemoteStatement5", textRu = "УдалённоеВысказывание5", creatorUserId = 1),
+        Statement(id = 6, textEn = "RemoteStatement6", textRu = "УдалённоеВысказывание6", creatorUserId = 1),
+        Statement(id = 7, textEn = "RemoteStatement7", textRu = "УдалённоеВысказывание7", creatorUserId = 1),
+        Statement(id = 8, textEn = "RemoteStatement8", textRu = "УдалённоеВысказывание8", creatorUserId = 1),
+        Statement(id = 9, textEn = "RemoteStatement9", textRu = "УдалённоеВысказывание9", creatorUserId = 1),
+        Statement(id = 10, textEn = "RemoteStatement10", textRu = "УдалённоеВысказывание10", creatorUserId = 1),
+        Statement(id = 11, textEn = "RemoteStatement11", textRu = "УдалённоеВысказывание11", creatorUserId = 1),
+        Statement(id = 12, textEn = "RemoteStatement12", textRu = "УдалённоеВысказывание12", creatorUserId = 1),
+        Statement(id = 13, textEn = "RemoteStatement13", textRu = "УдалённоеВысказывание13", creatorUserId = 1),
+        Statement(id = 14, textEn = "RemoteStatement14", textRu = "УдалённоеВысказывание14", creatorUserId = 1),
+        Statement(id = 15, textEn = "RemoteStatement15", textRu = "УдалённоеВысказывание15", creatorUserId = 1),
+        Statement(id = 16, textEn = "RemoteStatement16", textRu = "УдалённоеВысказывание16", creatorUserId = 1),
+        Statement(id = 17, textEn = "RemoteStatement17", textRu = "УдалённоеВысказывание17", creatorUserId = 1),
+        Statement(id = 18, textEn = "RemoteStatement18", textRu = "УдалённоеВысказывание18", creatorUserId = 1),
+        Statement(id = 19, textEn = "RemoteStatement19", textRu = "УдалённоеВысказывание19", creatorUserId = 1),
+        Statement(id = 20, textEn = "RemoteStatement20", textRu = "УдалённоеВысказывание20", creatorUserId = 1),
+        Statement(id = 21, textEn = "RemoteStatement21", textRu = "УдалённоеВысказывание21", creatorUserId = 1),
+        Statement(id = 22, textEn = "RemoteStatement22", textRu = "УдалённоеВысказывание22", creatorUserId = 1),
+        Statement(id = 23, textEn = "RemoteStatement23", textRu = "УдалённоеВысказывание23", creatorUserId = 1),
+        Statement(id = 24, textEn = "RemoteStatement24", textRu = "УдалённоеВысказывание24", creatorUserId = 1),
+        Statement(id = 25, textEn = "RemoteStatement25", textRu = "УдалённоеВысказывание25", creatorUserId = 1),
+        Statement(id = 26, textEn = "RemoteStatement26", textRu = "УдалённоеВысказывание26", creatorUserId = 1),
+        Statement(id = 27, textEn = "RemoteStatement27", textRu = "УдалённоеВысказывание27", creatorUserId = 1),
+        Statement(id = 28, textEn = "RemoteStatement28", textRu = "УдалённоеВысказывание28", creatorUserId = 1),
+        Statement(id = 29, textEn = "RemoteStatement29", textRu = "УдалённоеВысказывание29", creatorUserId = 1),
+        Statement(id = 30, textEn = "RemoteStatement30", textRu = "УдалённоеВысказывание30", creatorUserId = 1),
+        Statement(id = 31, textEn = "RemoteStatement31", textRu = "УдалённоеВысказывание31", creatorUserId = 1),
+        Statement(id = 32, textEn = "RemoteStatement32", textRu = "УдалённоеВысказывание32", creatorUserId = 1),
+        Statement(id = 33, textEn = "RemoteStatement33", textRu = "УдалённоеВысказывание33", creatorUserId = 1),
+        Statement(id = 34, textEn = "RemoteStatement34", textRu = "УдалённоеВысказывание34", creatorUserId = 1),
+        Statement(id = 35, textEn = "RemoteStatement35", textRu = "УдалённоеВысказывание35", creatorUserId = 1),
+        Statement(id = 36, textEn = "RemoteStatement36", textRu = "УдалённоеВысказывание36", creatorUserId = 1),
+        Statement(id = 37, textEn = "RemoteStatement37", textRu = "УдалённоеВысказывание37", creatorUserId = 1),
+        Statement(id = 38, textEn = "RemoteStatement38", textRu = "УдалённоеВысказывание38", creatorUserId = 1),
+        Statement(id = 39, textEn = "RemoteStatement39", textRu = "УдалённоеВысказывание39", creatorUserId = 1),
+        Statement(id = 40, textEn = "RemoteStatement40", textRu = "УдалённоеВысказывание40", creatorUserId = 1),
+        Statement(id = 41, textEn = "RemoteStatement41", textRu = "УдалённоеВысказывание41", creatorUserId = 1),
+        Statement(id = 42, textEn = "RemoteStatement42", textRu = "УдалённоеВысказывание42", creatorUserId = 1),
+        Statement(id = 43, textEn = "RemoteStatement43", textRu = "УдалённоеВысказывание43", creatorUserId = 1),
+        Statement(id = 44, textEn = "RemoteStatement44", textRu = "УдалённоеВысказывание44", creatorUserId = 1),
+        Statement(id = 45, textEn = "RemoteStatement45", textRu = "УдалённоеВысказывание45", creatorUserId = 1),
+        Statement(id = 46, textEn = "RemoteStatement46", textRu = "УдалённоеВысказывание46", creatorUserId = 1),
+        Statement(id = 47, textEn = "RemoteStatement47", textRu = "УдалённоеВысказывание47", creatorUserId = 1),
+        Statement(id = 48, textEn = "RemoteStatement48", textRu = "УдалённоеВысказывание48", creatorUserId = 1),
+        Statement(id = 49, textEn = "RemoteStatement49", textRu = "УдалённоеВысказывание49", creatorUserId = 1),
+        Statement(id = 50, textEn = "RemoteStatement50", textRu = "УдалённоеВысказывание50", creatorUserId = 1),
+        Statement(id = 51, textEn = "RemoteStatement51", textRu = "УдалённоеВысказывание51", creatorUserId = 1),
+        Statement(id = 52, textEn = "RemoteStatement52", textRu = "УдалённоеВысказывание52", creatorUserId = 1),
+        Statement(id = 53, textEn = "RemoteStatement53", textRu = "УдалённоеВысказывание53", creatorUserId = 1),
+        Statement(id = 54, textEn = "RemoteStatement54", textRu = "УдалённоеВысказывание54", creatorUserId = 1),
+        Statement(id = 55, textEn = "RemoteStatement55", textRu = "УдалённоеВысказывание55", creatorUserId = 1),
+        Statement(id = 56, textEn = "RemoteStatement56", textRu = "УдалённоеВысказывание56", creatorUserId = 1),
+        Statement(id = 57, textEn = "RemoteStatement57", textRu = "УдалённоеВысказывание57", creatorUserId = 1),
+        Statement(id = 58, textEn = "RemoteStatement58", textRu = "УдалённоеВысказывание58", creatorUserId = 1),
+        Statement(id = 59, textEn = "RemoteStatement59", textRu = "УдалённоеВысказывание59", creatorUserId = 1),
+        Statement(id = 60, textEn = "RemoteStatement60", textRu = "УдалённоеВысказывание60", creatorUserId = 1),
+        Statement(id = 61, textEn = "RemoteStatement61", textRu = "УдалённоеВысказывание61", creatorUserId = 1),
+        Statement(id = 62, textEn = "RemoteStatement62", textRu = "УдалённоеВысказывание62", creatorUserId = 1),
+        Statement(id = 63, textEn = "RemoteStatement63", textRu = "УдалённоеВысказывание63", creatorUserId = 1),
+        Statement(id = 64, textEn = "RemoteStatement64", textRu = "УдалённоеВысказывание64", creatorUserId = 1),
+        Statement(id = 65, textEn = "RemoteStatement65", textRu = "УдалённоеВысказывание65", creatorUserId = 1)
     )
 
     val statementDefiningThemes = listOf(
@@ -183,7 +184,8 @@ object FakeStatementsData {
 
     val statementsWithDefiningThemes = statements.map { statement ->
         statement.toStatementWithDefiningThemes(
-            statementDefiningThemes.filter { it.statementId == statement.id }
+            statementDefiningThemes.filter { it.statementId == statement.id },
+            ENGLISH
         )
     }
 
@@ -253,7 +255,8 @@ object FakeStatementsData {
     fun List<Statement>.toStatementsWithNullIds() =
         this.map {
             Statement(
-                text = it.text,
+                textEn = it.textEn,
+                textRu = it.textRu,
                 creatorUserId = it.creatorUserId
             )
         }

@@ -53,6 +53,7 @@ class AuthServiceUnitTest {
     private lateinit var authService: AuthService
 
     private val user = FakeUsersData.users[0]
+    private val userResponse = FakeUsersData.userResponses[0]
     private val accessToken = "accessToken"
     private val refreshToken = "refreshToken"
 
@@ -82,7 +83,7 @@ class AuthServiceUnitTest {
 
         val result = authService.loginUser(LoginDetails(user.username, "password"))
 
-        assertEquals(user, result.user)
+        assertEquals(userResponse, result.user)
         assertEquals(accessToken, result.accessToken)
         assertEquals(refreshToken, result.refreshToken)
 
@@ -104,7 +105,7 @@ class AuthServiceUnitTest {
 
         val result = authService.registerUser(registrationDetails)
 
-        assertEquals(user, result.user)
+        assertEquals(userResponse, result.user)
         assertEquals(accessToken, result.accessToken)
         assertEquals(refreshToken, result.refreshToken)
         assertEquals("encodedPassword", savedUserSlot.captured.password)
@@ -126,7 +127,7 @@ class AuthServiceUnitTest {
 
         val result = authService.registerUser(registrationDetails)
 
-        assertEquals(user, result.user)
+        assertEquals(userResponse, result.user)
 
         verify(exactly = 1) { usersRepository.findByUsername(registrationDetails.username) }
         verify(exactly = 0) { usersRepository.findByEmail(any()) }
@@ -175,7 +176,7 @@ class AuthServiceUnitTest {
 
         val result = authService.refreshToken(refreshTokenDetails)
 
-        assertEquals(user, result.user)
+        assertEquals(userResponse, result.user)
         assertEquals(accessToken, result.accessToken)
         assertEquals(refreshToken, result.refreshToken)
 

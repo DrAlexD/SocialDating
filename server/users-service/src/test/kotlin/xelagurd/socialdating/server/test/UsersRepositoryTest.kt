@@ -31,13 +31,13 @@ class UsersRepositoryTest(
 
     private fun user(name: String, username: String, email: String?) =
         User(
-            name = name,
+            nameEn = name,
             gender = Gender.MALE,
             username = username,
             password = FakeUsersData.users[0].password,
             email = email,
             age = 25,
-            city = "city",
+            cityEn = "city",
             purpose = Purpose.FRIENDS,
             role = Role.USER
         )

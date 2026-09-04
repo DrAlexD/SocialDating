@@ -39,7 +39,7 @@ class AuthControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     private val objectMapper = jacksonObjectMapper()
 
-    private val user = FakeUsersData.users[0]
+    private val user = FakeUsersData.userResponses[0]
     private val authResponse = AuthResponse(user, "accessToken", "refreshToken")
 
     private val loginDetails = LoginDetails(username = "username1", password = "password")

@@ -209,6 +209,59 @@ class IntegrationTest {
         assertEquals(admin.data["purpose"], responseSimilarUser["purpose"])
     }
 
+    @Order(7)
+    @Test
+    fun getCategories_russianLanguage_returnsRussianName() {
+        val englishCategory = getCategory(ENGLISH_LANGUAGE)
+        val russianCategory = getCategory(RUSSIAN_LANGUAGE)
+
+        assertEquals("$RUSSIAN_NAME_PREFIX${englishCategory["name"]}", russianCategory["name"])
+    }
+
+    @Order(8)
+    @Test
+    fun getDefiningThemes_russianLanguage_returnsRussianNameAndOpinions() {
+        val englishDefiningTheme = getDefiningTheme(ENGLISH_LANGUAGE)
+        val russianDefiningTheme = getDefiningTheme(RUSSIAN_LANGUAGE)
+
+        assertEquals("$RUSSIAN_NAME_PREFIX${englishDefiningTheme["name"]}", russianDefiningTheme["name"])
+        assertEquals("Нет", russianDefiningTheme["fromOpinion"])
+        assertEquals("Да", russianDefiningTheme["toOpinion"])
+    }
+
+    private fun getCategory(language: String): Map<String, Any> {
+        val response = restTemplate.getWithToken(
+            admin,
+            "$GATEWAY_URL/categories?categoryIds=$categoryId",
+            String::class.java,
+            language
+        )
+        assertEquals(HttpStatus.OK, response.statusCode)
+
+        val responseCategory = readArrayFromJsonString(response.body!!)
+            .firstOrNull { it["id"] == categoryId }
+        assertNotNull(responseCategory)
+
+        return responseCategory
+    }
+
+    private fun getDefiningTheme(language: String): Map<String, Any> {
+        val definingThemeId = definingThemeIds.first()
+        val response = restTemplate.getWithToken(
+            admin,
+            "$GATEWAY_URL/defining-themes?definingThemeIds=$definingThemeId",
+            String::class.java,
+            language
+        )
+        assertEquals(HttpStatus.OK, response.statusCode)
+
+        val responseDefiningTheme = readArrayFromJsonString(response.body!!)
+            .firstOrNull { it["id"] == definingThemeId }
+        assertNotNull(responseDefiningTheme)
+
+        return responseDefiningTheme
+    }
+
     private fun loginUser(): AuthorizedUser {
         val request = mapOf(
             "username" to ADMIN_USERNAME,
@@ -257,7 +310,8 @@ class IntegrationTest {
 
     private fun addCategory(name: String): Int {
         val request = mapOf(
-            "name" to name
+            "nameEn" to name,
+            "nameRu" to "$RUSSIAN_NAME_PREFIX$name"
         )
         val response = restTemplate.postWithToken(
             admin,
@@ -269,16 +323,20 @@ class IntegrationTest {
 
         val responseCategory = readObjectFromJsonString(response.body!!)
         assertNotNull(responseCategory["id"])
-        assertEquals(request["name"], responseCategory["name"])
+        assertEquals(request["nameEn"], responseCategory["name"])
 
         return responseCategory["id"] as Int
     }
 
     private fun addDefiningTheme(categoryId: Int, numberInCategory: Int): Int {
+        val name = "TestRemoteDefiningTheme${uniqueNumber}_${categoryId}_$numberInCategory"
         val request = mapOf(
-            "name" to "TestRemoteDefiningTheme${uniqueNumber}_${categoryId}_$numberInCategory",
-            "fromOpinion" to "No",
-            "toOpinion" to "Yes",
+            "nameEn" to name,
+            "nameRu" to "$RUSSIAN_NAME_PREFIX$name",
+            "fromOpinionEn" to "No",
+            "fromOpinionRu" to "Нет",
+            "toOpinionEn" to "Yes",
+            "toOpinionRu" to "Да",
             "categoryId" to categoryId
         )
         val response = restTemplate.postWithToken(
@@ -291,9 +349,9 @@ class IntegrationTest {
 
         val responseDefiningTheme = readObjectFromJsonString(response.body!!)
         assertNotNull(responseDefiningTheme["id"])
-        assertEquals(request["name"], responseDefiningTheme["name"])
-        assertEquals(request["fromOpinion"], responseDefiningTheme["fromOpinion"])
-        assertEquals(request["toOpinion"], responseDefiningTheme["toOpinion"])
+        assertEquals(request["nameEn"], responseDefiningTheme["name"])
+        assertEquals(request["fromOpinionEn"], responseDefiningTheme["fromOpinion"])
+        assertEquals(request["toOpinionEn"], responseDefiningTheme["toOpinion"])
         assertEquals(categoryId, responseDefiningTheme["categoryId"])
         assertEquals(numberInCategory, responseDefiningTheme["numberInCategory"])
 
@@ -449,10 +507,12 @@ class IntegrationTest {
     private fun <T> TestRestTemplate.getWithToken(
         authorizedUser: AuthorizedUser,
         url: String,
-        responseType: Class<T>
+        responseType: Class<T>,
+        language: String = ENGLISH_LANGUAGE
     ): ResponseEntity<T> {
         val headers = HttpHeaders()
         headers.setBearerAuth(authorizedUser.accessToken)
+        headers.set(HttpHeaders.ACCEPT_LANGUAGE, language)
         return exchange(url, HttpMethod.GET, HttpEntity<Void>(headers), responseType)
     }
 
@@ -460,11 +520,13 @@ class IntegrationTest {
         authorizedUser: AuthorizedUser,
         url: String,
         body: Any,
-        responseType: Class<T>
+        responseType: Class<T>,
+        language: String = ENGLISH_LANGUAGE
     ): ResponseEntity<T> {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         headers.setBearerAuth(authorizedUser.accessToken)
+        headers.set(HttpHeaders.ACCEPT_LANGUAGE, language)
         return exchange(url, HttpMethod.POST, HttpEntity(body, headers), responseType)
     }
 
@@ -473,6 +535,11 @@ class IntegrationTest {
     companion object {
         private const val ADMIN_USERNAME = "username1"
         private const val ADMIN_PASSWORD = "password1"
+
+        private const val RUSSIAN_NAME_PREFIX = "Рус"
+
+        private const val ENGLISH_LANGUAGE = "en"
+        private const val RUSSIAN_LANGUAGE = "ru"
 
         private const val AWAIT_TIMEOUT_MILLIS = 30_000L
         private const val AWAIT_INTERVAL_MILLIS = 200L
