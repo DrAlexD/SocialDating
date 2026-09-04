@@ -18,7 +18,6 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.FakeDefiningThemesData
 import xelagurd.socialdating.server.controller.DefiningThemesController
 import xelagurd.socialdating.server.service.DefiningThemesService
@@ -36,10 +35,10 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     private val objectMapper = jacksonObjectMapper()
 
-    private val categoryId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
+    private val categoryId = Random.nextInt(1, Int.MAX_VALUE)
     private val definingThemeIds = Random.nextIntList()
     private val definingThemeDetails = FakeDefiningThemesData.definingThemesDetails[0]
-    private val definingTheme = FakeDefiningThemesData.definingThemeResponses[0]
+    private val definingThemeDto = FakeDefiningThemesData.definingThemeDtos[0]
 
     @Test
     fun getDefiningThemes_existData_ok() {
@@ -71,7 +70,7 @@ class DefiningThemesControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     @Test
     fun addDefiningTheme_validData_created() {
-        every { definingThemesService.addDefiningTheme(any()) } returns definingTheme
+        every { definingThemesService.addDefiningTheme(any()) } returns definingThemeDto
 
         mockMvc.perform(
             post("/defining-themes")

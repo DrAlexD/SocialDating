@@ -8,7 +8,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
 import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
-import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.details.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.dto.DefiningThemeReactionDto
 
 @Entity(name = "statement_defining_themes")
 @Table(
@@ -34,6 +35,12 @@ class StatementDefiningTheme(
     @field:Column(nullable = false)
     var isSupportDefiningTheme: Boolean
 ) {
+
+    fun toDefiningThemeReactionDto() =
+        DefiningThemeReactionDto(
+            definingThemeId = definingThemeId,
+            isSupportDefiningTheme = isSupportDefiningTheme
+        )
 
     fun toDefiningThemeReactionDetails() =
         DefiningThemeReactionDetails(

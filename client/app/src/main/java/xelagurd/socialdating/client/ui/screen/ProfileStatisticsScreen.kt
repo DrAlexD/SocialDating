@@ -33,16 +33,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.model.DataUtils.toUserCategoriesWithData
-import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesWithData
-import xelagurd.socialdating.client.data.model.additional.DetailedSimilarCategory
-import xelagurd.socialdating.client.data.model.additional.DetailedSimilarDefiningTheme
+import xelagurd.socialdating.client.data.model.DataUtils.toUserCategoriesData
+import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesData
+import xelagurd.socialdating.client.data.model.additional.UserCategoryData
+import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeData
+import xelagurd.socialdating.client.data.model.dto.DetailedSimilarCategoryDto
+import xelagurd.socialdating.client.data.model.dto.DetailedSimilarDefiningThemeDto
 import xelagurd.socialdating.client.data.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.client.data.model.enums.SimilarityType.SIMILAR
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_NO_MAINTAIN
-import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
-import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
 import xelagurd.socialdating.client.ui.AppTopBar
 import xelagurd.socialdating.client.ui.navigation.ProfileStatisticsDestination
@@ -103,7 +103,7 @@ fun ProfileStatisticsScreenComponent(
             AppExpandedEntityCard(
                 entity = it
             ) { entity, isExpanded ->
-                val userCategory = entity as UserCategoryWithData
+                val userCategory = entity as UserCategoryData
                 UserCategoryCardContent(
                     userCategory = userCategory,
                     userDefiningThemes = profileStatisticsUiState.entityIdToData[userCategory.categoryId],
@@ -117,9 +117,9 @@ fun ProfileStatisticsScreenComponent(
 
 @Composable
 private fun UserCategoryCardContent(
-    userCategory: UserCategoryWithData,
-    userDefiningThemes: List<UserDefiningThemeWithData>?,
-    detailedSimilarCategory: DetailedSimilarCategory?,
+    userCategory: UserCategoryData,
+    userDefiningThemes: List<UserDefiningThemeData>?,
+    detailedSimilarCategory: DetailedSimilarCategoryDto?,
     isExpanded: Boolean
 ) {
     Column(
@@ -174,7 +174,7 @@ private fun UserCategoryCardContent(
         if (isExpanded && userDefiningThemes != null && userDefiningThemes.isNotEmpty()) {
             HorizontalDivider(color = MaterialTheme.colorScheme.secondary)
             AppList(entities = userDefiningThemes) {
-                val userDefiningTheme = it as UserDefiningThemeWithData
+                val userDefiningTheme = it as UserDefiningThemeData
                 UserDefiningThemeDetailsBody(
                     userDefiningTheme = userDefiningTheme,
                     detailedSimilarDefiningTheme = detailedSimilarCategory?.definingThemes[userDefiningTheme.definingThemeNumberInCategory]
@@ -186,8 +186,8 @@ private fun UserCategoryCardContent(
 
 @Composable
 private fun UserDefiningThemeDetailsBody(
-    userDefiningTheme: UserDefiningThemeWithData,
-    detailedSimilarDefiningTheme: DetailedSimilarDefiningTheme?
+    userDefiningTheme: UserDefiningThemeData,
+    detailedSimilarDefiningTheme: DetailedSimilarDefiningThemeDto?
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -236,8 +236,8 @@ private fun ProfileStatisticsComponentDataPreview() {
     AppTheme {
         ProfileStatisticsScreenComponent(
             profileStatisticsUiState = ProfileStatisticsUiState(
-                entities = FakeData.userCategories.toUserCategoriesWithData(FakeData.categories),
-                entityIdToData = FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)
+                entities = FakeData.userCategories.toUserCategoriesData(FakeData.categories),
+                entityIdToData = FakeData.userDefiningThemes.toUserDefiningThemesData(FakeData.definingThemes)
                     .groupBy { it.categoryId },
                 entitiesMask = null
             )
@@ -251,8 +251,8 @@ private fun ProfileStatisticsComponentDataWithSimilarityPreview() {
     AppTheme {
         ProfileStatisticsScreenComponent(
             profileStatisticsUiState = ProfileStatisticsUiState(
-                entities = FakeData.userCategories.toUserCategoriesWithData(FakeData.categories),
-                entityIdToData = FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)
+                entities = FakeData.userCategories.toUserCategoriesData(FakeData.categories),
+                entityIdToData = FakeData.userDefiningThemes.toUserDefiningThemesData(FakeData.definingThemes)
                     .groupBy { it.categoryId },
                 entitiesMask = FakeData.detailedSimilarUser
             )
@@ -271,7 +271,7 @@ private fun UserDefiningThemeDetailsBodyPreview() {
         ) {
             HorizontalDivider()
             UserDefiningThemeDetailsBody(
-                userDefiningTheme = FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)[0],
+                userDefiningTheme = FakeData.userDefiningThemes.toUserDefiningThemesData(FakeData.definingThemes)[0],
                 detailedSimilarDefiningTheme = null
             )
             HorizontalDivider()
@@ -290,7 +290,7 @@ private fun UserDefiningThemeDetailsBodyWithSimilarityPreview() {
         ) {
             HorizontalDivider()
             UserDefiningThemeDetailsBody(
-                userDefiningTheme = FakeData.userDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)[0],
+                userDefiningTheme = FakeData.userDefiningThemes.toUserDefiningThemesData(FakeData.definingThemes)[0],
                 detailedSimilarDefiningTheme = FakeData.detailedSimilarUser.categories[1]?.definingThemes[1]
             )
             HorizontalDivider()

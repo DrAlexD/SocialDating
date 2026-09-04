@@ -9,10 +9,10 @@ import xelagurd.socialdating.server.exception.ExpiredTokenException
 import xelagurd.socialdating.server.exception.InvalidDataException
 import xelagurd.socialdating.server.exception.InvalidTokenException
 import xelagurd.socialdating.server.model.User
-import xelagurd.socialdating.server.model.additional.AuthResponse
 import xelagurd.socialdating.server.model.details.LoginDetails
 import xelagurd.socialdating.server.model.details.RefreshTokenDetails
 import xelagurd.socialdating.server.model.details.RegistrationDetails
+import xelagurd.socialdating.server.model.dto.AuthDto
 import xelagurd.socialdating.server.repository.UsersRepository
 import xelagurd.socialdating.server.security.JwtGenerationUtils
 
@@ -25,7 +25,7 @@ class AuthService(
     private val authenticationManager: AuthenticationManager
 ) {
 
-    fun loginUser(loginDetails: LoginDetails): AuthResponse {
+    fun loginUser(loginDetails: LoginDetails): AuthDto {
         val auth = authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(
                 loginDetails.username,
@@ -37,10 +37,10 @@ class AuthService(
         val accessToken = jwtUtils.generateAccessToken(user.username, user.role, user.id!!)
         val refreshToken = jwtUtils.generateRefreshToken(user.username)
 
-        return AuthResponse(user.toUserResponse(), accessToken, refreshToken)
+        return AuthDto(user.toUserDto(), accessToken, refreshToken)
     }
 
-    fun registerUser(registrationDetails: RegistrationDetails): AuthResponse {
+    fun registerUser(registrationDetails: RegistrationDetails): AuthDto {
         if (usersRepository.findByUsername(registrationDetails.username) != null) {
             throw InvalidDataException("error.user.usernameAlreadyExists")
         }
@@ -54,10 +54,10 @@ class AuthService(
         val accessToken = jwtUtils.generateAccessToken(user.username, user.role, user.id!!)
         val refreshToken = jwtUtils.generateRefreshToken(user.username)
 
-        return AuthResponse(user.toUserResponse(), accessToken, refreshToken)
+        return AuthDto(user.toUserDto(), accessToken, refreshToken)
     }
 
-    fun refreshToken(refreshTokenDetails: RefreshTokenDetails): AuthResponse {
+    fun refreshToken(refreshTokenDetails: RefreshTokenDetails): AuthDto {
         if (!jwtUtils.isRefreshToken(refreshTokenDetails.refreshToken)) {
             throw InvalidTokenException()
         }
@@ -75,6 +75,6 @@ class AuthService(
         val accessToken = jwtUtils.generateAccessToken(user.username, user.role, user.id!!)
         val refreshToken = jwtUtils.generateRefreshToken(user.username)
 
-        return AuthResponse(user.toUserResponse(), accessToken, refreshToken)
+        return AuthDto(user.toUserDto(), accessToken, refreshToken)
     }
 }

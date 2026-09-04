@@ -30,12 +30,12 @@ class UserDefiningThemesServiceUnitTest {
     private val userDefiningTheme = FakeDefiningThemesData.userDefiningThemes[0]
 
     @Test
-    fun getUserDefiningThemes_existData_returnsRepositoryResult() {
+    fun getUserDefiningThemes_existData_returnsMappedDtos() {
         every { userDefiningThemesRepository.findAllByUserId(any()) } returns userDefiningThemes
 
         val result = userDefiningThemesService.getUserDefiningThemes(userId)
 
-        assertEquals(userDefiningThemes, result)
+        assertEquals(FakeDefiningThemesData.userDefiningThemeDtos, result)
 
         verify(exactly = 1) { userDefiningThemesRepository.findAllByUserId(userId) }
         confirmVerified(userDefiningThemesRepository)

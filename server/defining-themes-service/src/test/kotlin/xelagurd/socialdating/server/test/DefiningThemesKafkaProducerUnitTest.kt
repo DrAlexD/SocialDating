@@ -10,8 +10,8 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import xelagurd.socialdating.server.model.common.CategoryUpdateDetails
-import xelagurd.socialdating.server.model.common.UserCategoriesUpdateDetails
+import xelagurd.socialdating.server.model.details.CategoryUpdateDetails
+import xelagurd.socialdating.server.model.details.UserCategoriesUpdateDetails
 import xelagurd.socialdating.server.service.DefiningThemesKafkaProducer
 
 @ExtendWith(MockKExtension::class)

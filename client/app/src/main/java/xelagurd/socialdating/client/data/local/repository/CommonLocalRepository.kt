@@ -6,7 +6,7 @@ import androidx.room.Transaction
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DefiningTheme
-import xelagurd.socialdating.client.data.model.additional.StatementWithDefiningThemes
+import xelagurd.socialdating.client.data.model.dto.StatementDto
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
 
@@ -24,7 +24,7 @@ class CommonLocalRepository @Inject constructor(
     suspend fun updateStatementsScreenData(
         definingThemes: List<DefiningTheme>,
         categoryId: Int,
-        statements: List<StatementWithDefiningThemes>
+        statements: List<StatementDto>
     ) {
         definingThemesRepository.insertDefiningThemes(definingThemes)
 

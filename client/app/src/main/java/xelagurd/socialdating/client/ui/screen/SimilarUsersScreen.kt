@@ -28,11 +28,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType.FULL_NO_MAINTAIN
-import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
 import xelagurd.socialdating.client.ui.AppTopBar
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
@@ -90,7 +90,7 @@ fun SimilarUsersScreenComponent(
                 onEntityClick = onSimilarUserClick
             ) {
                 SimilarUserCardContent(
-                    similarUser = it as SimilarUserWithData
+                    similarUser = it as SimilarUserDto
                 )
             }
         }
@@ -99,7 +99,7 @@ fun SimilarUsersScreenComponent(
 
 @Composable
 private fun SimilarUserCardContent(
-    similarUser: SimilarUserWithData
+    similarUser: SimilarUserDto
 ) {
     Box(contentAlignment = Alignment.Center) {
         Row(

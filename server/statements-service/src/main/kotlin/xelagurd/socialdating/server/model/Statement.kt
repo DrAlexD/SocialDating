@@ -11,7 +11,7 @@ import jakarta.persistence.UniqueConstraint
 import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MIN
-import xelagurd.socialdating.server.model.additional.StatementWithDefiningThemes
+import xelagurd.socialdating.server.model.dto.StatementDto
 import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.utils.LocalizationUtils.localize
 
@@ -45,15 +45,15 @@ class Statement(
     var creatorUserId: Int
 ) {
 
-    fun toStatementWithDefiningThemes(
+    fun toStatementDto(
         definingThemes: List<StatementDefiningTheme>,
         language: AppLanguage = AppLanguage.current()
     ) =
-        StatementWithDefiningThemes(
+        StatementDto(
             id = id!!,
             text = localize(textEn, textRu, language),
             creatorUserId = creatorUserId,
-            definingThemes = definingThemes.map { it.toDefiningThemeReactionDetails() }
+            definingThemes = definingThemes.map { it.toDefiningThemeReactionDto() }
         )
 
     override fun equals(other: Any?): Boolean {

@@ -33,7 +33,7 @@ class DefiningThemesServiceUnitTest {
     private val categoryId = Random.nextInt(1, Int.MAX_VALUE)
     private val definingThemeIds = Random.nextIntList()
     private val definingThemes = FakeDefiningThemesData.definingThemes
-    private val definingThemeResponses = FakeDefiningThemesData.definingThemeResponses
+    private val definingThemeDtos = FakeDefiningThemesData.definingThemeDtos
     private val definingTheme = FakeDefiningThemesData.definingThemes[0]
     private val definingThemeDetails = FakeDefiningThemesData.definingThemesDetails[0]
     private val definingThemeSlot = slot<DefiningTheme>()
@@ -45,7 +45,7 @@ class DefiningThemesServiceUnitTest {
 
         val result = definingThemesService.getDefiningThemes(definingThemeIds, categoryId)
 
-        assertEquals(definingThemeResponses, result)
+        assertEquals(definingThemeDtos, result)
 
         verify(exactly = 1) {
             definingThemesRepository.findAllByIdsAndCategoryId(definingThemeIds, categoryId)

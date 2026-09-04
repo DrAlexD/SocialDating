@@ -7,7 +7,6 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.STATEMENT_TEXT_L
 import xelagurd.socialdating.server.model.DefaultDataProperties.STATEMENT_TEXT_LENGTH_MIN
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.StatementDefiningTheme
-import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
 import xelagurd.socialdating.server.utils.LocalizationUtils.englishOrNull
 import xelagurd.socialdating.server.utils.LocalizationUtils.russianOrNull
 import xelagurd.socialdating.server.validation.TrimmedSize

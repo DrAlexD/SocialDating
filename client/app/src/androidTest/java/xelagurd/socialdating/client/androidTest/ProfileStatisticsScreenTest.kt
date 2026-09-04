@@ -21,8 +21,8 @@ import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecomp
 import xelagurd.socialdating.client.MainActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.model.DataUtils.toUserCategoriesWithData
-import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesWithData
+import xelagurd.socialdating.client.data.model.DataUtils.toUserCategoriesData
+import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesData
 import xelagurd.socialdating.client.ui.screen.ProfileStatisticsScreenComponent
 import xelagurd.socialdating.client.ui.state.ProfileStatisticsUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -40,14 +40,14 @@ class ProfileStatisticsScreenTest {
         hiltRule.inject()
     }
 
-    private val userCategoriesWithData = FakeData.userCategories.toUserCategoriesWithData(FakeData.categories)
-    private val userDefiningThemesWithData = FakeData.userDefiningThemes
-        .toUserDefiningThemesWithData(FakeData.definingThemes)
+    private val userCategoriesData = FakeData.userCategories.toUserCategoriesData(FakeData.categories)
+    private val userDefiningThemesData = FakeData.userDefiningThemes
+        .toUserDefiningThemesData(FakeData.definingThemes)
 
-    private val userCategoryWithData = userCategoriesWithData[0]
-    private val userDefiningThemeWithData = userDefiningThemesWithData[0]
+    private val userCategoryData = userCategoriesData[0]
+    private val userDefiningThemeData = userDefiningThemesData[0]
 
-    private val entityIdToData = userDefiningThemesWithData.groupBy { it.categoryId }
+    private val entityIdToData = userDefiningThemesData.groupBy { it.categoryId }
 
     @Test
     fun profileStatisticsScreen_defaultParameters_loadingIndicator() {
@@ -70,25 +70,25 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_expandedCategoryWithDefiningThemes_displayedDefiningThemes() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = listOf(userCategoryWithData),
-            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf(userDefiningThemeWithData)),
+            entities = listOf(userCategoryData),
+            entityIdToData = mapOf(userCategoryData.categoryId to listOf(userDefiningThemeData)),
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
         setContentToProfileStatisticsBody(profileStatisticsUiState)
 
-        composeTestRule.onNodeWithText(userCategoryWithData.categoryName).assertIsDisplayed()
-        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeName).assertIsNotDisplayed()
-        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeFromOpinion).assertIsNotDisplayed()
-        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeToOpinion).assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(userCategoryData.categoryName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeData.definingThemeName).assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeData.definingThemeFromOpinion).assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeData.definingThemeToOpinion).assertIsNotDisplayed()
         composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsNotDisplayed()
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list).checkButtonAndClick()
 
-        composeTestRule.onNodeWithText(userCategoryWithData.categoryName).assertIsDisplayed()
-        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeName).assertIsDisplayed()
-        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeFromOpinion).assertIsDisplayed()
-        composeTestRule.onNodeWithText(userDefiningThemeWithData.definingThemeToOpinion).assertIsDisplayed()
+        composeTestRule.onNodeWithText(userCategoryData.categoryName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeData.definingThemeName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeData.definingThemeFromOpinion).assertIsDisplayed()
+        composeTestRule.onNodeWithText(userDefiningThemeData.definingThemeToOpinion).assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsDisplayed()
     }
 
@@ -105,7 +105,7 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_expandedCategoryWithoutDefiningThemes_displayedOnlyCategory() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = listOf(userCategoryWithData),
+            entities = listOf(userCategoryData),
             entityIdToData = mapOf(),
             dataRequestStatus = RequestStatus.SUCCESS
         )
@@ -114,15 +114,15 @@ class ProfileStatisticsScreenTest {
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list).checkButtonAndClick()
 
-        composeTestRule.onNodeWithText(userCategoryWithData.categoryName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(userCategoryData.categoryName).assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsNotDisplayed()
     }
 
     @Test
     fun profileStatisticsScreen_expandedCategoryWithEmptyDefiningThemes_displayedOnlyCategory() {
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = listOf(userCategoryWithData),
-            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf()),
+            entities = listOf(userCategoryData),
+            entityIdToData = mapOf(userCategoryData.categoryId to listOf()),
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
@@ -130,7 +130,7 @@ class ProfileStatisticsScreenTest {
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.expand_list).checkButtonAndClick()
 
-        composeTestRule.onNodeWithText(userCategoryWithData.categoryName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(userCategoryData.categoryName).assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.progress_indicator).assertIsNotDisplayed()
     }
 
@@ -139,7 +139,7 @@ class ProfileStatisticsScreenTest {
         val profileStatisticsUiState = ProfileStatisticsUiState(
             userId = FakeData.mainUser.id,
             anotherUserId = FakeData.mainUser.id + 1,
-            entities = listOf(userCategoryWithData),
+            entities = listOf(userCategoryData),
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
@@ -154,7 +154,7 @@ class ProfileStatisticsScreenTest {
         val profileStatisticsUiState = ProfileStatisticsUiState(
             userId = FakeData.mainUser.id,
             anotherUserId = FakeData.mainUser.id,
-            entities = listOf(userCategoryWithData),
+            entities = listOf(userCategoryData),
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
@@ -169,8 +169,8 @@ class ProfileStatisticsScreenTest {
         var isNavigateUpClicked = false
         var isRefreshClicked = false
         val profileStatisticsUiState = ProfileStatisticsUiState(
-            entities = listOf(userCategoryWithData),
-            entityIdToData = mapOf(userCategoryWithData.categoryId to listOf(userDefiningThemeWithData)),
+            entities = listOf(userCategoryData),
+            entityIdToData = mapOf(userCategoryData.categoryId to listOf(userDefiningThemeData)),
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
@@ -190,7 +190,7 @@ class ProfileStatisticsScreenTest {
     }
 
     private fun assertSimilarityDataIsDisplayed(categoryIndex: Int) {
-        val userCategory = userCategoriesWithData[categoryIndex]
+        val userCategory = userCategoriesData[categoryIndex]
         val userDefiningThemes = entityIdToData[userCategory.categoryId].orEmpty()
         val detailedSimilarCategory = FakeData.detailedSimilarUser.categories[userCategory.categoryId]!!
 

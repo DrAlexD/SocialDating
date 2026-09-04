@@ -3,7 +3,7 @@ package xelagurd.socialdating.server.repository
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.repository.CategoryWithData
+import xelagurd.socialdating.server.model.additional.UserCategoryData
 
 interface UserCategoriesRepository : JpaRepository<UserCategory, Int> {
 
@@ -29,7 +29,7 @@ interface UserCategoriesRepository : JpaRepository<UserCategory, Int> {
         """,
         nativeQuery = true
     )
-    fun findCurrentUserCategories(currentUserId: Int, categoryIds: List<Int>?): List<CategoryWithData>
+    fun findCurrentUserCategories(currentUserId: Int, categoryIds: List<Int>?): List<UserCategoryData>
 
     @Query(
         """

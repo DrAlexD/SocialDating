@@ -107,7 +107,7 @@ MVVM + Repository pattern, Jetpack Compose UI, Dagger Hilt DI (`AppModule`).
   `ScreenComponents`/`AppComponents`. You should **only** add components to screens if they are unique to screen and
   cannot be reused.
 - `state/` — UI state classes
-- `form/` — Form-related composables
+- `form/` — Form states and validation
 - `theme/` — Material theme
 
 **Data layer** (`data/`) — dual-source (Room local + Retrofit remote), offline-first:

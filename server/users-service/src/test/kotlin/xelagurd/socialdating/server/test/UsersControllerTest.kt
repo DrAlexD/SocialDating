@@ -17,7 +17,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.controller.UsersController
 import xelagurd.socialdating.server.service.UsersService
 import xelagurd.socialdating.server.utils.TestUtils.mockkList
@@ -32,7 +31,7 @@ class UsersControllerTest(@param:Autowired private val mockMvc: MockMvc) {
     @MockkBean
     private lateinit var usersService: UsersService
 
-    private val userId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
+    private val userId = Random.nextInt(1, Int.MAX_VALUE)
     private val userIds = Random.nextIntList()
 
     @Test

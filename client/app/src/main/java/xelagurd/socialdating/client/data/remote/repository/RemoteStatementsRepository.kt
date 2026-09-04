@@ -2,8 +2,8 @@ package xelagurd.socialdating.client.data.remote.repository
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import xelagurd.socialdating.client.data.model.additional.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.details.StatementDetails
+import xelagurd.socialdating.client.data.model.details.StatementReactionDetails
 import xelagurd.socialdating.client.data.remote.ApiService
 
 @Singleton

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import jakarta.validation.Valid
-import xelagurd.socialdating.server.model.additional.StatementReactionDetails
+import xelagurd.socialdating.server.model.details.StatementReactionDetails
 import xelagurd.socialdating.server.security.BearerAuth
 import xelagurd.socialdating.server.service.UserStatementsService
 

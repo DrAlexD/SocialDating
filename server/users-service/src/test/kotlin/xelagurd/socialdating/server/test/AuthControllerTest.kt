@@ -21,10 +21,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeUsersData
 import xelagurd.socialdating.server.controller.AuthController
-import xelagurd.socialdating.server.model.additional.AuthResponse
 import xelagurd.socialdating.server.model.details.LoginDetails
 import xelagurd.socialdating.server.model.details.RefreshTokenDetails
 import xelagurd.socialdating.server.model.details.RegistrationDetails
+import xelagurd.socialdating.server.model.dto.AuthDto
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
 import xelagurd.socialdating.server.service.AuthService
@@ -39,8 +39,8 @@ class AuthControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     private val objectMapper = jacksonObjectMapper()
 
-    private val user = FakeUsersData.userResponses[0]
-    private val authResponse = AuthResponse(user, "accessToken", "refreshToken")
+    private val user = FakeUsersData.userDtos[0]
+    private val authDto = AuthDto(user, "accessToken", "refreshToken")
 
     private val loginDetails = LoginDetails(username = "username1", password = "password")
     private val registrationDetails = RegistrationDetails(
@@ -57,7 +57,7 @@ class AuthControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     @Test
     fun loginUser_validData_ok() {
-        every { authService.loginUser(any()) } returns authResponse
+        every { authService.loginUser(any()) } returns authDto
 
         mockMvc.perform(
             post("/users/auth/login")
@@ -75,7 +75,7 @@ class AuthControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     @Test
     fun registerUser_validData_ok() {
-        every { authService.registerUser(any()) } returns authResponse
+        every { authService.registerUser(any()) } returns authDto
 
         mockMvc.perform(
             post("/users/auth/register")
@@ -107,7 +107,7 @@ class AuthControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     @Test
     fun refreshToken_validData_ok() {
-        every { authService.refreshToken(any()) } returns authResponse
+        every { authService.refreshToken(any()) } returns authDto
 
         mockMvc.perform(
             post("/users/auth/refresh-token")

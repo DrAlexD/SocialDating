@@ -12,7 +12,7 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.DEFINING_THEME_N
 import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.OPINION_LENGTH_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.OPINION_LENGTH_MIN
-import xelagurd.socialdating.server.model.additional.DefiningThemeResponse
+import xelagurd.socialdating.server.model.dto.DefiningThemeDto
 import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.utils.LocalizationUtils.localize
 
@@ -91,8 +91,8 @@ class DefiningTheme(
     var orderNumber: Int = numberInCategory
 ) {
 
-    fun toDefiningThemeResponse(language: AppLanguage = AppLanguage.current()) =
-        DefiningThemeResponse(
+    fun toDefiningThemeDto(language: AppLanguage = AppLanguage.current()) =
+        DefiningThemeDto(
             id = id!!,
             name = localize(nameEn, nameRu, language),
             fromOpinion = localize(fromOpinionEn, fromOpinionRu, language),

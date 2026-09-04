@@ -1,23 +1,23 @@
 package xelagurd.socialdating.client.data.model
 
-import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
-import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.additional.UserCategoryData
+import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeData
 
 object DataUtils {
 
     const val TIMEOUT_MILLIS = 5_000L
 
-    fun List<UserCategory>.toUserCategoriesWithData(categories: List<Category>): List<UserCategoryWithData> {
+    fun List<UserCategory>.toUserCategoriesData(categories: List<Category>): List<UserCategoryData> {
         val categoriesById = categories.associateBy { it.id }
         return this
-            .mapNotNull { it.toUserCategoryWithData(categoriesById[it.categoryId]) }
+            .mapNotNull { it.toUserCategoryData(categoriesById[it.categoryId]) }
             .sortedWith(compareBy({ it.categoryOrderNumber }, { it.categoryId }))
     }
 
-    fun List<UserDefiningTheme>.toUserDefiningThemesWithData(definingThemes: List<DefiningTheme>): List<UserDefiningThemeWithData> {
+    fun List<UserDefiningTheme>.toUserDefiningThemesData(definingThemes: List<DefiningTheme>): List<UserDefiningThemeData> {
         val definingThemesById = definingThemes.associateBy { it.id }
         return this
-            .mapNotNull { it.toUserDefiningThemeWithData(definingThemesById[it.definingThemeId]) }
+            .mapNotNull { it.toUserDefiningThemeData(definingThemesById[it.definingThemeId]) }
             .sortedWith(compareBy({ it.definingThemeOrderNumber }, { it.definingThemeNumberInCategory }))
     }
 }

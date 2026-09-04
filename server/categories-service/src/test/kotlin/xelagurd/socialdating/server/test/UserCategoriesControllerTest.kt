@@ -17,10 +17,9 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.controller.UserCategoriesController
-import xelagurd.socialdating.server.model.additional.DetailedSimilarUser
-import xelagurd.socialdating.server.model.additional.SimilarUserWithData
+import xelagurd.socialdating.server.model.dto.DetailedSimilarUserDto
+import xelagurd.socialdating.server.model.dto.SimilarUserDto
 import xelagurd.socialdating.server.model.enums.Gender.MALE
 import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.service.UserCategoriesService
@@ -34,8 +33,8 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
     @MockkBean
     private lateinit var userCategoriesService: UserCategoriesService
 
-    private val userId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
-    private val anotherUserId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
+    private val userId = Random.nextInt(1, Int.MAX_VALUE)
+    private val anotherUserId = Random.nextInt(1, Int.MAX_VALUE)
 
     @Test
     fun getUserCategories_existData_ok() {
@@ -54,7 +53,7 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
     @Test
     fun getSimilarUsers_existData_ok() {
         every { userCategoriesService.getSimilarUsers(any(), any()) } returns listOf(
-            SimilarUserWithData(
+            SimilarUserDto(
                 id = anotherUserId,
                 name = "User",
                 gender = MALE,
@@ -95,7 +94,7 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
     @Test
     fun getDetailedSimilarUser_existData_ok() {
         every { userCategoriesService.getDetailedSimilarUser(any(), any()) } returns
-                DetailedSimilarUser(similarNumber = 5, oppositeNumber = 2, categories = emptyMap())
+                DetailedSimilarUserDto(similarNumber = 5, oppositeNumber = 2, categories = emptyMap())
 
         mockMvc.perform(
             get("/categories/users/detailed-similar-user?currentUserId=$userId&anotherUserId=$anotherUserId")

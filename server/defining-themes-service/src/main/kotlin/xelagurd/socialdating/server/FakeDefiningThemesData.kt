@@ -2,9 +2,9 @@ package xelagurd.socialdating.server
 
 import xelagurd.socialdating.server.model.DefiningTheme
 import xelagurd.socialdating.server.model.UserDefiningTheme
-import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
-import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.model.details.DefiningThemeDetails
+import xelagurd.socialdating.server.model.details.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.details.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.model.enums.AppLanguage.ENGLISH
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_NO_MAINTAIN
 
@@ -225,7 +225,7 @@ object FakeDefiningThemesData {
         )
     )
 
-    val definingThemeResponses = definingThemes.map { it.toDefiningThemeResponse(ENGLISH) }
+    val definingThemeDtos = definingThemes.map { it.toDefiningThemeDto(ENGLISH) }
 
     val userDefiningThemes = listOf(
         UserDefiningTheme(id = 1, value = 85, interest = 25, userId = 1, definingThemeId = 1),
@@ -241,6 +241,8 @@ object FakeDefiningThemesData {
         UserDefiningTheme(id = 11, value = 15, interest = 25, userId = 3, definingThemeId = 8),
         UserDefiningTheme(id = 12, value = 95, interest = 25, userId = 3, definingThemeId = 11)
     )
+
+    val userDefiningThemeDtos = userDefiningThemes.map { it.toUserDefiningThemeDto() }
 
     val userDefiningThemesUpdateDetails =
         UserDefiningThemesUpdateDetails(

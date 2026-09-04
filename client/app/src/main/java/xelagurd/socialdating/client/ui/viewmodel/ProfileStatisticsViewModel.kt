@@ -25,11 +25,11 @@ import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRep
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserDefiningThemesRepository
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
-import xelagurd.socialdating.client.data.model.DataUtils.toUserCategoriesWithData
-import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesWithData
-import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
-import xelagurd.socialdating.client.data.model.ui.UserCategoryWithData
-import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.DataUtils.toUserCategoriesData
+import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesData
+import xelagurd.socialdating.client.data.model.additional.UserCategoryData
+import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeData
+import xelagurd.socialdating.client.data.model.dto.DetailedSimilarUserDto
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
@@ -61,17 +61,17 @@ class ProfileStatisticsViewModel @Inject constructor(
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
-    private val userCategoriesStateFlow = MutableStateFlow<List<UserCategoryWithData>>(listOf())
+    private val userCategoriesStateFlow = MutableStateFlow<List<UserCategoryData>>(listOf())
     private val userCategoriesFlow = when (anotherUserId) {
         userId -> localUserCategoriesRepository.getUserCategories(anotherUserId).distinctUntilChanged()
         else -> userCategoriesStateFlow
     }
-    private val userDefiningThemesStateFlow = MutableStateFlow<List<UserDefiningThemeWithData>>(listOf())
+    private val userDefiningThemesStateFlow = MutableStateFlow<List<UserDefiningThemeData>>(listOf())
     private val userDefiningThemesFlow = when (anotherUserId) {
         userId -> localUserDefiningThemesRepository.getUserDefiningThemes(anotherUserId).distinctUntilChanged()
         else -> userDefiningThemesStateFlow
     }
-    private val detailedSimilarUserFlow = MutableStateFlow<DetailedSimilarUser?>(null)
+    private val detailedSimilarUserFlow = MutableStateFlow<DetailedSimilarUserDto?>(null)
 
     val uiState = combine(userCategoriesFlow, userDefiningThemesFlow, detailedSimilarUserFlow, dataRequestStatusFlow)
     { userCategories, userDefiningThemes, detailedSimilarUser, dataRequestStatus ->
@@ -96,10 +96,10 @@ class ProfileStatisticsViewModel @Inject constructor(
             dataRequestStatusFlow.update { RequestStatus.LOADING }
             detailedSimilarUserFlow.update { FakeData.detailedSimilarUser }
             userDefiningThemesStateFlow.update {
-                FakeData.similarUserDefiningThemes.toUserDefiningThemesWithData(FakeData.definingThemes)
+                FakeData.similarUserDefiningThemes.toUserDefiningThemesData(FakeData.definingThemes)
             }
             userCategoriesStateFlow.update {
-                FakeData.similarUserCategories.toUserCategoriesWithData(FakeData.categories)
+                FakeData.similarUserCategories.toUserCategoriesData(FakeData.categories)
             }
             dataRequestStatusFlow.update { RequestStatus.SUCCESS }
         } else {
@@ -177,13 +177,13 @@ class ProfileStatisticsViewModel @Inject constructor(
                                     val allDefiningThemes = localDefiningThemes.toMutableList()
                                     allDefiningThemes.addAll(remoteDefiningThemes ?: emptyList())
                                     userDefiningThemesStateFlow.update {
-                                        remoteUserDefiningThemes.toUserDefiningThemesWithData(allDefiningThemes)
+                                        remoteUserDefiningThemes.toUserDefiningThemesData(allDefiningThemes)
                                     }
 
                                     val allCategories = localCategories.toMutableList()
                                     allCategories.addAll(remoteCategories ?: emptyList())
                                     userCategoriesStateFlow.update {
-                                        remoteUserCategories.toUserCategoriesWithData(allCategories)
+                                        remoteUserCategories.toUserCategoriesData(allCategories)
                                     }
                                 }
 

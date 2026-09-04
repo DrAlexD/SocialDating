@@ -21,8 +21,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.StatementDefiningTheme
-import xelagurd.socialdating.server.model.additional.StatementWithDefiningThemes
-import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.details.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.dto.DefiningThemeReactionDto
+import xelagurd.socialdating.server.model.dto.StatementDto
 import xelagurd.socialdating.server.repository.StatementDefiningThemesRepository
 import xelagurd.socialdating.server.repository.StatementsRepository
 import xelagurd.socialdating.server.service.StatementsService
@@ -46,9 +47,9 @@ class StatementsServiceUnitTest {
     private val statements = FakeStatementsData.statements.take(5)
     private val statementDefiningThemes = FakeStatementsData.statementDefiningThemes
         .filter { it.statementId <= 5 }
-    private val multiThemeDefiningThemes = listOf(
-        DefiningThemeReactionDetails(1, true),
-        DefiningThemeReactionDetails(2, false)
+    private val multiThemeDefiningThemeDtos = listOf(
+        DefiningThemeReactionDto(1, true),
+        DefiningThemeReactionDto(2, false)
     )
 
     private val statementDetails = FakeStatementsData.statementsDetails[4]
@@ -76,7 +77,7 @@ class StatementsServiceUnitTest {
 
         assertEquals(statements.size, result.size)
         assertEquals(statements.map { it.id }, result.map { it.id })
-        assertEquals(multiThemeDefiningThemes, result.last().definingThemes)
+        assertEquals(multiThemeDefiningThemeDtos, result.last().definingThemes)
 
         verify(exactly = 1) { statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds) }
         verify(exactly = 1) { statementDefiningThemesRepository.findAllByStatementIdIn(statements.map { it.id!! }) }
@@ -90,7 +91,7 @@ class StatementsServiceUnitTest {
 
         val result = statementsService.getStatements(currentUserId, definingThemeIds)
 
-        assertEquals(listOf<StatementWithDefiningThemes>(), result)
+        assertEquals(listOf<StatementDto>(), result)
 
         verify(exactly = 1) { statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds) }
         confirmVerified(statementsRepository, statementDefiningThemesRepository)
@@ -132,7 +133,7 @@ class StatementsServiceUnitTest {
                 assertEquals(statementDetails.definingThemes[index].isSupportDefiningTheme, isSupportDefiningTheme)
             }
         }
-        assertEquals(statementDetails.definingThemes, result.definingThemes)
+        assertEquals(multiThemeDefiningThemeDtos, result.definingThemes)
 
         verify(exactly = 1) { statementsRepository.save(any()) }
         verify(exactly = 1) { statementDefiningThemesRepository.saveAll(any<List<StatementDefiningTheme>>()) }

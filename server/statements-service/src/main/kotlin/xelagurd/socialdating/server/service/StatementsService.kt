@@ -3,8 +3,8 @@ package xelagurd.socialdating.server.service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import xelagurd.socialdating.server.exception.InvalidDataException
-import xelagurd.socialdating.server.model.additional.StatementWithDefiningThemes
 import xelagurd.socialdating.server.model.details.StatementDetails
+import xelagurd.socialdating.server.model.dto.StatementDto
 import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.repository.StatementDefiningThemesRepository
 import xelagurd.socialdating.server.repository.StatementsRepository
@@ -16,7 +16,7 @@ class StatementsService(
     private val statementDefiningThemesRepository: StatementDefiningThemesRepository
 ) {
 
-    fun getStatements(currentUserId: Int, definingThemeIds: List<Int>): List<StatementWithDefiningThemes> {
+    fun getStatements(currentUserId: Int, definingThemeIds: List<Int>): List<StatementDto> {
         checkCurrentUserAuth(currentUserId)
 
         val statements = statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds)
@@ -30,12 +30,12 @@ class StatementsService(
             .groupBy { it.statementId }
 
         return statements.map {
-            it.toStatementWithDefiningThemes(definingThemesByStatementId[it.id] ?: emptyList(), language)
+            it.toStatementDto(definingThemesByStatementId[it.id] ?: emptyList(), language)
         }
     }
 
     @Transactional
-    fun addStatement(statementDetails: StatementDetails): StatementWithDefiningThemes {
+    fun addStatement(statementDetails: StatementDetails): StatementDto {
         val definingThemeIds = statementDetails.definingThemes.map { it.definingThemeId }
 
         if (definingThemeIds.size != definingThemeIds.toSet().size) {
@@ -46,6 +46,6 @@ class StatementsService(
         val definingThemes = statementDefiningThemesRepository
             .saveAll(statementDetails.toStatementDefiningThemes(statement.id!!))
 
-        return statement.toStatementWithDefiningThemes(definingThemes)
+        return statement.toStatementDto(definingThemes)
     }
 }

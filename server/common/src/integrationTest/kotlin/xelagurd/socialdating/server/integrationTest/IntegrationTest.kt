@@ -187,7 +187,7 @@ class IntegrationTest {
 
     @Order(6)
     @Test
-    fun getSimilarUsers_afterReactions_returnsSimilarUserWithDataFromUsersService() {
+    fun getSimilarUsers_afterReactions_returnsSimilarUserDtoFromUsersService() {
         val response = restTemplate.getWithToken(
             user,
             "$GATEWAY_URL/categories/users/similar-users?currentUserId=${user.id}",

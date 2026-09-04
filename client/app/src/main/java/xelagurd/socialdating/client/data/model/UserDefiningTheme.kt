@@ -10,7 +10,7 @@ import xelagurd.socialdating.client.data.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.PERCENT_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidId
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidPercent
-import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeData
 
 @Serializable
 @Entity(
@@ -46,9 +46,9 @@ data class UserDefiningTheme(
         require(definingThemeId.isValidId()) { "DefiningThemeId must be at least $ID_MIN" }
     }
 
-    fun toUserDefiningThemeWithData(definingTheme: DefiningTheme?) =
+    fun toUserDefiningThemeData(definingTheme: DefiningTheme?) =
         definingTheme?.let {
-            UserDefiningThemeWithData(
+            UserDefiningThemeData(
                 id = id,
                 value = value,
                 interest = interest,

@@ -5,12 +5,13 @@ import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.additional.DefiningThemeReactionDetails
-import xelagurd.socialdating.client.data.model.additional.DetailedSimilarCategory
-import xelagurd.socialdating.client.data.model.additional.DetailedSimilarDefiningTheme
-import xelagurd.socialdating.client.data.model.additional.DetailedSimilarUser
-import xelagurd.socialdating.client.data.model.additional.SimilarCategory
-import xelagurd.socialdating.client.data.model.additional.StatementWithDefiningThemes
+import xelagurd.socialdating.client.data.model.dto.DefiningThemeReactionDto
+import xelagurd.socialdating.client.data.model.dto.DetailedSimilarCategoryDto
+import xelagurd.socialdating.client.data.model.dto.DetailedSimilarDefiningThemeDto
+import xelagurd.socialdating.client.data.model.dto.DetailedSimilarUserDto
+import xelagurd.socialdating.client.data.model.dto.SimilarCategoryDto
+import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
+import xelagurd.socialdating.client.data.model.dto.StatementDto
 import xelagurd.socialdating.client.data.model.enums.Gender.MALE
 import xelagurd.socialdating.client.data.model.enums.Purpose.ALL_AT_ONCE
 import xelagurd.socialdating.client.data.model.enums.Purpose.FRIENDS
@@ -19,7 +20,6 @@ import xelagurd.socialdating.client.data.model.enums.Role.ADMIN
 import xelagurd.socialdating.client.data.model.enums.Role.USER
 import xelagurd.socialdating.client.data.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.client.data.model.enums.SimilarityType.SIMILAR
-import xelagurd.socialdating.client.data.model.ui.SimilarUserWithData
 import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.form.RegistrationFormData
 import xelagurd.socialdating.client.ui.form.StatementFormData
@@ -256,192 +256,192 @@ object FakeData {
         UserDefiningTheme(id = 9, value = 15, interest = 25, userId = 2, definingThemeId = 11)
     )
 
-    val statementsWithDefiningThemes = listOf(
-        StatementWithDefiningThemes(
+    val statementDtos = listOf(
+        StatementDto(
             id = 6, text = "Statement6", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(1, true))
+            definingThemes = listOf(DefiningThemeReactionDto(1, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 7, text = "Statement7", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(1, true))
+            definingThemes = listOf(DefiningThemeReactionDto(1, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 8, text = "Statement8", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(1, true))
+            definingThemes = listOf(DefiningThemeReactionDto(1, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 9, text = "Statement9", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(1, true))
+            definingThemes = listOf(DefiningThemeReactionDto(1, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 10, text = "Statement10", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(1, true))
+            definingThemes = listOf(DefiningThemeReactionDto(1, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 16, text = "Statement16", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(2, true))
+            definingThemes = listOf(DefiningThemeReactionDto(2, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 17, text = "Statement17", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(2, true))
+            definingThemes = listOf(DefiningThemeReactionDto(2, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 18, text = "Statement18", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(2, true))
+            definingThemes = listOf(DefiningThemeReactionDto(2, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 19, text = "Statement19", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(2, true))
+            definingThemes = listOf(DefiningThemeReactionDto(2, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 20, text = "Statement20", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(2, true))
+            definingThemes = listOf(DefiningThemeReactionDto(2, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 21, text = "Statement21", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(5, true), DefiningThemeReactionDetails(8, false))
+            definingThemes = listOf(DefiningThemeReactionDto(5, true), DefiningThemeReactionDto(8, false))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 22, text = "Statement22", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(5, true))
+            definingThemes = listOf(DefiningThemeReactionDto(5, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 23, text = "Statement23", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(5, true))
+            definingThemes = listOf(DefiningThemeReactionDto(5, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 24, text = "Statement24", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(5, true))
+            definingThemes = listOf(DefiningThemeReactionDto(5, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 25, text = "Statement25", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(5, true))
+            definingThemes = listOf(DefiningThemeReactionDto(5, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 31, text = "Statement31", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(8, true))
+            definingThemes = listOf(DefiningThemeReactionDto(8, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 32, text = "Statement32", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(8, true))
+            definingThemes = listOf(DefiningThemeReactionDto(8, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 33, text = "Statement33", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(8, true))
+            definingThemes = listOf(DefiningThemeReactionDto(8, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 34, text = "Statement34", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(8, true))
+            definingThemes = listOf(DefiningThemeReactionDto(8, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 35, text = "Statement35", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(8, true))
+            definingThemes = listOf(DefiningThemeReactionDto(8, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 36, text = "Statement36", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
+            definingThemes = listOf(DefiningThemeReactionDto(9, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 37, text = "Statement37", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
+            definingThemes = listOf(DefiningThemeReactionDto(9, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 38, text = "Statement38", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
+            definingThemes = listOf(DefiningThemeReactionDto(9, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 39, text = "Statement39", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
+            definingThemes = listOf(DefiningThemeReactionDto(9, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 40, text = "Statement40", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
+            definingThemes = listOf(DefiningThemeReactionDto(9, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 41, text = "Statement41", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
+            definingThemes = listOf(DefiningThemeReactionDto(9, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 42, text = "Statement42", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
+            definingThemes = listOf(DefiningThemeReactionDto(9, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 43, text = "Statement43", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
+            definingThemes = listOf(DefiningThemeReactionDto(9, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 44, text = "Statement44", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
+            definingThemes = listOf(DefiningThemeReactionDto(9, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 45, text = "Statement45", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(9, true))
+            definingThemes = listOf(DefiningThemeReactionDto(9, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 51, text = "Statement51", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(11, true))
+            definingThemes = listOf(DefiningThemeReactionDto(11, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 52, text = "Statement52", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(11, true))
+            definingThemes = listOf(DefiningThemeReactionDto(11, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 53, text = "Statement53", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(11, true))
+            definingThemes = listOf(DefiningThemeReactionDto(11, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 54, text = "Statement54", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(11, true))
+            definingThemes = listOf(DefiningThemeReactionDto(11, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 55, text = "Statement55", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(11, true))
+            definingThemes = listOf(DefiningThemeReactionDto(11, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 56, text = "Statement56", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
+            definingThemes = listOf(DefiningThemeReactionDto(12, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 57, text = "Statement57", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
+            definingThemes = listOf(DefiningThemeReactionDto(12, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 58, text = "Statement58", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
+            definingThemes = listOf(DefiningThemeReactionDto(12, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 59, text = "Statement59", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
+            definingThemes = listOf(DefiningThemeReactionDto(12, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 60, text = "Statement60", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
+            definingThemes = listOf(DefiningThemeReactionDto(12, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 61, text = "Statement61", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
+            definingThemes = listOf(DefiningThemeReactionDto(12, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 62, text = "Statement62", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
+            definingThemes = listOf(DefiningThemeReactionDto(12, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 63, text = "Statement63", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
+            definingThemes = listOf(DefiningThemeReactionDto(12, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 64, text = "Statement64", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
+            definingThemes = listOf(DefiningThemeReactionDto(12, true))
         ),
-        StatementWithDefiningThemes(
+        StatementDto(
             id = 65, text = "Statement65", creatorUserId = 1,
-            definingThemes = listOf(DefiningThemeReactionDetails(12, true))
+            definingThemes = listOf(DefiningThemeReactionDto(12, true))
         )
     )
 
-    val statements = statementsWithDefiningThemes.map { it.toStatement() }
+    val statements = statementDtos.map { it.toStatement() }
 
-    val statementDefiningThemes = statementsWithDefiningThemes.flatMap { it.toStatementDefiningThemes() }
+    val statementDefiningThemes = statementDtos.flatMap { it.toStatementDefiningThemes() }
 
     val mainUser = users[0]
     val mainCategory = categories[0]
@@ -469,15 +469,15 @@ object FakeData {
         creatorUserId = mainStatement.creatorUserId
     )
 
-    val newStatement = StatementWithDefiningThemes(
+    val newStatement = StatementDto(
         id = 66, text = "NewStatement66", creatorUserId = 1,
-        definingThemes = listOf(DefiningThemeReactionDetails(1, true))
+        definingThemes = listOf(DefiningThemeReactionDto(1, true))
     )
 
     private val similarUser = users[1]
 
     val similarUsers = listOf(
-        SimilarUserWithData(
+        SimilarUserDto(
             id = similarUser.id,
             name = similarUser.name,
             gender = similarUser.gender,
@@ -487,54 +487,54 @@ object FakeData {
             similarNumber = 3,
             oppositeNumber = 1,
             similarCategories = listOf(
-                SimilarCategory(name = "Category1", differenceNumber = 2),
-                SimilarCategory(name = "Category3", differenceNumber = 1)
+                SimilarCategoryDto(name = "Category1", differenceNumber = 2),
+                SimilarCategoryDto(name = "Category3", differenceNumber = 1)
             ),
             oppositeCategories = listOf(
-                SimilarCategory(name = "Category2", differenceNumber = -1)
+                SimilarCategoryDto(name = "Category2", differenceNumber = -1)
             )
         )
     )
 
-    val detailedSimilarUser = DetailedSimilarUser(
+    val detailedSimilarUser = DetailedSimilarUserDto(
         similarNumber = 3,
         oppositeNumber = 1,
         categories = mapOf(
-            1 to DetailedSimilarCategory(
+            1 to DetailedSimilarCategoryDto(
                 id = 1,
                 similarityType = SIMILAR,
                 similarNumber = 2,
                 oppositeNumber = 0,
                 definingThemes = mapOf(
-                    1 to DetailedSimilarDefiningTheme(
+                    1 to DetailedSimilarDefiningThemeDto(
                         id = 1,
                         similarityType = SIMILAR
                     ),
-                    2 to DetailedSimilarDefiningTheme(
+                    2 to DetailedSimilarDefiningThemeDto(
                         id = 2,
                         similarityType = SIMILAR
                     )
                 )
             ),
-            2 to DetailedSimilarCategory(
+            2 to DetailedSimilarCategoryDto(
                 id = 2,
                 similarityType = OPPOSITE,
                 similarNumber = 0,
                 oppositeNumber = 1,
                 definingThemes = mapOf(
-                    3 to DetailedSimilarDefiningTheme(
+                    3 to DetailedSimilarDefiningThemeDto(
                         id = 3,
                         similarityType = OPPOSITE
                     )
                 )
             ),
-            3 to DetailedSimilarCategory(
+            3 to DetailedSimilarCategoryDto(
                 id = 3,
                 similarityType = SIMILAR,
                 similarNumber = 1,
                 oppositeNumber = 0,
                 definingThemes = mapOf(
-                    1 to DetailedSimilarDefiningTheme(
+                    1 to DetailedSimilarDefiningThemeDto(
                         id = 1,
                         similarityType = SIMILAR
                     )

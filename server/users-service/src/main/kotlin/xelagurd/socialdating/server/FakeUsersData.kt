@@ -58,7 +58,7 @@ object FakeUsersData {
         )
     )
 
-    val userResponses = users.map { it.toUserResponse(ENGLISH) }
+    val userDtos = users.map { it.toUserDto(ENGLISH) }
 
     fun List<User>.toUsersWithNullIds() =
         this.map {

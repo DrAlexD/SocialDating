@@ -22,7 +22,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.TestUtils.mockkList
 import xelagurd.socialdating.client.data.PreferencesRepository
@@ -52,8 +51,8 @@ class StatementAddingViewModelTest {
     private val statementAddingUiState
         get() = viewModel.uiState.value
 
-    private val userId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
-    private val categoryId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
+    private val userId = Random.nextInt(1, Int.MAX_VALUE)
+    private val categoryId = Random.nextInt(1, Int.MAX_VALUE)
     private val isOfflineModeFlow = flowOf(false)
 
     private val statementFormData = FakeData.statementFormData

@@ -20,14 +20,16 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.client.UsersServiceClient
+import xelagurd.socialdating.server.model.DefaultDataProperties.USER_ACTIVITY_INITIAL
 import xelagurd.socialdating.server.model.UserCategory
-import xelagurd.socialdating.server.model.additional.UserData
+import xelagurd.socialdating.server.model.additional.UserCategoryData
+import xelagurd.socialdating.server.model.dto.UserDto
 import xelagurd.socialdating.server.model.enums.Gender.MALE
 import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
+import xelagurd.socialdating.server.model.enums.Role.USER
 import xelagurd.socialdating.server.model.enums.SimilarityType.EQUAL
 import xelagurd.socialdating.server.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.server.model.enums.SimilarityType.SIMILAR
-import xelagurd.socialdating.server.model.repository.CategoryWithData
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
 import xelagurd.socialdating.server.service.UserCategoriesService
 
@@ -58,19 +60,19 @@ class UserCategoriesServiceUnitTest {
         SecurityContextHolder.getContext().authentication = authentication
     }
 
-    private fun categoryData(
+    private fun userCategoryData(
         id: Int,
         name: String = "Category$id",
         maintained: Array<Long>? = null,
         notMaintained: Array<Long>? = null
-    ) = CategoryWithData(id, name, name, maintained, notMaintained)
+    ) = UserCategoryData(id, name, name, maintained, notMaintained)
 
-    private fun userData(
+    private fun userDto(
         id: Int,
         name: String = "User$id",
         age: Int = 20 + id,
         city: String = "City$id"
-    ) = UserData(id, name, MALE, age, city, FRIENDS)
+    ) = UserDto(id, name, MALE, "username$id", age, city, FRIENDS, USER_ACTIVITY_INITIAL, USER)
 
     private fun userCategory(
         userId: Int,
@@ -80,13 +82,12 @@ class UserCategoriesServiceUnitTest {
     ) = UserCategory(userId = userId, categoryId = categoryId, maintained = maintained, notMaintained = notMaintained)
 
     @Test
-    fun getUserCategories_existData_returnsRepositoryResult() {
-        val expected = FakeCategoriesData.userCategories
-        every { userCategoriesRepository.findAllByUserId(any()) } returns expected
+    fun getUserCategories_existData_returnsMappedDtos() {
+        every { userCategoriesRepository.findAllByUserId(any()) } returns FakeCategoriesData.userCategories
 
         val result = userCategoriesService.getUserCategories(currentUserId)
 
-        assertEquals(expected, result)
+        assertEquals(FakeCategoriesData.userCategoryDtos, result)
 
         verify(exactly = 1) { userCategoriesRepository.findAllByUserId(currentUserId) }
         confirmVerified(userCategoriesRepository)
@@ -135,9 +136,9 @@ class UserCategoriesServiceUnitTest {
         setAuthenticatedUser(currentUserId)
 
         val currentUserCategories = listOf(
-            categoryData(id = 1, maintained = arrayOf(0b0111L)),     // bits 1, 2, 3
-            categoryData(id = 2, notMaintained = arrayOf(0b0011L)),  // bits 1, 2
-            categoryData(id = 3, maintained = arrayOf(0b1000L))      // bit 4
+            userCategoryData(id = 1, maintained = arrayOf(0b0111L)),     // bits 1, 2, 3
+            userCategoryData(id = 2, notMaintained = arrayOf(0b0011L)),  // bits 1, 2
+            userCategoryData(id = 3, maintained = arrayOf(0b1000L))      // bit 4
         )
         every { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) } returns currentUserCategories
 
@@ -156,7 +157,7 @@ class UserCategoriesServiceUnitTest {
             userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1, 2, 3))
         } returns anotherUsersCategories
 
-        every { usersServiceClient.getUsers(listOf(10, 20)) } returns listOf(userData(20), userData(10))
+        every { usersServiceClient.getUsers(listOf(10, 20)) } returns listOf(userDto(20), userDto(10))
 
         val result = userCategoriesService.getSimilarUsers(currentUserId)
 
@@ -181,7 +182,7 @@ class UserCategoriesServiceUnitTest {
     fun getSimilarUsers_withoutUsersData_returnsOnlyUsersWithData() {
         setAuthenticatedUser(currentUserId)
 
-        val currentUserCategories = listOf(categoryData(id = 1, maintained = arrayOf(0b0011L)))
+        val currentUserCategories = listOf(userCategoryData(id = 1, maintained = arrayOf(0b0011L)))
         every { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) } returns currentUserCategories
 
         val anotherUsersCategories = listOf(
@@ -192,7 +193,7 @@ class UserCategoriesServiceUnitTest {
             userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1))
         } returns anotherUsersCategories
 
-        every { usersServiceClient.getUsers(listOf(10, 20)) } returns listOf(userData(10))
+        every { usersServiceClient.getUsers(listOf(10, 20)) } returns listOf(userDto(10))
 
         val result = userCategoriesService.getSimilarUsers(currentUserId)
 
@@ -209,11 +210,11 @@ class UserCategoriesServiceUnitTest {
         setAuthenticatedUser(currentUserId)
 
         val currentUserCategories = listOf(
-            categoryData(id = 1, maintained = arrayOf(0b0111L)),  // 3 bits
-            categoryData(id = 2, maintained = arrayOf(0b0011L)),  // 2 bits
-            categoryData(id = 3, maintained = arrayOf(0b0001L)),  // 1 bit
-            categoryData(id = 4, maintained = arrayOf(0b0001L)),  // 1 bit
-            categoryData(id = 5, maintained = arrayOf(0b0001L))   // 1 bit
+            userCategoryData(id = 1, maintained = arrayOf(0b0111L)),  // 3 bits
+            userCategoryData(id = 2, maintained = arrayOf(0b0011L)),  // 2 bits
+            userCategoryData(id = 3, maintained = arrayOf(0b0001L)),  // 1 bit
+            userCategoryData(id = 4, maintained = arrayOf(0b0001L)),  // 1 bit
+            userCategoryData(id = 5, maintained = arrayOf(0b0001L))   // 1 bit
         )
         every { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) } returns currentUserCategories
 
@@ -228,7 +229,7 @@ class UserCategoriesServiceUnitTest {
             userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1, 2, 3, 4, 5))
         } returns anotherUsersCategories
 
-        every { usersServiceClient.getUsers(listOf(10)) } returns listOf(userData(10))
+        every { usersServiceClient.getUsers(listOf(10)) } returns listOf(userDto(10))
 
         val result = userCategoriesService.getSimilarUsers(currentUserId)
 
@@ -288,11 +289,11 @@ class UserCategoriesServiceUnitTest {
 
         val currentUserCategories = listOf(
             // index 0: bits 1, 2, 4; index 1: bit 1 -> defining theme 65
-            categoryData(id = 1, maintained = arrayOf(0b1011L, 0b0001L)),
-            categoryData(id = 2, maintained = arrayOf(0b0001L), notMaintained = arrayOf(0b0010L)),
-            categoryData(id = 3, notMaintained = arrayOf(0b0100L)),
+            userCategoryData(id = 1, maintained = arrayOf(0b1011L, 0b0001L)),
+            userCategoryData(id = 2, maintained = arrayOf(0b0001L), notMaintained = arrayOf(0b0010L)),
+            userCategoryData(id = 3, notMaintained = arrayOf(0b0100L)),
             // bit 4, no overlap with another user -> neither similar nor opposite (category skipped)
-            categoryData(id = 4, maintained = arrayOf(0b1000L))
+            userCategoryData(id = 4, maintained = arrayOf(0b1000L))
         )
         every { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) } returns currentUserCategories
 

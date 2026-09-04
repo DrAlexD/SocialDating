@@ -20,9 +20,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.model.UserStatement
-import xelagurd.socialdating.server.model.additional.StatementReactionDetails
-import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
-import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
+import xelagurd.socialdating.server.model.details.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.details.StatementReactionDetails
+import xelagurd.socialdating.server.model.details.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.repository.StatementDefiningThemesRepository
 import xelagurd.socialdating.server.repository.UserStatementsRepository
@@ -58,7 +58,7 @@ class UserStatementsServiceUnitTest {
     )
 
     private val userStatementSlot = slot<UserStatement>()
-    private val updateDetailsSlot = slot<UserDefiningThemesUpdateDetails>()
+    private val userDefiningThemesUpdateDetailsSlot = slot<UserDefiningThemesUpdateDetails>()
 
     @AfterEach
     fun clearSecurityContext() {
@@ -87,7 +87,7 @@ class UserStatementsServiceUnitTest {
         setAuthenticatedUser(statementReactionDetails.userId)
         every { statementDefiningThemesRepository.findAllByStatementId(any()) } returns statementDefiningThemes
         every { userStatementsRepository.save(capture(userStatementSlot)) } returns mockk()
-        every { kafkaProducer.updateUserDefiningThemes(capture(updateDetailsSlot)) } just Runs
+        every { kafkaProducer.updateUserDefiningThemes(capture(userDefiningThemesUpdateDetailsSlot)) } just Runs
 
         userStatementsService.processStatementReaction(statementReactionDetails)
 
@@ -96,7 +96,7 @@ class UserStatementsServiceUnitTest {
             assertEquals(statementReactionDetails.userId, userId)
             assertEquals(statementReactionDetails.statementId, statementId)
         }
-        with(updateDetailsSlot.captured) {
+        with(userDefiningThemesUpdateDetailsSlot.captured) {
             assertEquals(statementReactionDetails.userId, userId)
             assertEquals(statementReactionDetails.reactionType, reactionType)
             assertEquals(expectedDefiningThemes, definingThemes)

@@ -16,7 +16,6 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import xelagurd.socialdating.server.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.server.controller.UserDefiningThemesController
 import xelagurd.socialdating.server.service.UserDefiningThemesService
 import xelagurd.socialdating.server.utils.TestUtils.mockkList
@@ -29,7 +28,7 @@ class UserDefiningThemesControllerTest(@param:Autowired private val mockMvc: Moc
     @MockkBean
     private lateinit var userDefiningThemesService: UserDefiningThemesService
 
-    private val userId = Random.nextInt(ID_MIN, Int.MAX_VALUE)
+    private val userId = Random.nextInt(1, Int.MAX_VALUE)
 
     @Test
     fun getUserDefiningThemes_existData_ok() {

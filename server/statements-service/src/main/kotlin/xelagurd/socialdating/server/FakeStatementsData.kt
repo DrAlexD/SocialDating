@@ -3,7 +3,7 @@ package xelagurd.socialdating.server
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.StatementDefiningTheme
 import xelagurd.socialdating.server.model.UserStatement
-import xelagurd.socialdating.server.model.common.DefiningThemeReactionDetails
+import xelagurd.socialdating.server.model.details.DefiningThemeReactionDetails
 import xelagurd.socialdating.server.model.details.StatementDetails
 import xelagurd.socialdating.server.model.enums.AppLanguage.ENGLISH
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
@@ -182,8 +182,8 @@ object FakeStatementsData {
         StatementDefiningTheme(id = 67, statementId = 65, definingThemeId = 12, isSupportDefiningTheme = true)
     )
 
-    val statementsWithDefiningThemes = statements.map { statement ->
-        statement.toStatementWithDefiningThemes(
+    val statementDtos = statements.map { statement ->
+        statement.toStatementDto(
             statementDefiningThemes.filter { it.statementId == statement.id },
             ENGLISH
         )

@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
-import xelagurd.socialdating.client.data.model.ui.UserDefiningThemeWithData
+import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeData
 
 @Dao
 interface UserDefiningThemesDao {
@@ -28,7 +28,7 @@ interface UserDefiningThemesDao {
         order by dt.orderNumber, dt.numberInCategory
         """
     )
-    fun getUserDefiningThemes(userId: Int): Flow<List<UserDefiningThemeWithData>>
+    fun getUserDefiningThemes(userId: Int): Flow<List<UserDefiningThemeData>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUserDefiningThemes(userDefiningThemes: List<UserDefiningTheme>)

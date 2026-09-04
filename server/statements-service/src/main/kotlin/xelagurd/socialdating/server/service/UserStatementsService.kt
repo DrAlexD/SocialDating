@@ -1,8 +1,8 @@
 package xelagurd.socialdating.server.service
 
 import org.springframework.stereotype.Service
-import xelagurd.socialdating.server.model.additional.StatementReactionDetails
-import xelagurd.socialdating.server.model.common.UserDefiningThemesUpdateDetails
+import xelagurd.socialdating.server.model.details.StatementReactionDetails
+import xelagurd.socialdating.server.model.details.UserDefiningThemesUpdateDetails
 import xelagurd.socialdating.server.repository.StatementDefiningThemesRepository
 import xelagurd.socialdating.server.repository.UserStatementsRepository
 import xelagurd.socialdating.server.utils.SecurityUtils.checkCurrentUserAuth

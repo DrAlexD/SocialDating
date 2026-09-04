@@ -40,7 +40,7 @@ class CategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     private val categoryIds = Random.nextIntList()
     private val categoryDetails = FakeCategoriesData.categoriesDetails[0]
-    private val category = FakeCategoriesData.categoryResponses[0]
+    private val categoryDto = FakeCategoriesData.categoryDtos[0]
 
     @Test
     fun getCategories_existData_ok() {
@@ -72,7 +72,7 @@ class CategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc) {
 
     @Test
     fun addCategory_validData_created() {
-        every { categoriesService.addCategory(any()) } returns category
+        every { categoriesService.addCategory(any()) } returns categoryDto
 
         mockMvc.perform(
             post("/categories")
