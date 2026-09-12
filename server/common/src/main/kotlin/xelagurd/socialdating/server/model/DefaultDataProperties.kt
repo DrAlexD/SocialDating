@@ -5,6 +5,10 @@ object DefaultDataProperties {
 
     const val ID_MIN = 1
 
+    const val PAGE_SIZE_MIN = 1
+    const val PAGE_SIZE_DEFAULT = 30
+    const val PAGE_SIZE_MAX = 100
+
     const val NAME_LENGTH_MIN = 2
     const val NAME_LENGTH_MAX = 20
     const val USERNAME_LENGTH_MIN = 2

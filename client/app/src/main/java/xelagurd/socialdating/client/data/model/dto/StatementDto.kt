@@ -11,11 +11,12 @@ data class StatementDto(
     val creatorUserId: Int,
     val definingThemes: List<DefiningThemeReactionDto>
 ) {
-    fun toStatement() =
+    fun toStatement(orderNumber: Int) =
         Statement(
             id = id,
             text = text,
-            creatorUserId = creatorUserId
+            creatorUserId = creatorUserId,
+            orderNumber = orderNumber
         )
 
     fun toStatementDefiningThemes() =

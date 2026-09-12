@@ -1,9 +1,15 @@
 package xelagurd.socialdating.server.service
 
+import org.springframework.data.domain.Limit
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import xelagurd.socialdating.server.exception.InvalidDataException
+import xelagurd.socialdating.server.model.DefaultDataProperties.PAGE_SIZE_DEFAULT
+import xelagurd.socialdating.server.model.DefaultDataProperties.PAGE_SIZE_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.PAGE_SIZE_MIN
+import xelagurd.socialdating.server.model.StatementsCursor
 import xelagurd.socialdating.server.model.details.StatementDetails
+import xelagurd.socialdating.server.model.dto.PageDto
 import xelagurd.socialdating.server.model.dto.StatementDto
 import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.repository.StatementDefiningThemesRepository
@@ -16,12 +22,26 @@ class StatementsService(
     private val statementDefiningThemesRepository: StatementDefiningThemesRepository
 ) {
 
-    fun getStatements(currentUserId: Int, definingThemeIds: List<Int>): List<StatementDto> {
+    fun getStatements(
+        currentUserId: Int,
+        definingThemeIds: List<Int>,
+        cursor: String? = null,
+        size: Int = PAGE_SIZE_DEFAULT
+    ): PageDto<StatementDto> {
         checkCurrentUserAuth(currentUserId)
 
-        val statements = statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds)
+        val statementsCursor = StatementsCursor.decodeOrNew(cursor)
+        val pageSize = size.coerceIn(PAGE_SIZE_MIN, PAGE_SIZE_MAX)
 
-        if (statements.isEmpty()) return emptyList()
+        val statements = statementsRepository.findUnreactedStatements(
+            currentUserId,
+            definingThemeIds,
+            statementsCursor.seed,
+            statementsCursor.lastOrderKey,
+            Limit.of(pageSize)
+        )
+
+        if (statements.isEmpty()) return PageDto(listOf())
 
         val language = AppLanguage.current()
 
@@ -29,9 +49,13 @@ class StatementsService(
             .findAllByStatementIdIn(statements.map { it.id!! })
             .groupBy { it.statementId }
 
-        return statements.map {
-            it.toStatementDto(definingThemesByStatementId[it.id] ?: emptyList(), language)
-        }
+        return PageDto(
+            content = statements.map { it.toStatementDto(definingThemesByStatementId[it.id] ?: listOf(), language) },
+            nextCursor = when {
+                statements.size < pageSize -> null
+                else -> statementsCursor.next(statements.last().id!!).encode()
+            }
+        )
     }
 
     @Transactional

@@ -1,6 +1,7 @@
 package xelagurd.socialdating.client.data.fake
 
 import xelagurd.socialdating.client.data.model.Category
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
@@ -439,7 +440,7 @@ object FakeData {
         )
     )
 
-    val statements = statementDtos.map { it.toStatement() }
+    val statements = statementDtos.mapIndexed { index, statementDto -> statementDto.toStatement(index + ID_MIN) }
 
     val statementDefiningThemes = statementDtos.flatMap { it.toStatementDefiningThemes() }
 

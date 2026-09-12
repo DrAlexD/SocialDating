@@ -20,7 +20,9 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.client.UsersServiceClient
+import xelagurd.socialdating.server.exception.InvalidDataException
 import xelagurd.socialdating.server.model.DefaultDataProperties.USER_ACTIVITY_INITIAL
+import xelagurd.socialdating.server.model.SimilarUsersCursor
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.additional.UserCategoryData
 import xelagurd.socialdating.server.model.dto.UserDto
@@ -48,6 +50,7 @@ class UserCategoriesServiceUnitTest {
     private val currentUserId = Random.nextInt(1, Int.MAX_VALUE)
     private val anotherUserId = Random.nextInt(1, Int.MAX_VALUE)
     private val categoryId = Random.nextInt(1, Int.MAX_VALUE)
+    private val pageSize = 2
 
     @AfterEach
     fun clearSecurityContext() {
@@ -161,9 +164,9 @@ class UserCategoriesServiceUnitTest {
 
         val result = userCategoriesService.getSimilarUsers(currentUserId)
 
-        assertEquals(listOf(10, 20), result.map { it.id })
+        assertEquals(listOf(10, 20), result.content.map { it.id })
 
-        val similarUser10 = result[0]
+        val similarUser10 = result.content[0]
         assertEquals(3, similarUser10.similarNumber)
         assertEquals(0, similarUser10.oppositeNumber)
         assertEquals("User10", similarUser10.name)
@@ -197,7 +200,7 @@ class UserCategoriesServiceUnitTest {
 
         val result = userCategoriesService.getSimilarUsers(currentUserId)
 
-        assertEquals(listOf(10), result.map { it.id })
+        assertEquals(listOf(10), result.content.map { it.id })
 
         verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) }
         verify(exactly = 1) { userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1)) }
@@ -233,8 +236,8 @@ class UserCategoriesServiceUnitTest {
 
         val result = userCategoriesService.getSimilarUsers(currentUserId)
 
-        assertEquals(1, result.size)
-        val similarUser = result.single()
+        assertEquals(1, result.content.size)
+        val similarUser = result.content.single()
         assertEquals(6, similarUser.similarNumber)
         assertEquals(2, similarUser.oppositeNumber)
         // SIMILAR_CATEGORIES_NUMBER = 2, only the top 2 of 3 similar categories are kept, sorted descending
@@ -252,6 +255,77 @@ class UserCategoriesServiceUnitTest {
     }
 
     @Test
+    fun getSimilarUsers_pagedToTheEnd_returnsEveryUserOnceInTheSameOrder() {
+        setAuthenticatedUser(currentUserId)
+        mockThreeSimilarUsers()
+        every { usersServiceClient.getUsers(any()) } answers { firstArg<List<Int>>().map { userDto(it) } }
+
+        val pagedUserIds = mutableListOf<Int>()
+        var cursor: String? = null
+
+        do {
+            val result = userCategoriesService.getSimilarUsers(currentUserId, cursor = cursor, size = pageSize)
+
+            assertTrue(result.content.size <= pageSize)
+
+            pagedUserIds += result.content.map { it.id }
+            cursor = result.nextCursor
+        } while (cursor != null)
+
+        assertEquals(listOf(10, 20, 30), pagedUserIds)
+
+        verify(exactly = 2) { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) }
+        verify(exactly = 2) { userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1)) }
+        verify(exactly = 2) { usersServiceClient.getUsers(any()) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
+    }
+
+    @Test
+    fun getSimilarUsers_fullPage_returnsNextCursorOfTheLastUser() {
+        setAuthenticatedUser(currentUserId)
+        mockThreeSimilarUsers()
+        every { usersServiceClient.getUsers(listOf(10, 20)) } returns listOf(userDto(10), userDto(20))
+
+        val result = userCategoriesService.getSimilarUsers(currentUserId, size = pageSize)
+
+        assertEquals(listOf(10, 20), result.content.map { it.id })
+        // the last user of the page has the difference number 1 and the id 20
+        assertEquals(SimilarUsersCursor(1, 20).encode(), result.nextCursor)
+
+        verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) }
+        verify(exactly = 1) { userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1)) }
+        verify(exactly = 1) { usersServiceClient.getUsers(listOf(10, 20)) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
+    }
+
+    @Test
+    fun getSimilarUsers_wrongCursor_throwsInvalidData() {
+        setAuthenticatedUser(currentUserId)
+
+        assertThrows<InvalidDataException> {
+            userCategoriesService.getSimilarUsers(currentUserId, cursor = "wrongCursor")
+        }
+
+        verify(exactly = 0) { userCategoriesRepository.findCurrentUserCategories(any(), any()) }
+        verify(exactly = 0) { usersServiceClient.getUsers(any()) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
+    }
+
+    private fun mockThreeSimilarUsers() {
+        val currentUserCategories = listOf(userCategoryData(id = 1, maintained = arrayOf(0b0011L)))
+        every { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) } returns currentUserCategories
+
+        val anotherUsersCategories = listOf(
+            userCategory(userId = 30, categoryId = 1, maintained = arrayOf(0b0001L)),  // similar 1
+            userCategory(userId = 10, categoryId = 1, maintained = arrayOf(0b0011L)),  // similar 2
+            userCategory(userId = 20, categoryId = 1, maintained = arrayOf(0b0001L))   // similar 1
+        )
+        every {
+            userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1))
+        } returns anotherUsersCategories
+    }
+
+    @Test
     fun getSimilarUsers_noCurrentUserCategories_passesCategoryIdsAndReturnsEmpty() {
         setAuthenticatedUser(currentUserId)
         val categoryIds = listOf(1, 2)
@@ -263,7 +337,7 @@ class UserCategoriesServiceUnitTest {
 
         val result = userCategoriesService.getSimilarUsers(currentUserId, categoryIds)
 
-        assertTrue(result.isEmpty())
+        assertTrue(result.content.isEmpty())
 
         verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, categoryIds) }
         verify(exactly = 1) { userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, emptyList()) }

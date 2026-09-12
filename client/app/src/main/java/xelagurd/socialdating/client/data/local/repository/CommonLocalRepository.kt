@@ -5,6 +5,7 @@ import javax.inject.Singleton
 import androidx.room.Transaction
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Category
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.dto.StatementDto
 import xelagurd.socialdating.client.data.model.UserCategory
@@ -24,12 +25,18 @@ class CommonLocalRepository @Inject constructor(
     suspend fun updateStatementsScreenData(
         definingThemes: List<DefiningTheme>,
         categoryId: Int,
-        statements: List<StatementDto>
+        statements: List<StatementDto>,
+        firstOrderNumber: Int,
+        isFirstPage: Boolean
     ) {
         definingThemesRepository.insertDefiningThemes(definingThemes)
 
-        statementsRepository.deleteStatements(categoryId)
-        statementsRepository.insertStatements(statements.map { it.toStatement() })
+        if (isFirstPage) {
+            statementsRepository.deleteStatements(categoryId)
+        }
+        statementsRepository.insertStatements(
+            statements.mapIndexed { index, statement -> statement.toStatement(firstOrderNumber + index) }
+        )
         statementsRepository.insertStatementDefiningThemes(
             statements.flatMap { it.toStatementDefiningThemes() }
         )
@@ -73,7 +80,11 @@ class CommonLocalRepository @Inject constructor(
         definingThemesRepository.insertDefiningThemes(FakeData.definingThemes)
         userCategoriesRepository.insertUserCategories(FakeData.userCategories)
         userDefiningThemesRepository.insertUserDefiningThemes(FakeData.userDefiningThemes)
-        statementsRepository.insertStatements(FakeData.statements)
+        statementsRepository.insertStatements(
+            FakeData.statements
+                .shuffled()
+                .mapIndexed { index, statement -> statement.copy(orderNumber = index + ID_MIN) }
+        )
         statementsRepository.insertStatementDefiningThemes(FakeData.statementDefiningThemes)
     }
 }

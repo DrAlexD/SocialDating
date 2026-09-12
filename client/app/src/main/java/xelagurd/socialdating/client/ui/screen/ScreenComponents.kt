@@ -1,5 +1,6 @@
 package xelagurd.socialdating.client.ui.screen
 
+import kotlinx.coroutines.flow.distinctUntilChanged
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -17,24 +18,32 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -48,6 +57,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.model.DataEntity
+import xelagurd.socialdating.client.data.model.DataUtils.NEXT_PAGE_PREFETCH_COUNT
 import xelagurd.socialdating.client.ui.form.FormFieldError
 
 @Composable
@@ -203,6 +213,34 @@ fun AppLargeTextCard(
 }
 
 @Composable
+fun AppRefreshTextCard(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        onClick = onClick,
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.elevation_2dp)),
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_8dp))
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            AppMediumTitleText(
+                text = text,
+                overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
+            )
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = stringResource(R.string.refresh),
+                modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_4dp))
+            )
+        }
+    }
+}
+
+@Composable
 private fun AppTextCard(
     isEnabled: Boolean,
     onClick: () -> Unit,
@@ -265,9 +303,12 @@ inline fun AppDataList(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    listState: LazyListState = rememberLazyListState(),
+    noinline footer: (@Composable () -> Unit)? = null,
     crossinline card: @Composable (DataEntity) -> Unit
 ) {
     LazyColumn(
+        state = listState,
         contentPadding = contentPadding,
         horizontalAlignment = horizontalAlignment,
         modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_8dp))
@@ -275,6 +316,32 @@ inline fun AppDataList(
         items(items = entities, key = { it.id }) {
             card(it)
         }
+        footer?.let { footerContent ->
+            item { footerContent() }
+        }
+    }
+}
+
+@Composable
+fun LoadNextPageEffect(
+    listState: LazyListState,
+    entitiesCount: Int,
+    isEnabled: Boolean,
+    prefetchCount: Int = NEXT_PAGE_PREFETCH_COUNT,
+    onLoadNextPage: () -> Unit
+) {
+    val currentOnLoadNextPage by rememberUpdatedState(onLoadNextPage)
+
+    LaunchedEffect(listState, entitiesCount, isEnabled, prefetchCount) {
+        if (!isEnabled) return@LaunchedEffect
+
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .distinctUntilChanged()
+            .collect { lastVisibleIndex ->
+                if (lastVisibleIndex != null && entitiesCount - lastVisibleIndex <= prefetchCount) {
+                    currentOnLoadNextPage()
+                }
+            }
     }
 }
 

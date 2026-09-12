@@ -15,6 +15,7 @@ import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.model.details.RefreshTokenDetails
 import xelagurd.socialdating.client.data.remote.ApiUtils.UNAUTHORIZED
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
+import xelagurd.socialdating.client.ui.state.RequestStatus
 
 @Singleton
 class AuthInterceptor @Inject constructor(
@@ -29,58 +30,56 @@ class AuthInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val accessToken = runBlocking { preferencesRepository.accessToken.first() }
 
-        val request = chain
-            .request()
-            .newBuilder()
-            .header("Authorization", "Bearer $accessToken")
-            .build()
+        val response = chain.proceed(chain.authorizedRequest(accessToken))
 
-        val response = chain.proceed(request)
+        if (response.code != UNAUTHORIZED) return response
 
-        if (response.code == UNAUTHORIZED) {
-            refreshLock.withLock {
-                val currentAccessToken = runBlocking { preferencesRepository.accessToken.first() }
+        refreshLock.withLock {
+            val currentAccessToken = runBlocking { preferencesRepository.accessToken.first() }
 
-                if (currentAccessToken != accessToken) {
-                    val newRequest = chain
-                        .request()
-                        .newBuilder()
-                        .header("Authorization", "Bearer $currentAccessToken")
-                        .build()
+            if (currentAccessToken != accessToken) {
+                return chain.retryWith(response, currentAccessToken)
+            }
 
-                    return chain.proceed(newRequest)
+            val refreshToken = runBlocking { preferencesRepository.refreshToken.first() }
+
+            if (refreshToken.isEmpty()) return response
+
+            val (refreshResponse, refreshStatus) = runBlocking {
+                safeApiCall(context) {
+                    authApiService.refreshToken(RefreshTokenDetails(refreshToken))
+                }
+            }
+
+            if (refreshResponse != null) {
+                runBlocking {
+                    preferencesRepository.saveAccessToken(refreshResponse.accessToken)
+                    preferencesRepository.saveRefreshToken(refreshResponse.refreshToken)
                 }
 
-                val refreshToken = runBlocking { preferencesRepository.refreshToken.first() }
+                return chain.retryWith(response, refreshResponse.accessToken)
+            }
 
-                val (refreshResponse, _) = runBlocking {
-                    safeApiCall(context) {
-                        authApiService.refreshToken(RefreshTokenDetails(refreshToken))
-                    }
-                }
-
-                if (refreshResponse != null) {
-                    runBlocking {
-                        preferencesRepository.saveAccessToken(refreshResponse.accessToken)
-                        preferencesRepository.saveRefreshToken(refreshResponse.refreshToken)
-                    }
-
-                    val newRequest = chain
-                        .request()
-                        .newBuilder()
-                        .header("Authorization", "Bearer ${refreshResponse.accessToken}")
-                        .build()
-
-                    return chain.proceed(newRequest)
-                } else {
-                    runBlocking {
-                        preferencesRepository.clearPreferences()
-                        commonLocalRepository.clearData()
-                    }
+            if (refreshStatus is RequestStatus.FAILURE) {
+                runBlocking {
+                    preferencesRepository.clearPreferences()
+                    commonLocalRepository.clearData()
                 }
             }
         }
 
         return response
+    }
+
+    private fun Interceptor.Chain.authorizedRequest(accessToken: String) =
+        request()
+            .newBuilder()
+            .header("Authorization", "Bearer $accessToken")
+            .build()
+
+    private fun Interceptor.Chain.retryWith(unauthorizedResponse: Response, accessToken: String): Response {
+        unauthorizedResponse.close()
+
+        return proceed(authorizedRequest(accessToken))
     }
 }

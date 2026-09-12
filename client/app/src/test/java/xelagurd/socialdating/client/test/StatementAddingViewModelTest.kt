@@ -15,6 +15,7 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -28,6 +29,7 @@ import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
+import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.remote.ApiUtils.BAD_REQUEST
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.client.ui.navigation.StatementAddingDestination
@@ -57,6 +59,9 @@ class StatementAddingViewModelTest {
 
     private val statementFormData = FakeData.statementFormData
 
+    private val maxOrderNumber = Random.nextInt(0, Int.MAX_VALUE - 1)
+    private val insertedStatementsSlot = slot<List<Statement>>()
+
     @Before
     fun setup() {
         mockGeneralMethods()
@@ -83,9 +88,12 @@ class StatementAddingViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, statementAddingUiState.actionRequestStatus)
+        // the added statement is placed after all the statements which are already loaded by the statements screen
+        assertEquals(maxOrderNumber + 1, insertedStatementsSlot.captured.single().orderNumber)
 
         verify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes(any()) }
         coVerify(exactly = 1) { remoteStatementsRepository.addStatement(any()) }
+        coVerify(exactly = 1) { localStatementsRepository.getMaxOrderNumber(any()) }
         coVerify(exactly = 1) { localStatementsRepository.insertStatements(any()) }
         coVerify(exactly = 1) { localStatementsRepository.insertStatementDefiningThemes(any()) }
         confirmVerified(localDefiningThemesRepository, localStatementsRepository, remoteStatementsRepository)
@@ -134,6 +142,7 @@ class StatementAddingViewModelTest {
 
         verify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes(any()) }
         coVerify(exactly = 2) { remoteStatementsRepository.addStatement(any()) }
+        coVerify(exactly = 1) { localStatementsRepository.getMaxOrderNumber(any()) }
         coVerify(exactly = 1) { localStatementsRepository.insertStatements(any()) }
         coVerify(exactly = 1) { localStatementsRepository.insertStatementDefiningThemes(any()) }
         confirmVerified(localDefiningThemesRepository, localStatementsRepository, remoteStatementsRepository)
@@ -154,6 +163,7 @@ class StatementAddingViewModelTest {
 
         verify(exactly = 1) { localDefiningThemesRepository.getDefiningThemes(any()) }
         coVerify(exactly = 2) { remoteStatementsRepository.addStatement(any()) }
+        coVerify(exactly = 1) { localStatementsRepository.getMaxOrderNumber(any()) }
         coVerify(exactly = 1) { localStatementsRepository.insertStatements(any()) }
         coVerify(exactly = 1) { localStatementsRepository.insertStatementDefiningThemes(any()) }
         confirmVerified(localDefiningThemesRepository, localStatementsRepository, remoteStatementsRepository)
@@ -169,7 +179,8 @@ class StatementAddingViewModelTest {
     private fun mockDataWithInternet() {
         coEvery { remoteStatementsRepository.addStatement(any()) } returns
                 Response.success(FakeData.newStatement)
-        coEvery { localStatementsRepository.insertStatements(any()) } just Runs
+        coEvery { localStatementsRepository.getMaxOrderNumber(any()) } returns maxOrderNumber
+        coEvery { localStatementsRepository.insertStatements(capture(insertedStatementsSlot)) } just Runs
         coEvery { localStatementsRepository.insertStatementDefiningThemes(any()) } just Runs
     }
 

@@ -18,6 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
+import xelagurd.socialdating.client.data.remote.ApiUtils.offlineModeStatus
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.ui.state.CategoriesUiState
@@ -51,11 +52,13 @@ class CategoriesViewModel @Inject constructor(
         if (!isOfflineMode) { // FixMe: remove after adding server hosting
             getCategories()
         } else {
-            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+            dataRequestStatusFlow.update { offlineModeStatus(context) }
         }
     }
 
     fun getCategories() {
+        if (isOfflineMode) return // FixMe: remove after adding server hosting
+
         viewModelScope.launch {
             dataRequestStatusFlow.update { RequestStatus.LOADING }
 

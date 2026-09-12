@@ -16,6 +16,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.StatementDefiningTheme
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
@@ -63,6 +64,10 @@ class StatementAddingViewModel @Inject constructor(
         }
     }
 
+    // the added statement is placed after all the statements which are already loaded by the statements screen
+    private suspend fun nextOrderNumber() =
+        localStatementsRepository.getMaxOrderNumber(categoryId)?.plus(1) ?: ID_MIN
+
     fun updateUiState(statementFormData: StatementFormData) =
         _uiState.update {
             it.copy(formData = statementFormData)
@@ -80,7 +85,9 @@ class StatementAddingViewModel @Inject constructor(
                 }
 
                 if (statement != null) {
-                    localStatementsRepository.insertStatements(listOf(statement.toStatement()))
+                    localStatementsRepository.insertStatements(
+                        listOf(statement.toStatement(nextOrderNumber()))
+                    )
                     localStatementsRepository.insertStatementDefiningThemes(
                         statement.toStatementDefiningThemes()
                     )
@@ -96,7 +103,8 @@ class StatementAddingViewModel @Inject constructor(
                         Statement(
                             id = newId,
                             text = statementFormData.text,
-                            creatorUserId = statementFormData.creatorUserId!!
+                            creatorUserId = statementFormData.creatorUserId!!,
+                            orderNumber = nextOrderNumber()
                         )
                     )
                 )

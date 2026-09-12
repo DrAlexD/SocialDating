@@ -21,6 +21,7 @@ import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.data.model.User
+import xelagurd.socialdating.client.data.remote.ApiUtils.offlineModeStatus
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
@@ -66,13 +67,15 @@ class ProfileViewModel @Inject constructor(
         } else if (anotherUserId != userId) {
             dataRequestStatusFlow.update { RequestStatus.LOADING }
             userStateFlow.update { FakeData.users[1] }
-            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+            dataRequestStatusFlow.update { offlineModeStatus(context) }
         } else {
-            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+            dataRequestStatusFlow.update { offlineModeStatus(context) }
         }
     }
 
     fun getUser() {
+        if (isOfflineMode) return // FixMe: remove after adding server hosting
+
         viewModelScope.launch {
             dataRequestStatusFlow.update { RequestStatus.LOADING }
 

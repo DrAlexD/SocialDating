@@ -38,6 +38,7 @@ class SimilarUsersScreenTest {
 
     private val similarUsers = FakeData.similarUsers
     private val similarUser = similarUsers[0]
+    private val nextPageErrorText = "NextPageError"
 
     @Test
     fun similarUsersScreen_defaultParameters_loadingIndicator() {
@@ -78,6 +79,52 @@ class SimilarUsersScreenTest {
 
         composeTestRule.onNodeWithText(similarUser.similarCategories.joinToString()).assertIsDisplayed()
         composeTestRule.onNodeWithText(similarUser.oppositeCategories.joinToString()).assertIsDisplayed()
+    }
+
+    @Test
+    fun similarUsersScreen_lastPage_displayedNoMoreData() {
+        val similarUsersUiState = SimilarUsersUiState(
+            entities = similarUsers,
+            dataRequestStatus = RequestStatus.SUCCESS,
+            isLastPage = true
+        )
+
+        setContentToSimilarUsersBody(similarUsersUiState)
+
+        composeTestRule.onNodeWithTextId(R.string.no_more_data).assertIsDisplayed()
+    }
+
+    @Test
+    fun similarUsersScreen_nextPageLoading_displayedLoadingIndicator() {
+        val similarUsersUiState = SimilarUsersUiState(
+            entities = similarUsers,
+            dataRequestStatus = RequestStatus.SUCCESS,
+            nextPageRequestStatus = RequestStatus.LOADING
+        )
+
+        setContentToSimilarUsersBody(similarUsersUiState)
+
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+    }
+
+    @Test
+    fun similarUsersScreen_nextPageError_loadedNextPageOnRetry() {
+        var isLoadNextPageClicked = false
+        val similarUsersUiState = SimilarUsersUiState(
+            entities = similarUsers,
+            dataRequestStatus = RequestStatus.SUCCESS,
+            nextPageRequestStatus = RequestStatus.ERROR(nextPageErrorText)
+        )
+
+        composeTestRule.setContentToScreen {
+            SimilarUsersScreenComponent(
+                similarUsersUiState = similarUsersUiState,
+                onLoadNextPage = { isLoadNextPageClicked = true }
+            )
+        }
+
+        composeTestRule.onNodeWithText(nextPageErrorText).checkButtonAndClick()
+        assertTrue(isLoadNextPageClicked)
     }
 
     @Test

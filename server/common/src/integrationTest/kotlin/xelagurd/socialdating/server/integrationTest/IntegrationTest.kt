@@ -25,6 +25,7 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.GATEWAY_URL
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_NO_MAINTAIN
+import xelagurd.socialdating.server.utils.TestUtils.readArray
 import xelagurd.socialdating.server.utils.TestUtils.readArrayFromJsonString
 import xelagurd.socialdating.server.utils.TestUtils.readObject
 import xelagurd.socialdating.server.utils.TestUtils.readObjectFromJsonString
@@ -195,7 +196,8 @@ class IntegrationTest {
         )
         assertEquals(HttpStatus.OK, response.statusCode)
 
-        val responseSimilarUser = readArrayFromJsonString(response.body!!)
+        val responseSimilarUser = readObjectFromJsonString(response.body!!)
+            .readArray("content")
             .firstOrNull { it["id"] == admin.id }
         assertNotNull(responseSimilarUser)
 

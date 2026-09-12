@@ -13,3 +13,9 @@ sealed class RequestStatus {
     fun isAllowedActionRefresh(isBlockOnSuccess: Boolean = true) =
         this !is LOADING && (!isBlockOnSuccess || this !is SUCCESS)
 }
+
+fun <T> List<T>.hideWhileLoading(dataRequestStatus: RequestStatus) =
+    when (dataRequestStatus) {
+        is RequestStatus.LOADING -> listOf()
+        else -> this
+    }

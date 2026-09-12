@@ -21,15 +21,19 @@ import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.ID_MIN
+import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.details.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType
+import xelagurd.socialdating.client.data.remote.ApiUtils.offlineModeStatus
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
 import xelagurd.socialdating.client.ui.navigation.StatementsDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.StatementsUiState
+import xelagurd.socialdating.client.ui.state.hideWhileLoading
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -49,14 +53,28 @@ class StatementsViewModel @Inject constructor(
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val nextPageRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val isLastPageFlow = MutableStateFlow(false)
     private val statementsFlow = localStatementsRepository.getStatements(categoryId)
         .distinctUntilChanged()
 
-    val uiState = combine(statementsFlow, dataRequestStatusFlow) { statements, dataRequestStatus ->
+    // the paging session state, it is dropped on every screen entry, so the statements order is a new one
+    private var definingThemes: List<DefiningTheme>? = null
+    private var nextCursor: String? = null
+    private var nextOrderNumber = ID_MIN
+
+    val uiState = combine(
+        statementsFlow,
+        dataRequestStatusFlow,
+        nextPageRequestStatusFlow,
+        isLastPageFlow
+    ) { statements, dataRequestStatus, nextPageRequestStatus, isLastPage ->
         StatementsUiState(
             categoryId = categoryId,
-            entities = statements,
-            dataRequestStatus = dataRequestStatus
+            entities = statements.hideWhileLoading(dataRequestStatus),
+            dataRequestStatus = dataRequestStatus,
+            nextPageRequestStatus = nextPageRequestStatus,
+            isLastPage = isLastPage
         )
     }.stateIn(
         scope = viewModelScope,
@@ -68,40 +86,83 @@ class StatementsViewModel @Inject constructor(
         if (!isOfflineMode) { // FixMe: remove after adding server hosting
             getStatements()
         } else {
-            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+            isLastPageFlow.update { true }
+            dataRequestStatusFlow.update { offlineModeStatus(context) }
         }
     }
 
     fun getStatements() {
+        if (isOfflineMode) return // FixMe: remove after adding server hosting
+
+        definingThemes = null
+        nextCursor = null
+        nextOrderNumber = ID_MIN
+        isLastPageFlow.update { false }
+        nextPageRequestStatusFlow.update { RequestStatus.UNDEFINED }
+
+        getStatementsPage(isFirstPage = true)
+    }
+
+    fun getNextStatements() {
+        if (isOfflineMode) return // FixMe: remove after adding server hosting
+        if (isLastPageFlow.value) return
+        if (dataRequestStatusFlow.value !is RequestStatus.SUCCESS) return
+        if (nextPageRequestStatusFlow.value is RequestStatus.LOADING) return
+
+        getStatementsPage(isFirstPage = false)
+    }
+
+    private fun getStatementsPage(isFirstPage: Boolean) {
         viewModelScope.launch {
-            var globalStatus: RequestStatus = RequestStatus.LOADING
+            updateRequestStatus(isFirstPage, RequestStatus.LOADING)
 
-            dataRequestStatusFlow.update { globalStatus }
-
-            val (remoteDefiningThemes, statusDefiningThemes) = safeApiCall(context) {
-                remoteDefiningThemesRepository.getDefiningThemes(categoryId = categoryId)
-            }
-
-            if (remoteDefiningThemes != null) {
-                val remoteDefiningThemeIds = remoteDefiningThemes.map { it.id }
-                val (remoteStatements, statusStatements) = safeApiCall(context) {
-                    remoteStatementsRepository.getStatements(userId, remoteDefiningThemeIds)
+            val (remoteDefiningThemes, statusDefiningThemes) = definingThemes
+                ?.let { it to RequestStatus.SUCCESS }
+                ?: safeApiCall(context) {
+                    remoteDefiningThemesRepository.getDefiningThemes(categoryId = categoryId)
                 }
 
-                if (remoteStatements != null) {
+            if (remoteDefiningThemes == null) {
+                updateRequestStatus(isFirstPage, statusDefiningThemes)
+                return@launch
+            }
+
+            definingThemes = remoteDefiningThemes
+
+            val (statementsPage, statusStatements) = safeApiCall(context) {
+                remoteStatementsRepository.getStatements(
+                    currentUserId = userId,
+                    definingThemeIds = remoteDefiningThemes.map { it.id },
+                    cursor = nextCursor
+                )
+            }
+
+            when {
+                statementsPage != null -> {
                     commonLocalRepository.updateStatementsScreenData(
                         remoteDefiningThemes,
                         categoryId,
-                        remoteStatements
+                        statementsPage.content,
+                        nextOrderNumber,
+                        isFirstPage
                     )
-                }
 
-                globalStatus = statusStatements
-            } else {
-                globalStatus = statusDefiningThemes
+                    nextOrderNumber += statementsPage.content.size
+                    nextCursor = statementsPage.nextCursor
+                    isLastPageFlow.update { statementsPage.nextCursor == null }
+                }
+                // no content means that there are no statements to load anymore
+                statusStatements is RequestStatus.SUCCESS -> isLastPageFlow.update { true }
             }
 
-            dataRequestStatusFlow.update { globalStatus }
+            updateRequestStatus(isFirstPage, statusStatements)
+        }
+    }
+
+    private fun updateRequestStatus(isFirstPage: Boolean, requestStatus: RequestStatus) {
+        when {
+            isFirstPage -> dataRequestStatusFlow.update { requestStatus }
+            else -> nextPageRequestStatusFlow.update { requestStatus }
         }
     }
 

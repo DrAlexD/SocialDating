@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.model.DataUtils.SIMILAR_USERS_NEXT_PAGE_PREFETCH_COUNT
 import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.data.model.enums.Purpose
@@ -52,7 +53,8 @@ fun SimilarUsersScreen(
     SimilarUsersScreenComponent(
         similarUsersUiState = similarUsersUiState,
         onSimilarUserClick = onSimilarUserClick,
-        refreshAction = similarUsersViewModel::getSimilarUsers
+        refreshAction = similarUsersViewModel::getSimilarUsers,
+        onLoadNextPage = similarUsersViewModel::getNextSimilarUsers
     )
 }
 
@@ -61,7 +63,8 @@ fun SimilarUsersScreen(
 fun SimilarUsersScreenComponent(
     similarUsersUiState: SimilarUsersUiState = SimilarUsersUiState(),
     onSimilarUserClick: (Int) -> Unit = {},
-    refreshAction: () -> Unit = {}
+    refreshAction: () -> Unit = {},
+    onLoadNextPage: () -> Unit = {}
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -81,9 +84,11 @@ fun SimilarUsersScreenComponent(
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
-        DataListComponent(
-            dataListUiState = similarUsersUiState,
-            contentPadding = innerPadding
+        PagedDataListComponent(
+            pagedDataListUiState = similarUsersUiState,
+            onLoadNextPage = onLoadNextPage,
+            contentPadding = innerPadding,
+            prefetchCount = SIMILAR_USERS_NEXT_PAGE_PREFETCH_COUNT
         ) {
             AppEntityCard(
                 entity = it,

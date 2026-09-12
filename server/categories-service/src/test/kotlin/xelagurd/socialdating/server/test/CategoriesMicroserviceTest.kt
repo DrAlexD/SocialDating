@@ -2,6 +2,7 @@ package xelagurd.socialdating.server.test
 
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -36,7 +37,7 @@ import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.model.enums.Role.USER
 import xelagurd.socialdating.server.repository.UserCategoriesRepository
 import xelagurd.socialdating.server.security.AuthHeaders
-import xelagurd.socialdating.server.utils.TestUtils.readArrayFromJsonString
+import xelagurd.socialdating.server.utils.TestUtils.readArray
 import xelagurd.socialdating.server.utils.TestUtils.readObject
 import xelagurd.socialdating.server.utils.TestUtils.readObjectFromJsonString
 import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
@@ -139,8 +140,12 @@ class CategoriesMicroserviceTest(
         )
         assertEquals(HttpStatus.OK, response.statusCode)
 
+        val responseSimilarUsersPage = readObjectFromJsonString(response.body!!)
+        // the only similar user fits into the single page, so there is nothing to page further
+        assertNull(responseSimilarUsersPage["nextCursor"])
+
         // user 3 is as often opposite to user 1 as similar, so only user 2 is returned
-        val responseSimilarUsers = readArrayFromJsonString(response.body!!)
+        val responseSimilarUsers = responseSimilarUsersPage.readArray("content")
         assertEquals(1, responseSimilarUsers.size)
 
         val responseSimilarUser = responseSimilarUsers.single()

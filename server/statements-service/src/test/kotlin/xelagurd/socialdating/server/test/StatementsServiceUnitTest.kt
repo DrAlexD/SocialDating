@@ -1,6 +1,7 @@
 package xelagurd.socialdating.server.test
 
 import kotlin.random.Random
+import org.springframework.data.domain.Limit
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -14,13 +15,18 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeStatementsData
+import xelagurd.socialdating.server.exception.InvalidDataException
+import xelagurd.socialdating.server.model.DefaultDataProperties.PAGE_SIZE_DEFAULT
 import xelagurd.socialdating.server.model.Statement
 import xelagurd.socialdating.server.model.StatementDefiningTheme
+import xelagurd.socialdating.server.model.StatementsCursor
 import xelagurd.socialdating.server.model.details.DefiningThemeReactionDetails
 import xelagurd.socialdating.server.model.dto.DefiningThemeReactionDto
 import xelagurd.socialdating.server.model.dto.StatementDto
@@ -56,6 +62,10 @@ class StatementsServiceUnitTest {
     private val statementSlot = slot<Statement>()
     private val definingThemesSlot = slot<List<StatementDefiningTheme>>()
 
+    private val seedSlot = slot<String>()
+    private val lastOrderKeySlot = slot<String>()
+    private val limitSlot = slot<Limit>()
+
     @AfterEach
     fun clearSecurityContext() {
         SecurityContextHolder.clearContext()
@@ -67,33 +77,138 @@ class StatementsServiceUnitTest {
         SecurityContextHolder.getContext().authentication = authentication
     }
 
+    private fun mockUnreactedStatements(foundStatements: List<Statement>) {
+        every {
+            statementsRepository.findUnreactedStatements(
+                any(), any(), capture(seedSlot), capture(lastOrderKeySlot), capture(limitSlot)
+            )
+        } returns foundStatements
+
+        if (foundStatements.isNotEmpty()) {
+            every { statementDefiningThemesRepository.findAllByStatementIdIn(any()) } returns statementDefiningThemes
+        }
+    }
+
     @Test
     fun getStatements_authorized_returnsUnreactedStatementsWithDefiningThemes() {
         setAuthenticatedUser(currentUserId)
-        every { statementsRepository.findUnreactedStatements(any(), any()) } returns statements
-        every { statementDefiningThemesRepository.findAllByStatementIdIn(any()) } returns statementDefiningThemes
+        mockUnreactedStatements(statements)
 
         val result = statementsService.getStatements(currentUserId, definingThemeIds)
 
-        assertEquals(statements.size, result.size)
-        assertEquals(statements.map { it.id }, result.map { it.id })
-        assertEquals(multiThemeDefiningThemeDtos, result.last().definingThemes)
+        assertEquals(statements.size, result.content.size)
+        assertEquals(statements.map { it.id }, result.content.map { it.id })
+        assertEquals(multiThemeDefiningThemeDtos, result.content.last().definingThemes)
 
-        verify(exactly = 1) { statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds) }
+        verify(exactly = 1) {
+            statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds, any(), any(), any())
+        }
         verify(exactly = 1) { statementDefiningThemesRepository.findAllByStatementIdIn(statements.map { it.id!! }) }
+        confirmVerified(statementsRepository, statementDefiningThemesRepository)
+    }
+
+    @Test
+    fun getStatements_noCursor_startsNewOrderFromTheBeginning() {
+        setAuthenticatedUser(currentUserId)
+        mockUnreactedStatements(statements)
+
+        statementsService.getStatements(currentUserId, definingThemeIds)
+        val firstSeed = seedSlot.captured
+
+        statementsService.getStatements(currentUserId, definingThemeIds)
+        val secondSeed = seedSlot.captured
+
+        assertEquals("", lastOrderKeySlot.captured)
+        assertEquals(PAGE_SIZE_DEFAULT, limitSlot.captured.max())
+        assertNotEquals(firstSeed, secondSeed)
+
+        verify(exactly = 2) {
+            statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds, any(), any(), any())
+        }
+        verify(exactly = 2) { statementDefiningThemesRepository.findAllByStatementIdIn(any()) }
+        confirmVerified(statementsRepository, statementDefiningThemesRepository)
+    }
+
+    @Test
+    fun getStatements_fullPage_returnsNextCursorOfTheSameOrder() {
+        setAuthenticatedUser(currentUserId)
+        mockUnreactedStatements(statements)
+
+        val result = statementsService.getStatements(currentUserId, definingThemeIds, size = statements.size)
+
+        assertNotNull(result.nextCursor)
+
+        val nextCursor = StatementsCursor.decodeOrNew(result.nextCursor!!)
+        assertEquals(seedSlot.captured, nextCursor.seed)
+        assertEquals(StatementsCursor.orderKey(statements.last().id!!, seedSlot.captured), nextCursor.lastOrderKey)
+
+        verify(exactly = 1) {
+            statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds, any(), any(), any())
+        }
+        verify(exactly = 1) { statementDefiningThemesRepository.findAllByStatementIdIn(any()) }
+        confirmVerified(statementsRepository, statementDefiningThemesRepository)
+    }
+
+    @Test
+    fun getStatements_partialPage_returnsNoNextCursor() {
+        setAuthenticatedUser(currentUserId)
+        mockUnreactedStatements(statements)
+
+        val result = statementsService.getStatements(currentUserId, definingThemeIds, size = statements.size + 1)
+
+        assertNull(result.nextCursor)
+
+        verify(exactly = 1) {
+            statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds, any(), any(), any())
+        }
+        verify(exactly = 1) { statementDefiningThemesRepository.findAllByStatementIdIn(any()) }
+        confirmVerified(statementsRepository, statementDefiningThemesRepository)
+    }
+
+    @Test
+    fun getStatements_withCursor_continuesTheSameOrder() {
+        setAuthenticatedUser(currentUserId)
+        mockUnreactedStatements(statements)
+
+        val cursor = StatementsCursor.decodeOrNew(null).next(statements.last().id!!)
+
+        statementsService.getStatements(currentUserId, definingThemeIds, cursor.encode())
+
+        assertEquals(cursor.seed, seedSlot.captured)
+        assertEquals(cursor.lastOrderKey, lastOrderKeySlot.captured)
+
+        verify(exactly = 1) {
+            statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds, any(), any(), any())
+        }
+        verify(exactly = 1) { statementDefiningThemesRepository.findAllByStatementIdIn(any()) }
+        confirmVerified(statementsRepository, statementDefiningThemesRepository)
+    }
+
+    @Test
+    fun getStatements_wrongCursor_throwsInvalidData() {
+        setAuthenticatedUser(currentUserId)
+
+        assertThrows<InvalidDataException> {
+            statementsService.getStatements(currentUserId, definingThemeIds, "wrongCursor")
+        }
+
+        verify(exactly = 0) { statementsRepository.findUnreactedStatements(any(), any(), any(), any(), any()) }
         confirmVerified(statementsRepository, statementDefiningThemesRepository)
     }
 
     @Test
     fun getStatements_noUnreactedStatements_returnsEmptyWithoutDefiningThemesRequest() {
         setAuthenticatedUser(currentUserId)
-        every { statementsRepository.findUnreactedStatements(any(), any()) } returns emptyList()
+        mockUnreactedStatements(listOf())
 
         val result = statementsService.getStatements(currentUserId, definingThemeIds)
 
-        assertEquals(listOf<StatementDto>(), result)
+        assertEquals(listOf<StatementDto>(), result.content)
+        assertNull(result.nextCursor)
 
-        verify(exactly = 1) { statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds) }
+        verify(exactly = 1) {
+            statementsRepository.findUnreactedStatements(currentUserId, definingThemeIds, any(), any(), any())
+        }
         confirmVerified(statementsRepository, statementDefiningThemesRepository)
     }
 
@@ -105,7 +220,7 @@ class StatementsServiceUnitTest {
             statementsService.getStatements(currentUserId, definingThemeIds)
         }
 
-        verify(exactly = 0) { statementsRepository.findUnreactedStatements(any(), any()) }
+        verify(exactly = 0) { statementsRepository.findUnreactedStatements(any(), any(), any(), any(), any()) }
         confirmVerified(statementsRepository, statementDefiningThemesRepository)
     }
 

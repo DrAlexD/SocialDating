@@ -18,7 +18,10 @@ import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.controller.UserCategoriesController
+import xelagurd.socialdating.server.model.DefaultDataProperties.PAGE_SIZE_DEFAULT
+import xelagurd.socialdating.server.model.SimilarUsersCursor
 import xelagurd.socialdating.server.model.dto.DetailedSimilarUserDto
+import xelagurd.socialdating.server.model.dto.PageDto
 import xelagurd.socialdating.server.model.dto.SimilarUserDto
 import xelagurd.socialdating.server.model.enums.Gender.MALE
 import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
@@ -35,6 +38,22 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     private val userId = Random.nextInt(1, Int.MAX_VALUE)
     private val anotherUserId = Random.nextInt(1, Int.MAX_VALUE)
+    private val cursor = SimilarUsersCursor(3, anotherUserId).encode()
+    private val size = PAGE_SIZE_DEFAULT / 2
+
+    private val similarUsersUrl = "/categories/users/similar-users?currentUserId=$userId"
+    private val similarUserDto = SimilarUserDto(
+        id = anotherUserId,
+        name = "User",
+        gender = MALE,
+        age = 27,
+        city = "City",
+        purpose = FRIENDS,
+        similarNumber = 3,
+        oppositeNumber = 1,
+        similarCategories = emptyList(),
+        oppositeCategories = emptyList()
+    )
 
     @Test
     fun getUserCategories_existData_ok() {
@@ -52,42 +71,49 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
 
     @Test
     fun getSimilarUsers_existData_ok() {
-        every { userCategoriesService.getSimilarUsers(any(), any()) } returns listOf(
-            SimilarUserDto(
-                id = anotherUserId,
-                name = "User",
-                gender = MALE,
-                age = 27,
-                city = "City",
-                purpose = FRIENDS,
-                similarNumber = 3,
-                oppositeNumber = 1,
-                similarCategories = emptyList(),
-                oppositeCategories = emptyList()
-            )
-        )
+        every { userCategoriesService.getSimilarUsers(any(), any(), any(), any()) } returns
+                PageDto(listOf(similarUserDto), cursor)
 
-        mockMvc.perform(
-            get("/categories/users/similar-users?currentUserId=$userId")
-        )
+        mockMvc.perform(get(similarUsersUrl))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
 
-        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, null) }
+        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, null, null, PAGE_SIZE_DEFAULT) }
+        confirmVerified(userCategoriesService)
+    }
+
+    @Test
+    fun getSimilarUsers_noData_noContent() {
+        every { userCategoriesService.getSimilarUsers(any(), any(), any(), any()) } returns PageDto(listOf())
+
+        mockMvc.perform(get(similarUsersUrl))
+            .andExpect(status().isNoContent)
+
+        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, null, null, PAGE_SIZE_DEFAULT) }
+        confirmVerified(userCategoriesService)
+    }
+
+    @Test
+    fun getSimilarUsers_withCursorAndSize_passesThemToService() {
+        every { userCategoriesService.getSimilarUsers(any(), any(), any(), any()) } returns
+                PageDto(listOf(similarUserDto))
+
+        mockMvc.perform(get("$similarUsersUrl&cursor=$cursor&size=$size"))
+            .andExpect(status().isOk)
+
+        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, null, cursor, size) }
         confirmVerified(userCategoriesService)
     }
 
     @Test
     fun getSimilarUsers_anotherUser_forbidden() {
-        every { userCategoriesService.getSimilarUsers(any(), any()) } throws
+        every { userCategoriesService.getSimilarUsers(any(), any(), any(), any()) } throws
                 AccessDeniedException("Access denied due to request another user`s data")
 
-        mockMvc.perform(
-            get("/categories/users/similar-users?currentUserId=$userId")
-        )
+        mockMvc.perform(get(similarUsersUrl))
             .andExpect(status().isForbidden)
 
-        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, null) }
+        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, null, null, PAGE_SIZE_DEFAULT) }
         confirmVerified(userCategoriesService)
     }
 

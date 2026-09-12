@@ -3,11 +3,13 @@ package xelagurd.socialdating.client.test
 import java.io.IOException
 import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import android.content.Context
@@ -21,6 +23,8 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -32,6 +36,8 @@ import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
 import xelagurd.socialdating.client.data.model.Statement
+import xelagurd.socialdating.client.data.model.dto.PageDto
+import xelagurd.socialdating.client.data.model.dto.StatementDto
 import xelagurd.socialdating.client.data.model.enums.StatementReactionType
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteStatementsRepository
@@ -63,6 +69,11 @@ class StatementsViewModelTest {
     private val isOfflineModeFlow = flowOf(false)
 
     private val statement = FakeData.mainStatement
+
+    private val nextCursor = "a1b2c3d4:${"0".repeat(32)}"
+    private val pageStatements = mockkList<StatementDto>()
+    private val pageSize = pageStatements.size
+    private val requestDelayMillis = 1000L
 
     @Before
     fun setup() {
@@ -101,8 +112,10 @@ class StatementsViewModelTest {
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
         coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
-        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any()) }
-        coVerify(exactly = 1) { commonLocalRepository.updateStatementsScreenData(any(), any(), any()) }
+        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any(), null, any()) }
+        coVerify(exactly = 1) {
+            commonLocalRepository.updateStatementsScreenData(any(), any(), any(), 1, true)
+        }
         confirmVerified(
             remoteStatementsRepository,
             localStatementsRepository,
@@ -168,8 +181,10 @@ class StatementsViewModelTest {
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
         coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
-        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any()) }
-        coVerify(exactly = 1) { commonLocalRepository.updateStatementsScreenData(any(), any(), any()) }
+        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any(), any(), any()) }
+        coVerify(exactly = 1) {
+            commonLocalRepository.updateStatementsScreenData(any(), any(), any(), any(), any())
+        }
         confirmVerified(
             remoteStatementsRepository,
             localStatementsRepository,
@@ -195,8 +210,10 @@ class StatementsViewModelTest {
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
         coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
-        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any()) }
-        coVerify(exactly = 1) { commonLocalRepository.updateStatementsScreenData(any(), any(), any()) }
+        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any(), any(), any()) }
+        coVerify(exactly = 1) {
+            commonLocalRepository.updateStatementsScreenData(any(), any(), any(), any(), any())
+        }
         confirmVerified(
             remoteStatementsRepository,
             localStatementsRepository,
@@ -220,8 +237,10 @@ class StatementsViewModelTest {
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
         coVerify(exactly = 2) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
-        coVerify(exactly = 2) { remoteStatementsRepository.getStatements(any(), any()) }
-        coVerify(exactly = 2) { commonLocalRepository.updateStatementsScreenData(any(), any(), any()) }
+        coVerify(exactly = 2) { remoteStatementsRepository.getStatements(any(), any(), null, any()) }
+        coVerify(exactly = 2) {
+            commonLocalRepository.updateStatementsScreenData(any(), any(), any(), 1, true)
+        }
         confirmVerified(
             remoteStatementsRepository,
             localStatementsRepository,
@@ -254,7 +273,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_withEmptyRemoteStatements_successStatus() = runTest {
+    fun statementsViewModel_withEmptyRemoteStatements_successStatusAndLastPage() = runTest {
         mockEmptyStatements()
 
         initViewModel()
@@ -262,16 +281,165 @@ class StatementsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
+        assertTrue(statementsUiState.isLastPage)
 
         verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
         coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
-        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any()) }
+        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any(), any(), any()) }
         confirmVerified(
             remoteStatementsRepository,
             localStatementsRepository,
             remoteDefiningThemesRepository,
             commonLocalRepository
         )
+    }
+
+    @Test
+    fun statementsViewModel_loadingFirstPage_hidesStatementsOfPreviousSession() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertEquals(statementsFlow.value, statementsUiState.entities)
+
+        coEvery { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) } coAnswers {
+            delay(requestDelayMillis)
+            Response.success(mockkList(relaxed = true))
+        }
+
+        viewModel.getStatements()
+        advanceTimeBy(requestDelayMillis / 2)
+
+        assertEquals(RequestStatus.LOADING, statementsUiState.dataRequestStatus)
+        assertEquals(listOf<Statement>(), statementsUiState.entities)
+
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
+        assertEquals(statementsFlow.value, statementsUiState.entities)
+    }
+
+    @Test
+    fun statementsViewModel_nextPageWithInternet_continuesPagingByCursor() = runTest {
+        mockDataWithInternet(firstPageNextCursor = nextCursor)
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertFalse(statementsUiState.isLastPage)
+
+        viewModel.getNextStatements()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, statementsUiState.nextPageRequestStatus)
+        assertTrue(statementsUiState.isLastPage)
+
+        verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
+        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any(), null, any()) }
+        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any(), nextCursor, any()) }
+        coVerify(exactly = 1) {
+            commonLocalRepository.updateStatementsScreenData(any(), any(), any(), 1, true)
+        }
+        coVerify(exactly = 1) {
+            commonLocalRepository.updateStatementsScreenData(any(), any(), any(), pageSize + 1, false)
+        }
+        confirmVerified(
+            remoteStatementsRepository,
+            localStatementsRepository,
+            remoteDefiningThemesRepository,
+            commonLocalRepository
+        )
+    }
+
+    @Test
+    fun statementsViewModel_nextPageAfterLastPage_doesNothing() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertTrue(statementsUiState.isLastPage)
+
+        viewModel.getNextStatements()
+        advanceUntilIdle()
+
+        verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
+        coVerify(exactly = 1) { remoteStatementsRepository.getStatements(any(), any(), any(), any()) }
+        coVerify(exactly = 1) {
+            commonLocalRepository.updateStatementsScreenData(any(), any(), any(), any(), any())
+        }
+        confirmVerified(
+            remoteStatementsRepository,
+            localStatementsRepository,
+            remoteDefiningThemesRepository,
+            commonLocalRepository
+        )
+    }
+
+    @Test
+    fun statementsViewModel_nextPageAfterFailedFirstPage_doesNothing() = runTest {
+        mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.getNextStatements()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.ERROR(), statementsUiState.dataRequestStatus)
+        assertEquals(RequestStatus.UNDEFINED, statementsUiState.nextPageRequestStatus)
+
+        verify(exactly = 1) { localStatementsRepository.getStatements(any()) }
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) }
+        confirmVerified(
+            remoteStatementsRepository,
+            localStatementsRepository,
+            remoteDefiningThemesRepository,
+            commonLocalRepository
+        )
+    }
+
+    @Test
+    fun statementsViewModel_nextPageWithoutInternet_errorStatusOfNextPageOnly() = runTest {
+        mockDataWithInternet(firstPageNextCursor = nextCursor)
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        coEvery { remoteStatementsRepository.getStatements(any(), any(), any(), any()) } throws IOException()
+
+        viewModel.getNextStatements()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), statementsUiState.nextPageRequestStatus)
+        assertFalse(statementsUiState.isLastPage)
+    }
+
+    @Test
+    fun statementsViewModel_emptyNextPage_lastPage() = runTest {
+        mockDataWithInternet(firstPageNextCursor = nextCursor)
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        coEvery { remoteStatementsRepository.getStatements(any(), any(), any(), any()) } returns
+                Response.success(null)
+
+        viewModel.getNextStatements()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, statementsUiState.nextPageRequestStatus)
+        assertTrue(statementsUiState.isLastPage)
     }
 
     @Test
@@ -313,13 +481,17 @@ class StatementsViewModelTest {
         every { localStatementsRepository.getStatements(any()) } returns statementsFlow
     }
 
-    private fun mockDataWithInternet() {
+    private fun mockDataWithInternet(firstPageNextCursor: String? = null) {
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) } returns
                 Response.success(mockkList(relaxed = true))
-        coEvery { remoteStatementsRepository.getStatements(any(), any()) } returns
-                Response.success(mockkList())
+        coEvery { remoteStatementsRepository.getStatements(any(), any(), null, any()) } returns
+                Response.success(PageDto(pageStatements, firstPageNextCursor))
+        coEvery { remoteStatementsRepository.getStatements(any(), any(), firstPageNextCursor ?: "", any()) } returns
+                Response.success(PageDto(pageStatements))
 
-        coEvery { commonLocalRepository.updateStatementsScreenData(any(), any(), any()) } just Runs
+        coEvery {
+            commonLocalRepository.updateStatementsScreenData(any(), any(), any(), any(), any())
+        } just Runs
     }
 
     private fun mockStatementReactionWithInternet() {
@@ -338,7 +510,8 @@ class StatementsViewModelTest {
     private fun mockEmptyStatements() {
         coEvery { remoteDefiningThemesRepository.getDefiningThemes(any(), any()) } returns
                 Response.success(mockkList(relaxed = true))
-        coEvery { remoteStatementsRepository.getStatements(any(), any()) } returns Response.success(null)
+        coEvery { remoteStatementsRepository.getStatements(any(), any(), any(), any()) } returns
+                Response.success(null)
     }
 
     private fun mockDataWithoutInternet() {

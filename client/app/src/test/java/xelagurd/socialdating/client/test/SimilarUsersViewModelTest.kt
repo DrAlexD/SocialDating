@@ -17,12 +17,15 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.model.dto.PageDto
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -47,6 +50,8 @@ class SimilarUsersViewModelTest {
     private val isOfflineModeFlow = flowOf(false)
 
     private val similarUsers = FakeData.similarUsers
+    private val nextCursor = "3:${Random.nextInt(1, Int.MAX_VALUE)}"
+    private val nextPageSimilarUsers = similarUsers.map { it.copy(id = it.id + similarUsers.size) }
 
     private fun initViewModel() {
         mockGeneralMethods()
@@ -75,8 +80,9 @@ class SimilarUsersViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, similarUsersUiState.dataRequestStatus)
         assertEquals(similarUsers, similarUsersUiState.entities)
+        assertTrue(similarUsersUiState.isLastPage)
 
-        coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) }
+        coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), null, any()) }
         confirmVerified(remoteUserCategoriesRepository)
     }
 
@@ -90,8 +96,9 @@ class SimilarUsersViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, similarUsersUiState.dataRequestStatus)
         assertEquals(listOf<Nothing>(), similarUsersUiState.entities)
+        assertTrue(similarUsersUiState.isLastPage)
 
-        coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) }
+        coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), any(), any()) }
         confirmVerified(remoteUserCategoriesRepository)
     }
 
@@ -105,7 +112,7 @@ class SimilarUsersViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), similarUsersUiState.dataRequestStatus)
 
-        coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) }
+        coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), any(), any()) }
         confirmVerified(remoteUserCategoriesRepository)
     }
 
@@ -124,7 +131,7 @@ class SimilarUsersViewModelTest {
 
         assertEquals(RequestStatus.SUCCESS, similarUsersUiState.dataRequestStatus)
 
-        coVerify(exactly = 2) { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) }
+        coVerify(exactly = 2) { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), any(), any()) }
         confirmVerified(remoteUserCategoriesRepository)
     }
 
@@ -143,7 +150,103 @@ class SimilarUsersViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), similarUsersUiState.dataRequestStatus)
 
-        coVerify(exactly = 2) { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) }
+        coVerify(exactly = 2) { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), any(), any()) }
+        confirmVerified(remoteUserCategoriesRepository)
+    }
+
+    @Test
+    fun similarUsersViewModel_nextPageWithInternet_addsPageToLoadedSimilarUsers() = runTest {
+        mockDataWithInternet(firstPageNextCursor = nextCursor)
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertFalse(similarUsersUiState.isLastPage)
+
+        viewModel.getNextSimilarUsers()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, similarUsersUiState.nextPageRequestStatus)
+        assertEquals(similarUsers + nextPageSimilarUsers, similarUsersUiState.entities)
+        assertTrue(similarUsersUiState.isLastPage)
+
+        coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), null, any()) }
+        coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), nextCursor, any()) }
+        confirmVerified(remoteUserCategoriesRepository)
+    }
+
+    @Test
+    fun similarUsersViewModel_nextPageWithAlreadyLoadedUser_keepsUniqueSimilarUsers() = runTest {
+        mockDataWithInternet(firstPageNextCursor = nextCursor)
+        coEvery { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), nextCursor, any()) } returns
+                Response.success(PageDto(listOf(similarUsers.last()) + nextPageSimilarUsers))
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.getNextSimilarUsers()
+        advanceUntilIdle()
+
+        assertEquals(similarUsers + nextPageSimilarUsers, similarUsersUiState.entities)
+
+        val loadedIds = similarUsersUiState.entities.map { it.id }
+        assertEquals(loadedIds.distinct(), loadedIds)
+    }
+
+    @Test
+    fun similarUsersViewModel_nextPageAfterLastPage_doesNothing() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.getNextSimilarUsers()
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), any(), any()) }
+        confirmVerified(remoteUserCategoriesRepository)
+    }
+
+    @Test
+    fun similarUsersViewModel_nextPageWithoutInternet_errorStatusOfNextPageOnly() = runTest {
+        mockDataWithInternet(firstPageNextCursor = nextCursor)
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        coEvery { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), any(), any()) } throws IOException()
+
+        viewModel.getNextSimilarUsers()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, similarUsersUiState.dataRequestStatus)
+        assertEquals(RequestStatus.ERROR(), similarUsersUiState.nextPageRequestStatus)
+        assertEquals(similarUsers, similarUsersUiState.entities)
+        assertFalse(similarUsersUiState.isLastPage)
+    }
+
+    @Test
+    fun similarUsersViewModel_refreshAfterNextPage_replacesLoadedSimilarUsers() = runTest {
+        mockDataWithInternet(firstPageNextCursor = nextCursor)
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.getNextSimilarUsers()
+        advanceUntilIdle()
+
+        viewModel.getSimilarUsers()
+        advanceUntilIdle()
+
+        assertEquals(similarUsers, similarUsersUiState.entities)
+
+        coVerify(exactly = 2) { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), null, any()) }
+        coVerify(exactly = 1) { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), nextCursor, any()) }
         confirmVerified(remoteUserCategoriesRepository)
     }
 
@@ -152,16 +255,20 @@ class SimilarUsersViewModelTest {
         every { preferencesRepository.isOfflineMode } returns isOfflineModeFlow
     }
 
-    private fun mockDataWithInternet() {
-        coEvery { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) } returns
-                Response.success(similarUsers)
+    private fun mockDataWithInternet(firstPageNextCursor: String? = null) {
+        coEvery { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), null, any()) } returns
+                Response.success(PageDto(similarUsers, firstPageNextCursor))
+        coEvery {
+            remoteUserCategoriesRepository.getSimilarUsers(any(), any(), firstPageNextCursor ?: "", any())
+        } returns Response.success(PageDto(nextPageSimilarUsers))
     }
 
     private fun mockEmptySimilarUsers() {
-        coEvery { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) } returns Response.success(null)
+        coEvery { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), any(), any()) } returns
+                Response.success(null)
     }
 
     private fun mockDataWithoutInternet() {
-        coEvery { remoteUserCategoriesRepository.getSimilarUsers(any(), any()) } throws IOException()
+        coEvery { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), any(), any()) } throws IOException()
     }
 }
