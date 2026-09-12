@@ -16,6 +16,9 @@ class LocalStatementsRepository @Inject constructor(
     fun getStatements(categoryId: Int) =
         statementsDao.getStatements(categoryId)
 
+    suspend fun getMaxOrderNumber(categoryId: Int) =
+        statementsDao.getMaxOrderNumber(categoryId)
+
     suspend fun insertStatements(statements: List<Statement>) =
         statementsDao.insertStatements(statements)
 

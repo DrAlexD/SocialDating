@@ -54,6 +54,7 @@ fun StatementsScreen(
         onStatementAddingClick = onStatementAddingClick,
         onNavigateUp = onNavigateUp,
         refreshAction = statementsViewModel::getStatements,
+        onLoadNextPage = statementsViewModel::getNextStatements,
         onStatementReactionClick = { statement, reactionType ->
             statementsViewModel.onStatementReactionClick(statement, reactionType)
         }
@@ -68,6 +69,7 @@ fun StatementsScreenComponent(
     onStatementAddingClick: (Int) -> Unit = {},
     onNavigateUp: () -> Unit = {},
     refreshAction: () -> Unit = {},
+    onLoadNextPage: () -> Unit = {},
     onStatementReactionClick: (Statement, StatementReactionType) -> Unit = { _, _ -> null }
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -88,21 +90,20 @@ fun StatementsScreenComponent(
             )
         },
         floatingActionButton = {
-            if (statementsUiState.isDataExist()) {
-                FloatingActionButton(
-                    onClick = { onStatementAddingClick(statementsUiState.categoryId) },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.add_statement)
-                    )
-                }
+            FloatingActionButton(
+                onClick = { onStatementAddingClick(statementsUiState.categoryId) },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.add_statement)
+                )
             }
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
-        DataListComponent(
-            dataListUiState = statementsUiState,
+        PagedDataListComponent(
+            pagedDataListUiState = statementsUiState,
+            onLoadNextPage = onLoadNextPage,
             contentPadding = innerPadding
         ) {
             AppEntityCard(

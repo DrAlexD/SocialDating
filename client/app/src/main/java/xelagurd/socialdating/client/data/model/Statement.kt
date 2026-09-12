@@ -19,12 +19,14 @@ data class Statement(
     @PrimaryKey
     override val id: Int,
     val text: String,
-    val creatorUserId: Int
+    val creatorUserId: Int,
+    val orderNumber: Int
 ) : DataEntity {
     init {
         require(text.isValidText(STATEMENT_TEXT_LENGTH_MIN, STATEMENT_TEXT_LENGTH_MAX)) {
             "Text length must be between $STATEMENT_TEXT_LENGTH_MIN and $STATEMENT_TEXT_LENGTH_MAX"
         }
         require(creatorUserId.isValidId()) { "CreatorUserId must be at least $ID_MIN" }
+        require(orderNumber.isValidId()) { "OrderNumber must be at least $ID_MIN" }
     }
 }

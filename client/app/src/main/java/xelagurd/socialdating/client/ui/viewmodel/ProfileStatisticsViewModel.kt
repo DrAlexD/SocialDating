@@ -30,6 +30,7 @@ import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesDat
 import xelagurd.socialdating.client.data.model.additional.UserCategoryData
 import xelagurd.socialdating.client.data.model.additional.UserDefiningThemeData
 import xelagurd.socialdating.client.data.model.dto.DetailedSimilarUserDto
+import xelagurd.socialdating.client.data.remote.ApiUtils.offlineModeStatus
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.data.remote.repository.RemoteDefiningThemesRepository
@@ -101,13 +102,15 @@ class ProfileStatisticsViewModel @Inject constructor(
             userCategoriesStateFlow.update {
                 FakeData.similarUserCategories.toUserCategoriesData(FakeData.categories)
             }
-            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+            dataRequestStatusFlow.update { offlineModeStatus(context) }
         } else {
-            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+            dataRequestStatusFlow.update { offlineModeStatus(context) }
         }
     }
 
     fun getProfileStatistics() {
+        if (isOfflineMode) return // FixMe: remove after adding server hosting
+
         viewModelScope.launch {
             var globalStatus: RequestStatus = RequestStatus.LOADING
 

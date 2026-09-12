@@ -18,6 +18,10 @@ object TestUtils {
     fun Map<String, Any>.readObject(key: String): Map<String, Any> =
         this[key] as Map<String, Any>
 
+    @Suppress("UNCHECKED_CAST")
+    fun Map<String, Any>.readArray(key: String): List<Map<String, Any>> =
+        this[key] as List<Map<String, Any>>
+
     fun List<Any>.toRequestParams() =
         this.toString().removeSurrounding("[", "]").replace(" ", "")
 

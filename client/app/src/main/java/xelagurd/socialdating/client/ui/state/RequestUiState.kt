@@ -17,6 +17,16 @@ sealed interface DataListUiState : DataRequestUiState {
     override fun isDataExist() = entities.isNotEmpty()
 }
 
+sealed interface PagedDataListUiState : DataListUiState {
+    val nextPageRequestStatus: RequestStatus
+    val isLastPage: Boolean
+
+    fun isAllowedNextPageLoading() =
+        !isLastPage &&
+                dataRequestStatus is RequestStatus.SUCCESS &&
+                (nextPageRequestStatus is RequestStatus.UNDEFINED || nextPageRequestStatus is RequestStatus.SUCCESS)
+}
+
 sealed interface DataEntityUiState : DataRequestUiState {
     val entity: DataEntity?
 

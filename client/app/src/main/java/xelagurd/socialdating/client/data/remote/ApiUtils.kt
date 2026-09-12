@@ -38,5 +38,8 @@ object ApiUtils {
         return data to newStatus
     }
 
+    fun offlineModeStatus(context: Context) = // FixMe: remove after adding server hosting
+        RequestStatus.ERROR(context.getString(R.string.no_internet_connection))
+
     private fun <T> Response<T>.isServerError() = this.code() in 500..599
 }

@@ -14,6 +14,7 @@ import xelagurd.socialdating.client.data.model.UserDefiningTheme
 import xelagurd.socialdating.client.data.model.details.StatementDetails
 import xelagurd.socialdating.client.data.model.details.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.dto.DetailedSimilarUserDto
+import xelagurd.socialdating.client.data.model.dto.PageDto
 import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
 import xelagurd.socialdating.client.data.model.dto.StatementDto
 
@@ -39,8 +40,10 @@ interface ApiService {
     @GET("statements")
     suspend fun getStatements(
         @Query("currentUserId") currentUserId: Int,
-        @Query("definingThemeIds") definingThemeIds: List<Int>
-    ): Response<List<StatementDto>>
+        @Query("definingThemeIds") definingThemeIds: List<Int>,
+        @Query("cursor") cursor: String?,
+        @Query("size") size: Int
+    ): Response<PageDto<StatementDto>>
 
     @POST("statements")
     suspend fun addStatement(@Body statementDetails: StatementDetails): Response<StatementDto>
@@ -53,8 +56,10 @@ interface ApiService {
     @GET("categories/users/similar-users")
     suspend fun getSimilarUsers(
         @Query("currentUserId") currentUserId: Int,
-        @Query("categoryIds") categoryIds: List<Int>?
-    ): Response<List<SimilarUserDto>>
+        @Query("categoryIds") categoryIds: List<Int>?,
+        @Query("cursor") cursor: String?,
+        @Query("size") size: Int
+    ): Response<PageDto<SimilarUserDto>>
 
     @GET("categories/users/detailed-similar-user")
     suspend fun getDetailedSimilarUser(

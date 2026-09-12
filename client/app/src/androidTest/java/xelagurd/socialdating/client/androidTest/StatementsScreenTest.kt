@@ -1,7 +1,6 @@
 package xelagurd.socialdating.client.androidTest
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -41,6 +40,7 @@ class StatementsScreenTest {
     }
 
     private val statements = listOf(FakeData.statements[0])
+    private val nextPageErrorText = "NextPageError"
 
     @Test
     fun statementsScreen_defaultParameters_loadingIndicator() {
@@ -80,14 +80,64 @@ class StatementsScreenTest {
     }
 
     @Test
-    fun statementsScreen_emptyData_withoutAddStatementButton() {
+    fun statementsScreen_emptyData_withAddStatementButton() {
         val statementsUiState = StatementsUiState(
             dataRequestStatus = RequestStatus.SUCCESS
         )
 
         setContentToStatementsBody(statementsUiState)
 
-        composeTestRule.onNodeWithContentDescriptionId(R.string.add_statement).assertIsNotDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.no_data).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.add_statement).checkEnabledButton()
+    }
+
+    @Test
+    fun statementsScreen_lastPage_displayedNoMoreData() {
+        val statementsUiState = StatementsUiState(
+            entities = statements,
+            dataRequestStatus = RequestStatus.SUCCESS,
+            isLastPage = true
+        )
+
+        setContentToStatementsBody(statementsUiState)
+
+        composeTestRule.onNodeWithText(statements[0].text).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.no_more_data).assertIsDisplayed()
+    }
+
+    @Test
+    fun statementsScreen_nextPageLoading_displayedLoadingIndicator() {
+        val statementsUiState = StatementsUiState(
+            entities = statements,
+            dataRequestStatus = RequestStatus.SUCCESS,
+            nextPageRequestStatus = RequestStatus.LOADING
+        )
+
+        setContentToStatementsBody(statementsUiState)
+
+        composeTestRule.onNodeWithText(statements[0].text).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+    }
+
+    @Test
+    fun statementsScreen_nextPageError_loadedNextPageOnRetry() {
+        var isLoadNextPageClicked = false
+        val statementsUiState = StatementsUiState(
+            entities = statements,
+            dataRequestStatus = RequestStatus.SUCCESS,
+            nextPageRequestStatus = RequestStatus.ERROR(nextPageErrorText)
+        )
+
+        composeTestRule.setContentToScreen {
+            StatementsScreenComponent(
+                statementsUiState = statementsUiState,
+                onLoadNextPage = { isLoadNextPageClicked = true }
+            )
+        }
+
+        composeTestRule.onNodeWithText(statements[0].text).assertIsDisplayed()
+        composeTestRule.onNodeWithText(nextPageErrorText).checkButtonAndClick()
+        assertTrue(isLoadNextPageClicked)
     }
 
     @Test

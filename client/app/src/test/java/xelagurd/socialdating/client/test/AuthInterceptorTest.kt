@@ -39,6 +39,7 @@ class AuthInterceptorTest {
 
     private val authorizationHeader = "Authorization"
     private val successCode = 200
+    private val serverErrorCode = 500
 
     private val accessToken = "accessToken"
     private val newAccessToken = "newAccessToken"
@@ -128,9 +129,8 @@ class AuthInterceptorTest {
     }
 
     @Test
-    fun authInterceptor_refreshTokenWithoutInternet_unauthorizedResponseWithClearedData() {
+    fun authInterceptor_refreshTokenWithoutInternet_unauthorizedResponseWithoutClearedData() {
         mockTokens()
-        mockClearedData()
         every { chain.proceed(capture(requests)) } returns unauthorizedResponse
         coEvery { authApiService.refreshToken(any()) } throws IOException()
 
@@ -139,8 +139,42 @@ class AuthInterceptorTest {
         assertEquals(unauthorizedResponse, result)
 
         verify(exactly = 1) { chain.proceed(any()) }
-        coVerify(exactly = 1) { preferencesRepository.clearPreferences() }
-        coVerify(exactly = 1) { commonLocalRepository.clearData() }
+        coVerify(exactly = 1) { authApiService.refreshToken(any()) }
+        coVerify(exactly = 0) { preferencesRepository.clearPreferences() }
+        coVerify(exactly = 0) { commonLocalRepository.clearData() }
+    }
+
+    @Test
+    fun authInterceptor_refreshTokenWithServerError_unauthorizedResponseWithoutClearedData() {
+        mockTokens()
+        every { chain.proceed(capture(requests)) } returns unauthorizedResponse
+        coEvery { authApiService.refreshToken(any()) } returns
+                RetrofitResponse.error(serverErrorCode, serverErrorCode.toString().toResponseBody())
+
+        val result = authInterceptor.intercept(chain)
+
+        assertEquals(unauthorizedResponse, result)
+
+        verify(exactly = 1) { chain.proceed(any()) }
+        coVerify(exactly = 1) { authApiService.refreshToken(any()) }
+        coVerify(exactly = 0) { preferencesRepository.clearPreferences() }
+        coVerify(exactly = 0) { commonLocalRepository.clearData() }
+    }
+
+    @Test
+    fun authInterceptor_withoutRefreshToken_unauthorizedResponseWithoutRefreshRequest() {
+        every { preferencesRepository.accessToken } returns flowOf(accessToken)
+        every { preferencesRepository.refreshToken } returns flowOf("")
+        every { chain.proceed(capture(requests)) } returns unauthorizedResponse
+
+        val result = authInterceptor.intercept(chain)
+
+        assertEquals(unauthorizedResponse, result)
+
+        verify(exactly = 1) { chain.proceed(any()) }
+        coVerify(exactly = 0) { authApiService.refreshToken(any()) }
+        coVerify(exactly = 0) { preferencesRepository.clearPreferences() }
+        coVerify(exactly = 0) { commonLocalRepository.clearData() }
     }
 
     private fun mockTokens() {

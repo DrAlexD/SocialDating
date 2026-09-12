@@ -5,13 +5,18 @@ import kotlin.math.min
 import org.springframework.stereotype.Service
 import xelagurd.socialdating.server.client.UsersServiceClient
 import xelagurd.socialdating.server.model.DefaultDataProperties.OPPOSITE_CATEGORIES_NUMBER
+import xelagurd.socialdating.server.model.DefaultDataProperties.PAGE_SIZE_DEFAULT
+import xelagurd.socialdating.server.model.DefaultDataProperties.PAGE_SIZE_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.PAGE_SIZE_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.SIMILAR_CATEGORIES_NUMBER
+import xelagurd.socialdating.server.model.SimilarUsersCursor
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.additional.SimilarUserData
 import xelagurd.socialdating.server.model.additional.UserCategoryData
 import xelagurd.socialdating.server.model.dto.DetailedSimilarCategoryDto
 import xelagurd.socialdating.server.model.dto.DetailedSimilarDefiningThemeDto
 import xelagurd.socialdating.server.model.dto.DetailedSimilarUserDto
+import xelagurd.socialdating.server.model.dto.PageDto
 import xelagurd.socialdating.server.model.dto.SimilarCategoryDto
 import xelagurd.socialdating.server.model.dto.SimilarUserDto
 import xelagurd.socialdating.server.model.dto.UserCategoryDto
@@ -39,9 +44,14 @@ class UserCategoriesService(
 
     fun getSimilarUsers(
         currentUserId: Int,
-        categoryIds: List<Int>? = null
-    ): List<SimilarUserDto> {
+        categoryIds: List<Int>? = null,
+        cursor: String? = null,
+        size: Int = PAGE_SIZE_DEFAULT
+    ): PageDto<SimilarUserDto> {
         checkCurrentUserAuth(currentUserId)
+
+        val similarUsersCursor = SimilarUsersCursor.decodeOrNull(cursor)
+        val pageSize = size.coerceIn(PAGE_SIZE_MIN, PAGE_SIZE_MAX)
 
         val language = AppLanguage.current()
 
@@ -75,15 +85,25 @@ class UserCategoriesService(
                     )
                 } else null
             }
-            .sortedByDescending { it.differenceNumber }
+            .sortedWith(compareByDescending<SimilarUserData> { it.differenceNumber }.thenBy { it.id })
 
-        if (similarUsers.isEmpty()) return emptyList()
+        val pageSimilarUsers = similarUsers
+            .filter { similarUsersCursor == null || similarUsersCursor.isAfter(it) }
+            .take(pageSize)
+
+        if (pageSimilarUsers.isEmpty()) return PageDto(listOf())
 
         val usersById = usersServiceClient
-            .getUsers(similarUsers.map { it.id })
+            .getUsers(pageSimilarUsers.map { it.id })
             .associateBy { it.id }
 
-        return similarUsers.mapNotNull { it.toSimilarUserDto(usersById[it.id]) }
+        return PageDto(
+            content = pageSimilarUsers.mapNotNull { it.toSimilarUserDto(usersById[it.id]) },
+            nextCursor = when {
+                pageSimilarUsers.size < pageSize -> null
+                else -> SimilarUsersCursor.of(pageSimilarUsers.last()).encode()
+            }
+        )
     }
 
     fun getDetailedSimilarUser(

@@ -20,11 +20,13 @@ import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
+import xelagurd.socialdating.client.data.remote.ApiUtils.offlineModeStatus
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.SimilarUsersUiState
+import xelagurd.socialdating.client.ui.state.hideWhileLoading
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -39,13 +41,24 @@ class SimilarUsersViewModel @Inject constructor(
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val nextPageRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val isLastPageFlow = MutableStateFlow(false)
     private val similarUsersFlow = MutableStateFlow<List<SimilarUserDto>>(listOf())
 
-    val uiState = combine(similarUsersFlow, dataRequestStatusFlow)
-    { similarUsers, dataRequestStatus ->
+    // the paging session state, it is dropped on every screen entry and refresh
+    private var nextCursor: String? = null
+
+    val uiState = combine(
+        similarUsersFlow,
+        dataRequestStatusFlow,
+        nextPageRequestStatusFlow,
+        isLastPageFlow
+    ) { similarUsers, dataRequestStatus, nextPageRequestStatus, isLastPage ->
         SimilarUsersUiState(
-            entities = similarUsers,
-            dataRequestStatus = dataRequestStatus
+            entities = similarUsers.hideWhileLoading(dataRequestStatus),
+            dataRequestStatus = dataRequestStatus,
+            nextPageRequestStatus = nextPageRequestStatus,
+            isLastPage = isLastPage
         )
     }.stateIn(
         scope = viewModelScope,
@@ -57,25 +70,68 @@ class SimilarUsersViewModel @Inject constructor(
         if (!isOfflineMode) { // FixMe: remove after adding server hosting
             getSimilarUsers()
         } else {
-            dataRequestStatusFlow.update { RequestStatus.LOADING }
             similarUsersFlow.update { FakeData.similarUsers }
-            dataRequestStatusFlow.update { RequestStatus.SUCCESS }
+            isLastPageFlow.update { true }
+            dataRequestStatusFlow.update { offlineModeStatus(context) }
         }
     }
 
     fun getSimilarUsers() {
+        if (isOfflineMode) return // FixMe: remove after adding server hosting
+
+        nextCursor = null
+        isLastPageFlow.update { false }
+        nextPageRequestStatusFlow.update { RequestStatus.UNDEFINED }
+
+        getSimilarUsersPage(isFirstPage = true)
+    }
+
+    fun getNextSimilarUsers() {
+        if (isOfflineMode) return // FixMe: remove after adding server hosting
+        if (isLastPageFlow.value) return
+        if (dataRequestStatusFlow.value !is RequestStatus.SUCCESS) return
+        if (nextPageRequestStatusFlow.value is RequestStatus.LOADING) return
+
+        getSimilarUsersPage(isFirstPage = false)
+    }
+
+    private fun getSimilarUsersPage(isFirstPage: Boolean) {
         viewModelScope.launch {
-            dataRequestStatusFlow.update { RequestStatus.LOADING }
+            updateRequestStatus(isFirstPage, RequestStatus.LOADING)
 
-            val (remoteSimilarUsers, status) = safeApiCall(context) {
-                remoteUserCategoriesRepository.getSimilarUsers(userId)
+            val (similarUsersPage, status) = safeApiCall(context) {
+                remoteUserCategoriesRepository.getSimilarUsers(userId, cursor = nextCursor)
             }
 
-            if (remoteSimilarUsers != null) {
-                similarUsersFlow.update { remoteSimilarUsers }
+            when {
+                similarUsersPage != null -> {
+                    similarUsersFlow.update {
+                        when {
+                            isFirstPage -> similarUsersPage.content
+                            // the similarity is recalculated on every request, so a user whose one has grown
+                            // between the pages can be returned again, and the list requires unique ids
+                            else -> (it + similarUsersPage.content).distinctBy { similarUser -> similarUser.id }
+                        }
+                    }
+
+                    nextCursor = similarUsersPage.nextCursor
+                    isLastPageFlow.update { similarUsersPage.nextCursor == null }
+                }
+                // no content means that there are no similar users to load anymore
+                status is RequestStatus.SUCCESS -> {
+                    if (isFirstPage) similarUsersFlow.update { listOf() }
+                    isLastPageFlow.update { true }
+                }
             }
 
-            dataRequestStatusFlow.update { status }
+            updateRequestStatus(isFirstPage, status)
+        }
+    }
+
+    private fun updateRequestStatus(isFirstPage: Boolean, requestStatus: RequestStatus) {
+        when {
+            isFirstPage -> dataRequestStatusFlow.update { requestStatus }
+            else -> nextPageRequestStatusFlow.update { requestStatus }
         }
     }
 }

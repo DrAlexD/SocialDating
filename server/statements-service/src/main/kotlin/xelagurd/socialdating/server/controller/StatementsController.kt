@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import jakarta.validation.Valid
+import xelagurd.socialdating.server.model.DefaultDataProperties.PAGE_SIZE_DEFAULT
 import xelagurd.socialdating.server.model.details.StatementDetails
 import xelagurd.socialdating.server.security.BearerAuth
 import xelagurd.socialdating.server.service.StatementsService
-import xelagurd.socialdating.server.utils.DataUtils.responseEntities
+import xelagurd.socialdating.server.utils.DataUtils.responsePage
 
 @RestController
 @RequestMapping(path = ["/statements"], produces = ["application/json"])
@@ -24,9 +25,11 @@ class StatementsController(
     @GetMapping
     fun getStatements(
         @RequestParam currentUserId: Int,
-        @RequestParam definingThemeIds: List<Int>
+        @RequestParam definingThemeIds: List<Int>,
+        @RequestParam(required = false) cursor: String?,
+        @RequestParam(defaultValue = "$PAGE_SIZE_DEFAULT") size: Int
     ) =
-        responseEntities { statementsService.getStatements(currentUserId, definingThemeIds) }
+        responsePage { statementsService.getStatements(currentUserId, definingThemeIds, cursor, size) }
 
     @BearerAuth
     @PostMapping

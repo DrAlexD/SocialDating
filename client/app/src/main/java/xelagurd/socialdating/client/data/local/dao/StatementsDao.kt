@@ -22,9 +22,21 @@ interface StatementsDao {
         join statement_defining_themes sdt on stm.id = sdt.statementId
         join defining_themes dt on sdt.definingThemeId = dt.id
         where dt.categoryId = :categoryId
+        order by stm.orderNumber, stm.id
         """
     )
     fun getStatements(categoryId: Int): Flow<List<Statement>>
+
+    @Query(
+        """
+        select max(stm.orderNumber)
+        from statements stm
+        join statement_defining_themes sdt on stm.id = sdt.statementId
+        join defining_themes dt on sdt.definingThemeId = dt.id
+        where dt.categoryId = :categoryId
+        """
+    )
+    suspend fun getMaxOrderNumber(categoryId: Int): Int?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStatements(statements: List<Statement>)

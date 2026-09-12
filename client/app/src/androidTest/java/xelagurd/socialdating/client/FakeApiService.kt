@@ -10,6 +10,7 @@ import xelagurd.socialdating.client.data.model.UserDefiningTheme
 import xelagurd.socialdating.client.data.model.details.StatementDetails
 import xelagurd.socialdating.client.data.model.details.StatementReactionDetails
 import xelagurd.socialdating.client.data.model.dto.DetailedSimilarUserDto
+import xelagurd.socialdating.client.data.model.dto.PageDto
 import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
 import xelagurd.socialdating.client.data.model.dto.StatementDto
 import xelagurd.socialdating.client.data.remote.ApiService
@@ -35,9 +36,11 @@ class FakeApiService : ApiService {
 
     override suspend fun getStatements(
         currentUserId: Int,
-        definingThemeIds: List<Int>
-    ): Response<List<StatementDto>> =
-        Response.success(FakeData.statementDtos)
+        definingThemeIds: List<Int>,
+        cursor: String?,
+        size: Int
+    ): Response<PageDto<StatementDto>> =
+        pageFrom(FakeData.statementDtos, cursor, size)
 
     override suspend fun addStatement(
         statementDetails: StatementDetails
@@ -51,13 +54,31 @@ class FakeApiService : ApiService {
 
     override suspend fun getSimilarUsers(
         currentUserId: Int,
-        categoryIds: List<Int>?
-    ): Response<List<SimilarUserDto>> =
-        Response.success(FakeData.similarUsers)
+        categoryIds: List<Int>?,
+        cursor: String?,
+        size: Int
+    ): Response<PageDto<SimilarUserDto>> =
+        pageFrom(FakeData.similarUsers, cursor, size)
 
     override suspend fun getDetailedSimilarUser(
         currentUserId: Int,
         anotherUserId: Int
     ): Response<DetailedSimilarUserDto> =
         Response.success(FakeData.detailedSimilarUser)
+
+    private fun <T> pageFrom(entities: List<T>, cursor: String?, size: Int): Response<PageDto<T>> {
+        val firstIndex = cursor?.toInt() ?: 0
+        val pageEntities = entities.drop(firstIndex).take(size)
+        val nextIndex = firstIndex + pageEntities.size
+
+        return when {
+            pageEntities.isEmpty() -> Response.success(null)
+            else -> Response.success(
+                PageDto(
+                    content = pageEntities,
+                    nextCursor = nextIndex.toString().takeIf { nextIndex < entities.size }
+                )
+            )
+        }
+    }
 }
