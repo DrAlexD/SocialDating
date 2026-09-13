@@ -5,6 +5,7 @@ import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -34,6 +35,7 @@ import xelagurd.socialdating.client.data.local.repository.LocalCategoriesReposit
 import xelagurd.socialdating.client.data.local.repository.LocalDefiningThemesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserCategoriesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalUserDefiningThemesRepository
+import xelagurd.socialdating.client.data.model.enums.AppLanguage
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DataUtils.toUserCategoriesData
 import xelagurd.socialdating.client.data.model.DataUtils.toUserDefiningThemesData
@@ -114,6 +116,7 @@ class ProfileStatisticsViewModelTest {
     private val allDefiningThemes = savedDefiningThemes + missingDefiningThemes
 
     private val isOfflineModeFlow = flowOf(false)
+    private val languageChangesFlow = MutableSharedFlow<AppLanguage>()
     private var categoriesFlow: Flow<List<Category>> = flowOf(allCategories)
     private var definingThemesFlow: Flow<List<DefiningTheme>> = flowOf(allDefiningThemes)
 
@@ -491,10 +494,33 @@ class ProfileStatisticsViewModelTest {
         coVerify(exactly = 0) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
     }
 
+    @Test
+    fun profileStatisticsViewModel_appLanguageChange_reloadedProfileStatisticsWithCachedData() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        // the local data is complete, so the initial request skips the categories and the defining themes
+        coVerify(exactly = 0) { remoteCategoriesRepository.getCategories(any()) }
+        coVerify(exactly = 0) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+
+        languageChangesFlow.emit(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
+
+        coVerify(exactly = 2) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
+        coVerify(exactly = 1) { remoteCategoriesRepository.getCategories(any()) }
+        coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+    }
+
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(ProfileStatisticsDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(ProfileStatisticsDestination.anotherUserId) } returns anotherUserId
         every { preferencesRepository.isOfflineMode } returns isOfflineModeFlow
+        every { preferencesRepository.languageChanges } returns languageChangesFlow
         every { localCategoriesRepository.getCategories() } returns categoriesFlow
         every { localDefiningThemesRepository.getDefiningThemes() } returns definingThemesFlow
         every { localUserCategoriesRepository.getUserCategories(any()) } returns userCategoriesFlow

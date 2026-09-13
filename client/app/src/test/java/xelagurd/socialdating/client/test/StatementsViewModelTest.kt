@@ -5,6 +5,7 @@ import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -35,6 +36,7 @@ import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.CommonLocalRepository
 import xelagurd.socialdating.client.data.local.repository.LocalStatementsRepository
+import xelagurd.socialdating.client.data.model.enums.AppLanguage
 import xelagurd.socialdating.client.data.model.Statement
 import xelagurd.socialdating.client.data.model.dto.PageDto
 import xelagurd.socialdating.client.data.model.dto.StatementDto
@@ -67,6 +69,7 @@ class StatementsViewModelTest {
     private val userId = Random.nextInt(1, Int.MAX_VALUE)
     private val categoryId = Random.nextInt(1, Int.MAX_VALUE)
     private val isOfflineModeFlow = flowOf(false)
+    private val languageChangesFlow = MutableSharedFlow<AppLanguage>()
 
     private val statement = FakeData.mainStatement
 
@@ -474,10 +477,27 @@ class StatementsViewModelTest {
         coVerify(exactly = 0) { localStatementsRepository.deleteStatement(any()) }
     }
 
+    @Test
+    fun statementsViewModel_appLanguageChange_reloadedStatements() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        languageChangesFlow.emit(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, statementsUiState.dataRequestStatus)
+
+        coVerify(exactly = 2) { remoteStatementsRepository.getStatements(any(), any(), null, any()) }
+    }
+
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(StatementsDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(StatementsDestination.categoryId) } returns categoryId
         every { preferencesRepository.isOfflineMode } returns isOfflineModeFlow
+        every { preferencesRepository.languageChanges } returns languageChangesFlow
         every { localStatementsRepository.getStatements(any()) } returns statementsFlow
     }
 

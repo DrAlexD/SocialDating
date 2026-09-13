@@ -12,7 +12,6 @@ enum class AppLanguage(
     RUSSIAN("ru", R.string.language_russian);
 
     companion object {
-        fun fromLanguageTag(languageTag: String?) =
-            entries.firstOrNull { it.languageTag == languageTag } ?: SYSTEM
+        fun fromName(name: String?) = entries.firstOrNull { it.name == name } ?: SYSTEM
     }
 }

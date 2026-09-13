@@ -58,7 +58,7 @@ class SettingsViewModelTest {
     @Test
     fun settingsViewModel_init_savedThemeModeAndLanguage() {
         every { preferencesRepository.themeMode } returns flowOf(ThemeMode.DARK)
-        every { appLocaleManager.getAppLanguage() } returns AppLanguage.RUSSIAN
+        every { preferencesRepository.language } returns flowOf(AppLanguage.RUSSIAN)
 
         initViewModel()
 
@@ -82,15 +82,18 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun settingsViewModel_updateLanguage_savedLanguage() {
+    fun settingsViewModel_updateLanguage_savedAndAppliedLanguage() = runTest {
+        coEvery { preferencesRepository.saveLanguage(any()) } just Runs
         every { appLocaleManager.setAppLanguage(any()) } just Runs
 
         initViewModel()
         viewModel.updateLanguage(AppLanguage.ENGLISH)
+        advanceUntilIdle()
 
         assertEquals(AppLanguage.ENGLISH, settingsUiState.language)
 
         verify(exactly = 1) { appLocaleManager.setAppLanguage(AppLanguage.ENGLISH) }
+        coVerify(exactly = 1) { preferencesRepository.saveLanguage(AppLanguage.ENGLISH) }
     }
 
     @Test
@@ -104,6 +107,7 @@ class SettingsViewModelTest {
         assertEquals(RequestStatus.SUCCESS, settingsUiState.actionRequestStatus)
 
         verify(exactly = 1) { preferencesRepository.themeMode }
+        verify(exactly = 1) { preferencesRepository.language }
         coVerify(exactly = 1) { preferencesRepository.clearPreferences() }
         coVerify(exactly = 1) { commonLocalRepository.clearData() }
         confirmVerified(preferencesRepository, commonLocalRepository)
@@ -111,7 +115,7 @@ class SettingsViewModelTest {
 
     private fun mockGeneralMethods() {
         every { preferencesRepository.themeMode } returns flowOf(ThemeMode.SYSTEM)
-        every { appLocaleManager.getAppLanguage() } returns AppLanguage.SYSTEM
+        every { preferencesRepository.language } returns flowOf(AppLanguage.SYSTEM)
     }
 
     private fun mockLogout() {

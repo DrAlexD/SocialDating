@@ -27,6 +27,7 @@ import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
 import xelagurd.socialdating.client.ui.state.ProfileUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
+import xelagurd.socialdating.client.ui.state.hideWhileLoading
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -52,7 +53,7 @@ class ProfileViewModel @Inject constructor(
         ProfileUiState(
             userId = userId,
             anotherUserId = anotherUserId,
-            entity = user,
+            entity = user.hideWhileLoading(dataRequestStatus),
             dataRequestStatus = dataRequestStatus
         )
     }.stateIn(
@@ -70,6 +71,10 @@ class ProfileViewModel @Inject constructor(
             dataRequestStatusFlow.update { offlineModeStatus(context) }
         } else {
             dataRequestStatusFlow.update { offlineModeStatus(context) }
+        }
+
+        viewModelScope.launch {
+            preferencesRepository.languageChanges.collect { getUser() }
         }
     }
 
