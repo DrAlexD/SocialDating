@@ -30,7 +30,7 @@ class SettingsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(
         SettingsUiState(
             themeMode = runBlocking { preferencesRepository.themeMode.first() },
-            language = appLocaleManager.getAppLanguage()
+            language = runBlocking { preferencesRepository.language.first() }
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -48,7 +48,10 @@ class SettingsViewModel @Inject constructor(
     fun updateLanguage(language: AppLanguage) {
         _uiState.update { it.copy(language = language) }
 
-        appLocaleManager.setAppLanguage(language)
+        viewModelScope.launch {
+            appLocaleManager.setAppLanguage(language)
+            preferencesRepository.saveLanguage(language)
+        }
     }
 
     fun logout() {

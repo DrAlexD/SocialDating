@@ -1,5 +1,7 @@
 package xelagurd.socialdating.client.ui.state
 
+import xelagurd.socialdating.client.data.model.DataEntity
+
 sealed class RequestStatus {
     data object SUCCESS : RequestStatus()
     data object LOADING : RequestStatus()
@@ -17,5 +19,11 @@ sealed class RequestStatus {
 fun <T> List<T>.hideWhileLoading(dataRequestStatus: RequestStatus) =
     when (dataRequestStatus) {
         is RequestStatus.LOADING -> listOf()
+        else -> this
+    }
+
+fun <T : DataEntity> T?.hideWhileLoading(dataRequestStatus: RequestStatus) =
+    when (dataRequestStatus) {
+        is RequestStatus.LOADING -> null
         else -> this
     }

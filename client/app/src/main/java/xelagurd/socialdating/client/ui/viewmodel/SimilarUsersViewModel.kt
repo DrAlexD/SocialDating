@@ -74,6 +74,10 @@ class SimilarUsersViewModel @Inject constructor(
             isLastPageFlow.update { true }
             dataRequestStatusFlow.update { offlineModeStatus(context) }
         }
+
+        viewModelScope.launch {
+            preferencesRepository.languageChanges.collect { getSimilarUsers() }
+        }
     }
 
     fun getSimilarUsers() {

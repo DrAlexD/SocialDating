@@ -11,9 +11,7 @@ class AppLocaleManager @Inject constructor(
     private val localeManager: LocaleManager
 ) {
 
-    fun getAppLanguage() = AppLanguage.fromLanguageTag(localeManager.applicationLocales[0]?.language)
-
-    fun getRequestLanguage( ): String {
+    fun getRequestLanguage(): String {
         val applicationLocales = localeManager.applicationLocales
 
         return if (applicationLocales.isEmpty) {

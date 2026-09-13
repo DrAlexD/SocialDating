@@ -3,6 +3,7 @@ package xelagurd.socialdating.client.ui.viewmodel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -53,14 +54,16 @@ class StatementAddingViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(dataRequestStatus = RequestStatus.LOADING) }
 
-            val definingThemes = localDefiningThemesRepository.getDefiningThemes(categoryId).first()
-
-            _uiState.update {
-                it.copy(
-                    entities = definingThemes,
-                    dataRequestStatus = RequestStatus.SUCCESS
-                )
-            }
+            localDefiningThemesRepository.getDefiningThemes(categoryId)
+                .distinctUntilChanged()
+                .collect { definingThemes ->
+                    _uiState.update {
+                        it.copy(
+                            entities = definingThemes,
+                            dataRequestStatus = RequestStatus.SUCCESS
+                        )
+                    }
+                }
         }
     }
 

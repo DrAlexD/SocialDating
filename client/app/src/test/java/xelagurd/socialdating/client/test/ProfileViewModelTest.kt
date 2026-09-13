@@ -4,6 +4,7 @@ import java.io.IOException
 import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -29,6 +30,7 @@ import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalUsersRepository
+import xelagurd.socialdating.client.data.model.enums.AppLanguage
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
@@ -55,6 +57,7 @@ class ProfileViewModelTest {
     private val userId = Random.nextInt(1, Int.MAX_VALUE)
     private var anotherUserId = userId
     private val isOfflineModeFlow = flowOf(false)
+    private val languageChangesFlow = MutableSharedFlow<AppLanguage>()
 
     @Before
     fun setup() {
@@ -220,10 +223,27 @@ class ProfileViewModelTest {
         confirmVerified(localUsersRepository, remoteUsersRepository)
     }
 
+    @Test
+    fun profileViewModel_appLanguageChange_reloadedUser() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        languageChangesFlow.emit(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
+
+        coVerify(exactly = 2) { remoteUsersRepository.getUser(any()) }
+    }
+
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(ProfileDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(ProfileDestination.anotherUserId) } returns anotherUserId
         every { preferencesRepository.isOfflineMode } returns isOfflineModeFlow
+        every { preferencesRepository.languageChanges } returns languageChangesFlow
         every { localUsersRepository.getUser(any()) } returns usersFlow
     }
 

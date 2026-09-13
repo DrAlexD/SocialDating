@@ -23,6 +23,7 @@ import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.ui.state.CategoriesUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
+import xelagurd.socialdating.client.ui.state.hideWhileLoading
 
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
@@ -39,7 +40,7 @@ class CategoriesViewModel @Inject constructor(
 
     val uiState = combine(categoriesFlow, dataRequestStatusFlow) { categories, dataRequestStatus ->
         CategoriesUiState(
-            entities = categories,
+            entities = categories.hideWhileLoading(dataRequestStatus),
             dataRequestStatus = dataRequestStatus
         )
     }.stateIn(
@@ -53,6 +54,10 @@ class CategoriesViewModel @Inject constructor(
             getCategories()
         } else {
             dataRequestStatusFlow.update { offlineModeStatus(context) }
+        }
+
+        viewModelScope.launch {
+            preferencesRepository.languageChanges.collect { getCategories() }
         }
     }
 

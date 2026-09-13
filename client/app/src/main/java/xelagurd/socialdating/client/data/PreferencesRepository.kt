@@ -2,6 +2,8 @@ package xelagurd.socialdating.client.data
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -9,6 +11,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import xelagurd.socialdating.client.data.model.enums.AppLanguage
 import xelagurd.socialdating.client.data.model.enums.ThemeMode
 
 @Singleton
@@ -20,6 +23,9 @@ class PreferencesRepository @Inject constructor(
     val refreshToken = dataStore.data.map { it[REFRESH_TOKEN] ?: REFRESH_TOKEN_DEFAULT }
     val isOfflineMode = dataStore.data.map { it[IS_OFFLINE_MODE] ?: IS_OFFLINE_MODE_DEFAULT }
     val themeMode = dataStore.data.map { ThemeMode.fromName(it[THEME_MODE]) }
+    val language = dataStore.data.map { AppLanguage.fromName(it[LANGUAGE]) }
+
+    val languageChanges = language.distinctUntilChanged().drop(1)
 
     suspend fun saveCurrentUserId(currentUserId: Int) {
         dataStore.edit { it[CURRENT_USER_ID] = currentUserId }
@@ -41,6 +47,10 @@ class PreferencesRepository @Inject constructor(
         dataStore.edit { it[THEME_MODE] = themeMode.name }
     }
 
+    suspend fun saveLanguage(language: AppLanguage) {
+        dataStore.edit { it[LANGUAGE] = language.name }
+    }
+
     suspend fun clearPreferences() {
         dataStore.edit {
             it[CURRENT_USER_ID] = CURRENT_USER_ID_DEFAULT
@@ -56,6 +66,7 @@ class PreferencesRepository @Inject constructor(
         private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
         private val IS_OFFLINE_MODE = booleanPreferencesKey("is_offline_mode")
         private val THEME_MODE = stringPreferencesKey("theme_mode")
+        private val LANGUAGE = stringPreferencesKey("language")
         const val CURRENT_USER_ID_DEFAULT = -1
         const val ACCESS_TOKEN_DEFAULT = ""
         const val REFRESH_TOKEN_DEFAULT = ""

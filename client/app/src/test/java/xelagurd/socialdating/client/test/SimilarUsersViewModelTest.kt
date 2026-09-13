@@ -3,6 +3,7 @@ package xelagurd.socialdating.client.test
 import java.io.IOException
 import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -25,6 +26,7 @@ import retrofit2.Response
 import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.model.enums.AppLanguage
 import xelagurd.socialdating.client.data.model.dto.PageDto
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
@@ -48,6 +50,7 @@ class SimilarUsersViewModelTest {
 
     private val userId = Random.nextInt(1, Int.MAX_VALUE)
     private val isOfflineModeFlow = flowOf(false)
+    private val languageChangesFlow = MutableSharedFlow<AppLanguage>()
 
     private val similarUsers = FakeData.similarUsers
     private val nextCursor = "3:${Random.nextInt(1, Int.MAX_VALUE)}"
@@ -250,9 +253,27 @@ class SimilarUsersViewModelTest {
         confirmVerified(remoteUserCategoriesRepository)
     }
 
+    @Test
+    fun similarUsersViewModel_appLanguageChange_reloadedSimilarUsers() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        languageChangesFlow.emit(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, similarUsersUiState.dataRequestStatus)
+        assertEquals(similarUsers, similarUsersUiState.entities)
+
+        coVerify(exactly = 2) { remoteUserCategoriesRepository.getSimilarUsers(any(), any(), null, any()) }
+    }
+
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(SimilarUsersDestination.userId) } returns userId
         every { preferencesRepository.isOfflineMode } returns isOfflineModeFlow
+        every { preferencesRepository.languageChanges } returns languageChangesFlow
     }
 
     private fun mockDataWithInternet(firstPageNextCursor: String? = null) {

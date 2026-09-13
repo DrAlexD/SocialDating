@@ -39,6 +39,7 @@ import xelagurd.socialdating.client.data.remote.repository.RemoteUserDefiningThe
 import xelagurd.socialdating.client.ui.navigation.ProfileStatisticsDestination
 import xelagurd.socialdating.client.ui.state.ProfileStatisticsUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
+import xelagurd.socialdating.client.ui.state.hideWhileLoading
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -79,7 +80,7 @@ class ProfileStatisticsViewModel @Inject constructor(
         ProfileStatisticsUiState(
             userId = userId,
             anotherUserId = anotherUserId,
-            entities = userCategories,
+            entities = userCategories.hideWhileLoading(dataRequestStatus),
             entityIdToData = userDefiningThemes.groupBy { it.categoryId },
             entitiesMask = detailedSimilarUser,
             dataRequestStatus = dataRequestStatus
@@ -106,9 +107,15 @@ class ProfileStatisticsViewModel @Inject constructor(
         } else {
             dataRequestStatusFlow.update { offlineModeStatus(context) }
         }
+
+        viewModelScope.launch {
+            preferencesRepository.languageChanges.collect {
+                getProfileStatistics(isCachedDataOutdated = true)
+            }
+        }
     }
 
-    fun getProfileStatistics() {
+    fun getProfileStatistics(isCachedDataOutdated: Boolean = false) {
         if (isOfflineMode) return // FixMe: remove after adding server hosting
 
         viewModelScope.launch {
@@ -134,7 +141,10 @@ class ProfileStatisticsViewModel @Inject constructor(
                     }
 
                     if (remoteUserCategories != null) {
-                        val localDefiningThemes = localDefiningThemesRepository.getDefiningThemes().first()
+                        val localDefiningThemes = when {
+                            isCachedDataOutdated -> listOf()
+                            else -> localDefiningThemesRepository.getDefiningThemes().first()
+                        }
                         val localDefiningThemeIds = localDefiningThemes.map { it.id }
                         val neededDefiningThemeIds = remoteUserDefiningThemes
                             .filter { it.definingThemeId !in localDefiningThemeIds }
@@ -148,7 +158,10 @@ class ProfileStatisticsViewModel @Inject constructor(
                         }
 
                         if (neededDefiningThemeIds.isEmpty() || remoteDefiningThemes != null) {
-                            val localCategories = localCategoriesRepository.getCategories().first()
+                            val localCategories = when {
+                                isCachedDataOutdated -> listOf()
+                                else -> localCategoriesRepository.getCategories().first()
+                            }
                             val localCategoryIds = localCategories.map { it.id }
                             val neededCategoryIds = remoteUserCategories
                                 .filter { it.categoryId !in localCategoryIds }

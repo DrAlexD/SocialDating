@@ -3,6 +3,7 @@ package xelagurd.socialdating.client.test
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -27,6 +28,7 @@ import xelagurd.socialdating.client.MainDispatcherRule
 import xelagurd.socialdating.client.TestUtils.mockkList
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
+import xelagurd.socialdating.client.data.model.enums.AppLanguage
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -49,6 +51,7 @@ class CategoriesViewModelTest {
         get() = viewModel.uiState.value
 
     private val isOfflineModeFlow = flowOf(false)
+    private val languageChangesFlow = MutableSharedFlow<AppLanguage>()
 
     @Before
     fun setup() {
@@ -197,9 +200,26 @@ class CategoriesViewModelTest {
         confirmVerified(localCategoriesRepository, remoteCategoriesRepository)
     }
 
+    @Test
+    fun categoriesViewModel_appLanguageChange_reloadedCategories() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        languageChangesFlow.emit(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
+
+        coVerify(exactly = 2) { remoteCategoriesRepository.getCategories() }
+    }
+
     private fun mockGeneralMethods() {
         every { localCategoriesRepository.getCategories() } returns categoriesFlow
         every { preferencesRepository.isOfflineMode } returns isOfflineModeFlow
+        every { preferencesRepository.languageChanges } returns languageChangesFlow
     }
 
     private fun mockDataWithInternet() {

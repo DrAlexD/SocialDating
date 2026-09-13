@@ -89,6 +89,10 @@ class StatementsViewModel @Inject constructor(
             isLastPageFlow.update { true }
             dataRequestStatusFlow.update { offlineModeStatus(context) }
         }
+
+        viewModelScope.launch {
+            preferencesRepository.languageChanges.collect { getStatements() }
+        }
     }
 
     fun getStatements() {
