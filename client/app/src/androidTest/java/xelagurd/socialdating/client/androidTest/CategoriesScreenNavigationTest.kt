@@ -19,7 +19,7 @@ import xelagurd.socialdating.client.AndroidTestUtils.assertBackStackDepth
 import xelagurd.socialdating.client.AndroidTestUtils.assertCurrentRouteName
 import xelagurd.socialdating.client.AndroidTestUtils.assertRouteInBackStack
 import xelagurd.socialdating.client.AndroidTestUtils.getCurrentRoute
-import xelagurd.socialdating.client.MainActivity
+import xelagurd.socialdating.client.HiltTestActivity
 import xelagurd.socialdating.client.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
 import xelagurd.socialdating.client.ui.navigation.SettingsDestination
@@ -32,7 +32,7 @@ class CategoriesScreenNavigationTest {
     val hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
+    val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
     private lateinit var navController: TestNavHostController
 
