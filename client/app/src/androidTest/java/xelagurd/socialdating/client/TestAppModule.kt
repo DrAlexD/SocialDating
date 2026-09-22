@@ -43,8 +43,8 @@ object TestAppModule {
 
     @Provides
     @Singleton
-    fun provideCredentialManager(@ApplicationContext context: Context) =
-        CredentialManager.create(context)
+    fun provideCredentialManager(@ApplicationContext context: Context): CredentialManager =
+        FakeCredentialManager()
 
     @Provides
     @Singleton

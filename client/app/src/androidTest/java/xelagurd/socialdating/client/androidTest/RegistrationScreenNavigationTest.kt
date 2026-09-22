@@ -43,7 +43,7 @@ class RegistrationScreenNavigationTest {
 
         navController.assertCurrentRouteName(CategoriesDestination.route)
         navController.assertRouteNotInBackStack(RegistrationDestination.route)
-        //navController.assertBackStackDepth(3)
+        navController.assertBackStackDepth(2)
     }
 
     @Test
@@ -53,6 +53,6 @@ class RegistrationScreenNavigationTest {
 
         navController.assertCurrentRouteName(LoginDestination.route)
         navController.assertRouteNotInBackStack(RegistrationDestination.route)
-        //navController.assertBackStackDepth(2)
+        navController.assertBackStackDepth(2)
     }
 }

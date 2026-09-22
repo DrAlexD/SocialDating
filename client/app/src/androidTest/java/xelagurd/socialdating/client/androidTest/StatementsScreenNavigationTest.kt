@@ -49,7 +49,7 @@ class StatementsScreenNavigationTest {
 
         navController.assertCurrentRouteName(StatementAddingDestination.routeWithArgs)
         navController.assertRouteInBackStack(StatementsDestination.routeWithArgs)
-        //navController.assertBackStackDepth(5)
+        navController.assertBackStackDepth(4)
     }
 
     @Test
@@ -59,7 +59,7 @@ class StatementsScreenNavigationTest {
 
         navController.assertCurrentRouteName(CategoriesDestination.route)
         navController.assertRouteNotInBackStack(StatementsDestination.routeWithArgs)
-        //navController.assertBackStackDepth(3)
+        navController.assertBackStackDepth(2)
     }
 
     @Test
@@ -70,7 +70,7 @@ class StatementsScreenNavigationTest {
         val currentRoute = navController.getCurrentRoute()
 
         assertEquals(previousRoute, currentRoute)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -81,7 +81,7 @@ class StatementsScreenNavigationTest {
 
         navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
         navController.assertRouteInBackStack(CategoriesDestination.route)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -92,7 +92,7 @@ class StatementsScreenNavigationTest {
 
         navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
         navController.assertRouteInBackStack(CategoriesDestination.route)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -103,6 +103,6 @@ class StatementsScreenNavigationTest {
 
         navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
         navController.assertRouteInBackStack(CategoriesDestination.route)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 }
