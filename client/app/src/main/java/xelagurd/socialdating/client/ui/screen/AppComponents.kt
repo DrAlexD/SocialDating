@@ -248,11 +248,10 @@ private inline fun ActionRequestStatusComponent(
         modifier = Modifier.fillMaxSize()
     ) {
         when (actionRequestStatus) {
-            RequestStatus.UNDEFINED -> {}
             RequestStatus.LOADING -> AppLoadingIndicator()
-            is RequestStatus.FAILURE -> AppLargeTitleText(actionRequestStatus.failureText)
-            is RequestStatus.ERROR -> AppLargeTitleText(actionRequestStatus.errorText)
             RequestStatus.SUCCESS -> onSuccess()
+            // the failed statuses are displayed by the notification
+            RequestStatus.UNDEFINED, is RequestStatus.FAILURE, is RequestStatus.ERROR -> {}
         }
     }
 }

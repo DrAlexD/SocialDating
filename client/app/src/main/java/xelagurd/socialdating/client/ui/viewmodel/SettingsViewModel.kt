@@ -35,6 +35,11 @@ class SettingsViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
+    fun onNotificationShown() =
+        _uiState.update {
+            it.copy(notification = null)
+        }
+
     fun updateThemeMode(themeMode: ThemeMode) {
         _uiState.update { it.copy(themeMode = themeMode) }
 

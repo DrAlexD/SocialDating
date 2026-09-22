@@ -1,6 +1,8 @@
 package xelagurd.socialdating.client.androidTest
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -43,11 +45,13 @@ import xelagurd.socialdating.client.ui.screen.AppLoadingIndicator
 import xelagurd.socialdating.client.ui.screen.AppMediumBodyText
 import xelagurd.socialdating.client.ui.screen.AppMediumTextCard
 import xelagurd.socialdating.client.ui.screen.AppMediumTitleText
+import xelagurd.socialdating.client.ui.screen.AppNotificationHost
 import xelagurd.socialdating.client.ui.screen.AppRadioGroup
 import xelagurd.socialdating.client.ui.screen.AppSmallBodyText
 import xelagurd.socialdating.client.ui.screen.AppSmallTitleText
 import xelagurd.socialdating.client.ui.screen.AppTextField
 import xelagurd.socialdating.client.ui.screen.AppYesNoRadioGroup
+import xelagurd.socialdating.client.ui.screen.NotificationEffect
 import xelagurd.socialdating.client.ui.screen.stringResourceWithColon
 
 @HiltAndroidTest
@@ -402,6 +406,56 @@ class ScreenComponentsTest {
         }
     }
 
+    @Test
+    fun notificationEffect_text_displayedNotification() {
+        composeTestRule.mainClock.autoAdvance = false
+        val shownCount = setContentToNotificationEffect(FakeData.ERROR_TEXT)
+        composeTestRule.mainClock.advanceTimeBy(NOTIFICATION_APPEARANCE_MILLIS)
+
+        composeTestRule.onNodeWithTagId(R.string.notification).assertIsDisplayed()
+        composeTestRule.onNodeWithText(FakeData.ERROR_TEXT).assertIsDisplayed()
+        assertEquals(0, shownCount())
+    }
+
+    @Test
+    fun notificationEffect_timeout_hiddenNotificationAndReportedShowing() {
+        composeTestRule.mainClock.autoAdvance = false
+        val shownCount = setContentToNotificationEffect(FakeData.ERROR_TEXT)
+        composeTestRule.mainClock.advanceTimeBy(NOTIFICATION_APPEARANCE_MILLIS)
+        composeTestRule.onNodeWithText(FakeData.ERROR_TEXT).assertIsDisplayed()
+
+        composeTestRule.mainClock.advanceTimeBy(NOTIFICATION_TIMEOUT_MILLIS)
+
+        composeTestRule.onNodeWithText(FakeData.ERROR_TEXT).assertDoesNotExist()
+        assertEquals(1, shownCount())
+    }
+
+    @Test
+    fun notificationEffect_withoutText_withoutNotification() {
+        val shownCount = setContentToNotificationEffect(null)
+
+        composeTestRule.onNodeWithTagId(R.string.notification).assertIsNotDisplayed()
+        assertEquals(0, shownCount())
+    }
+
+    private fun setContentToNotificationEffect(notification: String?): () -> Int {
+        var shownCount = 0
+
+        composeTestRule.setContentToScreen {
+            val notificationHostState = remember { SnackbarHostState() }
+
+            NotificationEffect(
+                notification = notification,
+                notificationHostState = notificationHostState,
+                onNotificationShown = { shownCount++ }
+            )
+
+            AppNotificationHost(notificationHostState)
+        }
+
+        return { shownCount }
+    }
+
     private fun assertAllCategoriesAreDisplayed() {
         categories.forEach {
             composeTestRule.onNodeWithText(it.name).assertIsDisplayed()
@@ -410,6 +464,8 @@ class ScreenComponentsTest {
 
     private companion object {
         const val CATEGORIES_COUNT = 3
+        const val NOTIFICATION_APPEARANCE_MILLIS = 1_000L
+        const val NOTIFICATION_TIMEOUT_MILLIS = 6_000L
         const val MAX_HEIGHT_DP = 300
         const val CHOSEN_MARK = " (chosen)"
         const val TEST_TAG_SUFFIX = "1"

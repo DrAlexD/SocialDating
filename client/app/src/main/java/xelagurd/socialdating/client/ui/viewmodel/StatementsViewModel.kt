@@ -34,6 +34,7 @@ import xelagurd.socialdating.client.ui.navigation.StatementsDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.StatementsUiState
 import xelagurd.socialdating.client.ui.state.hideWhileLoading
+import xelagurd.socialdating.client.ui.state.updatePageLoadingNotification
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -47,6 +48,13 @@ class StatementsViewModel @Inject constructor(
     private val commonLocalRepository: CommonLocalRepository
 ) : ViewModel() {
 
+    private data class RequestStatuses(
+        val data: RequestStatus,
+        val nextPage: RequestStatus,
+        val action: RequestStatus,
+        val notification: String?
+    )
+
     private val userId: Int = checkNotNull(savedStateHandle[StatementsDestination.userId])
 
     private val categoryId: Int = checkNotNull(savedStateHandle[StatementsDestination.categoryId])
@@ -54,7 +62,10 @@ class StatementsViewModel @Inject constructor(
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val nextPageRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val actionRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val reactingStatementIdsFlow = MutableStateFlow<Set<Int>>(setOf())
     private val isLastPageFlow = MutableStateFlow(false)
+    private val notificationFlow = MutableStateFlow<String?>(null)
     private val statementsFlow = localStatementsRepository.getStatements(categoryId)
         .distinctUntilChanged()
 
@@ -63,18 +74,31 @@ class StatementsViewModel @Inject constructor(
     private var nextCursor: String? = null
     private var nextOrderNumber = ID_MIN
 
-    val uiState = combine(
-        statementsFlow,
+    // the statuses are combined apart from the data, because a flow combination takes at most five flows
+    private val requestStatusesFlow = combine(
         dataRequestStatusFlow,
         nextPageRequestStatusFlow,
-        isLastPageFlow
-    ) { statements, dataRequestStatus, nextPageRequestStatus, isLastPage ->
+        actionRequestStatusFlow,
+        notificationFlow
+    ) { dataRequestStatus, nextPageRequestStatus, actionRequestStatus, notification ->
+        RequestStatuses(dataRequestStatus, nextPageRequestStatus, actionRequestStatus, notification)
+    }
+
+    val uiState = combine(
+        statementsFlow,
+        requestStatusesFlow,
+        isLastPageFlow,
+        reactingStatementIdsFlow
+    ) { statements, requestStatuses, isLastPage, reactingStatementIds ->
         StatementsUiState(
             categoryId = categoryId,
-            entities = statements.hideWhileLoading(dataRequestStatus),
-            dataRequestStatus = dataRequestStatus,
-            nextPageRequestStatus = nextPageRequestStatus,
-            isLastPage = isLastPage
+            entities = statements.hideWhileLoading(requestStatuses.data),
+            dataRequestStatus = requestStatuses.data,
+            nextPageRequestStatus = requestStatuses.nextPage,
+            isLastPage = isLastPage,
+            actionRequestStatus = requestStatuses.action,
+            reactingStatementIds = reactingStatementIds,
+            notification = requestStatuses.notification
         )
     }.stateIn(
         scope = viewModelScope,
@@ -84,19 +108,28 @@ class StatementsViewModel @Inject constructor(
 
     init {
         if (!isOfflineMode) { // FixMe: remove after adding server hosting
-            getStatements()
+            loadStatements(isRequestedByUser = false)
         } else {
             isLastPageFlow.update { true }
             dataRequestStatusFlow.update { offlineModeStatus(context) }
         }
 
         viewModelScope.launch {
-            preferencesRepository.languageChanges.collect { getStatements() }
+            preferencesRepository.languageChanges.collect { loadStatements(isRequestedByUser = false) }
         }
     }
 
-    fun getStatements() {
-        if (isOfflineMode) return // FixMe: remove after adding server hosting
+    fun onNotificationShown() = notificationFlow.update { null }
+
+    fun getStatements() = loadStatements(isRequestedByUser = true)
+
+    private fun loadStatements(isRequestedByUser: Boolean) {
+        if (isOfflineMode) { // FixMe: remove after adding server hosting
+            if (isRequestedByUser) {
+                notificationFlow.update { offlineModeStatus(context).notificationText() }
+            }
+            return
+        }
 
         definingThemes = null
         nextCursor = null
@@ -104,7 +137,7 @@ class StatementsViewModel @Inject constructor(
         isLastPageFlow.update { false }
         nextPageRequestStatusFlow.update { RequestStatus.UNDEFINED }
 
-        getStatementsPage(isFirstPage = true)
+        getStatementsPage(isFirstPage = true, isRequestedByUser = isRequestedByUser)
     }
 
     fun getNextStatements() {
@@ -113,10 +146,10 @@ class StatementsViewModel @Inject constructor(
         if (dataRequestStatusFlow.value !is RequestStatus.SUCCESS) return
         if (nextPageRequestStatusFlow.value is RequestStatus.LOADING) return
 
-        getStatementsPage(isFirstPage = false)
+        getStatementsPage(isFirstPage = false, isRequestedByUser = false)
     }
 
-    private fun getStatementsPage(isFirstPage: Boolean) {
+    private fun getStatementsPage(isFirstPage: Boolean, isRequestedByUser: Boolean) {
         viewModelScope.launch {
             updateRequestStatus(isFirstPage, RequestStatus.LOADING)
 
@@ -128,6 +161,12 @@ class StatementsViewModel @Inject constructor(
 
             if (remoteDefiningThemes == null) {
                 updateRequestStatus(isFirstPage, statusDefiningThemes)
+                notificationFlow.updatePageLoadingNotification(
+                    requestStatus = statusDefiningThemes,
+                    isFirstPage = isFirstPage,
+                    isRequestedByUser = isRequestedByUser,
+                    isDataExist = { statementsFlow.first().isNotEmpty() }
+                )
                 return@launch
             }
 
@@ -160,6 +199,12 @@ class StatementsViewModel @Inject constructor(
             }
 
             updateRequestStatus(isFirstPage, statusStatements)
+            notificationFlow.updatePageLoadingNotification(
+                requestStatus = statusStatements,
+                isFirstPage = isFirstPage,
+                isRequestedByUser = isRequestedByUser,
+                isDataExist = { statementsFlow.first().isNotEmpty() }
+            )
         }
     }
 
@@ -173,6 +218,9 @@ class StatementsViewModel @Inject constructor(
     fun onStatementReactionClick(statement: Statement, reactionType: StatementReactionType) {
         viewModelScope.launch {
             if (!isOfflineMode) { // FixMe: remove after adding server hosting
+                actionRequestStatusFlow.update { RequestStatus.LOADING }
+                reactingStatementIdsFlow.update { it + statement.id }
+
                 val (_, status) = safeApiCall(context) {
                     remoteStatementsRepository.processStatementReaction(
                         StatementReactionDetails(
@@ -187,7 +235,9 @@ class StatementsViewModel @Inject constructor(
                     localStatementsRepository.deleteStatement(statement)
                 }
 
-                // TODO: implement action on error
+                actionRequestStatusFlow.update { status }
+                notificationFlow.update { status.notificationText() }
+                reactingStatementIdsFlow.update { it - statement.id }
             } else {
                 localStatementsRepository.deleteStatement(statement)
             }

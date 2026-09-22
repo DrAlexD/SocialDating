@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -36,7 +38,8 @@ fun SettingsScreen(
         onSuccessLogout = onSuccessLogout,
         onThemeModeSelect = settingsViewModel::updateThemeMode,
         onLanguageSelect = settingsViewModel::updateLanguage,
-        onLogoutClick = settingsViewModel::logout
+        onLogoutClick = settingsViewModel::logout,
+        onNotificationShown = settingsViewModel::onNotificationShown
     )
 }
 
@@ -47,8 +50,17 @@ fun SettingsScreenComponent(
     onSuccessLogout: () -> Unit = {},
     onThemeModeSelect: (ThemeMode) -> Unit = {},
     onLanguageSelect: (AppLanguage) -> Unit = {},
-    onLogoutClick: () -> Unit = {}
+    onLogoutClick: () -> Unit = {},
+    onNotificationShown: () -> Unit = {}
 ) {
+    val notificationHostState = remember { SnackbarHostState() }
+
+    NotificationEffect(
+        notification = settingsUiState.notification,
+        notificationHostState = notificationHostState,
+        onNotificationShown = onNotificationShown
+    )
+
     Scaffold(
         topBar = {
             AppTopBar(
@@ -59,7 +71,8 @@ fun SettingsScreenComponent(
             AppBottomNavigationBar(
                 currentTopLevelRoute = SettingsDestination.topLevelRoute
             )
-        }
+        },
+        snackbarHost = { AppNotificationHost(notificationHostState) }
     ) { innerPadding ->
         ComponentWithActionRequestStatus(
             actionRequestStatus = settingsUiState.actionRequestStatus,
@@ -103,6 +116,7 @@ private fun SettingsDetailsBody(
             optionDescriptionRes = { it.descriptionRes }
         )
         AppLargeTextCard(
+            isEnabled = settingsUiState.actionRequestStatus.isAllowedActionRefresh(),
             text = stringResource(R.string.logout),
             onClick = onLogoutClick
         )

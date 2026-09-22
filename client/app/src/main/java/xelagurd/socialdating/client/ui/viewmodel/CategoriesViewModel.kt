@@ -23,6 +23,7 @@ import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteCategoriesRepository
 import xelagurd.socialdating.client.ui.state.CategoriesUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
+import xelagurd.socialdating.client.ui.state.updateLoadingNotification
 import xelagurd.socialdating.client.ui.state.hideWhileLoading
 
 @HiltViewModel
@@ -36,12 +37,18 @@ class CategoriesViewModel @Inject constructor(
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val notificationFlow = MutableStateFlow<String?>(null)
     private val categoriesFlow = localCategoriesRepository.getCategories().distinctUntilChanged()
 
-    val uiState = combine(categoriesFlow, dataRequestStatusFlow) { categories, dataRequestStatus ->
+    val uiState = combine(
+        categoriesFlow,
+        dataRequestStatusFlow,
+        notificationFlow
+    ) { categories, dataRequestStatus, notification ->
         CategoriesUiState(
             entities = categories.hideWhileLoading(dataRequestStatus),
-            dataRequestStatus = dataRequestStatus
+            dataRequestStatus = dataRequestStatus,
+            notification = notification
         )
     }.stateIn(
         scope = viewModelScope,
@@ -51,18 +58,27 @@ class CategoriesViewModel @Inject constructor(
 
     init {
         if (!isOfflineMode) { // FixMe: remove after adding server hosting
-            getCategories()
+            loadCategories(isRequestedByUser = false)
         } else {
             dataRequestStatusFlow.update { offlineModeStatus(context) }
         }
 
         viewModelScope.launch {
-            preferencesRepository.languageChanges.collect { getCategories() }
+            preferencesRepository.languageChanges.collect { loadCategories(isRequestedByUser = false) }
         }
     }
 
-    fun getCategories() {
-        if (isOfflineMode) return // FixMe: remove after adding server hosting
+    fun onNotificationShown() = notificationFlow.update { null }
+
+    fun getCategories() = loadCategories(isRequestedByUser = true)
+
+    private fun loadCategories(isRequestedByUser: Boolean) {
+        if (isOfflineMode) { // FixMe: remove after adding server hosting
+            if (isRequestedByUser) {
+                notificationFlow.update { offlineModeStatus(context).notificationText() }
+            }
+            return
+        }
 
         viewModelScope.launch {
             dataRequestStatusFlow.update { RequestStatus.LOADING }
@@ -76,6 +92,11 @@ class CategoriesViewModel @Inject constructor(
             }
 
             dataRequestStatusFlow.update { status }
+            notificationFlow.updateLoadingNotification(
+                requestStatus = status,
+                isRequestedByUser = isRequestedByUser,
+                isDataExist = categoriesFlow.first().isNotEmpty()
+            )
         }
     }
 }

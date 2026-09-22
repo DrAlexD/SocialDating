@@ -10,6 +10,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
+import xelagurd.socialdating.client.AndroidTestUtils.checkDisabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
@@ -21,6 +22,7 @@ import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.model.enums.AppLanguage
 import xelagurd.socialdating.client.data.model.enums.ThemeMode
 import xelagurd.socialdating.client.ui.screen.SettingsScreenComponent
+import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.SettingsUiState
 
 @HiltAndroidTest
@@ -52,6 +54,17 @@ class SettingsScreenTest {
         }
 
         composeTestRule.onNodeWithTextId(R.string.logout).checkEnabledButton()
+    }
+
+    @Test
+    fun settingsScreen_logoutLoading_disabledLogoutButton() {
+        composeTestRule.setContentToScreen {
+            SettingsScreenComponent(
+                settingsUiState = SettingsUiState(actionRequestStatus = RequestStatus.LOADING)
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.logout).checkDisabledButton()
     }
 
     @Test

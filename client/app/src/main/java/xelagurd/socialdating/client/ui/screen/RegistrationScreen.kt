@@ -10,10 +10,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -48,7 +50,8 @@ fun RegistrationScreen(
         onSuccessRegistration = onSuccessRegistration,
         onNavigateUp = onNavigateUp,
         onValueChange = registrationViewModel::updateUiState,
-        onRegisterClick = registrationViewModel::register
+        onRegisterClick = registrationViewModel::register,
+        onNotificationShown = registrationViewModel::onNotificationShown
     )
 }
 
@@ -59,15 +62,25 @@ fun RegistrationScreenComponent(
     onSuccessRegistration: () -> Unit = {},
     onNavigateUp: () -> Unit = {},
     onValueChange: (RegistrationFormData) -> Unit = {},
-    onRegisterClick: () -> Unit = {}
+    onRegisterClick: () -> Unit = {},
+    onNotificationShown: () -> Unit = {}
 ) {
+    val notificationHostState = remember { SnackbarHostState() }
+
+    NotificationEffect(
+        notification = registrationUiState.notification,
+        notificationHostState = notificationHostState,
+        onNotificationShown = onNotificationShown
+    )
+
     Scaffold(
         topBar = {
             AppTopBar(
                 title = stringResource(RegistrationDestination.titleRes),
                 navigateUp = onNavigateUp
             )
-        }
+        },
+        snackbarHost = { AppNotificationHost(notificationHostState) }
     ) { innerPadding ->
         ComponentWithActionRequestStatus(
             actionRequestStatus = registrationUiState.actionRequestStatus,

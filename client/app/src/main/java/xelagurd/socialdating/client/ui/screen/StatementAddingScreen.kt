@@ -7,9 +7,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -43,7 +45,8 @@ fun StatementAddingScreen(
         onSuccessStatementAdding = onSuccessStatementAdding,
         onNavigateUp = onNavigateUp,
         onValueChange = statementAddingViewModel::updateUiState,
-        onStatementAddingClick = statementAddingViewModel::addStatement
+        onStatementAddingClick = statementAddingViewModel::addStatement,
+        onNotificationShown = statementAddingViewModel::onNotificationShown
     )
 }
 
@@ -54,8 +57,17 @@ fun StatementAddingScreenComponent(
     onSuccessStatementAdding: () -> Unit = {},
     onNavigateUp: () -> Unit = {},
     onValueChange: (StatementFormData) -> Unit = {},
-    onStatementAddingClick: () -> Unit = {}
+    onStatementAddingClick: () -> Unit = {},
+    onNotificationShown: () -> Unit = {}
 ) {
+    val notificationHostState = remember { SnackbarHostState() }
+
+    NotificationEffect(
+        notification = statementAddingUiState.notification,
+        notificationHostState = notificationHostState,
+        onNotificationShown = onNotificationShown
+    )
+
     Scaffold(
         topBar = {
             AppTopBar(
@@ -67,7 +79,8 @@ fun StatementAddingScreenComponent(
             AppBottomNavigationBar(
                 currentTopLevelRoute = StatementAddingDestination.topLevelRoute
             )
-        }
+        },
+        snackbarHost = { AppNotificationHost(notificationHostState) }
     ) { innerPadding ->
         ComponentWithActionRequestStatus(
             actionRequestStatus = statementAddingUiState.actionRequestStatus,

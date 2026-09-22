@@ -6,5 +6,6 @@ import xelagurd.socialdating.client.data.model.enums.ThemeMode
 data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val language: AppLanguage = AppLanguage.SYSTEM,
-    override val actionRequestStatus: RequestStatus = RequestStatus.UNDEFINED
+    override val actionRequestStatus: RequestStatus = RequestStatus.UNDEFINED,
+    override val notification: String? = null
 ) : ActionRequestUiState

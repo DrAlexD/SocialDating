@@ -71,6 +71,11 @@ class StatementAddingViewModel @Inject constructor(
     private suspend fun nextOrderNumber() =
         localStatementsRepository.getMaxOrderNumber(categoryId)?.plus(1) ?: ID_MIN
 
+    fun onNotificationShown() =
+        _uiState.update {
+            it.copy(notification = null)
+        }
+
     fun updateUiState(statementFormData: StatementFormData) =
         _uiState.update {
             it.copy(formData = statementFormData)
@@ -96,7 +101,9 @@ class StatementAddingViewModel @Inject constructor(
                     )
                 }
 
-                _uiState.update { it.copy(actionRequestStatus = status) }
+                _uiState.update {
+                    it.copy(actionRequestStatus = status, notification = status.notificationText())
+                }
             } else {
                 _uiState.update { it.copy(actionRequestStatus = RequestStatus.LOADING) }
                 val statementFormData = uiState.value.formData

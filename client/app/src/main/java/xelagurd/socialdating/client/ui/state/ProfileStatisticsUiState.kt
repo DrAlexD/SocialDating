@@ -10,5 +10,6 @@ data class ProfileStatisticsUiState(
     override val entities: List<UserCategoryData> = listOf(),
     val entityIdToData: Map<Int, List<UserDefiningThemeData>> = mapOf(),
     val entitiesMask: DetailedSimilarUserDto? = null,
-    override val dataRequestStatus: RequestStatus = RequestStatus.UNDEFINED
+    override val dataRequestStatus: RequestStatus = RequestStatus.UNDEFINED,
+    override val notification: String? = null
 ) : DataListUiState

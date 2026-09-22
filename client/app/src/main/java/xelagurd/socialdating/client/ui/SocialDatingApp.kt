@@ -20,8 +20,10 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -61,53 +63,60 @@ fun AppTopBar(
     navigateUp: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    CenterAlignedTopAppBar(
-        title = { Text(title) },
-        navigationIcon = {
-            navigateUp?.let {
-                IconButton(onClick = it) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.back_button)
-                    )
-                }
-            }
-        },
-        actions = {
-            if (dataRequestStatus != null) {
-                val onCardStatusClick = refreshAction.takeIf { dataRequestStatus.isAllowedDataRefresh() } ?: {}
-                Card(onClick = onCardStatusClick) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        AppMediumTitleText(
-                            text = stringResource(
-                                when (dataRequestStatus) {
-                                    RequestStatus.SUCCESS -> R.string.online
-                                    RequestStatus.UNDEFINED, RequestStatus.LOADING -> R.string.loading
-                                    is RequestStatus.FAILURE, is RequestStatus.ERROR -> R.string.offline
-                                }
-                            ),
-                            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
+    val colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+
+    // the bar animates any change of its container color, so it is recreated on a theme change
+    // to apply the new colors immediately and keep the animation only for the content scrolling
+    key(colors) {
+        CenterAlignedTopAppBar(
+            title = { Text(title) },
+            navigationIcon = {
+                navigateUp?.let {
+                    IconButton(onClick = it) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back_button)
                         )
-                        if (dataRequestStatus.isAllowedDataRefresh()) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = stringResource(R.string.refresh),
-                                modifier = Modifier.graphicsLayer {
-                                    this.scaleX = 0.8f
-                                    this.scaleY = 0.8f
-                                }
+                    }
+                }
+            },
+            actions = {
+                if (dataRequestStatus != null) {
+                    val onCardStatusClick = refreshAction.takeIf { dataRequestStatus.isAllowedDataRefresh() } ?: {}
+                    Card(onClick = onCardStatusClick) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            AppMediumTitleText(
+                                text = stringResource(
+                                    when (dataRequestStatus) {
+                                        RequestStatus.SUCCESS -> R.string.online
+                                        RequestStatus.UNDEFINED, RequestStatus.LOADING -> R.string.loading
+                                        is RequestStatus.FAILURE, is RequestStatus.ERROR -> R.string.offline
+                                    }
+                                ),
+                                overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
                             )
+                            if (dataRequestStatus.isAllowedDataRefresh()) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = stringResource(R.string.refresh),
+                                    modifier = Modifier.graphicsLayer {
+                                        this.scaleX = 0.8f
+                                        this.scaleY = 0.8f
+                                    }
+                                )
+                            }
                         }
                     }
                 }
-            }
-        },
-        scrollBehavior = scrollBehavior,
-        modifier = modifier
-    )
+            },
+            colors = colors,
+            scrollBehavior = scrollBehavior,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable

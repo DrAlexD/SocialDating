@@ -27,6 +27,7 @@ import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.SimilarUsersUiState
 import xelagurd.socialdating.client.ui.state.hideWhileLoading
+import xelagurd.socialdating.client.ui.state.updatePageLoadingNotification
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -43,6 +44,7 @@ class SimilarUsersViewModel @Inject constructor(
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val nextPageRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val isLastPageFlow = MutableStateFlow(false)
+    private val notificationFlow = MutableStateFlow<String?>(null)
     private val similarUsersFlow = MutableStateFlow<List<SimilarUserDto>>(listOf())
 
     // the paging session state, it is dropped on every screen entry and refresh
@@ -52,13 +54,15 @@ class SimilarUsersViewModel @Inject constructor(
         similarUsersFlow,
         dataRequestStatusFlow,
         nextPageRequestStatusFlow,
-        isLastPageFlow
-    ) { similarUsers, dataRequestStatus, nextPageRequestStatus, isLastPage ->
+        isLastPageFlow,
+        notificationFlow
+    ) { similarUsers, dataRequestStatus, nextPageRequestStatus, isLastPage, notification ->
         SimilarUsersUiState(
             entities = similarUsers.hideWhileLoading(dataRequestStatus),
             dataRequestStatus = dataRequestStatus,
             nextPageRequestStatus = nextPageRequestStatus,
-            isLastPage = isLastPage
+            isLastPage = isLastPage,
+            notification = notification
         )
     }.stateIn(
         scope = viewModelScope,
@@ -68,7 +72,7 @@ class SimilarUsersViewModel @Inject constructor(
 
     init {
         if (!isOfflineMode) { // FixMe: remove after adding server hosting
-            getSimilarUsers()
+            loadSimilarUsers(isRequestedByUser = false)
         } else {
             similarUsersFlow.update { FakeData.similarUsers }
             isLastPageFlow.update { true }
@@ -76,18 +80,27 @@ class SimilarUsersViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            preferencesRepository.languageChanges.collect { getSimilarUsers() }
+            preferencesRepository.languageChanges.collect { loadSimilarUsers(isRequestedByUser = false) }
         }
     }
 
-    fun getSimilarUsers() {
-        if (isOfflineMode) return // FixMe: remove after adding server hosting
+    fun onNotificationShown() = notificationFlow.update { null }
+
+    fun getSimilarUsers() = loadSimilarUsers(isRequestedByUser = true)
+
+    private fun loadSimilarUsers(isRequestedByUser: Boolean) {
+        if (isOfflineMode) { // FixMe: remove after adding server hosting
+            if (isRequestedByUser) {
+                notificationFlow.update { offlineModeStatus(context).notificationText() }
+            }
+            return
+        }
 
         nextCursor = null
         isLastPageFlow.update { false }
         nextPageRequestStatusFlow.update { RequestStatus.UNDEFINED }
 
-        getSimilarUsersPage(isFirstPage = true)
+        getSimilarUsersPage(isFirstPage = true, isRequestedByUser = isRequestedByUser)
     }
 
     fun getNextSimilarUsers() {
@@ -96,10 +109,10 @@ class SimilarUsersViewModel @Inject constructor(
         if (dataRequestStatusFlow.value !is RequestStatus.SUCCESS) return
         if (nextPageRequestStatusFlow.value is RequestStatus.LOADING) return
 
-        getSimilarUsersPage(isFirstPage = false)
+        getSimilarUsersPage(isFirstPage = false, isRequestedByUser = false)
     }
 
-    private fun getSimilarUsersPage(isFirstPage: Boolean) {
+    private fun getSimilarUsersPage(isFirstPage: Boolean, isRequestedByUser: Boolean) {
         viewModelScope.launch {
             updateRequestStatus(isFirstPage, RequestStatus.LOADING)
 
@@ -129,6 +142,12 @@ class SimilarUsersViewModel @Inject constructor(
             }
 
             updateRequestStatus(isFirstPage, status)
+            notificationFlow.updatePageLoadingNotification(
+                requestStatus = status,
+                isFirstPage = isFirstPage,
+                isRequestedByUser = isRequestedByUser,
+                isDataExist = { similarUsersFlow.value.isNotEmpty() }
+            )
         }
     }
 

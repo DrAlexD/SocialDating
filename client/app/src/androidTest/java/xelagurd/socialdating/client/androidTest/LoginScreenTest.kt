@@ -26,6 +26,7 @@ import xelagurd.socialdating.client.data.model.DefaultDataProperties.PASSWORD_LE
 import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.screen.LoginScreenComponent
 import xelagurd.socialdating.client.ui.state.LoginUiState
+import xelagurd.socialdating.client.ui.state.RequestStatus
 
 @HiltAndroidTest
 class LoginScreenTest {
@@ -85,6 +86,21 @@ class LoginScreenTest {
             .onNodeWithTextId(R.string.error_length, PASSWORD_LENGTH_MIN, PASSWORD_LENGTH_MAX)
             .assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.login).checkDisabledButton()
+    }
+
+    @Test
+    fun loginScreen_loginLoading_disabledButtons() {
+        composeTestRule.setContentToScreen {
+            LoginScreenComponent(
+                loginUiState = LoginUiState(
+                    formData = loginFormData,
+                    actionRequestStatus = RequestStatus.LOADING
+                )
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.login).checkDisabledButton()
+        composeTestRule.onNodeWithTextId(R.string.offline_mode).checkDisabledButton()
     }
 
     @Test

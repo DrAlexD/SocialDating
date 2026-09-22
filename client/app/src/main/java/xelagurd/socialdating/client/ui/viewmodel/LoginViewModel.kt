@@ -56,6 +56,11 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    fun onNotificationShown() =
+        _uiState.update {
+            it.copy(notification = null)
+        }
+
     fun updateUiState(loginFormData: LoginFormData) =
         _uiState.update {
             it.copy(formData = loginFormData)
@@ -88,7 +93,9 @@ class LoginViewModel @Inject constructor(
             preferencesRepository.saveCurrentUserId(authResponse.user.id)
         }
 
-        _uiState.update { it.copy(actionRequestStatus = status) }
+        _uiState.update {
+            it.copy(actionRequestStatus = status, notification = status.notificationText())
+        }
     }
 
     fun initOfflineMode() { // FixMe: remove after adding server hosting

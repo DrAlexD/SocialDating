@@ -6,5 +6,6 @@ data class ProfileUiState(
     val userId: Int = -1,
     val anotherUserId: Int = -1,
     override val entity: User? = null,
-    override val dataRequestStatus: RequestStatus = RequestStatus.UNDEFINED
+    override val dataRequestStatus: RequestStatus = RequestStatus.UNDEFINED,
+    override val notification: String? = null
 ) : DataEntityUiState

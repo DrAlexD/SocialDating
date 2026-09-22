@@ -4,10 +4,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -35,7 +37,8 @@ fun CategoriesScreen(
     CategoriesScreenComponent(
         categoriesUiState = categoriesUiState,
         onCategoryClick = onCategoryClick,
-        refreshAction = categoriesViewModel::getCategories
+        refreshAction = categoriesViewModel::getCategories,
+        onNotificationShown = categoriesViewModel::onNotificationShown
     )
 }
 
@@ -44,9 +47,18 @@ fun CategoriesScreen(
 fun CategoriesScreenComponent(
     categoriesUiState: CategoriesUiState = CategoriesUiState(),
     onCategoryClick: (Int) -> Unit = {},
-    refreshAction: () -> Unit = {}
+    refreshAction: () -> Unit = {},
+    onNotificationShown: () -> Unit = {}
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    val notificationHostState = remember { SnackbarHostState() }
+
+    NotificationEffect(
+        notification = categoriesUiState.notification,
+        notificationHostState = notificationHostState,
+        onNotificationShown = onNotificationShown
+    )
 
     Scaffold(
         topBar = {
@@ -62,6 +74,7 @@ fun CategoriesScreenComponent(
                 currentTopLevelRoute = CategoriesDestination.topLevelRoute
             )
         },
+        snackbarHost = { AppNotificationHost(notificationHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         DataListComponent(

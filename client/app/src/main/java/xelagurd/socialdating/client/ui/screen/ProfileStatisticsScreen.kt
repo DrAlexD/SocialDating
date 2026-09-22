@@ -18,10 +18,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -63,7 +65,8 @@ fun ProfileStatisticsScreen(
     ProfileStatisticsScreenComponent(
         profileStatisticsUiState = profileStatisticsUiState,
         onNavigateUp = onNavigateUp,
-        refreshAction = profileStatisticsViewModel::getProfileStatistics
+        refreshAction = profileStatisticsViewModel::getProfileStatistics,
+        onNotificationShown = profileStatisticsViewModel::onNotificationShown
     )
 }
 
@@ -72,9 +75,18 @@ fun ProfileStatisticsScreen(
 fun ProfileStatisticsScreenComponent(
     profileStatisticsUiState: ProfileStatisticsUiState = ProfileStatisticsUiState(),
     onNavigateUp: () -> Unit = {},
-    refreshAction: () -> Unit = {}
+    refreshAction: () -> Unit = {},
+    onNotificationShown: () -> Unit = {}
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    val notificationHostState = remember { SnackbarHostState() }
+
+    NotificationEffect(
+        notification = profileStatisticsUiState.notification,
+        notificationHostState = notificationHostState,
+        onNotificationShown = onNotificationShown
+    )
 
     Scaffold(
         topBar = {
@@ -94,6 +106,7 @@ fun ProfileStatisticsScreenComponent(
                 }
             )
         },
+        snackbarHost = { AppNotificationHost(notificationHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         DataListComponent(

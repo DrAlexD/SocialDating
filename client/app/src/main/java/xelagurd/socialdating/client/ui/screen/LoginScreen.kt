@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -40,7 +42,8 @@ fun LoginScreen(
         onRegistrationClick = onRegistrationClick,
         onValueChange = loginViewModel::updateUiState,
         onLoginClick = loginViewModel::loginWithInput,
-        onOfflineModeClick = loginViewModel::initOfflineMode
+        onOfflineModeClick = loginViewModel::initOfflineMode,
+        onNotificationShown = loginViewModel::onNotificationShown
     )
 }
 
@@ -52,14 +55,24 @@ fun LoginScreenComponent(
     onRegistrationClick: () -> Unit = {},
     onValueChange: (LoginFormData) -> Unit = {},
     onLoginClick: () -> Unit = {},
-    onOfflineModeClick: () -> Unit = {}
+    onOfflineModeClick: () -> Unit = {},
+    onNotificationShown: () -> Unit = {}
 ) {
+    val notificationHostState = remember { SnackbarHostState() }
+
+    NotificationEffect(
+        notification = loginUiState.notification,
+        notificationHostState = notificationHostState,
+        onNotificationShown = onNotificationShown
+    )
+
     Scaffold(
         topBar = {
             AppTopBar(
                 title = stringResource(LoginDestination.titleRes)
             )
-        }
+        },
+        snackbarHost = { AppNotificationHost(notificationHostState) }
     ) { innerPadding ->
         ComponentWithActionRequestStatus(
             actionRequestStatus = loginUiState.actionRequestStatus,
@@ -121,6 +134,7 @@ private inline fun LoginDetailsBody(
             overrideModifier = Modifier
         )
         AppLargeTextCard(
+            isEnabled = actionRequestStatus.isAllowedActionRefresh(),
             text = stringResource(R.string.offline_mode),
             onClick = onOfflineModeClick
         )

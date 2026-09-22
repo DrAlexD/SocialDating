@@ -27,6 +27,7 @@ import xelagurd.socialdating.client.data.remote.repository.RemoteUsersRepository
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
 import xelagurd.socialdating.client.ui.state.ProfileUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
+import xelagurd.socialdating.client.ui.state.updateLoadingNotification
 import xelagurd.socialdating.client.ui.state.hideWhileLoading
 
 @HiltViewModel
@@ -43,18 +44,24 @@ class ProfileViewModel @Inject constructor(
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val notificationFlow = MutableStateFlow<String?>(null)
     private val userStateFlow = MutableStateFlow<User?>(null)
     private val userFlow = when (anotherUserId) {
         userId -> localUsersRepository.getUser(anotherUserId).distinctUntilChanged()
         else -> userStateFlow
     }
 
-    val uiState = combine(userFlow, dataRequestStatusFlow) { user, dataRequestStatus ->
+    val uiState = combine(
+        userFlow,
+        dataRequestStatusFlow,
+        notificationFlow
+    ) { user, dataRequestStatus, notification ->
         ProfileUiState(
             userId = userId,
             anotherUserId = anotherUserId,
             entity = user.hideWhileLoading(dataRequestStatus),
-            dataRequestStatus = dataRequestStatus
+            dataRequestStatus = dataRequestStatus,
+            notification = notification
         )
     }.stateIn(
         scope = viewModelScope,
@@ -64,7 +71,7 @@ class ProfileViewModel @Inject constructor(
 
     init {
         if (!isOfflineMode) { // FixMe: remove after adding server hosting
-            getUser()
+            loadUser(isRequestedByUser = false)
         } else if (anotherUserId != userId) {
             dataRequestStatusFlow.update { RequestStatus.LOADING }
             userStateFlow.update { FakeData.users[1] }
@@ -74,12 +81,21 @@ class ProfileViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            preferencesRepository.languageChanges.collect { getUser() }
+            preferencesRepository.languageChanges.collect { loadUser(isRequestedByUser = false) }
         }
     }
 
-    fun getUser() {
-        if (isOfflineMode) return // FixMe: remove after adding server hosting
+    fun onNotificationShown() = notificationFlow.update { null }
+
+    fun getUser() = loadUser(isRequestedByUser = true)
+
+    private fun loadUser(isRequestedByUser: Boolean) {
+        if (isOfflineMode) { // FixMe: remove after adding server hosting
+            if (isRequestedByUser) {
+                notificationFlow.update { offlineModeStatus(context).notificationText() }
+            }
+            return
+        }
 
         viewModelScope.launch {
             dataRequestStatusFlow.update { RequestStatus.LOADING }
@@ -96,6 +112,11 @@ class ProfileViewModel @Inject constructor(
             }
 
             dataRequestStatusFlow.update { status }
+            notificationFlow.updateLoadingNotification(
+                requestStatus = status,
+                isRequestedByUser = isRequestedByUser,
+                isDataExist = userFlow.first() != null
+            )
         }
     }
 }
