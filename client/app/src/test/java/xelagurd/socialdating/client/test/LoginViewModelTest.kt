@@ -16,6 +16,8 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNotNull
+import junit.framework.TestCase.assertNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Rule
@@ -102,6 +104,20 @@ class LoginViewModelTest {
         coVerify(exactly = 1) { accountManager.findCredentials() }
         coVerify(exactly = 1) { remoteUsersRepository.loginUser(any()) }
         confirmVerified(preferencesRepository, localUsersRepository, remoteUsersRepository, accountManager)
+    }
+
+    @Test
+    fun loginViewModel_loginWithoutInternet_notifiedAboutFailureUntilShown() = runTest {
+        mockDataWithoutInternet()
+
+        initViewModelAndLoginWithInput()
+        advanceUntilIdle()
+
+        assertNotNull(loginUiState.notification)
+
+        viewModel.onNotificationShown()
+
+        assertNull(loginUiState.notification)
     }
 
     @Test

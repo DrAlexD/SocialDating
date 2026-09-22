@@ -33,6 +33,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -86,6 +89,36 @@ fun AppLinearProgressIndicator(
         drawStopIndicator = {},
         modifier = modifier.testTag(stringResource(R.string.progress_indicator))
     )
+}
+
+@Composable
+fun AppNotificationHost(
+    notificationHostState: SnackbarHostState,
+    modifier: Modifier = Modifier
+) {
+    SnackbarHost(
+        hostState = notificationHostState,
+        modifier = modifier.testTag(stringResource(R.string.notification))
+    )
+}
+
+suspend fun SnackbarHostState.showNotification(text: String) =
+    showSnackbar(message = text, duration = SnackbarDuration.Short)
+
+@Composable
+fun NotificationEffect(
+    notification: String?,
+    notificationHostState: SnackbarHostState,
+    onNotificationShown: () -> Unit
+) {
+    val currentOnNotificationShown by rememberUpdatedState(onNotificationShown)
+
+    LaunchedEffect(notification) {
+        if (notification == null) return@LaunchedEffect
+
+        notificationHostState.showNotification(notification)
+        currentOnNotificationShown()
+    }
 }
 
 @Composable

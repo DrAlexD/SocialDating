@@ -31,6 +31,11 @@ class RegistrationViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(RegistrationUiState())
     val uiState = _uiState.asStateFlow()
 
+    fun onNotificationShown() =
+        _uiState.update {
+            it.copy(notification = null)
+        }
+
     fun updateUiState(registrationFormData: RegistrationFormData) =
         _uiState.update {
             it.copy(formData = registrationFormData)
@@ -55,7 +60,9 @@ class RegistrationViewModel @Inject constructor(
                 preferencesRepository.saveCurrentUserId(authResponse.user.id)
             }
 
-            _uiState.update { it.copy(actionRequestStatus = status) }
+            _uiState.update {
+                it.copy(actionRequestStatus = status, notification = status.notificationText())
+            }
         }
     }
 }

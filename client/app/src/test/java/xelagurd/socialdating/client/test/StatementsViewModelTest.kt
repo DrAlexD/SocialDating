@@ -446,7 +446,7 @@ class StatementsViewModelTest {
     }
 
     @Test
-    fun statementsViewModel_statementReactionWithInternet_deletedStatement() = runTest {
+    fun statementsViewModel_statementReactionWithInternet_deletedStatementAndSuccessStatus() = runTest {
         mockDataWithInternet()
         mockStatementReactionWithInternet()
 
@@ -457,12 +457,14 @@ class StatementsViewModelTest {
         viewModel.onStatementReactionClick(statement, StatementReactionType.FULL_MAINTAIN)
         advanceUntilIdle()
 
+        assertEquals(RequestStatus.SUCCESS, statementsUiState.actionRequestStatus)
+
         coVerify(exactly = 1) { remoteStatementsRepository.processStatementReaction(any()) }
         coVerify(exactly = 1) { localStatementsRepository.deleteStatement(statement) }
     }
 
     @Test
-    fun statementsViewModel_statementReactionWithoutInternet_notDeletedStatement() = runTest {
+    fun statementsViewModel_statementReactionWithoutInternet_notDeletedStatementAndErrorStatus() = runTest {
         mockDataWithInternet()
         mockStatementReactionWithoutInternet()
 
@@ -473,8 +475,34 @@ class StatementsViewModelTest {
         viewModel.onStatementReactionClick(statement, StatementReactionType.FULL_MAINTAIN)
         advanceUntilIdle()
 
+        assertEquals(RequestStatus.ERROR(), statementsUiState.actionRequestStatus)
+
         coVerify(exactly = 1) { remoteStatementsRepository.processStatementReaction(any()) }
         coVerify(exactly = 0) { localStatementsRepository.deleteStatement(any()) }
+    }
+
+    @Test
+    fun statementsViewModel_statementReactionInProgress_blockedReactedStatementOnly() = runTest {
+        mockDataWithInternet()
+        mockStatementReactionWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        coEvery { remoteStatementsRepository.processStatementReaction(any()) } coAnswers {
+            delay(requestDelayMillis)
+            Response.success(mockk())
+        }
+
+        viewModel.onStatementReactionClick(statement, StatementReactionType.FULL_MAINTAIN)
+        advanceTimeBy(requestDelayMillis / 2)
+
+        assertEquals(setOf(statement.id), statementsUiState.reactingStatementIds)
+
+        advanceUntilIdle()
+
+        assertEquals(setOf<Int>(), statementsUiState.reactingStatementIds)
     }
 
     @Test

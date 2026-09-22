@@ -7,5 +7,6 @@ data class StatementAddingUiState(
     override val entities: List<DefiningTheme> = listOf(),
     override val dataRequestStatus: RequestStatus = RequestStatus.UNDEFINED,
     override val formData: StatementFormData = StatementFormData(),
-    override val actionRequestStatus: RequestStatus = RequestStatus.UNDEFINED
+    override val actionRequestStatus: RequestStatus = RequestStatus.UNDEFINED,
+    override val notification: String? = null
 ) : FormUiState, DataListUiState

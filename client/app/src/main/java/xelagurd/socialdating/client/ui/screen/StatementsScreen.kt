@@ -12,11 +12,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -57,7 +59,8 @@ fun StatementsScreen(
         onLoadNextPage = statementsViewModel::getNextStatements,
         onStatementReactionClick = { statement, reactionType ->
             statementsViewModel.onStatementReactionClick(statement, reactionType)
-        }
+        },
+        onNotificationShown = statementsViewModel::onNotificationShown
     )
 }
 
@@ -70,9 +73,18 @@ fun StatementsScreenComponent(
     onNavigateUp: () -> Unit = {},
     refreshAction: () -> Unit = {},
     onLoadNextPage: () -> Unit = {},
-    onStatementReactionClick: (Statement, StatementReactionType) -> Unit = { _, _ -> null }
+    onStatementReactionClick: (Statement, StatementReactionType) -> Unit = { _, _ -> null },
+    onNotificationShown: () -> Unit = {}
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    val notificationHostState = remember { SnackbarHostState() }
+
+    NotificationEffect(
+        notification = statementsUiState.notification,
+        notificationHostState = notificationHostState,
+        onNotificationShown = onNotificationShown
+    )
 
     Scaffold(
         topBar = {
@@ -90,15 +102,18 @@ fun StatementsScreenComponent(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { onStatementAddingClick(statementsUiState.categoryId) },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_statement)
-                )
+            if (notificationHostState.currentSnackbarData == null) {
+                FloatingActionButton(
+                    onClick = { onStatementAddingClick(statementsUiState.categoryId) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add_statement)
+                    )
+                }
             }
         },
+        snackbarHost = { AppNotificationHost(notificationHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         PagedDataListComponent(
@@ -106,12 +121,15 @@ fun StatementsScreenComponent(
             onLoadNextPage = onLoadNextPage,
             contentPadding = innerPadding
         ) {
+            val statement = it as Statement
+
             AppEntityCard(
-                entity = it,
+                entity = statement,
                 onEntityClick = { } // TODO
             ) {
                 StatementCardContent(
-                    statement = it as Statement,
+                    statement = statement,
+                    isReactionEnabled = statement.id !in statementsUiState.reactingStatementIds,
                     onStatementReactionClick = onStatementReactionClick
                 )
             }
@@ -122,17 +140,20 @@ fun StatementsScreenComponent(
 @Composable
 private inline fun StatementCardContent(
     statement: Statement,
+    isReactionEnabled: Boolean,
     crossinline onStatementReactionClick: (Statement, StatementReactionType) -> Unit
 ) {
     AppLargeTitleText(text = statement.text)
     HorizontalDivider()
     ReactionsRow(
+        isReactionEnabled = isReactionEnabled,
         onStatementReactionClick = { onStatementReactionClick(statement, it) }
     )
 }
 
 @Composable
 private inline fun ReactionsRow(
+    isReactionEnabled: Boolean,
     crossinline onStatementReactionClick: (StatementReactionType) -> Unit
 ) {
     Row(
@@ -142,7 +163,7 @@ private inline fun ReactionsRow(
     ) {
         StatementReactionType.entries.forEachIndexed { index, statementReactionType ->
             IconButton(
-                enabled = true, // TODO: change to actionRequestStatus.isAllowedActionRefresh(isBlockOnSuccess = false)
+                enabled = isReactionEnabled,
                 onClick = { onStatementReactionClick(statementReactionType) }
             ) {
                 Icon(

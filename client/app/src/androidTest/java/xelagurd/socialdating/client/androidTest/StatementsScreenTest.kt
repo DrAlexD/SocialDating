@@ -11,6 +11,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
+import xelagurd.socialdating.client.AndroidTestUtils.checkDisabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
@@ -77,6 +78,36 @@ class StatementsScreenTest {
         composeTestRule.onNodeWithContentDescriptionId(R.string.full_no_maintain).checkEnabledButton()
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.add_statement).checkEnabledButton()
+    }
+
+    @Test
+    fun statementsScreen_reactingStatement_disabledStatementReactions() {
+        val statementsUiState = StatementsUiState(
+            entities = statements,
+            dataRequestStatus = RequestStatus.SUCCESS,
+            reactingStatementIds = setOf(statements[0].id)
+        )
+
+        setContentToStatementsBody(statementsUiState)
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).checkDisabledButton()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.part_maintain).checkDisabledButton()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.not_sure).checkDisabledButton()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.part_no_maintain).checkDisabledButton()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.full_no_maintain).checkDisabledButton()
+    }
+
+    @Test
+    fun statementsScreen_reactingAnotherStatement_enabledStatementReactions() {
+        val statementsUiState = StatementsUiState(
+            entities = statements,
+            dataRequestStatus = RequestStatus.SUCCESS,
+            reactingStatementIds = setOf(statements[0].id + 1)
+        )
+
+        setContentToStatementsBody(statementsUiState)
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).checkEnabledButton()
     }
 
     @Test

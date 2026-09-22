@@ -205,20 +205,22 @@ class AppComponentsTest {
     }
 
     @Test
-    fun componentWithActionRequestStatus_failureState_failureText() {
+    fun componentWithActionRequestStatus_failureState_onlyContent() {
         val isSuccess =
             setContentToComponentWithActionRequestStatus(RequestStatus.FAILURE(FakeData.FAILURE_TEXT))
 
-        composeTestRule.onNodeWithText(FakeData.FAILURE_TEXT).assertIsDisplayed()
+        composeTestRule.onNodeWithText(CONTENT_TEXT).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsNotDisplayed()
         assertFalse(isSuccess())
     }
 
     @Test
-    fun componentWithActionRequestStatus_errorState_errorText() {
+    fun componentWithActionRequestStatus_errorState_onlyContent() {
         val isSuccess =
             setContentToComponentWithActionRequestStatus(RequestStatus.ERROR(FakeData.ERROR_TEXT))
 
-        composeTestRule.onNodeWithText(FakeData.ERROR_TEXT).assertIsDisplayed()
+        composeTestRule.onNodeWithText(CONTENT_TEXT).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsNotDisplayed()
         assertFalse(isSuccess())
     }
 

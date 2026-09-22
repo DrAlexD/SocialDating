@@ -39,6 +39,7 @@ import xelagurd.socialdating.client.data.remote.repository.RemoteUserDefiningThe
 import xelagurd.socialdating.client.ui.navigation.ProfileStatisticsDestination
 import xelagurd.socialdating.client.ui.state.ProfileStatisticsUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
+import xelagurd.socialdating.client.ui.state.updateLoadingNotification
 import xelagurd.socialdating.client.ui.state.hideWhileLoading
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -74,16 +75,23 @@ class ProfileStatisticsViewModel @Inject constructor(
         else -> userDefiningThemesStateFlow
     }
     private val detailedSimilarUserFlow = MutableStateFlow<DetailedSimilarUserDto?>(null)
+    private val notificationFlow = MutableStateFlow<String?>(null)
 
-    val uiState = combine(userCategoriesFlow, userDefiningThemesFlow, detailedSimilarUserFlow, dataRequestStatusFlow)
-    { userCategories, userDefiningThemes, detailedSimilarUser, dataRequestStatus ->
+    val uiState = combine(
+        userCategoriesFlow,
+        userDefiningThemesFlow,
+        detailedSimilarUserFlow,
+        dataRequestStatusFlow,
+        notificationFlow
+    ) { userCategories, userDefiningThemes, detailedSimilarUser, dataRequestStatus, notification ->
         ProfileStatisticsUiState(
             userId = userId,
             anotherUserId = anotherUserId,
             entities = userCategories.hideWhileLoading(dataRequestStatus),
             entityIdToData = userDefiningThemes.groupBy { it.categoryId },
             entitiesMask = detailedSimilarUser,
-            dataRequestStatus = dataRequestStatus
+            dataRequestStatus = dataRequestStatus,
+            notification = notification
         )
     }.stateIn(
         scope = viewModelScope,
@@ -93,7 +101,7 @@ class ProfileStatisticsViewModel @Inject constructor(
 
     init {
         if (!isOfflineMode) { // FixMe: remove after adding server hosting
-            getProfileStatistics()
+            loadProfileStatistics(isCachedDataOutdated = false, isRequestedByUser = false)
         } else if (anotherUserId != userId) {
             dataRequestStatusFlow.update { RequestStatus.LOADING }
             detailedSimilarUserFlow.update { FakeData.detailedSimilarUser }
@@ -110,13 +118,23 @@ class ProfileStatisticsViewModel @Inject constructor(
 
         viewModelScope.launch {
             preferencesRepository.languageChanges.collect {
-                getProfileStatistics(isCachedDataOutdated = true)
+                loadProfileStatistics(isCachedDataOutdated = true, isRequestedByUser = false)
             }
         }
     }
 
-    fun getProfileStatistics(isCachedDataOutdated: Boolean = false) {
-        if (isOfflineMode) return // FixMe: remove after adding server hosting
+    fun onNotificationShown() = notificationFlow.update { null }
+
+    fun getProfileStatistics() =
+        loadProfileStatistics(isCachedDataOutdated = false, isRequestedByUser = true)
+
+    private fun loadProfileStatistics(isCachedDataOutdated: Boolean, isRequestedByUser: Boolean) {
+        if (isOfflineMode) { // FixMe: remove after adding server hosting
+            if (isRequestedByUser) {
+                notificationFlow.update { offlineModeStatus(context).notificationText() }
+            }
+            return
+        }
 
         viewModelScope.launch {
             var globalStatus: RequestStatus = RequestStatus.LOADING
@@ -224,6 +242,11 @@ class ProfileStatisticsViewModel @Inject constructor(
             }
 
             dataRequestStatusFlow.update { globalStatus }
+            notificationFlow.updateLoadingNotification(
+                requestStatus = globalStatus,
+                isRequestedByUser = isRequestedByUser,
+                isDataExist = userCategoriesFlow.first().isNotEmpty()
+            )
         }
     }
 }

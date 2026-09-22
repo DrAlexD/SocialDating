@@ -20,6 +20,8 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -214,6 +216,76 @@ class CategoriesViewModelTest {
         assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
 
         coVerify(exactly = 2) { remoteCategoriesRepository.getCategories() }
+    }
+
+    @Test
+    fun categoriesViewModel_withoutInternetAndCachedData_notifiedAboutFailure() = runTest {
+        mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertNotNull(categoriesUiState.notification)
+    }
+
+    @Test
+    fun categoriesViewModel_withoutInternetAndEmptyCachedData_notNotifiedAboutFailure() = runTest {
+        categoriesFlow.value = listOf()
+        mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertNull(categoriesUiState.notification)
+    }
+
+    @Test
+    fun categoriesViewModel_refreshWithoutInternetAndEmptyCachedData_notifiedAboutFailure() = runTest {
+        categoriesFlow.value = listOf()
+        mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.getCategories()
+        advanceUntilIdle()
+
+        assertNotNull(categoriesUiState.notification)
+    }
+
+    @Test
+    fun categoriesViewModel_shownNotification_clearedNotification() = runTest {
+        mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.onNotificationShown()
+        advanceUntilIdle()
+
+        assertNull(categoriesUiState.notification)
+    }
+
+    @Test
+    fun categoriesViewModel_refreshInOfflineMode_notifiedAboutOfflineModeOnlyByPress() = runTest {
+        every { preferencesRepository.isOfflineMode } returns flowOf(true)
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertNull(categoriesUiState.notification)
+
+        viewModel.getCategories()
+        advanceUntilIdle()
+
+        assertNotNull(categoriesUiState.notification)
+
+        coVerify(exactly = 0) { remoteCategoriesRepository.getCategories() }
     }
 
     private fun mockGeneralMethods() {

@@ -4,5 +4,6 @@ import xelagurd.socialdating.client.ui.form.LoginFormData
 
 data class LoginUiState(
     override val formData: LoginFormData = LoginFormData(),
-    override val actionRequestStatus: RequestStatus = RequestStatus.UNDEFINED
+    override val actionRequestStatus: RequestStatus = RequestStatus.UNDEFINED,
+    override val notification: String? = null
 ) : FormUiState

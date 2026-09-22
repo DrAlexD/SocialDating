@@ -3,7 +3,9 @@ package xelagurd.socialdating.client.ui.state
 import xelagurd.socialdating.client.data.model.DataEntity
 import xelagurd.socialdating.client.ui.form.FormData
 
-sealed interface RequestUiState
+sealed interface RequestUiState {
+    val notification: String?
+}
 
 sealed interface DataRequestUiState : RequestUiState {
     val dataRequestStatus: RequestStatus
