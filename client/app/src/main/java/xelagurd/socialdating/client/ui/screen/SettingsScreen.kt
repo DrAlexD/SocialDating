@@ -28,14 +28,12 @@ import xelagurd.socialdating.client.ui.viewmodel.SettingsViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onSuccessLogout: () -> Unit,
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val settingsUiState by settingsViewModel.uiState.collectAsState()
 
     SettingsScreenComponent(
         settingsUiState = settingsUiState,
-        onSuccessLogout = onSuccessLogout,
         onThemeModeSelect = settingsViewModel::updateThemeMode,
         onLanguageSelect = settingsViewModel::updateLanguage,
         onLogoutClick = settingsViewModel::logout,
@@ -47,7 +45,6 @@ fun SettingsScreen(
 @Composable
 fun SettingsScreenComponent(
     settingsUiState: SettingsUiState = SettingsUiState(),
-    onSuccessLogout: () -> Unit = {},
     onThemeModeSelect: (ThemeMode) -> Unit = {},
     onLanguageSelect: (AppLanguage) -> Unit = {},
     onLogoutClick: () -> Unit = {},
@@ -76,7 +73,6 @@ fun SettingsScreenComponent(
     ) { innerPadding ->
         ComponentWithActionRequestStatus(
             actionRequestStatus = settingsUiState.actionRequestStatus,
-            onSuccess = onSuccessLogout,
             contentPadding = innerPadding
         ) {
             SettingsDetailsBody(

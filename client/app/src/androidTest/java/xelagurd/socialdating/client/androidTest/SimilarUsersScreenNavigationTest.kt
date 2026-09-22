@@ -51,7 +51,7 @@ class SimilarUsersScreenNavigationTest {
 
         navController.assertCurrentRouteName(ProfileStatisticsDestination.routeWithArgs)
         navController.assertRouteInBackStack(SimilarUsersDestination.routeWithArgs)
-        //navController.assertBackStackDepth(5)
+        navController.assertBackStackDepth(4)
     }
 
     @Test
@@ -63,7 +63,7 @@ class SimilarUsersScreenNavigationTest {
         val currentRoute = navController.getCurrentRoute()
 
         assertEquals(previousRoute, currentRoute)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -74,7 +74,7 @@ class SimilarUsersScreenNavigationTest {
 
         navController.assertCurrentRouteName(CategoriesDestination.route)
         navController.assertRouteNotInBackStack(SimilarUsersDestination.routeWithArgs)
-        //navController.assertBackStackDepth(3)
+        navController.assertBackStackDepth(2)
     }
 
     @Test
@@ -85,7 +85,7 @@ class SimilarUsersScreenNavigationTest {
 
         navController.assertCurrentRouteName(ProfileDestination.routeWithArgs)
         navController.assertRouteNotInBackStack(SimilarUsersDestination.routeWithArgs)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -96,6 +96,6 @@ class SimilarUsersScreenNavigationTest {
 
         navController.assertCurrentRouteName(SettingsDestination.route)
         navController.assertRouteNotInBackStack(SimilarUsersDestination.routeWithArgs)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 }

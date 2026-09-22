@@ -43,7 +43,7 @@ class LoginScreenNavigationTest {
     fun appNavHost_withoutLoggedInUser_startScreenIsLogin() {
         navController.assertCurrentRouteName(LoginDestination.route)
         navController.assertRouteNotInBackStack(CategoriesDestination.route)
-        //navController.assertBackStackDepth(2)
+        navController.assertBackStackDepth(2)
     }
 
     @Test
@@ -57,7 +57,7 @@ class LoginScreenNavigationTest {
 
         navController.assertCurrentRouteName(CategoriesDestination.route)
         navController.assertRouteNotInBackStack(LoginDestination.route)
-        //navController.assertBackStackDepth(2)
+        navController.assertBackStackDepth(2)
     }
 
     @Test
@@ -66,7 +66,7 @@ class LoginScreenNavigationTest {
 
         navController.assertCurrentRouteName(CategoriesDestination.route)
         navController.assertRouteNotInBackStack(LoginDestination.route)
-        //navController.assertBackStackDepth(3)
+        navController.assertBackStackDepth(2)
     }
 
     @Test
@@ -75,6 +75,6 @@ class LoginScreenNavigationTest {
 
         navController.assertCurrentRouteName(RegistrationDestination.route)
         navController.assertRouteInBackStack(LoginDestination.route)
-        //navController.assertBackStackDepth(3)
+        navController.assertBackStackDepth(3)
     }
 }

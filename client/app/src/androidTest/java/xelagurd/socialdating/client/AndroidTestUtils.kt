@@ -58,7 +58,11 @@ object AndroidTestUtils {
         assertEquals(expectedRouteName, getCurrentRoute())
 
     fun NavController.assertBackStackDepth(expectedDepth: Int) =
-        assertEquals(expectedDepth, currentBackStack.value.size)
+        assertEquals(
+            currentBackStack.value.joinToString { it.destination.route ?: "graph" },
+            expectedDepth,
+            currentBackStack.value.size
+        )
 
     fun NavController.assertRouteInBackStack(expectedRouteName: String) =
         assertTrue(isRouteInBackStack(expectedRouteName))

@@ -11,10 +11,12 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -46,20 +48,38 @@ fun AppNavHost(
 
     initializeTopLevelDestinations(navController)
 
-    NavHost(
-        navController = navController,
-        startDestination = when (currentUserId) {
+    // the start destination belongs to the graph, so it is calculated once per navigation
+    // controller: a change of the current user navigates instead of recreating the graph,
+    // which would reset the back stack and duplicate the opened screen
+    val startDestination = remember(navController) {
+        when (currentUserId) {
             CURRENT_USER_ID_DEFAULT -> LoginDestination.route
             else -> CategoriesDestination.route
         }
+    }
+
+    // the only place which reacts to a logout, either by the button or by a rejected refresh token
+    LaunchedEffect(currentUserId) {
+        val currentRoute = navController.currentDestination?.route
+
+        if (currentUserId == CURRENT_USER_ID_DEFAULT && currentRoute != null &&
+            currentRoute != LoginDestination.route
+        ) {
+            navController.navigateWithClearedBackStack(LoginDestination.route)
+        }
+    }
+
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
     ) {
         composable(route = LoginDestination.route) {
             LoginScreen(
                 onSuccessLogin = {
-                    navController.navigate(CategoriesDestination.route)
+                    navController.navigateWithClearedBackStack(CategoriesDestination.route)
                 },
                 onRegistrationClick = {
-                    navController.navigate(RegistrationDestination.route)
+                    navController.navigateIfResumed(RegistrationDestination.route)
                 }
             )
         }
@@ -67,24 +87,20 @@ fun AppNavHost(
         composable(route = RegistrationDestination.route) {
             RegistrationScreen(
                 onSuccessRegistration = {
-                    navController.navigate(CategoriesDestination.route)
+                    navController.navigateWithClearedBackStack(CategoriesDestination.route)
                 },
-                onNavigateUp = { navController.navigateUp() }
+                onNavigateUp = { navController.navigateUpIfResumed() }
             )
         }
 
         composable(route = SettingsDestination.route) {
-            SettingsScreen(
-                onSuccessLogout = {
-                    navController.navigate(LoginDestination.route)
-                },
-            )
+            SettingsScreen()
         }
 
         composable(route = CategoriesDestination.route) {
             CategoriesScreen(
                 onCategoryClick = {
-                    navController.navigate("${StatementsDestination.route}/$currentUserId/$it")
+                    navController.navigateIfResumed("${StatementsDestination.route}/$currentUserId/$it")
                 }
             )
         }
@@ -102,12 +118,12 @@ fun AppNavHost(
         ) {
             StatementsScreen(
                 onStatementClick = {
-                    navController.navigate("${StatementDetailsDestination.route}/$it")
+                    navController.navigateIfResumed("${StatementDetailsDestination.route}/$it")
                 },
                 onStatementAddingClick = {
-                    navController.navigate("${StatementAddingDestination.route}/$currentUserId/$it")
+                    navController.navigateIfResumed("${StatementAddingDestination.route}/$currentUserId/$it")
                 },
-                onNavigateUp = { navController.navigateUp() }
+                onNavigateUp = { navController.navigateUpIfResumed() }
             )
         }
 
@@ -123,8 +139,8 @@ fun AppNavHost(
             )
         ) {
             StatementAddingScreen(
-                onSuccessStatementAdding = { navController.navigateUp() },
-                onNavigateUp = { navController.navigateUp() }
+                onSuccessStatementAdding = { navController.navigateUpIfResumed() },
+                onNavigateUp = { navController.navigateUpIfResumed() }
             )
         }
 
@@ -141,7 +157,7 @@ fun AppNavHost(
         ) {
             ProfileScreen(
                 onProfileStatisticsClick = {
-                    navController.navigate("${ProfileStatisticsDestination.route}/$currentUserId/$it")
+                    navController.navigateIfResumed("${ProfileStatisticsDestination.route}/$currentUserId/$it")
                 }
             )
         }
@@ -158,7 +174,7 @@ fun AppNavHost(
             )
         ) {
             ProfileStatisticsScreen(
-                onNavigateUp = { navController.navigateUp() }
+                onNavigateUp = { navController.navigateUpIfResumed() }
             )
         }
 
@@ -172,7 +188,7 @@ fun AppNavHost(
         ) {
             SimilarUsersScreen(
                 onSimilarUserClick = {
-                    navController.navigate("${ProfileStatisticsDestination.route}/$currentUserId/$it")
+                    navController.navigateIfResumed("${ProfileStatisticsDestination.route}/$currentUserId/$it")
                 }
             )
         }
@@ -190,10 +206,35 @@ fun AppNavHost(
     }
 }
 
+private fun NavHostController.navigateIfResumed(route: String) {
+    if (isCurrentScreenResumed()) {
+        navigate(route)
+    }
+}
+
+private fun NavHostController.navigateUpIfResumed() {
+    if (isCurrentScreenResumed()) {
+        navigateUp()
+    }
+}
+
+private fun NavHostController.navigateWithClearedBackStack(route: String) =
+    navigate(route) {
+        // the whole graph is popped, the start destination is not used, because it can be already
+        // removed from the back stack by a previous clearing navigation
+        popUpTo(graph.id) { inclusive = true }
+        launchSingleTop = true
+    }
+
+private fun NavHostController.isCurrentScreenResumed() =
+    currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED
+
 fun initializeTopLevelDestinations(navController: NavHostController) {
+    // the categories screen is the home of the logged in area, the start destination of the graph
+    // is not used here, because it stays the login screen when the app was started logged out
     val navigateTo = { route: String ->
         navController.navigate(route) {
-            popUpTo(navController.graph.findStartDestination().id) {
+            popUpTo(CategoriesDestination.route) {
                 saveState = true
             }
             launchSingleTop = true

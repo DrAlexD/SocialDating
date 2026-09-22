@@ -49,7 +49,7 @@ class CategoriesScreenNavigationTest {
 
         navController.assertCurrentRouteName(StatementsDestination.routeWithArgs)
         navController.assertRouteInBackStack(CategoriesDestination.route)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -60,7 +60,7 @@ class CategoriesScreenNavigationTest {
         val currentRoute = navController.getCurrentRoute()
 
         assertEquals(previousRoute, currentRoute)
-        //navController.assertBackStackDepth(3)
+        navController.assertBackStackDepth(2)
     }
 
     @Test
@@ -70,7 +70,7 @@ class CategoriesScreenNavigationTest {
 
         navController.assertCurrentRouteName(ProfileDestination.routeWithArgs)
         navController.assertRouteInBackStack(CategoriesDestination.route)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -80,7 +80,7 @@ class CategoriesScreenNavigationTest {
 
         navController.assertCurrentRouteName(SimilarUsersDestination.routeWithArgs)
         navController.assertRouteInBackStack(CategoriesDestination.route)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -90,6 +90,6 @@ class CategoriesScreenNavigationTest {
 
         navController.assertCurrentRouteName(SettingsDestination.route)
         navController.assertRouteInBackStack(CategoriesDestination.route)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 }

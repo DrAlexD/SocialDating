@@ -51,7 +51,7 @@ class SettingsScreenNavigationTest {
 
         navController.assertCurrentRouteName(LoginDestination.route)
         navController.assertRouteNotInBackStack(SettingsDestination.route)
-        //navController.assertBackStackDepth(2)
+        navController.assertBackStackDepth(2)
     }
 
     @Test
@@ -63,7 +63,7 @@ class SettingsScreenNavigationTest {
         val currentRoute = navController.getCurrentRoute()
 
         assertEquals(previousRoute, currentRoute)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -74,7 +74,7 @@ class SettingsScreenNavigationTest {
 
         navController.assertCurrentRouteName(ProfileDestination.routeWithArgs)
         navController.assertRouteNotInBackStack(SettingsDestination.route)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -85,7 +85,7 @@ class SettingsScreenNavigationTest {
 
         navController.assertCurrentRouteName(SimilarUsersDestination.routeWithArgs)
         navController.assertRouteNotInBackStack(SettingsDestination.route)
-        //navController.assertBackStackDepth(4)
+        navController.assertBackStackDepth(3)
     }
 
     @Test
@@ -96,6 +96,6 @@ class SettingsScreenNavigationTest {
 
         navController.assertCurrentRouteName(CategoriesDestination.route)
         navController.assertRouteNotInBackStack(SettingsDestination.route)
-        //navController.assertBackStackDepth(3)
+        navController.assertBackStackDepth(2)
     }
 }

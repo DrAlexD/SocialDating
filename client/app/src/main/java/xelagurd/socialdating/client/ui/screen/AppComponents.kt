@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -220,7 +223,7 @@ private fun DataRequestStatusComponent(
 @Composable
 fun ComponentWithActionRequestStatus(
     actionRequestStatus: RequestStatus,
-    onSuccess: () -> Unit,
+    onSuccess: () -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable () -> Unit
 ) {
@@ -238,10 +241,18 @@ fun ComponentWithActionRequestStatus(
 }
 
 @Composable
-private inline fun ActionRequestStatusComponent(
+private fun ActionRequestStatusComponent(
     actionRequestStatus: RequestStatus,
     onSuccess: () -> Unit
 ) {
+    val currentOnSuccess by rememberUpdatedState(onSuccess)
+
+    // a success is a one-time event, so it is handled by an effect instead of the composition,
+    // which would repeat the action on every recomposition with the same status
+    LaunchedEffect(actionRequestStatus) {
+        if (actionRequestStatus == RequestStatus.SUCCESS) currentOnSuccess()
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
@@ -249,9 +260,9 @@ private inline fun ActionRequestStatusComponent(
     ) {
         when (actionRequestStatus) {
             RequestStatus.LOADING -> AppLoadingIndicator()
-            RequestStatus.SUCCESS -> onSuccess()
-            // the failed statuses are displayed by the notification
-            RequestStatus.UNDEFINED, is RequestStatus.FAILURE, is RequestStatus.ERROR -> {}
+            // the success is handled by the effect, the failed statuses by the notification
+            RequestStatus.SUCCESS, RequestStatus.UNDEFINED, is RequestStatus.FAILURE,
+            is RequestStatus.ERROR -> {}
         }
     }
 }

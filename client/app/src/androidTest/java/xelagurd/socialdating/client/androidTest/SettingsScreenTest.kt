@@ -125,7 +125,6 @@ class SettingsScreenTest {
         composeTestRule.setContentToScreen {
             SettingsScreenComponent(
                 settingsUiState = SettingsUiState(),
-                onSuccessLogout = {},
                 onLogoutClick = { isLogoutClicked = true }
             )
         }
