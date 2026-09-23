@@ -55,7 +55,7 @@ fun SimilarUsersScreen(
     SimilarUsersScreenComponent(
         similarUsersUiState = similarUsersUiState,
         onSimilarUserClick = onSimilarUserClick,
-        refreshAction = similarUsersViewModel::getSimilarUsers,
+        onRefresh = similarUsersViewModel::getSimilarUsers,
         onLoadNextPage = similarUsersViewModel::getNextSimilarUsers,
         onNotificationShown = similarUsersViewModel::onNotificationShown
     )
@@ -66,7 +66,7 @@ fun SimilarUsersScreen(
 fun SimilarUsersScreenComponent(
     similarUsersUiState: SimilarUsersUiState = SimilarUsersUiState(),
     onSimilarUserClick: (Int) -> Unit = {},
-    refreshAction: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     onLoadNextPage: () -> Unit = {},
     onNotificationShown: () -> Unit = {}
 ) {
@@ -85,7 +85,6 @@ fun SimilarUsersScreenComponent(
             AppTopBar(
                 title = stringResource(SimilarUsersDestination.titleRes),
                 dataRequestStatus = similarUsersUiState.dataRequestStatus,
-                refreshAction = refreshAction,
                 scrollBehavior = scrollBehavior
             )
         },
@@ -100,6 +99,7 @@ fun SimilarUsersScreenComponent(
         PagedDataListComponent(
             pagedDataListUiState = similarUsersUiState,
             onLoadNextPage = onLoadNextPage,
+            onRefresh = onRefresh,
             contentPadding = innerPadding,
             prefetchCount = SIMILAR_USERS_NEXT_PAGE_PREFETCH_COUNT
         ) {

@@ -16,6 +16,7 @@ import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
+import xelagurd.socialdating.client.AndroidTestUtils.performPullToRefresh
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.HiltTestActivity
@@ -49,7 +50,7 @@ class StatementsScreenTest {
             StatementsScreenComponent()
         }
 
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
     }
 
     @Test
@@ -58,7 +59,7 @@ class StatementsScreenTest {
             StatementsScreenComponent(statementsUiState = StatementsUiState())
         }
 
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
     }
 
     @Test
@@ -176,7 +177,7 @@ class StatementsScreenTest {
         var reaction: Pair<Statement, StatementReactionType>? = null
         var addingCategoryId = -1
         var isNavigateUpClicked = false
-        var isRefreshClicked = false
+        var isRefreshed = false
         val statementsUiState = StatementsUiState(
             categoryId = FakeData.mainCategory.id,
             entities = statements,
@@ -189,7 +190,7 @@ class StatementsScreenTest {
                 onStatementClick = {},
                 onStatementAddingClick = { addingCategoryId = it },
                 onNavigateUp = { isNavigateUpClicked = true },
-                refreshAction = { isRefreshClicked = true },
+                onRefresh = { isRefreshed = true },
                 onStatementReactionClick = { statement, reactionType ->
                     reaction = statement to reactionType
                 }
@@ -207,8 +208,8 @@ class StatementsScreenTest {
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).checkButtonAndClick()
         assertTrue(isNavigateUpClicked)
 
-        composeTestRule.onNodeWithTextId(R.string.online).checkButtonAndClick()
-        assertTrue(isRefreshClicked)
+        composeTestRule.performPullToRefresh()
+        assertTrue(isRefreshed)
     }
 
     private fun setContentToStatementsBody(statementsUiState: StatementsUiState) {

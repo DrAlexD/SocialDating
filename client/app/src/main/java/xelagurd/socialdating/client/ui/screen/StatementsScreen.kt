@@ -55,7 +55,7 @@ fun StatementsScreen(
         onStatementClick = onStatementClick,
         onStatementAddingClick = onStatementAddingClick,
         onNavigateUp = onNavigateUp,
-        refreshAction = statementsViewModel::getStatements,
+        onRefresh = statementsViewModel::getStatements,
         onLoadNextPage = statementsViewModel::getNextStatements,
         onStatementReactionClick = { statement, reactionType ->
             statementsViewModel.onStatementReactionClick(statement, reactionType)
@@ -71,7 +71,7 @@ fun StatementsScreenComponent(
     onStatementClick: (Int) -> Unit = {},
     onStatementAddingClick: (Int) -> Unit = {},
     onNavigateUp: () -> Unit = {},
-    refreshAction: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     onLoadNextPage: () -> Unit = {},
     onStatementReactionClick: (Statement, StatementReactionType) -> Unit = { _, _ -> null },
     onNotificationShown: () -> Unit = {}
@@ -91,7 +91,6 @@ fun StatementsScreenComponent(
             AppTopBar(
                 title = stringResource(StatementsDestination.titleRes),
                 dataRequestStatus = statementsUiState.dataRequestStatus,
-                refreshAction = refreshAction,
                 navigateUp = onNavigateUp,
                 scrollBehavior = scrollBehavior
             )
@@ -119,6 +118,7 @@ fun StatementsScreenComponent(
         PagedDataListComponent(
             pagedDataListUiState = statementsUiState,
             onLoadNextPage = onLoadNextPage,
+            onRefresh = onRefresh,
             contentPadding = innerPadding
         ) {
             val statement = it as Statement

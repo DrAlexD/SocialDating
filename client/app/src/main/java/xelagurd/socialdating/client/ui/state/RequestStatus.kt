@@ -11,8 +11,11 @@ sealed class RequestStatus {
     data class ERROR(val errorText: String = "") : RequestStatus()
     data object UNDEFINED : RequestStatus()
 
+    fun isDataLoading() =
+        this is LOADING || this is UNDEFINED
+
     fun isAllowedDataRefresh() =
-        this !is LOADING && this !is UNDEFINED
+        !isDataLoading()
 
     fun isAllowedActionRefresh() =
         this !is LOADING && this !is SUCCESS

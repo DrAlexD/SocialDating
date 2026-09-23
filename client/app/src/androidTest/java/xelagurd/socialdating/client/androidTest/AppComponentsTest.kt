@@ -17,6 +17,7 @@ import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextIdWithColon
+import xelagurd.socialdating.client.AndroidTestUtils.performPullToRefresh
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
 import xelagurd.socialdating.client.HiltTestActivity
 import xelagurd.socialdating.client.R
@@ -115,6 +116,56 @@ class AppComponentsTest {
     }
 
     @Test
+    fun dataListComponent_loadingStateAndRefreshAction_refreshIndicator() {
+        setContentToRefreshableDataListComponent(
+            CategoriesUiState(dataRequestStatus = RequestStatus.LOADING)
+        )
+
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun dataListComponent_pullToRefreshWithData_calledRefreshAction() {
+        var isRefreshed = false
+
+        setContentToRefreshableDataListComponent(
+            CategoriesUiState(entities = categories, dataRequestStatus = RequestStatus.SUCCESS)
+        ) { isRefreshed = true }
+
+        composeTestRule.performPullToRefresh()
+
+        assertTrue(isRefreshed)
+    }
+
+    @Test
+    fun dataListComponent_pullToRefreshWithoutData_calledRefreshAction() {
+        var isRefreshed = false
+
+        setContentToRefreshableDataListComponent(
+            CategoriesUiState(dataRequestStatus = RequestStatus.ERROR(FakeData.ERROR_TEXT))
+        ) { isRefreshed = true }
+
+        composeTestRule.onNodeWithText(FakeData.ERROR_TEXT).assertIsDisplayed()
+        composeTestRule.performPullToRefresh()
+
+        assertTrue(isRefreshed)
+    }
+
+    @Test
+    fun dataListComponent_pullToRefreshWhileLoading_notCalledRefreshAction() {
+        var isRefreshed = false
+
+        setContentToRefreshableDataListComponent(
+            CategoriesUiState(entities = categories, dataRequestStatus = RequestStatus.LOADING)
+        ) { isRefreshed = true }
+
+        composeTestRule.performPullToRefresh()
+
+        assertFalse(isRefreshed)
+    }
+
+    @Test
     fun dataEntityComponent_successStateAndEmptyData_noDataText() {
         setContentToDataEntityComponent(ProfileUiState(dataRequestStatus = RequestStatus.SUCCESS))
 
@@ -131,6 +182,27 @@ class AppComponentsTest {
             composeTestRule.onNodeWithText(user.username).assertIsDisplayed()
             composeTestRule.onNodeWithTagId(R.string.loading).assertIsNotDisplayed()
         }
+    }
+
+    @Test
+    fun dataEntityComponent_pullToRefreshWithData_calledRefreshAction() {
+        var isRefreshed = false
+
+        composeTestRule.setContentToScreen {
+            DataEntityComponent(
+                dataEntityUiState = ProfileUiState(
+                    entity = user,
+                    dataRequestStatus = RequestStatus.SUCCESS
+                ),
+                onRefresh = { isRefreshed = true }
+            ) {
+                AppLargeTitleText(text = (it as User).username)
+            }
+        }
+
+        composeTestRule.performPullToRefresh()
+
+        assertTrue(isRefreshed)
     }
 
     @Test
@@ -235,6 +307,20 @@ class AppComponentsTest {
     private fun setContentToDataListComponent(categoriesUiState: CategoriesUiState) {
         composeTestRule.setContentToScreen {
             DataListComponent(dataListUiState = categoriesUiState) {
+                AppLargeTitleText(text = (it as Category).name)
+            }
+        }
+    }
+
+    private fun setContentToRefreshableDataListComponent(
+        categoriesUiState: CategoriesUiState,
+        onRefresh: () -> Unit = {}
+    ) {
+        composeTestRule.setContentToScreen {
+            DataListComponent(
+                dataListUiState = categoriesUiState,
+                onRefresh = onRefresh
+            ) {
                 AppLargeTitleText(text = (it as Category).name)
             }
         }

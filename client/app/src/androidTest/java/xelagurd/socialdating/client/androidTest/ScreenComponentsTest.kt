@@ -20,9 +20,11 @@ import xelagurd.socialdating.client.AndroidTestUtils.INPUT_TEXT
 import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.checkDisabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.checkTextFieldAndInput
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextIdWithColon
+import xelagurd.socialdating.client.AndroidTestUtils.performPullToRefresh
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
 import xelagurd.socialdating.client.HiltTestActivity
 import xelagurd.socialdating.client.R
@@ -35,8 +37,10 @@ import xelagurd.socialdating.client.ui.form.FormFieldError
 import xelagurd.socialdating.client.ui.screen.AppDataChoosingList
 import xelagurd.socialdating.client.ui.screen.AppDataList
 import xelagurd.socialdating.client.ui.screen.AppDataMultiChoosingList
+import xelagurd.socialdating.client.ui.screen.AppDataRequestStatusIndicator
 import xelagurd.socialdating.client.ui.screen.AppEntityCard
 import xelagurd.socialdating.client.ui.screen.AppExpandedEntityCard
+import xelagurd.socialdating.client.ui.screen.AppFullSizeScrollableContainer
 import xelagurd.socialdating.client.ui.screen.AppLargeBodyText
 import xelagurd.socialdating.client.ui.screen.AppLargeTextCard
 import xelagurd.socialdating.client.ui.screen.AppLargeTitleText
@@ -46,6 +50,7 @@ import xelagurd.socialdating.client.ui.screen.AppMediumBodyText
 import xelagurd.socialdating.client.ui.screen.AppMediumTextCard
 import xelagurd.socialdating.client.ui.screen.AppMediumTitleText
 import xelagurd.socialdating.client.ui.screen.AppNotificationHost
+import xelagurd.socialdating.client.ui.screen.AppPullToRefreshContainer
 import xelagurd.socialdating.client.ui.screen.AppRadioGroup
 import xelagurd.socialdating.client.ui.screen.AppSmallBodyText
 import xelagurd.socialdating.client.ui.screen.AppSmallTitleText
@@ -53,6 +58,7 @@ import xelagurd.socialdating.client.ui.screen.AppTextField
 import xelagurd.socialdating.client.ui.screen.AppYesNoRadioGroup
 import xelagurd.socialdating.client.ui.screen.NotificationEffect
 import xelagurd.socialdating.client.ui.screen.stringResourceWithColon
+import xelagurd.socialdating.client.ui.state.RequestStatus
 
 @HiltAndroidTest
 class ScreenComponentsTest {
@@ -76,6 +82,62 @@ class ScreenComponentsTest {
         }
 
         composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+    }
+
+    @Test
+    fun appDataRequestStatusIndicator_anyStatus_displayedStatusDescription() {
+        val statusesWithDescriptions = mapOf(
+            RequestStatus.SUCCESS to R.string.online,
+            RequestStatus.LOADING to R.string.loading,
+            RequestStatus.UNDEFINED to R.string.loading,
+            RequestStatus.FAILURE() to R.string.offline,
+            RequestStatus.ERROR() to R.string.offline
+        )
+
+        statusesWithDescriptions.forEach { (dataRequestStatus, descriptionRes) ->
+            composeTestRule.setContentToScreen {
+                AppDataRequestStatusIndicator(dataRequestStatus = dataRequestStatus)
+            }
+
+            composeTestRule.onNodeWithContentDescriptionId(descriptionRes).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun appPullToRefreshContainer_pullToRefresh_calledRefreshAction() {
+        var isRefreshed = false
+
+        composeTestRule.setContentToScreen {
+            AppPullToRefreshContainer(
+                isRefreshing = false,
+                onRefresh = { isRefreshed = true }
+            ) {
+                AppFullSizeScrollableContainer {
+                    AppLargeTitleText(text = LARGE_TITLE_TEXT)
+                }
+            }
+        }
+
+        composeTestRule.onNodeWithText(LARGE_TITLE_TEXT).assertIsDisplayed()
+        composeTestRule.performPullToRefresh()
+
+        assertTrue(isRefreshed)
+    }
+
+    @Test
+    fun appPullToRefreshContainer_refreshingState_displayedRefreshIndicator() {
+        composeTestRule.setContentToScreen {
+            AppPullToRefreshContainer(
+                isRefreshing = true,
+                onRefresh = {}
+            ) {
+                AppFullSizeScrollableContainer {
+                    AppLargeTitleText(text = LARGE_TITLE_TEXT)
+                }
+            }
+        }
+
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
     }
 
     @Test

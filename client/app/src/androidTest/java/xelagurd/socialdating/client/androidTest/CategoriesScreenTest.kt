@@ -13,6 +13,7 @@ import org.junit.Test
 import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
+import xelagurd.socialdating.client.AndroidTestUtils.performPullToRefresh
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.HiltTestActivity
@@ -43,7 +44,7 @@ class CategoriesScreenTest {
             CategoriesScreenComponent()
         }
 
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
     }
 
     @Test
@@ -52,7 +53,7 @@ class CategoriesScreenTest {
             CategoriesScreenComponent(categoriesUiState = CategoriesUiState())
         }
 
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
     }
 
     @Test
@@ -71,7 +72,7 @@ class CategoriesScreenTest {
     @Test
     fun categoriesScreen_allActions_calledAllActions() {
         var clickedCategoryId = -1
-        var isRefreshClicked = false
+        var isRefreshed = false
         val categoriesUiState = CategoriesUiState(
             entities = categories,
             dataRequestStatus = RequestStatus.SUCCESS
@@ -81,15 +82,15 @@ class CategoriesScreenTest {
             CategoriesScreenComponent(
                 categoriesUiState = categoriesUiState,
                 onCategoryClick = { clickedCategoryId = it },
-                refreshAction = { isRefreshClicked = true }
+                onRefresh = { isRefreshed = true }
             )
         }
 
         composeTestRule.onNodeWithText(categories[0].name).checkButtonAndClick()
         assertEquals(categories[0].id, clickedCategoryId)
 
-        composeTestRule.onNodeWithTextId(R.string.online).checkButtonAndClick()
-        assertTrue(isRefreshClicked)
+        composeTestRule.performPullToRefresh()
+        assertTrue(isRefreshed)
     }
 
     private fun setContentToCategoriesBody(categoriesUiState: CategoriesUiState) {
