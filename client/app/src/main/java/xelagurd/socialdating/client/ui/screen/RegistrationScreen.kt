@@ -22,7 +22,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
@@ -204,31 +203,22 @@ private inline fun RegistrationDetailsBody(
                 }
             }
         }
-        Row(
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            AppTextField(
-                value = registrationFormData.password,
-                onValueChange = { onValueChange(registrationFormData.copy(password = it)) },
-                label = stringResource(R.string.password),
-                overrideModifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_4dp))
-                    .width(TextFieldDefaults.MinWidth / 2 + 35.dp),
-                isPassword = true,
-                error = registrationFormData.passwordError
-            )
-            AppTextField(
-                value = registrationFormData.repeatedPassword,
-                onValueChange = { onValueChange(registrationFormData.copy(repeatedPassword = it)) },
-                label = stringResource(R.string.repeat_password),
-                overrideModifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_4dp))
-                    .width(TextFieldDefaults.MinWidth / 2 + 35.dp),
-                isPassword = true,
-                error = registrationFormData.repeatedPasswordError
-            )
-        }
+        AppTextField(
+            value = registrationFormData.password,
+            onValueChange = { onValueChange(registrationFormData.copy(password = it)) },
+            label = stringResource(R.string.password),
+            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp)),
+            isPassword = true,
+            error = registrationFormData.passwordError
+        )
+        AppTextField(
+            value = registrationFormData.repeatedPassword,
+            onValueChange = { onValueChange(registrationFormData.copy(repeatedPassword = it)) },
+            label = stringResource(R.string.repeat_password),
+            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp)),
+            isPassword = true,
+            error = registrationFormData.repeatedPasswordError
+        )
         AppLargeTextCard(
             isEnabled = registrationFormData.isValid && actionRequestStatus.isAllowedActionRefresh(),
             text = stringResource(R.string.register),
