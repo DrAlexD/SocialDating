@@ -44,7 +44,7 @@ fun ProfileScreen(
     ProfileScreenComponent(
         profileUiState = profileUiState,
         onProfileStatisticsClick = onProfileStatisticsClick,
-        refreshAction = profileViewModel::getUser,
+        onRefresh = profileViewModel::getUser,
         onNotificationShown = profileViewModel::onNotificationShown
     )
 }
@@ -54,7 +54,7 @@ fun ProfileScreen(
 fun ProfileScreenComponent(
     profileUiState: ProfileUiState = ProfileUiState(),
     onProfileStatisticsClick: (Int) -> Unit = {},
-    refreshAction: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     onNotificationShown: () -> Unit = {}
 ) {
     val notificationHostState = remember { SnackbarHostState() }
@@ -69,8 +69,7 @@ fun ProfileScreenComponent(
         topBar = {
             AppTopBar(
                 title = stringResource(ProfileDestination.titleRes),
-                dataRequestStatus = profileUiState.dataRequestStatus,
-                refreshAction = refreshAction
+                dataRequestStatus = profileUiState.dataRequestStatus
             )
         },
         bottomBar = {
@@ -85,6 +84,7 @@ fun ProfileScreenComponent(
     ) { innerPadding ->
         DataEntityComponent(
             dataEntityUiState = profileUiState,
+            onRefresh = onRefresh,
             contentPadding = innerPadding
         ) {
             ProfileDetailsBody(

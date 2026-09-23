@@ -16,6 +16,7 @@ import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
+import xelagurd.socialdating.client.AndroidTestUtils.performPullToRefresh
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.HiltTestActivity
@@ -55,7 +56,7 @@ class ProfileStatisticsScreenTest {
             ProfileStatisticsScreenComponent()
         }
 
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
     }
 
     @Test
@@ -64,7 +65,7 @@ class ProfileStatisticsScreenTest {
             ProfileStatisticsScreenComponent(profileStatisticsUiState = ProfileStatisticsUiState())
         }
 
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
     }
 
     @Test
@@ -167,7 +168,7 @@ class ProfileStatisticsScreenTest {
     @Test
     fun profileStatisticsScreen_allActions_calledAllActions() {
         var isNavigateUpClicked = false
-        var isRefreshClicked = false
+        var isRefreshed = false
         val profileStatisticsUiState = ProfileStatisticsUiState(
             entities = listOf(userCategoryData),
             entityIdToData = mapOf(userCategoryData.categoryId to listOf(userDefiningThemeData)),
@@ -178,15 +179,15 @@ class ProfileStatisticsScreenTest {
             ProfileStatisticsScreenComponent(
                 profileStatisticsUiState = profileStatisticsUiState,
                 onNavigateUp = { isNavigateUpClicked = true },
-                refreshAction = { isRefreshClicked = true }
+                onRefresh = { isRefreshed = true }
             )
         }
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).checkButtonAndClick()
         assertTrue(isNavigateUpClicked)
 
-        composeTestRule.onNodeWithTextId(R.string.online).checkButtonAndClick()
-        assertTrue(isRefreshClicked)
+        composeTestRule.performPullToRefresh()
+        assertTrue(isRefreshed)
     }
 
     private fun assertSimilarityDataIsDisplayed(categoryIndex: Int) {

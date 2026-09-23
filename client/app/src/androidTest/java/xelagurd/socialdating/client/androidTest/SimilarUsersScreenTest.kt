@@ -14,6 +14,7 @@ import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
+import xelagurd.socialdating.client.AndroidTestUtils.performPullToRefresh
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.HiltTestActivity
@@ -46,7 +47,7 @@ class SimilarUsersScreenTest {
             SimilarUsersScreenComponent()
         }
 
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
     }
 
     @Test
@@ -55,7 +56,7 @@ class SimilarUsersScreenTest {
             SimilarUsersScreenComponent(similarUsersUiState = SimilarUsersUiState())
         }
 
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
     }
 
     @Test
@@ -130,7 +131,7 @@ class SimilarUsersScreenTest {
     @Test
     fun similarUsersScreen_allActions_calledAllActions() {
         var clickedSimilarUserId = -1
-        var isRefreshClicked = false
+        var isRefreshed = false
         val similarUsersUiState = SimilarUsersUiState(
             entities = similarUsers,
             dataRequestStatus = RequestStatus.SUCCESS
@@ -140,15 +141,15 @@ class SimilarUsersScreenTest {
             SimilarUsersScreenComponent(
                 similarUsersUiState = similarUsersUiState,
                 onSimilarUserClick = { clickedSimilarUserId = it },
-                refreshAction = { isRefreshClicked = true }
+                onRefresh = { isRefreshed = true }
             )
         }
 
         composeTestRule.onNodeWithText("${similarUser.name}, ${similarUser.age}").checkButtonAndClick()
         assertEquals(similarUser.id, clickedSimilarUserId)
 
-        composeTestRule.onNodeWithTextId(R.string.online).checkButtonAndClick()
-        assertTrue(isRefreshClicked)
+        composeTestRule.performPullToRefresh()
+        assertTrue(isRefreshed)
     }
 
     private fun setContentToSimilarUsersBody(similarUsersUiState: SimilarUsersUiState) {

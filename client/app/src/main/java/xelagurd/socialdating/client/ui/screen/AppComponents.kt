@@ -32,17 +32,20 @@ import xelagurd.socialdating.client.ui.state.RequestStatus
 @Composable
 fun DataListComponent(
     dataListUiState: DataListUiState,
+    onRefresh: (() -> Unit)? = null,
     listModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     card: @Composable (DataEntity) -> Unit
 ) {
     DataComponent(
         dataRequestUiState = dataListUiState,
+        onRefresh = onRefresh,
+        contentPadding = contentPadding,
         statusModifier = Modifier.fillMaxSize()
     ) {
         AppDataList(
             entities = dataListUiState.entities,
-            modifier = listModifier,
+            modifier = listModifier.fillMaxSize(),
             contentPadding = contentPadding,
             card = card
         )
@@ -53,6 +56,7 @@ fun DataListComponent(
 fun PagedDataListComponent(
     pagedDataListUiState: PagedDataListUiState,
     onLoadNextPage: () -> Unit,
+    onRefresh: (() -> Unit)? = null,
     listModifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     prefetchCount: Int = NEXT_PAGE_PREFETCH_COUNT,
@@ -60,6 +64,8 @@ fun PagedDataListComponent(
 ) {
     DataComponent(
         dataRequestUiState = pagedDataListUiState,
+        onRefresh = onRefresh,
+        contentPadding = contentPadding,
         statusModifier = Modifier.fillMaxSize()
     ) {
         val listState = rememberLazyListState()
@@ -74,7 +80,7 @@ fun PagedDataListComponent(
 
         AppDataList(
             entities = pagedDataListUiState.entities,
-            modifier = listModifier,
+            modifier = listModifier.fillMaxSize(),
             contentPadding = contentPadding,
             listState = listState,
             footer = {
@@ -168,33 +174,63 @@ fun DataMultiChoosingListComponent(
 @Composable
 fun DataEntityComponent(
     dataEntityUiState: DataEntityUiState,
+    onRefresh: (() -> Unit)? = null,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable (DataEntity) -> Unit
 ) {
     DataComponent(
         dataRequestUiState = dataEntityUiState,
+        onRefresh = onRefresh,
+        contentPadding = contentPadding,
         statusModifier = Modifier.fillMaxSize()
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-            content = { content(dataEntityUiState.entity!!) }
-        )
+        // the entity is not scrollable by itself, so it is placed into a scrollable container
+        // to be refreshable by the gesture
+        AppFullSizeScrollableContainer(contentPadding = contentPadding) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize(),
+                content = { content(dataEntityUiState.entity!!) }
+            )
+        }
     }
 }
 
 @Composable
 private inline fun DataComponent(
     dataRequestUiState: DataRequestUiState,
+    noinline onRefresh: (() -> Unit)? = null,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     statusModifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    crossinline content: @Composable () -> Unit
 ) {
-    if (dataRequestUiState.isDataExist()) {
-        content()
-    } else {
-        DataRequestStatusComponent(
+    when {
+        onRefresh != null -> AppPullToRefreshContainer(
+            isRefreshing = dataRequestUiState.dataRequestStatus.isDataLoading(),
+            onRefresh = {
+                if (dataRequestUiState.dataRequestStatus.isAllowedDataRefresh()) onRefresh()
+            },
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = contentPadding
+        ) {
+            if (dataRequestUiState.isDataExist()) {
+                content()
+            } else {
+                // the status is placed into a scrollable container, so the data is refreshable
+                // by the gesture while it is absent, for example after a failed request
+                AppFullSizeScrollableContainer(contentPadding = contentPadding) {
+                    DataRequestStatusComponent(
+                        dataRequestStatus = dataRequestUiState.dataRequestStatus,
+                        statusModifier = Modifier.fillMaxSize(),
+                        isLoadingIndicatorDisplayed = false
+                    )
+                }
+            }
+        }
+
+        dataRequestUiState.isDataExist() -> content()
+
+        else -> DataRequestStatusComponent(
             dataRequestStatus = dataRequestUiState.dataRequestStatus,
             statusModifier = statusModifier
         )
@@ -204,7 +240,8 @@ private inline fun DataComponent(
 @Composable
 private fun DataRequestStatusComponent(
     dataRequestStatus: RequestStatus,
-    statusModifier: Modifier = Modifier
+    statusModifier: Modifier = Modifier,
+    isLoadingIndicatorDisplayed: Boolean = true
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -212,7 +249,10 @@ private fun DataRequestStatusComponent(
         modifier = statusModifier
     ) {
         when (dataRequestStatus) {
-            RequestStatus.UNDEFINED, RequestStatus.LOADING -> AppLoadingIndicator()
+            RequestStatus.UNDEFINED, RequestStatus.LOADING -> {
+                if (isLoadingIndicatorDisplayed) AppLoadingIndicator()
+            }
+
             is RequestStatus.FAILURE -> AppLargeTitleText(text = dataRequestStatus.failureText)
             is RequestStatus.ERROR -> AppLargeTitleText(text = dataRequestStatus.errorText)
             RequestStatus.SUCCESS -> AppLargeTitleText(text = stringResource(R.string.no_data))

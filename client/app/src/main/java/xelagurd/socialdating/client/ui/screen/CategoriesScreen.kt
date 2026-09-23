@@ -37,7 +37,7 @@ fun CategoriesScreen(
     CategoriesScreenComponent(
         categoriesUiState = categoriesUiState,
         onCategoryClick = onCategoryClick,
-        refreshAction = categoriesViewModel::getCategories,
+        onRefresh = categoriesViewModel::getCategories,
         onNotificationShown = categoriesViewModel::onNotificationShown
     )
 }
@@ -47,7 +47,7 @@ fun CategoriesScreen(
 fun CategoriesScreenComponent(
     categoriesUiState: CategoriesUiState = CategoriesUiState(),
     onCategoryClick: (Int) -> Unit = {},
-    refreshAction: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     onNotificationShown: () -> Unit = {}
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -65,7 +65,6 @@ fun CategoriesScreenComponent(
             AppTopBar(
                 title = stringResource(CategoriesDestination.titleRes),
                 dataRequestStatus = categoriesUiState.dataRequestStatus,
-                refreshAction = refreshAction,
                 scrollBehavior = scrollBehavior
             )
         },
@@ -79,6 +78,7 @@ fun CategoriesScreenComponent(
     ) { innerPadding ->
         DataListComponent(
             dataListUiState = categoriesUiState,
+            onRefresh = onRefresh,
             contentPadding = innerPadding
         ) {
             AppEntityCard(

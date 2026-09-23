@@ -6,8 +6,11 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
@@ -17,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -28,6 +32,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -38,6 +43,9 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
@@ -49,10 +57,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -62,6 +73,11 @@ import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.model.DataEntity
 import xelagurd.socialdating.client.data.model.DataUtils.NEXT_PAGE_PREFETCH_COUNT
 import xelagurd.socialdating.client.ui.form.FormFieldError
+import xelagurd.socialdating.client.ui.state.RequestStatus
+
+private val ONLINE_COLOR = Color(0xFF4CAF50)
+private val LOADING_COLOR = Color(0xFFFFC107)
+private val OFFLINE_COLOR = Color(0xFFF44336)
 
 @Composable
 @ReadOnlyComposable
@@ -88,6 +104,33 @@ fun AppLinearProgressIndicator(
         progress = progress,
         drawStopIndicator = {},
         modifier = modifier.testTag(stringResource(R.string.progress_indicator))
+    )
+}
+
+@Composable
+fun AppDataRequestStatusIndicator(
+    dataRequestStatus: RequestStatus,
+    modifier: Modifier = Modifier
+) {
+    val statusColor = when (dataRequestStatus) {
+        RequestStatus.SUCCESS -> ONLINE_COLOR
+        RequestStatus.UNDEFINED, RequestStatus.LOADING -> LOADING_COLOR
+        is RequestStatus.FAILURE, is RequestStatus.ERROR -> OFFLINE_COLOR
+    }
+    val statusDescription = stringResource(
+        when (dataRequestStatus) {
+            RequestStatus.SUCCESS -> R.string.online
+            RequestStatus.UNDEFINED, RequestStatus.LOADING -> R.string.loading
+            is RequestStatus.FAILURE, is RequestStatus.ERROR -> R.string.offline
+        }
+    )
+
+    Box(
+        modifier = modifier
+            .padding(dimensionResource(R.dimen.padding_12dp))
+            .size(dimensionResource(R.dimen.size_12dp))
+            .background(statusColor, CircleShape)
+            .semantics { contentDescription = statusDescription }
     )
 }
 
@@ -328,6 +371,57 @@ fun AppTextField(
         keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else keyboardType),
         modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_8dp))
     )
+}
+
+// the content must be scrollable, otherwise the gesture is not delivered to the container,
+// and the indicator is displaced by the top content padding, so it is not hidden by a top bar
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+inline fun AppPullToRefreshContainer(
+    isRefreshing: Boolean,
+    noinline onRefresh: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    crossinline content: @Composable () -> Unit
+) {
+    val pullToRefreshState = rememberPullToRefreshState()
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        state = pullToRefreshState,
+        indicator = {
+            PullToRefreshDefaults.Indicator(
+                state = pullToRefreshState,
+                isRefreshing = isRefreshing,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = contentPadding.calculateTopPadding())
+                    .testTag(stringResource(R.string.refresh_indicator))
+            )
+        },
+        modifier = modifier,
+        content = { content() }
+    )
+}
+
+@Composable
+inline fun AppFullSizeScrollableContainer(
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    crossinline content: @Composable () -> Unit
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(contentPadding)
+    ) {
+        item {
+            Box(modifier = Modifier.fillParentMaxSize()) {
+                content()
+            }
+        }
+    }
 }
 
 @Composable

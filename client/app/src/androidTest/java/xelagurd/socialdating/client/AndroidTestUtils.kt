@@ -13,8 +13,11 @@ import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
 import androidx.navigation.NavController
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.junit.Assert.assertEquals
@@ -51,6 +54,11 @@ object AndroidTestUtils {
         waitForIdle()
 
         runOnUiThread { recompositionTrigger.intValue++ }
+        waitForIdle()
+    }
+
+    fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.performPullToRefresh() {
+        onRoot().performTouchInput { swipeDown(startY = centerY, endY = bottom) }
         waitForIdle()
     }
 

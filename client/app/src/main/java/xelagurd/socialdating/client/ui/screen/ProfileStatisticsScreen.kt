@@ -65,7 +65,7 @@ fun ProfileStatisticsScreen(
     ProfileStatisticsScreenComponent(
         profileStatisticsUiState = profileStatisticsUiState,
         onNavigateUp = onNavigateUp,
-        refreshAction = profileStatisticsViewModel::getProfileStatistics,
+        onRefresh = profileStatisticsViewModel::getProfileStatistics,
         onNotificationShown = profileStatisticsViewModel::onNotificationShown
     )
 }
@@ -75,7 +75,7 @@ fun ProfileStatisticsScreen(
 fun ProfileStatisticsScreenComponent(
     profileStatisticsUiState: ProfileStatisticsUiState = ProfileStatisticsUiState(),
     onNavigateUp: () -> Unit = {},
-    refreshAction: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     onNotificationShown: () -> Unit = {}
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -93,7 +93,6 @@ fun ProfileStatisticsScreenComponent(
             AppTopBar(
                 title = stringResource(ProfileStatisticsDestination.titleRes),
                 dataRequestStatus = profileStatisticsUiState.dataRequestStatus,
-                refreshAction = refreshAction,
                 navigateUp = onNavigateUp,
                 scrollBehavior = scrollBehavior
             )
@@ -111,6 +110,7 @@ fun ProfileStatisticsScreenComponent(
     ) { innerPadding ->
         DataListComponent(
             dataListUiState = profileStatisticsUiState,
+            onRefresh = onRefresh,
             contentPadding = innerPadding
         ) {
             AppExpandedEntityCard(

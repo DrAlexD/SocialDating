@@ -17,6 +17,7 @@ import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextIdWithColon
+import xelagurd.socialdating.client.AndroidTestUtils.performPullToRefresh
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.HiltTestActivity
@@ -47,7 +48,7 @@ class ProfileScreenTest {
             ProfileScreenComponent()
         }
 
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
     }
 
     @Test
@@ -56,7 +57,7 @@ class ProfileScreenTest {
             ProfileScreenComponent(profileUiState = ProfileUiState())
         }
 
-        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
     }
 
     @Test
@@ -116,7 +117,7 @@ class ProfileScreenTest {
     @Test
     fun profileScreen_allActions_calledAllActions() {
         var clickedUserId = -1
-        var isRefreshClicked = false
+        var isRefreshed = false
         val profileUiState = ProfileUiState(
             entity = user,
             dataRequestStatus = RequestStatus.SUCCESS
@@ -126,15 +127,15 @@ class ProfileScreenTest {
             ProfileScreenComponent(
                 profileUiState = profileUiState,
                 onProfileStatisticsClick = { clickedUserId = it },
-                refreshAction = { isRefreshClicked = true }
+                onRefresh = { isRefreshed = true }
             )
         }
 
         composeTestRule.onNodeWithTextId(R.string.open_profile_statistics).checkButtonAndClick()
         assertEquals(user.id, clickedUserId)
 
-        composeTestRule.onNodeWithTextId(R.string.online).checkButtonAndClick()
-        assertTrue(isRefreshClicked)
+        composeTestRule.performPullToRefresh()
+        assertTrue(isRefreshed)
     }
 
     private fun setContentToProfileBody(profileUiState: ProfileUiState) {
