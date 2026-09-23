@@ -20,8 +20,10 @@ import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.fake.FakeData.TEST_TIMEOUT_MILLIS
 import xelagurd.socialdating.client.ui.navigation.AppNavHost
+import xelagurd.socialdating.client.ui.theme.AppTheme
 
-typealias MainComposeTestRule = AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>
+typealias MainComposeTestRule =
+    AndroidComposeTestRule<ActivityScenarioRule<HiltTestActivity>, HiltTestActivity>
 
 object AndroidNavigationTestUtils {
 
@@ -38,13 +40,19 @@ object AndroidNavigationTestUtils {
     fun MainComposeTestRule.setContentToAppNavHost(): TestNavHostController {
         var navController: TestNavHostController? = null
 
-        activity.setContent {
-            val testNavHostController = TestNavHostController(activity).apply {
-                navigatorProvider.addNavigator(ComposeNavigator())
-            }
-            navController = testNavHostController
+        // the activity has no content of its own, so the first setContent creates the compose view
+        // and has to be called from the ui thread
+        runOnUiThread {
+            activity.setContent {
+                val testNavHostController = TestNavHostController(activity).apply {
+                    navigatorProvider.addNavigator(ComposeNavigator())
+                }
+                navController = testNavHostController
 
-            AppNavHost(testNavHostController)
+                AppTheme {
+                    AppNavHost(testNavHostController)
+                }
+            }
         }
 
         return runOnIdle { requireNotNull(navController) }

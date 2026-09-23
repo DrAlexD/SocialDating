@@ -29,9 +29,11 @@ object AndroidTestUtils {
     fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.setContentToScreen(
         content: @Composable () -> Unit
     ) {
-        activity.setContent {
-            AppTheme {
-                content()
+        runOnUiThread {
+            activity.setContent {
+                AppTheme {
+                    content()
+                }
             }
         }
     }

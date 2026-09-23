@@ -14,7 +14,7 @@ import xelagurd.socialdating.client.AndroidNavigationTestUtils.setContentToAppNa
 import xelagurd.socialdating.client.AndroidTestUtils.assertBackStackDepth
 import xelagurd.socialdating.client.AndroidTestUtils.assertCurrentRouteName
 import xelagurd.socialdating.client.AndroidTestUtils.assertRouteNotInBackStack
-import xelagurd.socialdating.client.MainActivity
+import xelagurd.socialdating.client.HiltTestActivity
 import xelagurd.socialdating.client.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.client.ui.navigation.LoginDestination
 import xelagurd.socialdating.client.ui.navigation.RegistrationDestination
@@ -25,7 +25,7 @@ class RegistrationScreenNavigationTest {
     val hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
+    val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
     private lateinit var navController: TestNavHostController
 
