@@ -22,6 +22,8 @@
     <string name="similar_users">Similar users</string>
     <string name="settings">Settings</string>
     <string name="expand_list">Expand list</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
     <string name="open_profile_statistics">Open profile statistics</string>
     <string name="full_maintain">Fully maintain</string>
     <string name="part_maintain">Partially maintain</string>

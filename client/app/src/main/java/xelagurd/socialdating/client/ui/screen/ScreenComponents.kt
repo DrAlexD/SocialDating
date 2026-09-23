@@ -35,6 +35,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -60,6 +61,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -349,6 +351,8 @@ fun AppTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     error: FormFieldError? = null
 ) {
+    var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
+
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -366,11 +370,44 @@ fun AppTextField(
                 )
             }
         },
+        trailingIcon = if (isPassword) {
+            {
+                AppPasswordVisibilityToggle(
+                    isPasswordVisible = isPasswordVisible,
+                    onClick = { isPasswordVisible = !isPasswordVisible }
+                )
+            }
+        } else null,
         singleLine = singleLine,
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        visualTransformation = if (isPassword && !isPasswordVisible) {
+            PasswordVisualTransformation()
+        } else {
+            VisualTransformation.None
+        },
         keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else keyboardType),
         modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_8dp))
     )
+}
+
+@Composable
+private fun AppPasswordVisibilityToggle(
+    isPasswordVisible: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        Icon(
+            painter = painterResource(
+                if (isPasswordVisible) R.drawable.visibility_off else R.drawable.visibility
+            ),
+            contentDescription = stringResource(
+                if (isPasswordVisible) R.string.hide_password else R.string.show_password
+            )
+        )
+    }
 }
 
 // the content must be scrollable, otherwise the gesture is not delivered to the container,

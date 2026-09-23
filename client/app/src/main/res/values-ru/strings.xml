@@ -18,6 +18,8 @@
     <string name="similar_users">Похожие пользователи</string>
     <string name="settings">Настройки</string>
     <string name="expand_list">Раскрыть список</string>
+    <string name="show_password">Показать пароль</string>
+    <string name="hide_password">Скрыть пароль</string>
     <string name="open_profile_statistics">Открыть статистику профиля</string>
     <string name="full_maintain">Полностью поддерживаю</string>
     <string name="part_maintain">Скорее поддерживаю</string>
