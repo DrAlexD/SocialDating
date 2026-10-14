@@ -17,6 +17,8 @@ import xelagurd.socialdating.client.data.model.dto.DetailedSimilarUserDto
 import xelagurd.socialdating.client.data.model.dto.PageDto
 import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
 import xelagurd.socialdating.client.data.model.dto.StatementDto
+import xelagurd.socialdating.client.data.model.enums.Gender
+import xelagurd.socialdating.client.data.model.enums.Purpose
 
 interface ApiService {
     @GET("users/{id}")
@@ -56,7 +58,14 @@ interface ApiService {
     @GET("categories/users/similar-users")
     suspend fun getSimilarUsers(
         @Query("currentUserId") currentUserId: Int,
-        @Query("categoryIds") categoryIds: List<Int>?,
+        @Query("categoryIds") categoryIds: List<Int>,
+        @Query("minDifferenceNumber") minDifferenceNumber: Int?,
+        @Query("maxDifferenceNumber") maxDifferenceNumber: Int?,
+        @Query("genders") genders: List<@JvmSuppressWildcards Gender>,
+        @Query("ageMin") ageMin: Int?,
+        @Query("ageMax") ageMax: Int?,
+        @Query("purposes") purposes: List<@JvmSuppressWildcards Purpose>,
+        @Query("isSameCity") isSameCity: Boolean,
         @Query("cursor") cursor: String?,
         @Query("size") size: Int
     ): Response<PageDto<SimilarUserDto>>

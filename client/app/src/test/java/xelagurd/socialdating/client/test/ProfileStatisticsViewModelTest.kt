@@ -79,6 +79,7 @@ class ProfileStatisticsViewModelTest {
 
     private val userId = Random.nextInt(1, Int.MAX_VALUE)
     private var anotherUserId = userId
+    private var categoryIds: IntArray? = null
 
     private val savedCategories = listOf(Category(id = 1, name = "Category1", orderNumber = 1))
     private val missingCategories = listOf(Category(id = 2, name = "Category2", orderNumber = 2))
@@ -479,6 +480,24 @@ class ProfileStatisticsViewModelTest {
     }
 
     @Test
+    fun profileStatisticsViewModel_anotherUserWithCategoryIds_displayedOnlyChosenCategories() = runTest {
+        anotherUserId = userId + 1
+        val chosenCategoryId = remoteUserCategories.first().categoryId
+        categoryIds = intArrayOf(chosenCategoryId)
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, profileStatisticsUiState.dataRequestStatus)
+        assertEquals(
+            remoteUserCategories.toUserCategoriesData(allCategories).filter { it.categoryId == chosenCategoryId },
+            profileStatisticsUiState.entities
+        )
+    }
+
+    @Test
     fun profileStatisticsViewModel_anotherUserWithEmptyRemoteDetailedSimilarUser_successStatus() = runTest {
         anotherUserId = userId + 1
         mockDataWithInternet()
@@ -519,6 +538,7 @@ class ProfileStatisticsViewModelTest {
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(ProfileStatisticsDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(ProfileStatisticsDestination.anotherUserId) } returns anotherUserId
+        every { savedStateHandle.get<IntArray>(ProfileStatisticsDestination.categoryIds) } returns categoryIds
         every { preferencesRepository.isOfflineMode } returns isOfflineModeFlow
         every { preferencesRepository.languageChanges } returns languageChangesFlow
         every { localCategoriesRepository.getCategories() } returns categoriesFlow

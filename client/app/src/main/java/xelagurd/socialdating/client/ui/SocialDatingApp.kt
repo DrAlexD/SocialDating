@@ -1,6 +1,7 @@
 package xelagurd.socialdating.client.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -55,6 +56,7 @@ fun AppTopBar(
     dataRequestStatus: RequestStatus? = null,
     navigateUp: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
     val colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
 
@@ -74,6 +76,7 @@ fun AppTopBar(
                 }
             },
             actions = {
+                actions()
                 // the data is refreshed by a pull down gesture, so the status is only displayed here
                 dataRequestStatus?.let {
                     AppDataRequestStatusIndicator(dataRequestStatus = it)

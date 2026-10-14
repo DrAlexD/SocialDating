@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -18,11 +19,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
 import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
 import xelagurd.socialdating.client.data.remote.ApiUtils.offlineModeStatus
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
 import xelagurd.socialdating.client.data.remote.repository.RemoteUserCategoriesRepository
+import xelagurd.socialdating.client.ui.form.SimilarUsersFilterFormData
+import xelagurd.socialdating.client.ui.form.toSimilarUsersFilterFormData
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
 import xelagurd.socialdating.client.ui.state.RequestStatus
 import xelagurd.socialdating.client.ui.state.SimilarUsersUiState
@@ -35,61 +39,108 @@ class SimilarUsersViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val preferencesRepository: PreferencesRepository,
-    private val remoteUserCategoriesRepository: RemoteUserCategoriesRepository
+    private val remoteUserCategoriesRepository: RemoteUserCategoriesRepository,
+    localCategoriesRepository: LocalCategoriesRepository
 ) : ViewModel() {
 
     private val userId: Int = checkNotNull(savedStateHandle[SimilarUsersDestination.userId])
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
-    private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    // the similar users are calculated only on the user request
+    private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.NOT_REQUESTED)
     private val nextPageRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val isLastPageFlow = MutableStateFlow(false)
     private val notificationFlow = MutableStateFlow<String?>(null)
     private val similarUsersFlow = MutableStateFlow<List<SimilarUserDto>>(listOf())
+    private val categoriesFlow = localCategoriesRepository.getCategories().distinctUntilChanged()
+    private val formDataFlow = MutableStateFlow(
+        runBlocking { preferencesRepository.similarUsersFilterDetails.first() }.toSimilarUsersFilterFormData()
+    )
 
-    // the paging session state, it is dropped on every screen entry and refresh
+    // the paging session state, it is dropped on every screen entry and calculation
     private var nextCursor: String? = null
 
-    val uiState = combine(
+    // the filter can be changed after the calculation, but the next pages have to be loaded with the calculated one
+    private val calculatedFilterDetailsFlow = MutableStateFlow(formDataFlow.value.toSimilarUsersFilterDetails())
+
+    // the typed combine is limited by five flows, so the paging state is combined separately
+    private val pagedSimilarUsersUiStateFlow = combine(
         similarUsersFlow,
         dataRequestStatusFlow,
         nextPageRequestStatusFlow,
-        isLastPageFlow,
-        notificationFlow
-    ) { similarUsers, dataRequestStatus, nextPageRequestStatus, isLastPage, notification ->
+        isLastPageFlow
+    ) { similarUsers, dataRequestStatus, nextPageRequestStatus, isLastPage ->
         SimilarUsersUiState(
             entities = similarUsers.hideWhileLoading(dataRequestStatus),
             dataRequestStatus = dataRequestStatus,
             nextPageRequestStatus = nextPageRequestStatus,
-            isLastPage = isLastPage,
+            isLastPage = isLastPage
+        )
+    }
+
+    val uiState = combine(
+        pagedSimilarUsersUiStateFlow,
+        categoriesFlow,
+        formDataFlow,
+        calculatedFilterDetailsFlow,
+        notificationFlow
+    ) { pagedSimilarUsersUiState, categories, formData, calculatedFilterDetails, notification ->
+        pagedSimilarUsersUiState.copy(
+            categories = categories,
+            formData = formData,
+            calculatedFilterDetails = calculatedFilterDetails,
             notification = notification
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = SimilarUsersUiState()
+        initialValue = SimilarUsersUiState(formData = formDataFlow.value)
     )
 
     init {
-        if (!isOfflineMode) { // FixMe: remove after adding server hosting
-            loadSimilarUsers(isRequestedByUser = false)
-        } else {
-            similarUsersFlow.update { FakeData.similarUsers }
-            isLastPageFlow.update { true }
-            dataRequestStatusFlow.update { offlineModeStatus(context) }
-        }
-
         viewModelScope.launch {
-            preferencesRepository.languageChanges.collect { loadSimilarUsers(isRequestedByUser = false) }
+            preferencesRepository.languageChanges.collect {
+                // the calculated similar users contain the localized texts, so they are recalculated
+                // with the same filter, but the similar users are not calculated without the user request
+                if (dataRequestStatusFlow.value !is RequestStatus.NOT_REQUESTED) {
+                    loadSimilarUsers(isRequestedByUser = false)
+                }
+            }
         }
     }
 
     fun onNotificationShown() = notificationFlow.update { null }
 
-    fun getSimilarUsers() = loadSimilarUsers(isRequestedByUser = true)
+    fun updateUiState(similarUsersFilterFormData: SimilarUsersFilterFormData) {
+        formDataFlow.update { similarUsersFilterFormData }
+
+        // the incorrect filter is not saved, so the last correct one is restored on the next screen entry
+        if (similarUsersFilterFormData.isValid) {
+            viewModelScope.launch {
+                preferencesRepository.saveSimilarUsersFilterDetails(
+                    similarUsersFilterFormData.toSimilarUsersFilterDetails()
+                )
+            }
+        }
+    }
+
+    fun calculateSimilarUsers() {
+        if (dataRequestStatusFlow.value is RequestStatus.LOADING) return
+
+        // the incorrect filter can't be sent, its error is displayed in the filter instead
+        val similarUsersFilterFormData = formDataFlow.value
+        if (!similarUsersFilterFormData.isValid) return
+
+        calculatedFilterDetailsFlow.update { similarUsersFilterFormData.toSimilarUsersFilterDetails() }
+
+        loadSimilarUsers(isRequestedByUser = true)
+    }
 
     private fun loadSimilarUsers(isRequestedByUser: Boolean) {
         if (isOfflineMode) { // FixMe: remove after adding server hosting
+            similarUsersFlow.update { FakeData.filterSimilarUsers(calculatedFilterDetailsFlow.value) }
+            isLastPageFlow.update { true }
+            dataRequestStatusFlow.update { offlineModeStatus(context) }
             if (isRequestedByUser) {
                 notificationFlow.update { offlineModeStatus(context).notificationText() }
             }
@@ -117,7 +168,7 @@ class SimilarUsersViewModel @Inject constructor(
             updateRequestStatus(isFirstPage, RequestStatus.LOADING)
 
             val (similarUsersPage, status) = safeApiCall(context) {
-                remoteUserCategoriesRepository.getSimilarUsers(userId, cursor = nextCursor)
+                remoteUserCategoriesRepository.getSimilarUsers(userId, calculatedFilterDetailsFlow.value, nextCursor)
             }
 
             when {

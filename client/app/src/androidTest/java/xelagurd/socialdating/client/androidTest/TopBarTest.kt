@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -78,6 +79,14 @@ class TopBarTest {
     }
 
     @Test
+    fun topBar_notRequestedState_notRequestedIndicator() {
+        setContentToAppTopBar(RequestStatus.NOT_REQUESTED)
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).assertIsNotDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.not_requested).assertIsDisplayed()
+    }
+
+    @Test
     fun topBar_withNavigateUpAction_displayedBackButton() {
         setContentToAppTopBar(RequestStatus.SUCCESS) {}
 
@@ -97,6 +106,20 @@ class TopBarTest {
         composeTestRule.onNodeWithContentDescriptionId(R.string.online).assertIsNotDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.loading).assertIsNotDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.offline).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun topBar_withActions_displayedActions() {
+        composeTestRule.setContentToScreen {
+            AppTopBar(
+                title = stringResource(CategoriesDestination.titleRes),
+                dataRequestStatus = RequestStatus.SUCCESS,
+                actions = { Text(text = ACTION_TEXT) }
+            )
+        }
+
+        composeTestRule.onNodeWithText(ACTION_TEXT).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescriptionId(R.string.online).assertIsDisplayed()
     }
 
     private fun setContentToAppTopBar(
@@ -119,5 +142,9 @@ class TopBarTest {
                 )
             }
         }
+    }
+
+    private companion object {
+        const val ACTION_TEXT = "Action"
     }
 }

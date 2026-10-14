@@ -1,7 +1,9 @@
 package xelagurd.socialdating.server.integrationTest
 
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -213,6 +215,37 @@ class IntegrationTest {
 
     @Order(7)
     @Test
+    fun getSimilarUsers_usersDataFilter_returnsOnlySimilarUsersFilteredByUsersService() {
+        val adminGender = admin.data["gender"]
+        val anotherGender = listOf("MALE", "FEMALE").first { it != adminGender }
+        val similarUsersUrl = "$GATEWAY_URL/categories/users/similar-users?currentUserId=${user.id}" +
+                "&purposes=${admin.data["purpose"]}&ageMin=${admin.data["age"]}&ageMax=${admin.data["age"]}"
+
+        val suitableResponse = restTemplate.getWithToken(
+            user,
+            "$similarUsersUrl&genders=$adminGender",
+            String::class.java
+        )
+        assertEquals(HttpStatus.OK, suitableResponse.statusCode)
+
+        val suitableSimilarUsers = readObjectFromJsonString(suitableResponse.body!!).readArray("content")
+        assertTrue(suitableSimilarUsers.any { it["id"] == admin.id })
+
+        val unsuitableResponse = restTemplate.getWithToken(
+            user,
+            "$similarUsersUrl&genders=$anotherGender",
+            String::class.java
+        )
+
+        // the long living server can have other similar users, otherwise the response has no content
+        val unsuitableSimilarUsers = unsuitableResponse.body
+            ?.let { body -> readObjectFromJsonString(body).readArray("content") }
+            .orEmpty()
+        assertFalse(unsuitableSimilarUsers.any { it["id"] == admin.id })
+    }
+
+    @Order(8)
+    @Test
     fun getCategories_russianLanguage_returnsRussianName() {
         val englishCategory = getCategory(ENGLISH_LANGUAGE)
         val russianCategory = getCategory(RUSSIAN_LANGUAGE)
@@ -220,7 +253,7 @@ class IntegrationTest {
         assertEquals("$RUSSIAN_NAME_PREFIX${englishCategory["name"]}", russianCategory["name"])
     }
 
-    @Order(8)
+    @Order(9)
     @Test
     fun getDefiningThemes_russianLanguage_returnsRussianNameAndOpinions() {
         val englishDefiningTheme = getDefiningTheme(ENGLISH_LANGUAGE)

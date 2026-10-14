@@ -27,11 +27,16 @@ import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.FakeCategoriesData.filterByUserId
 import xelagurd.socialdating.server.FakeCategoriesData.toUserCategoriesWithNullIds
 import xelagurd.socialdating.server.client.UsersServiceClient
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USER_ACTIVITY_INITIAL
 import xelagurd.socialdating.server.model.details.CategoryOrderDetails
+import xelagurd.socialdating.server.model.details.UsersFilterDetails
 import xelagurd.socialdating.server.model.dto.CategoryDto
 import xelagurd.socialdating.server.model.dto.UserCategoryDto
 import xelagurd.socialdating.server.model.dto.UserDto
+import xelagurd.socialdating.server.model.enums.AppLanguage.ENGLISH
+import xelagurd.socialdating.server.model.enums.AppLanguage.RUSSIAN
+import xelagurd.socialdating.server.model.enums.Gender.FEMALE
 import xelagurd.socialdating.server.model.enums.Gender.MALE
 import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.model.enums.Role.USER
@@ -168,6 +173,92 @@ class CategoriesMicroserviceTest(
     }
 
     @Test
+    fun getSimilarUsers_minDifferenceNumberAboveUsersDifference_noContent() {
+        // user 2 has the difference number 2
+        val response = restTemplate.getWithAuth(
+            currentUserId,
+            "/categories/users/similar-users?currentUserId=$currentUserId&minDifferenceNumber=3",
+            String::class.java
+        )
+        assertEquals(HttpStatus.NO_CONTENT, response.statusCode)
+    }
+
+    @Test
+    fun getSimilarUsers_maxDifferenceNumberWithoutMin_returnsNotSimilarUsersToo() {
+        // the minimum isn't limited, so user 3 with the difference number 0 is returned unlike user 2
+        val thirdUserId = 3
+        every { usersServiceClient.getUsers(listOf(thirdUserId)) } returns
+                listOf(anotherUser.copy(id = thirdUserId, name = "RemoteUser3"))
+
+        val response = restTemplate.getWithAuth(
+            currentUserId,
+            "/categories/users/similar-users?currentUserId=$currentUserId&maxDifferenceNumber=0",
+            String::class.java
+        )
+        assertEquals(HttpStatus.OK, response.statusCode)
+
+        val responseSimilarUser = readObjectFromJsonString(response.body!!).readArray("content").single()
+        assertEquals(thirdUserId, responseSimilarUser["id"])
+        assertEquals(responseSimilarUser["similarNumber"], responseSimilarUser["oppositeNumber"])
+    }
+
+    @Test
+    fun getSimilarUsers_usersDataFilterWithoutSimilarUsers_noContent() {
+        // user 3 fits the filter, but it is not similar
+        every {
+            usersServiceClient.getUserIds(UsersFilterDetails(genders = listOf(FEMALE), sameCityUserId = currentUserId))
+        } returns listOf(3)
+
+        val response = restTemplate.getWithAuth(
+            currentUserId,
+            "/categories/users/similar-users?currentUserId=$currentUserId&genders=FEMALE&isSameCity=true",
+            String::class.java
+        )
+        assertEquals(HttpStatus.NO_CONTENT, response.statusCode)
+    }
+
+    @Test
+    fun getSimilarUsers_ageMinGreaterThanAgeMax_badRequestWithLocalizedMessage() {
+        val url = "/categories/users/similar-users?currentUserId=$currentUserId&ageMin=30&ageMax=20"
+
+        val englishResponse = restTemplate.getWithAuth(currentUserId, url, String::class.java)
+        assertEquals(HttpStatus.BAD_REQUEST, englishResponse.statusCode)
+        assertEquals("'AgeMax' must not be less than AgeMin", englishResponse.body)
+
+        val russianResponse = restTemplate.getWithAuth(currentUserId, url, String::class.java, RUSSIAN.languageTag)
+        assertEquals(HttpStatus.BAD_REQUEST, russianResponse.statusCode)
+        assertEquals("'AgeMax' не должно быть меньше AgeMin", russianResponse.body)
+    }
+
+    @Test
+    fun getSimilarUsers_minDifferenceNumberGreaterThanMax_badRequestWithLocalizedMessage() {
+        val url = "/categories/users/similar-users?currentUserId=$currentUserId" +
+                "&minDifferenceNumber=2&maxDifferenceNumber=-2"
+
+        val englishResponse = restTemplate.getWithAuth(currentUserId, url, String::class.java)
+        assertEquals(HttpStatus.BAD_REQUEST, englishResponse.statusCode)
+        assertEquals("'MaxDifferenceNumber' must not be less than MinDifferenceNumber", englishResponse.body)
+
+        val russianResponse = restTemplate.getWithAuth(currentUserId, url, String::class.java, RUSSIAN.languageTag)
+        assertEquals(HttpStatus.BAD_REQUEST, russianResponse.statusCode)
+        assertEquals("'MaxDifferenceNumber' не должно быть меньше MinDifferenceNumber", russianResponse.body)
+    }
+
+    // the messages of the validation provider are resolved in the same way as the own ones
+    @Test
+    fun getSimilarUsers_ageMinBelowMin_badRequestWithLocalizedProviderMessage() {
+        val url = "/categories/users/similar-users?currentUserId=$currentUserId&ageMin=${AGE_MIN - 1}"
+
+        val englishResponse = restTemplate.getWithAuth(currentUserId, url, String::class.java)
+        assertEquals(HttpStatus.BAD_REQUEST, englishResponse.statusCode)
+        assertEquals("'AgeMin' must be greater than or equal to $AGE_MIN", englishResponse.body)
+
+        val russianResponse = restTemplate.getWithAuth(currentUserId, url, String::class.java, RUSSIAN.languageTag)
+        assertEquals(HttpStatus.BAD_REQUEST, russianResponse.statusCode)
+        assertEquals("'AgeMin' должно быть не меньше $AGE_MIN", russianResponse.body)
+    }
+
+    @Test
     fun getDetailedSimilarUser_existData_returnsSimilarityWithDefiningThemes() {
         val response = restTemplate.getWithAuth(
             currentUserId,
@@ -276,11 +367,13 @@ class CategoriesMicroserviceTest(
     private fun <T> TestRestTemplate.getWithAuth(
         userId: Int,
         url: String,
-        responseType: Class<T>
+        responseType: Class<T>,
+        language: String = ENGLISH.languageTag
     ): ResponseEntity<T> {
         val headers = HttpHeaders()
         headers.set(AuthHeaders.USER_ID, userId.toString())
         headers.set(AuthHeaders.ROLE, "USER")
+        headers.set(HttpHeaders.ACCEPT_LANGUAGE, language)
         return exchange(url, HttpMethod.GET, HttpEntity<Void>(headers), responseType)
     }
 

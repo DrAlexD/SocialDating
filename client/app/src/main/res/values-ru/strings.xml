@@ -9,6 +9,7 @@
     <string name="loading">Загрузка</string>
     <string name="online">В сети</string>
     <string name="offline">Не в сети</string>
+    <string name="not_requested">Не запрошено</string>
     <string name="nav_categories">Перейти к Категориям</string>
     <string name="nav_profile">Перейти к Профилю</string>
     <string name="nav_settings">Перейти к Настройкам</string>
@@ -56,6 +57,7 @@
     <string name="relationships">Найти отношения</string>
     <string name="all_at_once">Всё и сразу</string>
     <string name="add_statement">Добавить высказывание</string>
+    <string name="publish">Опубликовать</string>
     <string name="statement_text">Текст высказывания</string>
     <string name="defining_themes">Определяющие темы</string>
     <string name="is_support_defining_theme">Поддерживает ли высказывание каждую выбранную тему?</string>
@@ -67,4 +69,20 @@
     <string name="error_email_format">Некорректный формат email</string>
     <string name="error_repeated_password">Пароли не совпадают</string>
     <string name="error_age">От %1$d до %2$d лет</string>
+    <string name="error_integer">Нужно целое число</string>
+    <string name="error_empty_range">Заполните хотя бы одно поле</string>
+    <string name="error_less_than_min">Не должно быть меньше минимума</string>
+    <string name="calculate">Рассчитать</string>
+    <string name="filters">Фильтры</string>
+    <string name="reset">Сбросить</string>
+    <string name="done">Готово</string>
+    <string name="similarity">Схожесть</string>
+    <string name="default_similarity">По умолчанию</string>
+    <string name="custom_similarity">Своя</string>
+    <string name="default_similarity_hint">По умолчанию минимум равен %1$d, а максимум не ограничен</string>
+    <string name="min_similarity">Минимальная схожесть</string>
+    <string name="max_similarity">Максимальная схожесть</string>
+    <string name="only_my_city">Только мой город</string>
+    <string name="all_at_once_always_displayed">Пользователи с целью «Всё и сразу» отображаются всегда</string>
+    <string name="calculate_similar_users_hint">Настройте фильтры и нажмите «Рассчитать», чтобы найти похожих пользователей</string>
 </resources>

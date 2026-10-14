@@ -78,7 +78,7 @@ class StatementsScreenTest {
         composeTestRule.onNodeWithContentDescriptionId(R.string.part_no_maintain).checkEnabledButton()
         composeTestRule.onNodeWithContentDescriptionId(R.string.full_no_maintain).checkEnabledButton()
 
-        composeTestRule.onNodeWithContentDescriptionId(R.string.add_statement).checkEnabledButton()
+        composeTestRule.onNodeWithTextId(R.string.add_statement).checkEnabledButton()
     }
 
     @Test
@@ -120,7 +120,7 @@ class StatementsScreenTest {
         setContentToStatementsBody(statementsUiState)
 
         composeTestRule.onNodeWithTextId(R.string.no_data).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescriptionId(R.string.add_statement).checkEnabledButton()
+        composeTestRule.onNodeWithTextId(R.string.add_statement).checkEnabledButton()
     }
 
     @Test
@@ -202,7 +202,7 @@ class StatementsScreenTest {
         composeTestRule.onNodeWithContentDescriptionId(R.string.full_maintain).checkButtonAndClick()
         assertEquals(statements[0] to StatementReactionType.FULL_MAINTAIN, reaction)
 
-        composeTestRule.onNodeWithContentDescriptionId(R.string.add_statement).checkButtonAndClick()
+        composeTestRule.onNodeWithTextId(R.string.add_statement).checkButtonAndClick()
         assertEquals(FakeData.mainCategory.id, addingCategoryId)
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).checkButtonAndClick()

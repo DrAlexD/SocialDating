@@ -18,6 +18,11 @@ import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.controller.UsersController
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
+import xelagurd.socialdating.server.model.details.UsersFilterDetails
+import xelagurd.socialdating.server.model.enums.Gender.MALE
+import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.service.UsersService
 import xelagurd.socialdating.server.utils.TestUtils.mockkList
 import xelagurd.socialdating.server.utils.TestUtils.nextIntList
@@ -85,6 +90,60 @@ class UsersControllerTest(@param:Autowired private val mockMvc: MockMvc) {
             .andExpect(status().isNoContent)
 
         verify(exactly = 1) { usersService.getUsers(userIds) }
+        confirmVerified(usersService)
+    }
+
+    @Test
+    fun getUserIds_withFilter_ok() {
+        val usersFilterDetails = UsersFilterDetails(
+            genders = listOf(MALE),
+            ageMin = 20,
+            ageMax = 30,
+            purposes = listOf(FRIENDS),
+            sameCityUserId = userId
+        )
+        every { usersService.getUserIds(any()) } returns userIds
+
+        mockMvc.perform(
+            get("/users/ids?genders=MALE&ageMin=20&ageMax=30&purposes=FRIENDS&sameCityUserId=$userId")
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+
+        verify(exactly = 1) { usersService.getUserIds(usersFilterDetails) }
+        confirmVerified(usersService)
+    }
+
+    @Test
+    fun getUserIds_noData_noContent() {
+        every { usersService.getUserIds(any()) } returns emptyList()
+
+        mockMvc.perform(
+            get("/users/ids")
+        )
+            .andExpect(status().isNoContent)
+
+        verify(exactly = 1) { usersService.getUserIds(UsersFilterDetails()) }
+        confirmVerified(usersService)
+    }
+
+    @Test
+    fun getUserIds_wrongFilter_badRequest() {
+        val wrongFilterQueries = listOf(
+            "ageMin=${AGE_MIN - 1}",
+            "ageMax=${AGE_MAX + 1}",
+            "ageMin=30&ageMax=20",
+            "sameCityUserId=0"
+        )
+
+        wrongFilterQueries.forEach {
+            mockMvc.perform(
+                get("/users/ids?$it")
+            )
+                .andExpect(status().isBadRequest)
+        }
+
+        verify(exactly = 0) { usersService.getUserIds(any()) }
         confirmVerified(usersService)
     }
 }

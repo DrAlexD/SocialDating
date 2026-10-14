@@ -1,17 +1,34 @@
 package xelagurd.socialdating.client.androidTest
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.width
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -34,12 +51,16 @@ import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LE
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.enums.ThemeMode
 import xelagurd.socialdating.client.ui.form.FormFieldError
+import xelagurd.socialdating.client.ui.screen.AppBadgedIconButton
 import xelagurd.socialdating.client.ui.screen.AppDataChoosingList
 import xelagurd.socialdating.client.ui.screen.AppDataList
 import xelagurd.socialdating.client.ui.screen.AppDataMultiChoosingList
 import xelagurd.socialdating.client.ui.screen.AppDataRequestStatusIndicator
 import xelagurd.socialdating.client.ui.screen.AppEntityCard
 import xelagurd.socialdating.client.ui.screen.AppExpandedEntityCard
+import xelagurd.socialdating.client.ui.screen.AppExtendedFloatingActionButton
+import xelagurd.socialdating.client.ui.screen.AppFilterChip
+import xelagurd.socialdating.client.ui.screen.AppFilterChipGroup
 import xelagurd.socialdating.client.ui.screen.AppFullSizeScrollableContainer
 import xelagurd.socialdating.client.ui.screen.AppLargeBodyText
 import xelagurd.socialdating.client.ui.screen.AppLargeTextCard
@@ -49,11 +70,13 @@ import xelagurd.socialdating.client.ui.screen.AppLoadingIndicator
 import xelagurd.socialdating.client.ui.screen.AppMediumBodyText
 import xelagurd.socialdating.client.ui.screen.AppMediumTextCard
 import xelagurd.socialdating.client.ui.screen.AppMediumTitleText
+import xelagurd.socialdating.client.ui.screen.AppModalBottomSheet
 import xelagurd.socialdating.client.ui.screen.AppNotificationHost
 import xelagurd.socialdating.client.ui.screen.AppPullToRefreshContainer
 import xelagurd.socialdating.client.ui.screen.AppRadioGroup
 import xelagurd.socialdating.client.ui.screen.AppSmallBodyText
 import xelagurd.socialdating.client.ui.screen.AppSmallTitleText
+import xelagurd.socialdating.client.ui.screen.AppSwitchOption
 import xelagurd.socialdating.client.ui.screen.AppTextField
 import xelagurd.socialdating.client.ui.screen.AppYesNoRadioGroup
 import xelagurd.socialdating.client.ui.screen.NotificationEffect
@@ -91,7 +114,8 @@ class ScreenComponentsTest {
             RequestStatus.LOADING to R.string.loading,
             RequestStatus.UNDEFINED to R.string.loading,
             RequestStatus.FAILURE() to R.string.offline,
-            RequestStatus.ERROR() to R.string.offline
+            RequestStatus.ERROR() to R.string.offline,
+            RequestStatus.NOT_REQUESTED to R.string.not_requested
         )
 
         statusesWithDescriptions.forEach { (dataRequestStatus, descriptionRes) ->
@@ -299,6 +323,21 @@ class ScreenComponentsTest {
     }
 
     @Test
+    fun appTextField_errorWithoutMessage_markedAsError() {
+        composeTestRule.setContentToScreen {
+            AppTextField(
+                value = "",
+                onValueChange = {},
+                label = composeTestRule.activity.getString(R.string.username),
+                isError = true
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.username)
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Error))
+    }
+
+    @Test
     fun appDataList_entities_displayedAllData() {
         composeTestRule.setContentToScreen {
             AppDataList(entities = categories) {
@@ -447,6 +486,211 @@ class ScreenComponentsTest {
         composeTestRule.onNodeWithText(EXPANDED_TEXT).assertIsNotDisplayed()
     }
 
+    @Test
+    fun appBadgedIconButton_positiveBadgeNumber_displayedBadgeAndCalledClickAction() {
+        var isClicked = false
+
+        setContentToAppBadgedIconButton(BADGE_NUMBER) { isClicked = true }
+
+        composeTestRule.onNodeWithText(BADGE_NUMBER.toString()).assertIsDisplayed()
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.filters).checkButtonAndClick()
+        assertTrue(isClicked)
+    }
+
+    @Test
+    fun appBadgedIconButton_zeroBadgeNumber_withoutBadge() {
+        setContentToAppBadgedIconButton(0) { }
+
+        composeTestRule.onNodeWithContentDescriptionId(R.string.filters).assertIsDisplayed()
+        composeTestRule.onNodeWithText("0").assertDoesNotExist()
+    }
+
+    @Test
+    fun appExtendedFloatingActionButton_click_calledClickAction() {
+        var isClicked = false
+
+        composeTestRule.setContentToScreen {
+            AppExtendedFloatingActionButton(
+                text = BUTTON_TEXT,
+                icon = Icons.Default.Search,
+                onClick = { isClicked = true }
+            )
+        }
+
+        composeTestRule.onNodeWithText(BUTTON_TEXT).checkButtonAndClick()
+        assertTrue(isClicked)
+    }
+
+    @Test
+    fun appExtendedFloatingActionButton_disabledClick_notCalledClickAction() {
+        var isClicked = false
+
+        composeTestRule.setContentToScreen {
+            AppExtendedFloatingActionButton(
+                text = BUTTON_TEXT,
+                icon = Icons.Default.Search,
+                onClick = { isClicked = true },
+                isEnabled = false
+            )
+        }
+
+        composeTestRule.onNodeWithText(BUTTON_TEXT).apply {
+            checkDisabledButton()
+            performClick()
+        }
+        assertFalse(isClicked)
+    }
+
+    @Test
+    fun appExtendedFloatingActionButton_repeatedDisabling_disabledButton() {
+        var isEnabled by mutableStateOf(true)
+
+        composeTestRule.setContentToScreen {
+            AppExtendedFloatingActionButton(
+                text = BUTTON_TEXT,
+                icon = Icons.Default.Search,
+                onClick = {},
+                isEnabled = isEnabled
+            )
+        }
+
+        repeat(3) {
+            isEnabled = false
+            composeTestRule.waitForIdle()
+            isEnabled = true
+            composeTestRule.waitForIdle()
+        }
+        isEnabled = false
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(BUTTON_TEXT).checkDisabledButton()
+    }
+
+    @Test
+    fun appModalBottomSheet_hideSheet_hiddenContentAndCalledDismissAction() {
+        var isDismissed = false
+
+        composeTestRule.setContentToScreen {
+            var isOpened by remember { mutableStateOf(true) }
+
+            if (isOpened) {
+                AppModalBottomSheet(
+                    onDismissRequest = {
+                        isOpened = false
+                        isDismissed = true
+                    }
+                ) { hideSheet ->
+                    AppMediumTextCard(text = BUTTON_TEXT, onClick = hideSheet)
+                }
+            }
+        }
+
+        composeTestRule.onNodeWithText(BUTTON_TEXT).checkButtonAndClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(BUTTON_TEXT).assertDoesNotExist()
+        assertTrue(isDismissed)
+    }
+
+    @Test
+    fun appFilterChipGroup_click_toggledSelectedOptions() {
+        var selectedThemeModes by mutableStateOf(setOf(ThemeMode.SYSTEM))
+
+        composeTestRule.setContentToScreen {
+            AppFilterChipGroup(
+                options = ThemeMode.entries,
+                selectedOptions = selectedThemeModes,
+                onToggle = {
+                    selectedThemeModes = when (it) {
+                        in selectedThemeModes -> selectedThemeModes - it
+                        else -> selectedThemeModes + it
+                    }
+                },
+                optionText = { stringResource(it.descriptionRes) }
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.theme_system).assertIsSelected()
+        composeTestRule.onNodeWithTextId(R.string.theme_dark).assertIsNotSelected()
+
+        composeTestRule.onNodeWithTextId(R.string.theme_dark).checkButtonAndClick()
+        composeTestRule.onNodeWithTextId(R.string.theme_system).checkButtonAndClick()
+
+        composeTestRule.onNodeWithTextId(R.string.theme_system).assertIsNotSelected()
+        composeTestRule.onNodeWithTextId(R.string.theme_dark).assertIsSelected()
+        assertEquals(setOf(ThemeMode.DARK), selectedThemeModes)
+    }
+
+    @Test
+    fun appFilterChip_selection_keptWidth() {
+        var isSelected by mutableStateOf(false)
+
+        composeTestRule.setContentToScreen {
+            AppFilterChip(
+                text = CHIP_TEXT,
+                isSelected = isSelected,
+                onClick = { isSelected = !isSelected }
+            )
+        }
+
+        val notSelectedWidth = composeTestRule.onNodeWithText(CHIP_TEXT).getUnclippedBoundsInRoot().width
+
+        composeTestRule.onNodeWithText(CHIP_TEXT).checkButtonAndClick()
+        composeTestRule.onNodeWithText(CHIP_TEXT).assertIsSelected()
+
+        val selectedWidth = composeTestRule.onNodeWithText(CHIP_TEXT).getUnclippedBoundsInRoot().width
+
+        assertEquals(notSelectedWidth, selectedWidth)
+    }
+
+    @Test
+    fun appFilterChipGroup_selection_keptPositionsOfOtherChips() {
+        var selectedThemeModes by mutableStateOf(setOf<ThemeMode>())
+
+        composeTestRule.setContentToScreen {
+            AppFilterChipGroup(
+                options = ThemeMode.entries,
+                selectedOptions = selectedThemeModes,
+                onToggle = { selectedThemeModes = selectedThemeModes + it },
+                optionText = { stringResource(it.descriptionRes) }
+            )
+        }
+
+        val notSelectedBounds = ThemeMode.entries.map {
+            composeTestRule.onNodeWithTextId(it.descriptionRes).getUnclippedBoundsInRoot()
+        }
+
+        composeTestRule.onNodeWithTextId(ThemeMode.entries.first().descriptionRes).checkButtonAndClick()
+        composeTestRule.onNodeWithTextId(ThemeMode.entries.last().descriptionRes).checkButtonAndClick()
+
+        val selectedBounds = ThemeMode.entries.map {
+            composeTestRule.onNodeWithTextId(it.descriptionRes).getUnclippedBoundsInRoot()
+        }
+
+        assertEquals(notSelectedBounds, selectedBounds)
+    }
+
+    @Test
+    fun appSwitchOption_click_toggledCheckedState() {
+        var isChecked by mutableStateOf(false)
+
+        composeTestRule.setContentToScreen {
+            AppSwitchOption(
+                text = SWITCH_TEXT,
+                isChecked = isChecked,
+                onCheckedChange = { isChecked = it }
+            )
+        }
+
+        composeTestRule.onNodeWithText(SWITCH_TEXT).assertIsOff()
+
+        composeTestRule.onNodeWithText(SWITCH_TEXT).checkButtonAndClick()
+
+        composeTestRule.onNodeWithText(SWITCH_TEXT).assertIsOn()
+        assertTrue(isChecked)
+    }
+
     private fun assertAllTextsAreDisplayed() {
         composeTestRule.onNodeWithText(SMALL_BODY_TEXT).assertIsDisplayed()
         composeTestRule.onNodeWithText(MEDIUM_BODY_TEXT).assertIsDisplayed()
@@ -454,6 +698,17 @@ class ScreenComponentsTest {
         composeTestRule.onNodeWithText(SMALL_TITLE_TEXT).assertIsDisplayed()
         composeTestRule.onNodeWithText(MEDIUM_TITLE_TEXT).assertIsDisplayed()
         composeTestRule.onNodeWithText(LARGE_TITLE_TEXT).assertIsDisplayed()
+    }
+
+    private fun setContentToAppBadgedIconButton(badgeNumber: Int, onClick: () -> Unit) {
+        composeTestRule.setContentToScreen {
+            AppBadgedIconButton(
+                iconRes = R.drawable.filter_list,
+                contentDescription = stringResource(R.string.filters),
+                badgeNumber = badgeNumber,
+                onClick = onClick
+            )
+        }
     }
 
     private fun setContentToAppRadioGroup(onSelect: (ThemeMode) -> Unit) {
@@ -526,6 +781,10 @@ class ScreenComponentsTest {
 
     private companion object {
         const val CATEGORIES_COUNT = 3
+        const val BADGE_NUMBER = 3
+        const val BUTTON_TEXT = "Button"
+        const val SWITCH_TEXT = "Switch"
+        const val CHIP_TEXT = "Chip"
         const val NOTIFICATION_APPEARANCE_MILLIS = 1_000L
         const val NOTIFICATION_TIMEOUT_MILLIS = 6_000L
         const val MAX_HEIGHT_DP = 300

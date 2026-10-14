@@ -14,6 +14,7 @@ import io.mockk.verify
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -25,7 +26,10 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.USER_ACTIVITY_IN
 import xelagurd.socialdating.server.model.SimilarUsersCursor
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.additional.UserCategoryData
+import xelagurd.socialdating.server.model.details.SimilarUsersFilterDetails
+import xelagurd.socialdating.server.model.details.UsersFilterDetails
 import xelagurd.socialdating.server.model.dto.UserDto
+import xelagurd.socialdating.server.model.enums.Gender.FEMALE
 import xelagurd.socialdating.server.model.enums.Gender.MALE
 import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.model.enums.Role.USER
@@ -311,6 +315,152 @@ class UserCategoriesServiceUnitTest {
         confirmVerified(userCategoriesRepository, usersServiceClient)
     }
 
+    @Test
+    fun getSimilarUsers_minDifferenceNumber_returnsOnlyUsersWithEnoughDifference() {
+        setAuthenticatedUser(currentUserId)
+        mockThreeSimilarUsers()
+        every { usersServiceClient.getUsers(listOf(10)) } returns listOf(userDto(10))
+
+        val result = userCategoriesService.getSimilarUsers(
+            currentUserId,
+            SimilarUsersFilterDetails(minDifferenceNumber = 2)
+        )
+
+        // users 20 and 30 have the difference number 1
+        assertEquals(listOf(10), result.content.map { it.id })
+
+        verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) }
+        verify(exactly = 1) { userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1)) }
+        verify(exactly = 1) { usersServiceClient.getUsers(listOf(10)) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
+    }
+
+    @Test
+    fun getSimilarUsers_maxDifferenceNumberWithoutMin_returnsOppositeUsersToo() {
+        setAuthenticatedUser(currentUserId)
+        val currentUserCategories = listOf(userCategoryData(id = 1, maintained = arrayOf(0b0111L)))
+        every { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) } returns currentUserCategories
+        every {
+            userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1))
+        } returns listOf(
+            userCategory(userId = 10, categoryId = 1, maintained = arrayOf(0b0011L)),   // difference 2
+            userCategory(userId = 20, categoryId = 1, maintained = arrayOf(0b0001L)),   // difference 1
+            userCategory(userId = 30, categoryId = 1, notMaintained = arrayOf(0b0111L)) // difference -3
+        )
+        every { usersServiceClient.getUsers(listOf(20, 30)) } returns listOf(userDto(20), userDto(30))
+
+        val result = userCategoriesService.getSimilarUsers(
+            currentUserId,
+            SimilarUsersFilterDetails(maxDifferenceNumber = 1)
+        )
+
+        assertEquals(listOf(20, 30), result.content.map { it.id })
+        assertEquals(listOf(1, -3), result.content.map { it.similarNumber - it.oppositeNumber })
+
+        verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) }
+        verify(exactly = 1) { userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1)) }
+        verify(exactly = 1) { usersServiceClient.getUsers(listOf(20, 30)) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
+    }
+
+    @Test
+    fun getSimilarUsers_differenceNumberRange_returnsOnlyUsersInRange() {
+        setAuthenticatedUser(currentUserId)
+        mockThreeSimilarUsers()
+        every { usersServiceClient.getUsers(listOf(20, 30)) } returns listOf(userDto(20), userDto(30))
+
+        val result = userCategoriesService.getSimilarUsers(
+            currentUserId,
+            SimilarUsersFilterDetails(minDifferenceNumber = 1, maxDifferenceNumber = 1)
+        )
+
+        // user 10 has the difference number 2
+        assertEquals(listOf(20, 30), result.content.map { it.id })
+
+        verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) }
+        verify(exactly = 1) { userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1)) }
+        verify(exactly = 1) { usersServiceClient.getUsers(listOf(20, 30)) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
+    }
+
+    @Test
+    fun getSimilarUsers_usersDataFilter_calculatesOnlyFilteredUsers() {
+        setAuthenticatedUser(currentUserId)
+        val filteredUserIds = listOf(20, 30, 40)
+        val currentUserCategories = listOf(userCategoryData(id = 1, maintained = arrayOf(0b0011L)))
+        every { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) } returns currentUserCategories
+        // user 40 has no similarity, so it is not returned in spite of the filter
+        every {
+            userCategoriesRepository.findAnotherUsersCategories(currentUserId, filteredUserIds, listOf(1))
+        } returns listOf(
+            userCategory(userId = 30, categoryId = 1, maintained = arrayOf(0b0001L)),  // similar 1
+            userCategory(userId = 20, categoryId = 1, maintained = arrayOf(0b0001L))   // similar 1
+        )
+        every { usersServiceClient.getUserIds(any()) } returns filteredUserIds
+        every { usersServiceClient.getUsers(listOf(20, 30)) } returns listOf(userDto(20), userDto(30))
+
+        val result = userCategoriesService.getSimilarUsers(
+            currentUserId,
+            SimilarUsersFilterDetails(
+                genders = listOf(FEMALE),
+                ageMin = 20,
+                ageMax = 30,
+                purposes = listOf(FRIENDS),
+                isSameCity = true
+            )
+        )
+
+        assertEquals(listOf(20, 30), result.content.map { it.id })
+
+        verify(exactly = 1) {
+            usersServiceClient.getUserIds(UsersFilterDetails(listOf(FEMALE), 20, 30, listOf(FRIENDS), currentUserId))
+        }
+        verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) }
+        verify(exactly = 1) {
+            userCategoriesRepository.findAnotherUsersCategories(currentUserId, filteredUserIds, listOf(1))
+        }
+        verify(exactly = 1) { usersServiceClient.getUsers(listOf(20, 30)) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
+    }
+
+    @Test
+    fun getSimilarUsers_usersDataFilterWithoutSuitableUsers_returnsEmptyWithoutCalculation() {
+        setAuthenticatedUser(currentUserId)
+        // the response without content is decoded to null
+        every { usersServiceClient.getUserIds(any()) } returns null
+
+        val result = userCategoriesService.getSimilarUsers(
+            currentUserId,
+            SimilarUsersFilterDetails(genders = listOf(FEMALE))
+        )
+
+        assertTrue(result.content.isEmpty())
+        assertNull(result.nextCursor)
+
+        // the same city is not filtered, so the current user is not passed
+        verify(exactly = 1) { usersServiceClient.getUserIds(UsersFilterDetails(genders = listOf(FEMALE))) }
+        verify(exactly = 0) { userCategoriesRepository.findCurrentUserCategories(any(), any()) }
+        verify(exactly = 0) { userCategoriesRepository.findAnotherUsersCategories(any(), any(), any()) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
+    }
+
+    @Test
+    fun getSimilarUsers_usersWithoutContent_returnsEmptyContent() {
+        setAuthenticatedUser(currentUserId)
+        mockThreeSimilarUsers()
+        // the response without content is decoded to null
+        every { usersServiceClient.getUsers(any()) } returns null
+
+        val result = userCategoriesService.getSimilarUsers(currentUserId)
+
+        assertTrue(result.content.isEmpty())
+
+        verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) }
+        verify(exactly = 1) { userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, listOf(1)) }
+        verify(exactly = 1) { usersServiceClient.getUsers(listOf(10, 20, 30)) }
+        confirmVerified(userCategoriesRepository, usersServiceClient)
+    }
+
     private fun mockThreeSimilarUsers() {
         val currentUserCategories = listOf(userCategoryData(id = 1, maintained = arrayOf(0b0011L)))
         every { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) } returns currentUserCategories
@@ -335,7 +485,10 @@ class UserCategoriesServiceUnitTest {
             userCategoriesRepository.findAnotherUsersCategories(currentUserId, null, emptyList())
         } returns emptyList()
 
-        val result = userCategoriesService.getSimilarUsers(currentUserId, categoryIds)
+        val result = userCategoriesService.getSimilarUsers(
+            currentUserId,
+            SimilarUsersFilterDetails(categoryIds = categoryIds)
+        )
 
         assertTrue(result.content.isEmpty())
 
@@ -382,7 +535,11 @@ class UserCategoriesServiceUnitTest {
             userCategory(userId = 10, categoryId = 4, maintained = arrayOf(0b0001L))
         )
         every {
-            userCategoriesRepository.findAnotherUsersCategories(currentUserId, anotherUserId, listOf(1, 2, 3, 4))
+            userCategoriesRepository.findAnotherUsersCategories(
+                currentUserId,
+                listOf(anotherUserId),
+                listOf(1, 2, 3, 4)
+            )
         } returns anotherUserCategories
 
         val result = userCategoriesService.getDetailedSimilarUser(currentUserId, anotherUserId)
@@ -416,7 +573,11 @@ class UserCategoriesServiceUnitTest {
 
         verify(exactly = 1) { userCategoriesRepository.findCurrentUserCategories(currentUserId, null) }
         verify(exactly = 1) {
-            userCategoriesRepository.findAnotherUsersCategories(currentUserId, anotherUserId, listOf(1, 2, 3, 4))
+            userCategoriesRepository.findAnotherUsersCategories(
+                currentUserId,
+                listOf(anotherUserId),
+                listOf(1, 2, 3, 4)
+            )
         }
         confirmVerified(userCategoriesRepository)
     }

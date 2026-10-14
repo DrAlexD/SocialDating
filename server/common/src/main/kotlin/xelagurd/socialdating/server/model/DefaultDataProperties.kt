@@ -54,4 +54,6 @@ object DefaultDataProperties {
 
     const val SIMILAR_CATEGORIES_NUMBER = 2
     const val OPPOSITE_CATEGORIES_NUMBER = 2
+
+    const val DIFFERENCE_NUMBER_MIN = 1
 }

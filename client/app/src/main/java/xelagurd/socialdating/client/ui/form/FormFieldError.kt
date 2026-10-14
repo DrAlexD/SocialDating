@@ -65,6 +65,25 @@ object FormFieldErrors {
         else -> null
     }
 
+    fun String.integerError() = when {
+        isEmpty() -> null
+        toIntOrNull() == null -> FormFieldError(R.string.error_integer)
+        else -> null
+    }
+
+    fun String.rangeMaxError(min: String) = when {
+        isEmpty() && min.isEmpty() -> FormFieldError(R.string.error_empty_range)
+        isLessThan(min) -> FormFieldError(R.string.error_less_than_min)
+        else -> integerError()
+    }
+
+    private fun String.isLessThan(other: String): Boolean {
+        val value = toIntOrNull() ?: return false
+        val otherValue = other.toIntOrNull() ?: return false
+
+        return value < otherValue
+    }
+
     private fun lengthError(minLength: Int, maxLength: Int) =
         FormFieldError(R.string.error_length, listOf(minLength, maxLength))
 }

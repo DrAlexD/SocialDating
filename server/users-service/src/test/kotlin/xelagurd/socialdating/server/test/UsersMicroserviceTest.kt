@@ -115,6 +115,26 @@ class UsersMicroserviceTest(
     }
 
     @Test
+    fun getUserIds_withFilter_ok() {
+        // user 1 is too young, user 2 and the registered user search for friends only
+        val response = restTemplate.getForEntity(
+            "/users/ids?purposes=RELATIONSHIPS&ageMin=27&sameCityUserId=${users[0].id}",
+            Array<Int>::class.java
+        )
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertEquals(listOf(users[2].id), response.body!!.toList())
+    }
+
+    @Test
+    fun getUserIds_noData_noContent() {
+        val response = restTemplate.getForEntity(
+            "/users/ids?genders=FEMALE",
+            String::class.java
+        )
+        assertEquals(HttpStatus.NO_CONTENT, response.statusCode)
+    }
+
+    @Test
     fun loginUser_validData_ok() {
         val responseAuth = loginUser(loginDetails)
 

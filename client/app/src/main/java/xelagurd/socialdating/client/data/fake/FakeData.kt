@@ -1,11 +1,13 @@
 package xelagurd.socialdating.client.data.fake
 
 import xelagurd.socialdating.client.data.model.Category
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.DIFFERENCE_NUMBER_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.ID_MIN
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.UserCategory
 import xelagurd.socialdating.client.data.model.UserDefiningTheme
+import xelagurd.socialdating.client.data.model.details.SimilarUsersFilterDetails
 import xelagurd.socialdating.client.data.model.dto.DefiningThemeReactionDto
 import xelagurd.socialdating.client.data.model.dto.DetailedSimilarCategoryDto
 import xelagurd.socialdating.client.data.model.dto.DetailedSimilarDefiningThemeDto
@@ -13,6 +15,7 @@ import xelagurd.socialdating.client.data.model.dto.DetailedSimilarUserDto
 import xelagurd.socialdating.client.data.model.dto.SimilarCategoryDto
 import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
 import xelagurd.socialdating.client.data.model.dto.StatementDto
+import xelagurd.socialdating.client.data.model.enums.DifferenceRangeType
 import xelagurd.socialdating.client.data.model.enums.Gender.MALE
 import xelagurd.socialdating.client.data.model.enums.Purpose.ALL_AT_ONCE
 import xelagurd.socialdating.client.data.model.enums.Purpose.FRIENDS
@@ -23,6 +26,7 @@ import xelagurd.socialdating.client.data.model.enums.SimilarityType.OPPOSITE
 import xelagurd.socialdating.client.data.model.enums.SimilarityType.SIMILAR
 import xelagurd.socialdating.client.ui.form.LoginFormData
 import xelagurd.socialdating.client.ui.form.RegistrationFormData
+import xelagurd.socialdating.client.ui.form.SimilarUsersFilterFormData
 import xelagurd.socialdating.client.ui.form.StatementFormData
 
 object FakeData {
@@ -497,6 +501,28 @@ object FakeData {
         )
     )
 
+    val similarUsersFilterDetails = SimilarUsersFilterDetails(
+        categoryIds = setOf(categories[0].id, categories[2].id),
+        minDifferenceNumber = 2,
+        maxDifferenceNumber = 5,
+        genders = setOf(MALE),
+        ageMin = 25,
+        ageMax = 35,
+        purposes = setOf(FRIENDS),
+        isSameCity = true
+    )
+
+    val similarUsersFilterFormData = SimilarUsersFilterFormData(
+        categoryIds = setOf(categories[0].id, categories[2].id),
+        differenceRangeType = DifferenceRangeType.CUSTOM,
+        minDifferenceNumber = "2",
+        maxDifferenceNumber = "5",
+        genders = setOf(MALE),
+        ageRange = 25..35,
+        purposes = setOf(FRIENDS),
+        isSameCity = true
+    )
+
     val detailedSimilarUser = DetailedSimilarUserDto(
         similarNumber = 3,
         oppositeNumber = 1,
@@ -543,6 +569,54 @@ object FakeData {
             )
         )
     )
+
+    // FixMe: remove after adding server hosting
+    // the fake similar users have the same detailed similarity, so it is recalculated by the filtered categories
+    // and then the users are filtered like it is done by the server
+    fun filterSimilarUsers(similarUsersFilterDetails: SimilarUsersFilterDetails): List<SimilarUserDto> {
+        val categoryIds = similarUsersFilterDetails.categoryIds
+        val categoryNamesById = categories.associate { it.id to it.name }
+
+        val filteredCategories = detailedSimilarUser.categories.values
+            .filter { categoryIds.isEmpty() || it.id in categoryIds }
+
+        // the users without the common opinions can't be compared, so they are not returned by any range
+        if (filteredCategories.isEmpty()) return listOf()
+        val categoriesWithSimilarity = filteredCategories.map {
+            SimilarCategoryDto(
+                name = categoryNamesById.getValue(it.id),
+                differenceNumber = it.similarNumber - it.oppositeNumber
+            )
+        }
+
+        return similarUsers
+            .map { similarUser ->
+                similarUser.copy(
+                    similarNumber = filteredCategories.sumOf { it.similarNumber },
+                    oppositeNumber = filteredCategories.sumOf { it.oppositeNumber },
+                    similarCategories = categoriesWithSimilarity
+                        .filter { it.differenceNumber > 0 }
+                        .sortedByDescending { it.differenceNumber },
+                    oppositeCategories = categoriesWithSimilarity
+                        .filter { it.differenceNumber < 0 }
+                        .sortedBy { it.differenceNumber }
+                )
+            }
+            .filter { similarUsersFilterDetails.isSuitable(it) }
+    }
+
+    private fun SimilarUsersFilterDetails.isSuitable(similarUser: SimilarUserDto) =
+        similarUser.similarNumber - similarUser.oppositeNumber in toDifferenceNumberRange() &&
+                (genders.isEmpty() || similarUser.gender in genders) &&
+                (ageMin == null || similarUser.age >= ageMin) && (ageMax == null || similarUser.age <= ageMax) &&
+                // the users who search for everything at once are suitable for any purpose
+                (purposes.isEmpty() || similarUser.purpose in purposes + ALL_AT_ONCE) &&
+                (!isSameCity || similarUser.city.equals(mainUser.city, ignoreCase = true))
+
+    // the default range is used only when no border is set, otherwise the absent border doesn't limit anything
+    private fun SimilarUsersFilterDetails.toDifferenceNumberRange() =
+        (minDifferenceNumber ?: if (maxDifferenceNumber == null) DIFFERENCE_NUMBER_MIN else Int.MIN_VALUE)..
+                (maxDifferenceNumber ?: Int.MAX_VALUE)
 
     const val FAILURE_TEXT = "Failure Text"
     const val ERROR_TEXT = "Error Text"

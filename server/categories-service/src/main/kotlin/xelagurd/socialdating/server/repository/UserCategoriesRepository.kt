@@ -36,12 +36,16 @@ interface UserCategoriesRepository : JpaRepository<UserCategory, Int> {
         select *
         from user_categories
         where user_id != :currentUserId
-          and (:anotherUserId is null or user_id = :anotherUserId)
+          and (coalesce(:anotherUserIds) is null or user_id in (:anotherUserIds))
           and (maintained is not null or not_maintained is not null)
           and category_id in (:categoryIds)
         """,
         nativeQuery = true
     )
-    fun findAnotherUsersCategories(currentUserId: Int, anotherUserId: Int?, categoryIds: List<Int>): List<UserCategory>
+    fun findAnotherUsersCategories(
+        currentUserId: Int,
+        anotherUserIds: List<Int>?,
+        categoryIds: List<Int>
+    ): List<UserCategory>
 
 }

@@ -62,7 +62,7 @@ class StatementAddingScreenTest {
         }
 
         assertContentIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.add_statement).checkDisabledButton()
+        composeTestRule.onNodeWithTextId(R.string.publish).checkDisabledButton()
     }
 
     @Test
@@ -72,7 +72,7 @@ class StatementAddingScreenTest {
         }
 
         assertContentIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.add_statement).checkDisabledButton()
+        composeTestRule.onNodeWithTextId(R.string.publish).checkDisabledButton()
     }
 
     @Test
@@ -88,7 +88,7 @@ class StatementAddingScreenTest {
         assertOpinionIsDisplayed(anotherChosenDefiningTheme)
         assertOpinionIsNotDisplayed(notChosenDefiningTheme)
 
-        composeTestRule.onNodeWithTextId(R.string.add_statement).checkEnabledButton()
+        composeTestRule.onNodeWithTextId(R.string.publish).checkEnabledButton()
     }
 
     @Test
@@ -108,7 +108,7 @@ class StatementAddingScreenTest {
                 STATEMENT_TEXT_LENGTH_MAX
             )
             .performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.add_statement)
+        composeTestRule.onNodeWithTextId(R.string.publish)
             .performScrollTo().checkDisabledButton()
     }
 
@@ -127,7 +127,7 @@ class StatementAddingScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithTextId(R.string.add_statement).checkDisabledButton()
+        composeTestRule.onNodeWithTextId(R.string.publish).checkDisabledButton()
 
         composeTestRule.onNodeWithTextId(R.string.statement_text).checkTextFieldAndInput(INPUT_TEXT)
         assertEquals(true, changedFormData?.text?.contains(INPUT_TEXT))
@@ -166,7 +166,7 @@ class StatementAddingScreenTest {
             .checkButtonAndClick()
         assertEquals(true, changedFormData?.definingThemes?.get(chosenDefiningTheme.id))
 
-        composeTestRule.onNodeWithTextId(R.string.add_statement).checkButtonAndClick()
+        composeTestRule.onNodeWithTextId(R.string.publish).checkButtonAndClick()
         assertTrue(isStatementAddingClicked)
     }
 

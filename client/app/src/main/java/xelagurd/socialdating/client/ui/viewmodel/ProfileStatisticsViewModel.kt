@@ -61,6 +61,8 @@ class ProfileStatisticsViewModel @Inject constructor(
 
     private val userId: Int = checkNotNull(savedStateHandle[ProfileStatisticsDestination.userId])
     private val anotherUserId: Int = checkNotNull(savedStateHandle[ProfileStatisticsDestination.anotherUserId])
+    private val categoryIds: Set<Int> =
+        savedStateHandle.get<IntArray>(ProfileStatisticsDestination.categoryIds)?.toSet().orEmpty()
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
@@ -87,7 +89,9 @@ class ProfileStatisticsViewModel @Inject constructor(
         ProfileStatisticsUiState(
             userId = userId,
             anotherUserId = anotherUserId,
-            entities = userCategories.hideWhileLoading(dataRequestStatus),
+            entities = userCategories
+                .filter { categoryIds.isEmpty() || it.categoryId in categoryIds }
+                .hideWhileLoading(dataRequestStatus),
             entityIdToData = userDefiningThemes.groupBy { it.categoryId },
             entitiesMask = detailedSimilarUser,
             dataRequestStatus = dataRequestStatus,

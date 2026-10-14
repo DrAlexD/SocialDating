@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import xelagurd.socialdating.client.data.model.details.SimilarUsersFilterDetails
 import xelagurd.socialdating.client.data.model.enums.AppLanguage
 import xelagurd.socialdating.client.data.model.enums.ThemeMode
 
@@ -24,6 +25,7 @@ class PreferencesRepository @Inject constructor(
     val isOfflineMode = dataStore.data.map { it[IS_OFFLINE_MODE] ?: IS_OFFLINE_MODE_DEFAULT }
     val themeMode = dataStore.data.map { ThemeMode.fromName(it[THEME_MODE]) }
     val language = dataStore.data.map { AppLanguage.fromName(it[LANGUAGE]) }
+    val similarUsersFilterDetails = dataStore.data.map { SimilarUsersFilterDetails.fromJson(it[SIMILAR_USERS_FILTER]) }
 
     val languageChanges = language.distinctUntilChanged().drop(1)
 
@@ -51,12 +53,17 @@ class PreferencesRepository @Inject constructor(
         dataStore.edit { it[LANGUAGE] = language.name }
     }
 
+    suspend fun saveSimilarUsersFilterDetails(similarUsersFilterDetails: SimilarUsersFilterDetails) {
+        dataStore.edit { it[SIMILAR_USERS_FILTER] = similarUsersFilterDetails.toJson() }
+    }
+
     suspend fun clearPreferences() {
         dataStore.edit {
             it[CURRENT_USER_ID] = CURRENT_USER_ID_DEFAULT
             it[ACCESS_TOKEN] = ACCESS_TOKEN_DEFAULT
             it[REFRESH_TOKEN] = REFRESH_TOKEN_DEFAULT
             it[IS_OFFLINE_MODE] = IS_OFFLINE_MODE_DEFAULT
+            it.remove(SIMILAR_USERS_FILTER)
         }
     }
 
@@ -67,6 +74,7 @@ class PreferencesRepository @Inject constructor(
         private val IS_OFFLINE_MODE = booleanPreferencesKey("is_offline_mode")
         private val THEME_MODE = stringPreferencesKey("theme_mode")
         private val LANGUAGE = stringPreferencesKey("language")
+        private val SIMILAR_USERS_FILTER = stringPreferencesKey("similar_users_filter")
         const val CURRENT_USER_ID_DEFAULT = -1
         const val ACCESS_TOKEN_DEFAULT = ""
         const val REFRESH_TOKEN_DEFAULT = ""

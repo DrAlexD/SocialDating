@@ -170,6 +170,11 @@ fun AppNavHost(
                 },
                 navArgument(ProfileStatisticsDestination.anotherUserId) {
                     type = NavType.IntType
+                },
+                navArgument(ProfileStatisticsDestination.categoryIds) {
+                    type = NavType.IntArrayType
+                    nullable = true
+                    defaultValue = null
                 }
             )
         ) {
@@ -187,8 +192,11 @@ fun AppNavHost(
             )
         ) {
             SimilarUsersScreen(
-                onSimilarUserClick = {
-                    navController.navigateIfResumed("${ProfileStatisticsDestination.route}/$currentUserId/$it")
+                onSimilarUserClick = { anotherUserId, categoryIds ->
+                    navController.navigateIfResumed(
+                        "${ProfileStatisticsDestination.route}/$currentUserId/$anotherUserId" +
+                                ProfileStatisticsDestination.categoryIdsQuery(categoryIds)
+                    )
                 }
             )
         }

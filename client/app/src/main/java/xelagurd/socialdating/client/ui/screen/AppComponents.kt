@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +13,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -116,7 +120,7 @@ private fun NextPageRequestStatusComponent(
                 onClick = onLoadNextPage
             )
 
-            RequestStatus.UNDEFINED, RequestStatus.SUCCESS -> {
+            RequestStatus.UNDEFINED, RequestStatus.NOT_REQUESTED, RequestStatus.SUCCESS -> {
                 if (pagedDataListUiState.isLastPage) {
                     AppMediumTitleText(text = stringResource(R.string.no_more_data))
                 }
@@ -256,6 +260,7 @@ private fun DataRequestStatusComponent(
             is RequestStatus.FAILURE -> AppLargeTitleText(text = dataRequestStatus.failureText)
             is RequestStatus.ERROR -> AppLargeTitleText(text = dataRequestStatus.errorText)
             RequestStatus.SUCCESS -> AppLargeTitleText(text = stringResource(R.string.no_data))
+            RequestStatus.NOT_REQUESTED -> {}
         }
     }
 }
@@ -301,8 +306,8 @@ private fun ActionRequestStatusComponent(
         when (actionRequestStatus) {
             RequestStatus.LOADING -> AppLoadingIndicator()
             // the success is handled by the effect, the failed statuses by the notification
-            RequestStatus.SUCCESS, RequestStatus.UNDEFINED, is RequestStatus.FAILURE,
-            is RequestStatus.ERROR -> {}
+            RequestStatus.SUCCESS, RequestStatus.UNDEFINED, RequestStatus.NOT_REQUESTED,
+            is RequestStatus.FAILURE, is RequestStatus.ERROR -> {}
         }
     }
 }
@@ -326,6 +331,67 @@ fun <T> SettingChoosingComponent(
             onSelect = onSelect,
             optionDescriptionRes = optionDescriptionRes,
             testTagSuffix = stringResource(titleRes)
+        )
+    }
+}
+
+@Composable
+fun TitledComponent(
+    @StringRes titleRes: Int,
+    hint: String? = null,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
+    ) {
+        AppMediumTitleText(text = stringResourceWithColon(titleRes))
+        content()
+        if (hint != null) {
+            AppSmallBodyText(
+                text = hint,
+                modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_8dp))
+            )
+        }
+    }
+}
+
+@Composable
+fun <T> MultiChoosingComponent(
+    @StringRes titleRes: Int,
+    options: List<T>,
+    selectedOptions: Set<T>,
+    onToggle: (T) -> Unit,
+    optionText: @Composable (T) -> String,
+    hint: String? = null
+) {
+    TitledComponent(titleRes = titleRes, hint = hint) {
+        AppFilterChipGroup(
+            options = options,
+            selectedOptions = selectedOptions,
+            onToggle = onToggle,
+            optionText = optionText
+        )
+    }
+}
+
+@Composable
+fun RangeChoosingComponent(
+    @StringRes titleRes: Int,
+    value: IntRange,
+    valueRange: IntRange,
+    onValueChange: (IntRange) -> Unit
+) {
+    // the value is changed continuously while dragging, so it is passed on only when the dragging is finished
+    var currentValue by remember(value) { mutableStateOf(value) }
+
+    TitledComponent(titleRes = titleRes) {
+        AppLargeBodyText(text = stringResource(R.string.range, currentValue.first, currentValue.last))
+        AppRangeSlider(
+            value = currentValue,
+            valueRange = valueRange,
+            onValueChange = { currentValue = it },
+            onValueChangeFinished = { onValueChange(currentValue) }
         )
     }
 }

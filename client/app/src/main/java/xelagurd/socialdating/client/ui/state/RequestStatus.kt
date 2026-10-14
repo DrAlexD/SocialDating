@@ -10,6 +10,8 @@ sealed class RequestStatus {
     data class FAILURE(val failureText: String = "") : RequestStatus()
     data class ERROR(val errorText: String = "") : RequestStatus()
     data object UNDEFINED : RequestStatus()
+    // unlike the undefined status, which is replaced by the request started right away, this one waits for the user
+    data object NOT_REQUESTED : RequestStatus()
 
     fun isDataLoading() =
         this is LOADING || this is UNDEFINED
