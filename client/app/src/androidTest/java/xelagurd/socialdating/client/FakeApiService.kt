@@ -13,6 +13,8 @@ import xelagurd.socialdating.client.data.model.dto.DetailedSimilarUserDto
 import xelagurd.socialdating.client.data.model.dto.PageDto
 import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
 import xelagurd.socialdating.client.data.model.dto.StatementDto
+import xelagurd.socialdating.client.data.model.enums.Gender
+import xelagurd.socialdating.client.data.model.enums.Purpose
 import xelagurd.socialdating.client.data.remote.ApiService
 
 class FakeApiService : ApiService {
@@ -54,7 +56,14 @@ class FakeApiService : ApiService {
 
     override suspend fun getSimilarUsers(
         currentUserId: Int,
-        categoryIds: List<Int>?,
+        categoryIds: List<Int>,
+        minDifferenceNumber: Int?,
+        maxDifferenceNumber: Int?,
+        genders: List<Gender>,
+        ageMin: Int?,
+        ageMax: Int?,
+        purposes: List<Purpose>,
+        isSameCity: Boolean,
         cursor: String?,
         size: Int
     ): Response<PageDto<SimilarUserDto>> =

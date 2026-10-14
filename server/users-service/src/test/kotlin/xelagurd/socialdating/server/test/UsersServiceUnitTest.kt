@@ -10,9 +10,16 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeUsersData
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
+import xelagurd.socialdating.server.model.details.UsersFilterDetails
+import xelagurd.socialdating.server.model.enums.Gender.FEMALE
+import xelagurd.socialdating.server.model.enums.Purpose.ALL_AT_ONCE
+import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.repository.UsersRepository
 import xelagurd.socialdating.server.service.UsersService
 import xelagurd.socialdating.server.utils.TestUtils.nextIntList
@@ -66,6 +73,62 @@ class UsersServiceUnitTest {
         assertEquals(userDtos, result)
 
         verify(exactly = 1) { usersRepository.findAllByIdIn(userIds) }
+        confirmVerified(usersRepository)
+    }
+
+    @Test
+    fun getUserIds_withoutFilter_findsUserIdsOfAnyAge() {
+        every { usersRepository.findUserIds(any(), any(), any(), any(), any(), any()) } returns userIds
+
+        val result = usersService.getUserIds(UsersFilterDetails())
+
+        assertEquals(userIds, result)
+
+        verify(exactly = 1) { usersRepository.findUserIds(null, AGE_MIN, AGE_MAX, null, null, null) }
+        confirmVerified(usersRepository)
+    }
+
+    @Test
+    fun getUserIds_withFilter_findsUserIdsWithAllAtOncePurposeAndCityInItsLanguages() {
+        every { usersRepository.findById(any()) } returns Optional.of(user)
+        every { usersRepository.findUserIds(any(), any(), any(), any(), any(), any()) } returns userIds
+
+        val result = usersService.getUserIds(
+            UsersFilterDetails(
+                genders = listOf(FEMALE),
+                ageMin = 20,
+                ageMax = 30,
+                purposes = listOf(FRIENDS),
+                sameCityUserId = userId
+            )
+        )
+
+        assertEquals(userIds, result)
+
+        verify(exactly = 1) { usersRepository.findById(userId) }
+        verify(exactly = 1) {
+            usersRepository.findUserIds(
+                listOf(FEMALE.name),
+                20,
+                30,
+                listOf(FRIENDS.name, ALL_AT_ONCE.name),
+                user.cityEn,
+                user.cityRu
+            )
+        }
+        confirmVerified(usersRepository)
+    }
+
+    @Test
+    fun getUserIds_missingSameCityUser_returnsEmptyList() {
+        every { usersRepository.findById(any()) } returns Optional.empty()
+
+        val result = usersService.getUserIds(UsersFilterDetails(sameCityUserId = userId))
+
+        assertTrue(result.isEmpty())
+
+        verify(exactly = 1) { usersRepository.findById(userId) }
+        verify(exactly = 0) { usersRepository.findUserIds(any(), any(), any(), any(), any(), any()) }
         confirmVerified(usersRepository)
     }
 }

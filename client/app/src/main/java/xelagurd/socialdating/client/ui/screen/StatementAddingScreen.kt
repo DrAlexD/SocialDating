@@ -135,7 +135,7 @@ private inline fun StatementDetailsBody(
         }
         AppLargeTextCard(
             isEnabled = statementFormData.isValid && actionRequestStatus.isAllowedActionRefresh(),
-            text = stringResource(R.string.add_statement),
+            text = stringResource(R.string.publish),
             onClick = onStatementAddingClick
         )
     }

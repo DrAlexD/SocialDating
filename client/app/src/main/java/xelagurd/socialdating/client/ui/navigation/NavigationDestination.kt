@@ -105,7 +105,17 @@ object ProfileStatisticsDestination : NavigationDestination() {
 
     const val userId = "userId"
     const val anotherUserId = "anotherUserId"
-    val routeWithArgs = "$route/{$userId}/{$anotherUserId}"
+
+    // the statistics of a similar user are limited by the categories which were used to find this user
+    const val categoryIds = "categoryIds"
+    val routeWithArgs = "$route/{$userId}/{$anotherUserId}?$categoryIds={$categoryIds}"
+
+    // the list argument is passed by the repeated query parameter
+    fun categoryIdsQuery(ids: Set<Int>) =
+        when {
+            ids.isEmpty() -> ""
+            else -> ids.joinToString(separator = "&", prefix = "?") { "$categoryIds=$it" }
+        }
 }
 
 object SimilarUsersDestination : NavigationDestination() {

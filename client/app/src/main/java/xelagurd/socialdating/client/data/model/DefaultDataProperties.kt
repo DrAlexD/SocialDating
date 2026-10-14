@@ -29,6 +29,8 @@ object DefaultDataProperties {
     const val AGE_MIN = 18
     const val AGE_MAX = 99
 
+    const val DIFFERENCE_NUMBER_MIN = 1
+
     private const val EMAIL_LOCAL_PART = "[A-Za-z0-9_%+-]+(\\.[A-Za-z0-9_%+-]+)*"
     private const val EMAIL_DOMAIN_LABEL = "[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?"
 

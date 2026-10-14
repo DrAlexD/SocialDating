@@ -1,19 +1,25 @@
 package xelagurd.socialdating.client.androidTest
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.unit.dp
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithRange
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextIdWithColon
@@ -23,6 +29,8 @@ import xelagurd.socialdating.client.HiltTestActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Category
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.client.data.model.DefiningTheme
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.enums.ThemeMode
@@ -33,7 +41,10 @@ import xelagurd.socialdating.client.ui.screen.DataChoosingListComponent
 import xelagurd.socialdating.client.ui.screen.DataMultiChoosingListComponent
 import xelagurd.socialdating.client.ui.screen.DataEntityComponent
 import xelagurd.socialdating.client.ui.screen.DataListComponent
+import xelagurd.socialdating.client.ui.screen.MultiChoosingComponent
+import xelagurd.socialdating.client.ui.screen.RangeChoosingComponent
 import xelagurd.socialdating.client.ui.screen.SettingChoosingComponent
+import xelagurd.socialdating.client.ui.screen.TitledComponent
 import xelagurd.socialdating.client.ui.state.CategoriesUiState
 import xelagurd.socialdating.client.ui.state.ProfileUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
@@ -395,6 +406,122 @@ class AppComponentsTest {
         assertEquals(ThemeMode.DARK, selectedThemeMode)
     }
 
+    @Test
+    fun titledComponent_content_displayedTitleWithContent() {
+        composeTestRule.setContentToScreen {
+            TitledComponent(titleRes = R.string.theme) {
+                AppLargeTitleText(text = CONTENT_TEXT)
+            }
+        }
+
+        composeTestRule.onNodeWithTextIdWithColon(R.string.theme).assertIsDisplayed()
+        composeTestRule.onNodeWithText(CONTENT_TEXT).assertIsDisplayed()
+    }
+
+    @Test
+    fun titledComponent_hint_displayedHintUnderContent() {
+        composeTestRule.setContentToScreen {
+            TitledComponent(titleRes = R.string.theme, hint = HINT_TEXT) {
+                AppLargeTitleText(text = CONTENT_TEXT)
+            }
+        }
+
+        val contentBounds = composeTestRule.onNodeWithText(CONTENT_TEXT).getUnclippedBoundsInRoot()
+        val hintBounds = composeTestRule.onNodeWithText(HINT_TEXT).getUnclippedBoundsInRoot()
+
+        assertTrue(hintBounds.top >= contentBounds.bottom)
+    }
+
+    @Test
+    fun multiChoosingComponent_themeModes_displayedTitleWithAllOptions() {
+        setContentToMultiChoosingComponent { }
+
+        composeTestRule.onNodeWithTextIdWithColon(R.string.theme).assertIsDisplayed()
+        ThemeMode.entries.forEach {
+            composeTestRule.onNodeWithTextId(it.descriptionRes).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun multiChoosingComponent_hint_displayedHintUnderOptions() {
+        composeTestRule.setContentToScreen {
+            MultiChoosingComponent(
+                titleRes = R.string.theme,
+                options = ThemeMode.entries,
+                selectedOptions = setOf(),
+                onToggle = {},
+                optionText = { stringResource(it.descriptionRes) },
+                hint = CONTENT_TEXT
+            )
+        }
+
+        val optionBounds = composeTestRule.onNodeWithTextId(ThemeMode.SYSTEM.descriptionRes).getUnclippedBoundsInRoot()
+        val hintBounds = composeTestRule.onNodeWithText(CONTENT_TEXT).getUnclippedBoundsInRoot()
+
+        assertTrue(hintBounds.top >= optionBounds.bottom)
+    }
+
+    @Test
+    fun multiChoosingComponent_click_calledToggleAction() {
+        var toggledThemeMode: ThemeMode? = null
+
+        setContentToMultiChoosingComponent { toggledThemeMode = it }
+
+        composeTestRule.onNodeWithTextId(R.string.theme_dark).checkButtonAndClick()
+
+        assertEquals(ThemeMode.DARK, toggledThemeMode)
+    }
+
+    @Test
+    fun rangeChoosingComponent_value_displayedTitleWithRange() {
+        setContentToRangeChoosingComponent(RANGE_START..RANGE_END) { }
+
+        composeTestRule.onNodeWithTextIdWithColon(R.string.age).assertIsDisplayed()
+        composeTestRule.onNodeWithRange(RANGE_START..RANGE_END).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.range_slider).assertIsDisplayed()
+    }
+
+    @Test
+    fun rangeChoosingComponent_dragStartThumb_calledValueChangeActionWithNarrowedRange() {
+        var changedValue: IntRange? = null
+
+        setContentToRangeChoosingComponent(AGE_MIN..AGE_MAX) { changedValue = it }
+
+        composeTestRule.onNodeWithTagId(R.string.range_slider).performTouchInput {
+            swipeRight(startX = left, endX = centerX)
+        }
+        composeTestRule.waitForIdle()
+
+        assertNotNull(changedValue)
+        val value = changedValue!!
+        assertTrue(value.first > AGE_MIN)
+        assertEquals(AGE_MAX, value.last)
+        composeTestRule.onNodeWithRange(value).assertIsDisplayed()
+    }
+
+    private fun setContentToMultiChoosingComponent(onToggle: (ThemeMode) -> Unit) {
+        composeTestRule.setContentToScreen {
+            MultiChoosingComponent(
+                titleRes = R.string.theme,
+                options = ThemeMode.entries,
+                selectedOptions = setOf(ThemeMode.SYSTEM),
+                onToggle = onToggle,
+                optionText = { stringResource(it.descriptionRes) }
+            )
+        }
+    }
+
+    private fun setContentToRangeChoosingComponent(value: IntRange, onValueChange: (IntRange) -> Unit) {
+        composeTestRule.setContentToScreen {
+            RangeChoosingComponent(
+                titleRes = R.string.age,
+                value = value,
+                valueRange = AGE_MIN..AGE_MAX,
+                onValueChange = onValueChange
+            )
+        }
+    }
+
     private fun setContentToSettingChoosingComponent(onSelect: (ThemeMode) -> Unit) {
         composeTestRule.setContentToScreen {
             SettingChoosingComponent(
@@ -424,6 +551,9 @@ class AppComponentsTest {
 
     private companion object {
         const val CONTENT_TEXT = "Content"
+        const val HINT_TEXT = "Hint"
+        const val RANGE_START = 25
+        const val RANGE_END = 40
         const val MAX_HEIGHT_DP = 200
     }
 }

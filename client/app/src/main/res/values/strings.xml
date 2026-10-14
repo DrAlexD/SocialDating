@@ -4,7 +4,9 @@
     <string name="progress_indicator" translatable="false">Progress indicator</string>
     <string name="notification" translatable="false">Notification</string>
     <string name="refresh_indicator" translatable="false">Refresh indicator</string>
+    <string name="range_slider" translatable="false">Range slider</string>
     <string name="text_with_colon" translatable="false">%1$s:</string>
+    <string name="range" translatable="false">%1$d – %2$d</string>
     <string name="back_button">Back</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="no_data">No data</string>
@@ -13,6 +15,7 @@
     <string name="online">Online</string>
     <string name="loading">Loading</string>
     <string name="offline">Offline</string>
+    <string name="not_requested">Not requested</string>
     <string name="nav_categories">Navigate to Categories</string>
     <string name="nav_profile">Navigate to Profile</string>
     <string name="nav_settings">Navigate to Settings</string>
@@ -62,6 +65,7 @@
     <string name="relationships">Find relationships</string>
     <string name="all_at_once">All at once</string>
     <string name="add_statement">Add statement</string>
+    <string name="publish">Publish</string>
     <string name="statement_text">Statement text</string>
     <string name="defining_themes">Defining themes</string>
     <string name="is_support_defining_theme">Does statement support each chosen defining theme?</string>
@@ -73,4 +77,20 @@
     <string name="error_email_format">Incorrect email format</string>
     <string name="error_repeated_password">Passwords don\'t match</string>
     <string name="error_age">From %1$d to %2$d years</string>
+    <string name="error_integer">Integer is required</string>
+    <string name="error_empty_range">Fill in at least one field</string>
+    <string name="error_less_than_min">Must not be less than minimum</string>
+    <string name="calculate">Calculate</string>
+    <string name="filters">Filters</string>
+    <string name="reset">Reset</string>
+    <string name="done">Done</string>
+    <string name="similarity">Similarity</string>
+    <string name="default_similarity">Default</string>
+    <string name="custom_similarity">Custom</string>
+    <string name="default_similarity_hint">By default, minimum is %1$d and maximum is unlimited</string>
+    <string name="min_similarity">Minimum similarity</string>
+    <string name="max_similarity">Maximum similarity</string>
+    <string name="only_my_city">Only my city</string>
+    <string name="all_at_once_always_displayed">Users with the purpose \"All at once\" are always displayed</string>
+    <string name="calculate_similar_users_hint">Set up the filters and press \"Calculate\" to find similar users</string>
 </resources>

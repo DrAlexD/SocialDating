@@ -1,6 +1,8 @@
 package xelagurd.socialdating.client.androidTest
 
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.testing.TestNavHostController
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -21,6 +23,8 @@ import xelagurd.socialdating.client.AndroidTestUtils.assertRouteInBackStack
 import xelagurd.socialdating.client.AndroidTestUtils.assertRouteNotInBackStack
 import xelagurd.socialdating.client.AndroidTestUtils.getCurrentRoute
 import xelagurd.socialdating.client.HiltTestActivity
+import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.fake.FakeData.TEST_TIMEOUT_MILLIS
 import xelagurd.socialdating.client.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
 import xelagurd.socialdating.client.ui.navigation.ProfileStatisticsDestination
@@ -52,6 +56,21 @@ class SimilarUsersScreenNavigationTest {
         navController.assertCurrentRouteName(ProfileStatisticsDestination.routeWithArgs)
         navController.assertRouteInBackStack(SimilarUsersDestination.routeWithArgs)
         navController.assertBackStackDepth(4)
+    }
+
+    @Test
+    fun appNavHost_clickSimilarUserFoundByCategory_displayedOnlyThisCategoryInProfileStatistics() {
+        val filteredCategory = FakeData.mainCategory
+        val notFilteredCategory = FakeData.categories.first { it.id != filteredCategory.id }
+
+        composeTestRule.loginAndNavigateToCategories()
+        composeTestRule.navigateToSimilarUserProfileStatistics(filteredCategory)
+
+        navController.assertCurrentRouteName(ProfileStatisticsDestination.routeWithArgs)
+        composeTestRule.waitUntil(TEST_TIMEOUT_MILLIS) {
+            composeTestRule.onNodeWithText(filteredCategory.name).isDisplayed()
+        }
+        composeTestRule.onNodeWithText(notFilteredCategory.name).assertDoesNotExist()
     }
 
     @Test

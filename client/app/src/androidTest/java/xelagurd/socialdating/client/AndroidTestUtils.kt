@@ -105,6 +105,9 @@ object AndroidTestUtils {
     ) =
         onNodeWithText(activity.getString(R.string.text_with_colon, activity.getString(id)))
 
+    fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithRange(range: IntRange) =
+        onNodeWithText(activity.getString(R.string.range, range.first, range.last))
+
     fun SemanticsNodeInteraction.checkEnabledButton() {
         this.assertIsDisplayed()
         this.assertIsEnabled()

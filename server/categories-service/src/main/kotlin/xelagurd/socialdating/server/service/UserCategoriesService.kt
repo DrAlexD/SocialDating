@@ -13,6 +13,7 @@ import xelagurd.socialdating.server.model.SimilarUsersCursor
 import xelagurd.socialdating.server.model.UserCategory
 import xelagurd.socialdating.server.model.additional.SimilarUserData
 import xelagurd.socialdating.server.model.additional.UserCategoryData
+import xelagurd.socialdating.server.model.details.SimilarUsersFilterDetails
 import xelagurd.socialdating.server.model.dto.DetailedSimilarCategoryDto
 import xelagurd.socialdating.server.model.dto.DetailedSimilarDefiningThemeDto
 import xelagurd.socialdating.server.model.dto.DetailedSimilarUserDto
@@ -44,7 +45,7 @@ class UserCategoriesService(
 
     fun getSimilarUsers(
         currentUserId: Int,
-        categoryIds: List<Int>? = null,
+        similarUsersFilterDetails: SimilarUsersFilterDetails = SimilarUsersFilterDetails(),
         cursor: String? = null,
         size: Int = PAGE_SIZE_DEFAULT
     ): PageDto<SimilarUserDto> {
@@ -52,28 +53,36 @@ class UserCategoriesService(
 
         val similarUsersCursor = SimilarUsersCursor.decodeOrNull(cursor)
         val pageSize = size.coerceIn(PAGE_SIZE_MIN, PAGE_SIZE_MAX)
+        val differenceNumberRange = similarUsersFilterDetails.toDifferenceNumberRange()
 
         val language = AppLanguage.current()
 
+        val filteredUserIds = similarUsersFilterDetails
+            .takeIf { it.isUsersDataFiltered() }
+            ?.let { usersServiceClient.getUserIds(it.toUsersFilterDetails(currentUserId)).orEmpty() }
+
+        if (filteredUserIds?.isEmpty() == true) return PageDto(listOf())
+
         val currentUserCategoriesById = userCategoriesRepository
-            .findCurrentUserCategories(currentUserId, categoryIds)
+            .findCurrentUserCategories(currentUserId, similarUsersFilterDetails.categoryIds)
             .associateBy { it.id }
 
         val anotherUsersCategories = userCategoriesRepository
-            .findAnotherUsersCategories(currentUserId, null, currentUserCategoriesById.keys.toList())
+            .findAnotherUsersCategories(currentUserId, filteredUserIds, currentUserCategoriesById.keys.toList())
 
         val similarUsers = anotherUsersCategories
             .groupBy { it.userId }
             .mapNotNull { (anotherUserId, anotherUserCategories) ->
                 val (similarNumberUser, oppositeNumberUser, categoriesWithSimilarity) =
                     calculateUserSimilarity(currentUserCategoriesById, anotherUserCategories, language)
+                val differenceNumberUser = similarNumberUser - oppositeNumberUser
 
-                if (categoriesWithSimilarity.isNotEmpty() && similarNumberUser > oppositeNumberUser) {
+                if (categoriesWithSimilarity.isNotEmpty() && differenceNumberUser in differenceNumberRange) {
                     SimilarUserData(
                         id = anotherUserId,
                         similarNumber = similarNumberUser,
                         oppositeNumber = oppositeNumberUser,
-                        differenceNumber = similarNumberUser - oppositeNumberUser,
+                        differenceNumber = differenceNumberUser,
                         similarCategories = categoriesWithSimilarity
                             .filter { it.differenceNumber > 0 }
                             .sortedByDescending { it.differenceNumber }
@@ -95,6 +104,7 @@ class UserCategoriesService(
 
         val usersById = usersServiceClient
             .getUsers(pageSimilarUsers.map { it.id })
+            .orEmpty()
             .associateBy { it.id }
 
         return PageDto(
@@ -117,7 +127,7 @@ class UserCategoriesService(
             .associateBy { it.id }
 
         val anotherUserCategories = userCategoriesRepository
-            .findAnotherUsersCategories(currentUserId, anotherUserId, currentUserCategoriesById.keys.toList())
+            .findAnotherUsersCategories(currentUserId, listOf(anotherUserId), currentUserCategoriesById.keys.toList())
 
         val (similarNumberUser, oppositeNumberUser, categoriesWithSimilarity) =
             calculateDetailedUserSimilarity(currentUserCategoriesById, anotherUserCategories)

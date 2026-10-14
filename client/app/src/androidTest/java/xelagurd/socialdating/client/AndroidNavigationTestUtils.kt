@@ -9,6 +9,7 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -19,6 +20,7 @@ import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.fake.FakeData.TEST_TIMEOUT_MILLIS
+import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.ui.navigation.AppNavHost
 import xelagurd.socialdating.client.ui.theme.AppTheme
 
@@ -117,7 +119,7 @@ object AndroidNavigationTestUtils {
             onNodeWithText(FakeData.mainStatement.text).isDisplayed()
         }
 
-        onNodeWithContentDescriptionId(R.string.add_statement).checkButtonAndClick()
+        onNodeWithTextId(R.string.add_statement).checkButtonAndClick()
         checkBottomNavBarWithCategoriesTopLevel()
     }
 
@@ -126,9 +128,9 @@ object AndroidNavigationTestUtils {
         onNodeWithText(FakeData.mainDefiningTheme.name).checkButtonAndClick()
         onNodeWithTagId(R.string.yes, FakeData.mainDefiningTheme.id.toString()).checkButtonAndClick()
 
-        onNodeWithTextId(R.string.add_statement).checkButtonAndClick()
+        onNodeWithTextId(R.string.publish).checkButtonAndClick()
         waitUntil(TEST_TIMEOUT_MILLIS) {
-            onNodeWithTextId(R.string.add_statement).isNotDisplayed()
+            onNodeWithTextId(R.string.publish).isNotDisplayed()
         }
 
         checkBottomNavBarWithCategoriesTopLevel()
@@ -145,9 +147,24 @@ object AndroidNavigationTestUtils {
         checkBottomNavBarWithProfileTopLevel()
     }
 
-    fun MainComposeTestRule.navigateToSimilarUserProfileStatistics() {
+    fun MainComposeTestRule.navigateToSimilarUserProfileStatistics(filteredCategory: Category? = null) {
         navigateToSimilarUsersFromBottomNavBar()
 
+        if (filteredCategory != null) {
+            onNodeWithContentDescriptionId(R.string.filters).checkButtonAndClick()
+            waitUntil(TEST_TIMEOUT_MILLIS) {
+                onNodeWithText(filteredCategory.name).isDisplayed()
+            }
+
+            onNodeWithText(filteredCategory.name).checkButtonAndClick()
+            onNodeWithTextId(R.string.done).performScrollTo()
+            onNodeWithTextId(R.string.done).checkButtonAndClick()
+            waitUntil(TEST_TIMEOUT_MILLIS) {
+                onNodeWithTextId(R.string.done).isNotDisplayed()
+            }
+        }
+
+        onNodeWithTextId(R.string.calculate).checkButtonAndClick()
         waitUntil(TEST_TIMEOUT_MILLIS) {
             onNodeWithText(similarUserNameWithAge).isDisplayed()
         }

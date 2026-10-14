@@ -1,6 +1,9 @@
 package xelagurd.socialdating.client.ui.screen
 
+import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -8,7 +11,9 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,59 +21,84 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.RippleConfiguration
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import xelagurd.socialdating.client.R
@@ -80,6 +110,7 @@ import xelagurd.socialdating.client.ui.state.RequestStatus
 private val ONLINE_COLOR = Color(0xFF4CAF50)
 private val LOADING_COLOR = Color(0xFFFFC107)
 private val OFFLINE_COLOR = Color(0xFFF44336)
+private val NOT_REQUESTED_COLOR = Color(0xFF9E9E9E)
 
 @Composable
 @ReadOnlyComposable
@@ -118,12 +149,14 @@ fun AppDataRequestStatusIndicator(
         RequestStatus.SUCCESS -> ONLINE_COLOR
         RequestStatus.UNDEFINED, RequestStatus.LOADING -> LOADING_COLOR
         is RequestStatus.FAILURE, is RequestStatus.ERROR -> OFFLINE_COLOR
+        RequestStatus.NOT_REQUESTED -> NOT_REQUESTED_COLOR
     }
     val statusDescription = stringResource(
         when (dataRequestStatus) {
             RequestStatus.SUCCESS -> R.string.online
             RequestStatus.UNDEFINED, RequestStatus.LOADING -> R.string.loading
             is RequestStatus.FAILURE, is RequestStatus.ERROR -> R.string.offline
+            RequestStatus.NOT_REQUESTED -> R.string.not_requested
         }
     )
 
@@ -239,11 +272,13 @@ fun AppMediumTitleText(
 fun AppLargeTitleText(
     text: String,
     modifier: Modifier = Modifier,
-    overrideModifier: Modifier? = null
+    overrideModifier: Modifier? = null,
+    textAlign: TextAlign? = null
 ) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleLarge,
+        textAlign = textAlign,
         modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_12dp))
     )
 }
@@ -349,7 +384,9 @@ fun AppTextField(
     singleLine: Boolean = true,
     isPassword: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
-    error: FormFieldError? = null
+    error: FormFieldError? = null,
+    // the field can be marked by the error of the several fields, whose message is shown by another field
+    isError: Boolean = error != null
 ) {
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -362,7 +399,7 @@ fun AppTextField(
                 overrideModifier = textModifier
             )
         },
-        isError = error != null,
+        isError = isError,
         supportingText = error?.let {
             {
                 AppSmallBodyText(
@@ -407,6 +444,102 @@ private fun AppPasswordVisibilityToggle(
                 if (isPasswordVisible) R.string.hide_password else R.string.show_password
             )
         )
+    }
+}
+
+@Composable
+fun AppBadgedIconButton(
+    @DrawableRes iconRes: Int,
+    contentDescription: String,
+    badgeNumber: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        BadgedBox(
+            badge = {
+                // the zero number means that there is nothing to notice
+                if (badgeNumber > 0) {
+                    Badge { Text(text = badgeNumber.toString()) }
+                }
+            }
+        ) {
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = contentDescription
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppExtendedFloatingActionButton(
+    text: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = true
+) {
+    // the floating action button has no disabled state, so it gets the colors of the disabled button
+    // and loses the ripple, and the container is opaque, because the button is placed over the content
+    val containerColor = when {
+        isEnabled -> FloatingActionButtonDefaults.containerColor
+        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+            .compositeOver(MaterialTheme.colorScheme.surface)
+    }
+    val contentColor = when {
+        isEnabled -> contentColorFor(containerColor)
+        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    }   
+    // the ripple is made transparent instead of the switching off by the null configuration,
+    // because the repeated switching off fails in Material3 1.3
+    val rippleConfiguration = when {
+        isEnabled -> LocalRippleConfiguration.current
+        else -> RippleConfiguration(rippleAlpha = RippleAlpha(0f, 0f, 0f, 0f))
+    }
+
+    CompositionLocalProvider(LocalRippleConfiguration provides rippleConfiguration) {
+        // the overload with the separate text hides it from the semantics, so the button content is set here
+        ExtendedFloatingActionButton(
+            onClick = { if (isEnabled) onClick() },
+            containerColor = containerColor,
+            contentColor = contentColor,
+            modifier = modifier.semantics { if (!isEnabled) disabled() }
+        ) {
+            // the button is described by its text
+            Icon(imageVector = icon, contentDescription = null)
+            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_12dp)))
+            Text(text = text)
+        }
+    }
+}
+
+// the sheet is hidden by the animation before the dismiss, so the content gets the function to hide it
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppModalBottomSheet(
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.(hideSheet: () -> Unit) -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+    val currentOnDismissRequest by rememberUpdatedState(onDismissRequest)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
+        modifier = modifier
+    ) {
+        content {
+            coroutineScope
+                .launch { sheetState.hide() }
+                .invokeOnCompletion { currentOnDismissRequest() }
+        }
     }
 }
 
@@ -630,6 +763,115 @@ fun AppRadioOption(
             )
         )
     }
+}
+
+@Composable
+fun <T> AppFilterChipGroup(
+    options: List<T>,
+    selectedOptions: Set<T>,
+    onToggle: (T) -> Unit,
+    optionText: @Composable (T) -> String
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(
+            dimensionResource(R.dimen.padding_8dp),
+            Alignment.CenterHorizontally
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(R.dimen.padding_8dp))
+    ) {
+        options.forEach { option ->
+            AppFilterChip(
+                text = optionText(option),
+                isSelected = option in selectedOptions,
+                onClick = { onToggle(option) }
+            )
+        }
+    }
+}
+
+@Composable
+fun AppFilterChip(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // the chip keeps its layout on the selection, otherwise the chips around it are moved,
+    // so the icon is only hidden, and the text is centered by the offset, which doesn't affect the layout
+    FilterChip(
+        selected = isSelected,
+        onClick = onClick,
+        label = {
+            AppMediumBodyText(
+                text = text,
+                modifier = when {
+                    isSelected -> Modifier
+                    else -> Modifier.offset(x = -FilterChipDefaults.IconSize / 2)
+                }
+            )
+        },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Done,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(FilterChipDefaults.IconSize)
+                    .alpha(if (isSelected) 1f else 0f)
+            )
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun AppSwitchOption(
+    text: String,
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .fillMaxWidth()
+            .toggleable(
+                value = isChecked,
+                onValueChange = onCheckedChange,
+                role = Role.Switch
+            )
+            .padding(horizontal = dimensionResource(R.dimen.padding_16dp))
+    ) {
+        AppMediumTitleText(text = text)
+        Switch(
+            checked = isChecked,
+            onCheckedChange = null
+        )
+    }
+}
+
+// the slider is continuous, because the tick marks of every integer value overload the track,
+// and its thumbs are near the screen edges, so they are excluded from the system back gesture
+@Composable
+fun AppRangeSlider(
+    value: IntRange,
+    valueRange: IntRange,
+    onValueChange: (IntRange) -> Unit,
+    onValueChangeFinished: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    RangeSlider(
+        value = value.first.toFloat()..value.last.toFloat(),
+        onValueChange = { onValueChange(it.start.roundToInt()..it.endInclusive.roundToInt()) },
+        valueRange = valueRange.first.toFloat()..valueRange.last.toFloat(),
+        onValueChangeFinished = onValueChangeFinished,
+        modifier = modifier
+            .padding(horizontal = dimensionResource(R.dimen.padding_16dp))
+            .systemGestureExclusion()
+            .testTag(stringResource(R.string.range_slider))
+    )
 }
 
 @Composable

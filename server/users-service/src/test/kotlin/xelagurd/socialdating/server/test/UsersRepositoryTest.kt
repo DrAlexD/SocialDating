@@ -12,9 +12,16 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeUsersData
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.enums.Gender
+import xelagurd.socialdating.server.model.enums.Gender.FEMALE
+import xelagurd.socialdating.server.model.enums.Gender.MALE
 import xelagurd.socialdating.server.model.enums.Purpose
+import xelagurd.socialdating.server.model.enums.Purpose.ALL_AT_ONCE
+import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
+import xelagurd.socialdating.server.model.enums.Purpose.RELATIONSHIPS
 import xelagurd.socialdating.server.model.enums.Role
 import xelagurd.socialdating.server.repository.UsersRepository
 
@@ -29,16 +36,26 @@ class UsersRepositoryTest(
     private lateinit var user2: User
     private lateinit var user3: User
 
-    private fun user(name: String, username: String, email: String?) =
+    private fun user(
+        name: String,
+        username: String,
+        email: String? = null,
+        gender: Gender = MALE,
+        age: Int = 25,
+        cityEn: String? = "city",
+        cityRu: String? = null,
+        purpose: Purpose = FRIENDS
+    ) =
         User(
             nameEn = name,
-            gender = Gender.MALE,
+            gender = gender,
             username = username,
             password = FakeUsersData.users[0].password,
             email = email,
-            age = 25,
-            cityEn = "city",
-            purpose = Purpose.FRIENDS,
+            age = age,
+            cityEn = cityEn,
+            cityRu = cityRu,
+            purpose = purpose,
             role = Role.USER
         )
 
@@ -93,6 +110,58 @@ class UsersRepositoryTest(
     @Test
     fun findAllByIdIn_noMatches_returnsEmptyList() {
         assertTrue(usersRepository.findAllByIdIn(listOf(999_999)).isEmpty())
+    }
+
+    @Test
+    fun findUserIds_withoutFilter_returnsAllUserIds() {
+        val result = usersRepository.findUserIds(null, AGE_MIN, AGE_MAX, null, null, null)
+
+        assertEquals(setOf(user1.id, user2.id, user3.id), result.toSet())
+    }
+
+    @Test
+    fun findUserIds_byGendersAgeAndPurposes_returnsOnlyMatching() {
+        // only the first user has the suitable age and purpose
+        val matchingUser = usersRepository.saveAllAndFlush(
+            listOf(
+                user(name = "Maria", username = "username4", gender = FEMALE, age = 30, purpose = ALL_AT_ONCE),
+                user(name = "Anna", username = "username5", gender = FEMALE, age = 40, purpose = ALL_AT_ONCE),
+                user(name = "Olga", username = "username6", gender = FEMALE, age = 30, purpose = FRIENDS)
+            )
+        ).first()
+
+        val result = usersRepository.findUserIds(
+            listOf(FEMALE.name),
+            30,
+            35,
+            listOf(RELATIONSHIPS.name, ALL_AT_ONCE.name),
+            null,
+            null
+        )
+
+        assertEquals(listOf(matchingUser.id), result)
+    }
+
+    @Test
+    fun findUserIds_byCity_comparesCityOnlyInItsLanguagesIgnoringCaseAndSpaces() {
+        val (bothLanguagesUser, russianUser, englishUser) = usersRepository.saveAllAndFlush(
+            listOf(
+                user(name = "Ivan", username = "username4", cityEn = "Moscow", cityRu = "Москва"),
+                user(name = "Petr", username = "username5", cityEn = null, cityRu = "Москва"),
+                user(name = "John", username = "username6", cityEn = "Moscow", cityRu = null)
+            )
+        )
+
+        // the translation of the city is unknown, so the users without the city in the same language are not found
+        val russianResult = usersRepository.findUserIds(null, AGE_MIN, AGE_MAX, null, null, " москва")
+        assertEquals(setOf(bothLanguagesUser.id, russianUser.id), russianResult.toSet())
+
+        val englishResult = usersRepository.findUserIds(null, AGE_MIN, AGE_MAX, null, "MOSCOW ", null)
+        assertEquals(setOf(bothLanguagesUser.id, englishUser.id), englishResult.toSet())
+
+        // the city in both languages is the same for the users with the city in any of them
+        val bothLanguagesResult = usersRepository.findUserIds(null, AGE_MIN, AGE_MAX, null, "Moscow", "Москва")
+        assertEquals(setOf(bothLanguagesUser.id, russianUser.id, englishUser.id), bothLanguagesResult.toSet())
     }
 
     companion object {

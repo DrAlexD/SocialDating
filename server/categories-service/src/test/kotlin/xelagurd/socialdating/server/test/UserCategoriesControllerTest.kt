@@ -18,15 +18,20 @@ import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.controller.UserCategoriesController
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.PAGE_SIZE_DEFAULT
 import xelagurd.socialdating.server.model.SimilarUsersCursor
+import xelagurd.socialdating.server.model.details.SimilarUsersFilterDetails
 import xelagurd.socialdating.server.model.dto.DetailedSimilarUserDto
 import xelagurd.socialdating.server.model.dto.PageDto
 import xelagurd.socialdating.server.model.dto.SimilarUserDto
+import xelagurd.socialdating.server.model.enums.Gender.FEMALE
 import xelagurd.socialdating.server.model.enums.Gender.MALE
 import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
+import xelagurd.socialdating.server.model.enums.Purpose.RELATIONSHIPS
 import xelagurd.socialdating.server.service.UserCategoriesService
 import xelagurd.socialdating.server.utils.TestUtils.mockkList
+import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @WebMvcTest(UserCategoriesController::class)
 @Import(NoSecurityConfig::class)
@@ -42,6 +47,7 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
     private val size = PAGE_SIZE_DEFAULT / 2
 
     private val similarUsersUrl = "/categories/users/similar-users?currentUserId=$userId"
+    private val noFilterDetails = SimilarUsersFilterDetails()
     private val similarUserDto = SimilarUserDto(
         id = anotherUserId,
         name = "User",
@@ -78,7 +84,7 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
 
-        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, null, null, PAGE_SIZE_DEFAULT) }
+        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, noFilterDetails, null, PAGE_SIZE_DEFAULT) }
         confirmVerified(userCategoriesService)
     }
 
@@ -89,7 +95,7 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
         mockMvc.perform(get(similarUsersUrl))
             .andExpect(status().isNoContent)
 
-        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, null, null, PAGE_SIZE_DEFAULT) }
+        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, noFilterDetails, null, PAGE_SIZE_DEFAULT) }
         confirmVerified(userCategoriesService)
     }
 
@@ -101,7 +107,85 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
         mockMvc.perform(get("$similarUsersUrl&cursor=$cursor&size=$size"))
             .andExpect(status().isOk)
 
-        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, null, cursor, size) }
+        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, noFilterDetails, cursor, size) }
+        confirmVerified(userCategoriesService)
+    }
+
+    @Test
+    fun getSimilarUsers_withFilter_passesItToService() {
+        val similarUsersFilterDetails = SimilarUsersFilterDetails(
+            categoryIds = listOf(1, 2),
+            minDifferenceNumber = 3,
+            maxDifferenceNumber = 5,
+            genders = listOf(MALE, FEMALE),
+            ageMin = 20,
+            ageMax = 30,
+            purposes = listOf(FRIENDS, RELATIONSHIPS),
+            isSameCity = true
+        )
+        every { userCategoriesService.getSimilarUsers(any(), any(), any(), any()) } returns
+                PageDto(listOf(similarUserDto))
+
+        mockMvc.perform(
+            get(
+                similarUsersUrl +
+                        "&categoryIds=${similarUsersFilterDetails.categoryIds!!.toRequestParams()}" +
+                        "&minDifferenceNumber=${similarUsersFilterDetails.minDifferenceNumber}" +
+                        "&maxDifferenceNumber=${similarUsersFilterDetails.maxDifferenceNumber}" +
+                        "&genders=${similarUsersFilterDetails.genders!!.toRequestParams()}" +
+                        "&ageMin=${similarUsersFilterDetails.ageMin}" +
+                        "&ageMax=${similarUsersFilterDetails.ageMax}" +
+                        "&purposes=${similarUsersFilterDetails.purposes!!.toRequestParams()}" +
+                        "&isSameCity=${similarUsersFilterDetails.isSameCity}"
+            )
+        )
+            .andExpect(status().isOk)
+
+        verify(exactly = 1) {
+            userCategoriesService.getSimilarUsers(userId, similarUsersFilterDetails, null, PAGE_SIZE_DEFAULT)
+        }
+        confirmVerified(userCategoriesService)
+    }
+
+    @Test
+    fun getSimilarUsers_ageMinBelowMin_badRequest() {
+        mockMvc.perform(get("$similarUsersUrl&ageMin=${AGE_MIN - 1}"))
+            .andExpect(status().isBadRequest)
+
+        verify(exactly = 0) { userCategoriesService.getSimilarUsers(any(), any(), any(), any()) }
+        confirmVerified(userCategoriesService)
+    }
+
+    @Test
+    fun getSimilarUsers_ageMinGreaterThanAgeMax_badRequest() {
+        mockMvc.perform(get("$similarUsersUrl&ageMin=30&ageMax=20"))
+            .andExpect(status().isBadRequest)
+
+        verify(exactly = 0) { userCategoriesService.getSimilarUsers(any(), any(), any(), any()) }
+        confirmVerified(userCategoriesService)
+    }
+
+    @Test
+    fun getSimilarUsers_negativeDifferenceNumbers_passesThemToService() {
+        val similarUsersFilterDetails = SimilarUsersFilterDetails(minDifferenceNumber = -5, maxDifferenceNumber = -1)
+        every { userCategoriesService.getSimilarUsers(any(), any(), any(), any()) } returns
+                PageDto(listOf(similarUserDto))
+
+        mockMvc.perform(get("$similarUsersUrl&minDifferenceNumber=-5&maxDifferenceNumber=-1"))
+            .andExpect(status().isOk)
+
+        verify(exactly = 1) {
+            userCategoriesService.getSimilarUsers(userId, similarUsersFilterDetails, null, PAGE_SIZE_DEFAULT)
+        }
+        confirmVerified(userCategoriesService)
+    }
+
+    @Test
+    fun getSimilarUsers_minDifferenceNumberGreaterThanMax_badRequest() {
+        mockMvc.perform(get("$similarUsersUrl&minDifferenceNumber=2&maxDifferenceNumber=1"))
+            .andExpect(status().isBadRequest)
+
+        verify(exactly = 0) { userCategoriesService.getSimilarUsers(any(), any(), any(), any()) }
         confirmVerified(userCategoriesService)
     }
 
@@ -113,7 +197,7 @@ class UserCategoriesControllerTest(@param:Autowired private val mockMvc: MockMvc
         mockMvc.perform(get(similarUsersUrl))
             .andExpect(status().isForbidden)
 
-        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, null, null, PAGE_SIZE_DEFAULT) }
+        verify(exactly = 1) { userCategoriesService.getSimilarUsers(userId, noFilterDetails, null, PAGE_SIZE_DEFAULT) }
         confirmVerified(userCategoriesService)
     }
 

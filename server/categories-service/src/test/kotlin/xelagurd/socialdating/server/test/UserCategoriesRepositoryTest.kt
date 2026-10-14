@@ -109,7 +109,7 @@ class UserCategoriesRepositoryTest(
     fun findAnotherUsersCategories_allUsers_excludesCurrentUserAndEmptyData() {
         val result = userCategoriesRepository.findAnotherUsersCategories(
             currentUserId = 1,
-            anotherUserId = null,
+            anotherUserIds = null,
             categoryIds = listOf(category1.id!!, category2.id!!)
         )
 
@@ -121,10 +121,10 @@ class UserCategoriesRepositoryTest(
     }
 
     @Test
-    fun findAnotherUsersCategories_specificUser_returnsOnlyThatUser() {
+    fun findAnotherUsersCategories_specificUsers_returnsOnlyThoseUsers() {
         val result = userCategoriesRepository.findAnotherUsersCategories(
             currentUserId = 1,
-            anotherUserId = 2,
+            anotherUserIds = listOf(2, 4),
             categoryIds = listOf(category1.id!!, category2.id!!)
         )
 
@@ -137,7 +137,7 @@ class UserCategoriesRepositoryTest(
     fun findAnotherUsersCategories_categoryWithoutAnotherUsersData_returnsEmptyList() {
         val result = userCategoriesRepository.findAnotherUsersCategories(
             currentUserId = 1,
-            anotherUserId = null,
+            anotherUserIds = null,
             categoryIds = listOf(category2.id!!)
         )
 
