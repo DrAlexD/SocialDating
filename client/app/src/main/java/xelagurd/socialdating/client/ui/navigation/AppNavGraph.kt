@@ -226,13 +226,21 @@ private fun NavHostController.navigateUpIfResumed() {
     }
 }
 
-private fun NavHostController.navigateWithClearedBackStack(route: String) =
+private fun NavHostController.navigateWithClearedBackStack(route: String) {
     navigate(route) {
         // the whole graph is popped, the start destination is not used, because it can be already
         // removed from the back stack by a previous clearing navigation
         popUpTo(graph.id) { inclusive = true }
         launchSingleTop = true
     }
+
+    // the popping keeps the states saved by the bottom navigation, so they are cleared by the screens
+    // they start from, otherwise the next session would restore them with the view models of this one,
+    // and the categories screen is skipped, because it only refers to the state saved above it
+    graph
+        .filter { it.route != CategoriesDestination.route }
+        .forEach { clearBackStack(it.id) }
+}
 
 private fun NavHostController.isCurrentScreenResumed() =
     currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED

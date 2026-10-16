@@ -294,6 +294,65 @@ class SimilarUsersViewModelTest {
     }
 
     @Test
+    fun similarUsersViewModel_calculateWithoutInternetAfterFilterChange_keptFilterOfDisplayedSimilarUsers() = runTest {
+        mockDataWithInternet()
+
+        initViewModelAndCalculate()
+
+        mockDataWithoutInternet()
+
+        viewModel.updateUiState(changedFormData)
+        viewModel.calculateSimilarUsers()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.ERROR(), similarUsersUiState.dataRequestStatus)
+        assertEquals(similarUsers, similarUsersUiState.entities)
+        assertEquals(savedFilterDetails, similarUsersUiState.calculatedFilterDetails)
+
+        coVerify(exactly = 1) {
+            remoteUserCategoriesRepository.getSimilarUsers(userId, changedFilterDetails, null, any())
+        }
+    }
+
+    @Test
+    fun similarUsersViewModel_refreshAfterFilterChange_recalculatedWithCalculatedFilter() = runTest {
+        mockDataWithInternet()
+
+        initViewModelAndCalculate()
+
+        viewModel.updateUiState(changedFormData)
+        viewModel.refreshSimilarUsers()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, similarUsersUiState.dataRequestStatus)
+        assertEquals(changedFormData, similarUsersUiState.formData)
+        assertEquals(savedFilterDetails, similarUsersUiState.calculatedFilterDetails)
+
+        coVerify(exactly = 2) {
+            remoteUserCategoriesRepository.getSimilarUsers(userId, savedFilterDetails, null, any())
+        }
+        confirmVerified(remoteUserCategoriesRepository)
+    }
+
+    @Test
+    fun similarUsersViewModel_refreshWithInvalidForm_recalculatedWithCalculatedFilter() = runTest {
+        mockDataWithInternet()
+
+        initViewModelAndCalculate()
+
+        viewModel.updateUiState(invalidFormData)
+        viewModel.refreshSimilarUsers()
+        advanceUntilIdle()
+
+        assertEquals(RequestStatus.SUCCESS, similarUsersUiState.dataRequestStatus)
+
+        coVerify(exactly = 2) {
+            remoteUserCategoriesRepository.getSimilarUsers(userId, savedFilterDetails, null, any())
+        }
+        confirmVerified(remoteUserCategoriesRepository)
+    }
+
+    @Test
     fun similarUsersViewModel_nextPageWithInternet_addsPageToLoadedSimilarUsers() = runTest {
         mockDataWithInternet(firstPageNextCursor = nextCursor)
 
@@ -469,6 +528,29 @@ class SimilarUsersViewModelTest {
     }
 
     @Test
+    fun similarUsersViewModel_appLanguageChangeAfterFailedFirstCalculation_recalculatedWithFailedFilter() = runTest {
+        mockDataWithoutInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.updateUiState(changedFormData)
+        viewModel.calculateSimilarUsers()
+        advanceUntilIdle()
+
+        assertEquals(changedFilterDetails, similarUsersUiState.calculatedFilterDetails)
+
+        languageChangesFlow.emit(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        coVerify(exactly = 2) {
+            remoteUserCategoriesRepository.getSimilarUsers(userId, changedFilterDetails, null, any())
+        }
+        confirmVerified(remoteUserCategoriesRepository)
+    }
+
+    @Test
     fun similarUsersViewModel_calculateInOfflineMode_filteredFakeSimilarUsersWithOfflineStatus() = runTest {
         isOfflineMode = true
 
@@ -497,6 +579,49 @@ class SimilarUsersViewModelTest {
 
         assertEquals(RequestStatus.ERROR(), similarUsersUiState.dataRequestStatus)
         assertEquals(listOf<SimilarUserDto>(), similarUsersUiState.entities)
+    }
+
+    @Test
+    fun similarUsersViewModel_calculateInOfflineModeAfterFilterChange_calculatedWithChangedFilter() = runTest {
+        isOfflineMode = true
+
+        initViewModelAndCalculate()
+
+        viewModel.updateUiState(changedFormData)
+        viewModel.calculateSimilarUsers()
+        advanceUntilIdle()
+
+        assertEquals(FakeData.filterSimilarUsers(changedFilterDetails), similarUsersUiState.entities)
+        assertEquals(changedFilterDetails, similarUsersUiState.calculatedFilterDetails)
+    }
+
+    @Test
+    fun similarUsersViewModel_calculationAndRefresh_dataRequestedByPullOnlyByRefresh() = runTest {
+        mockDataWithInternet()
+
+        initViewModelAndCalculate()
+
+        assertFalse(similarUsersUiState.isDataRequestedByPull)
+
+        viewModel.refreshSimilarUsers()
+        advanceUntilIdle()
+
+        assertTrue(similarUsersUiState.isDataRequestedByPull)
+    }
+
+    @Test
+    fun similarUsersViewModel_appLanguageChangeAfterRefresh_dataNotRequestedByPull() = runTest {
+        mockDataWithInternet()
+
+        initViewModelAndCalculate()
+
+        viewModel.refreshSimilarUsers()
+        advanceUntilIdle()
+
+        languageChangesFlow.emit(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        assertFalse(similarUsersUiState.isDataRequestedByPull)
     }
 
     private fun mockGeneralMethods() {

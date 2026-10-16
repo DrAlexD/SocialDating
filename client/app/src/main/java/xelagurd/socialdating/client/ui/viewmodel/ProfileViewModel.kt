@@ -44,6 +44,7 @@ class ProfileViewModel @Inject constructor(
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val isDataRequestedByPullFlow = MutableStateFlow(false)
     private val notificationFlow = MutableStateFlow<String?>(null)
     private val userStateFlow = MutableStateFlow<User?>(null)
     private val userFlow = when (anotherUserId) {
@@ -54,13 +55,15 @@ class ProfileViewModel @Inject constructor(
     val uiState = combine(
         userFlow,
         dataRequestStatusFlow,
+        isDataRequestedByPullFlow,
         notificationFlow
-    ) { user, dataRequestStatus, notification ->
+    ) { user, dataRequestStatus, isDataRequestedByPull, notification ->
         ProfileUiState(
             userId = userId,
             anotherUserId = anotherUserId,
             entity = user.hideWhileLoading(dataRequestStatus),
             dataRequestStatus = dataRequestStatus,
+            isDataRequestedByPull = isDataRequestedByPull,
             notification = notification
         )
     }.stateIn(
@@ -98,6 +101,8 @@ class ProfileViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            // the user requests the data only by the pull gesture
+            isDataRequestedByPullFlow.update { isRequestedByUser }
             dataRequestStatusFlow.update { RequestStatus.LOADING }
 
             val (remoteUser, status) = safeApiCall(context) {
@@ -115,7 +120,7 @@ class ProfileViewModel @Inject constructor(
             notificationFlow.updateLoadingNotification(
                 requestStatus = status,
                 isRequestedByUser = isRequestedByUser,
-                isDataExist = userFlow.first() != null
+                isDataExist = { userFlow.first() != null }
             )
         }
     }

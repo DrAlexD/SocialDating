@@ -521,6 +521,39 @@ class StatementsViewModelTest {
         coVerify(exactly = 2) { remoteStatementsRepository.getStatements(any(), any(), null, any()) }
     }
 
+    @Test
+    fun statementsViewModel_initialLoadingAndRefresh_dataRequestedByPullOnlyByRefresh() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertFalse(statementsUiState.isDataRequestedByPull)
+
+        viewModel.getStatements()
+        advanceUntilIdle()
+
+        assertTrue(statementsUiState.isDataRequestedByPull)
+    }
+
+    @Test
+    fun statementsViewModel_appLanguageChangeAfterRefresh_dataNotRequestedByPull() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.getStatements()
+        advanceUntilIdle()
+
+        languageChangesFlow.emit(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        assertFalse(statementsUiState.isDataRequestedByPull)
+    }
+
     private fun mockGeneralMethods() {
         every { savedStateHandle.get<Int>(StatementsDestination.userId) } returns userId
         every { savedStateHandle.get<Int>(StatementsDestination.categoryId) } returns categoryId

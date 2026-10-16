@@ -31,6 +31,7 @@ import xelagurd.socialdating.client.ui.state.DataListUiState
 import xelagurd.socialdating.client.ui.state.DataRequestUiState
 import xelagurd.socialdating.client.ui.state.PagedDataListUiState
 import xelagurd.socialdating.client.ui.state.RequestStatus
+import xelagurd.socialdating.client.ui.state.isRequestedByUserOrDataExist
 
 
 @Composable
@@ -209,25 +210,35 @@ private inline fun DataComponent(
     crossinline content: @Composable () -> Unit
 ) {
     when {
-        onRefresh != null -> AppPullToRefreshContainer(
-            isRefreshing = dataRequestUiState.dataRequestStatus.isDataLoading(),
-            onRefresh = {
-                if (dataRequestUiState.dataRequestStatus.isAllowedDataRefresh()) onRefresh()
-            },
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = contentPadding
-        ) {
-            if (dataRequestUiState.isDataExist()) {
-                content()
-            } else {
-                // the status is placed into a scrollable container, so the data is refreshable
-                // by the gesture while it is absent, for example after a failed request
-                AppFullSizeScrollableContainer(contentPadding = contentPadding) {
-                    DataRequestStatusComponent(
-                        dataRequestStatus = dataRequestUiState.dataRequestStatus,
-                        statusModifier = Modifier.fillMaxSize(),
-                        isLoadingIndicatorDisplayed = false
+        onRefresh != null -> {
+            // the loading requested by the pull gesture is displayed by the refresh indicator, which continues it,
+            // and any other one by the loading indicator in place of the absent data, so the displayed data leaves
+            // only the former, while the user request of any other kind is still notified about its failure
+            val isRefreshIndicatorDisplayed = dataRequestUiState.dataRequestStatus.isDataLoading() &&
+                    isRequestedByUserOrDataExist(
+                        isRequestedByUser = dataRequestUiState.isDataRequestedByPull,
+                        isDataExist = { dataRequestUiState.isDataExist() }
                     )
+
+            AppPullToRefreshContainer(
+                isRefreshIndicatorDisplayed = isRefreshIndicatorDisplayed,
+                onRefresh = onRefresh,
+                modifier = Modifier.fillMaxSize(),
+                isAllowedDataRefresh = dataRequestUiState.dataRequestStatus.isAllowedDataRefresh(),
+                contentPadding = contentPadding
+            ) {
+                if (dataRequestUiState.isDataExist()) {
+                    content()
+                } else {
+                    // the status is placed into a scrollable container, so the data is refreshable
+                    // by the gesture while it is absent, for example after a failed request
+                    AppFullSizeScrollableContainer(contentPadding = contentPadding) {
+                        DataRequestStatusComponent(
+                            dataRequestStatus = dataRequestUiState.dataRequestStatus,
+                            statusModifier = Modifier.fillMaxSize(),
+                            isLoadingIndicatorDisplayed = !isRefreshIndicatorDisplayed
+                        )
+                    }
                 }
             }
         }

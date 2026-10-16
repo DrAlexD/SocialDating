@@ -7,5 +7,6 @@ data class ProfileUiState(
     val anotherUserId: Int = -1,
     override val entity: User? = null,
     override val dataRequestStatus: RequestStatus = RequestStatus.UNDEFINED,
+    override val isDataRequestedByPull: Boolean = false,
     override val notification: String? = null
 ) : DataEntityUiState

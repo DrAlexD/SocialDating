@@ -34,6 +34,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.client.AndroidTestUtils.INPUT_TEXT
+import xelagurd.socialdating.client.AndroidTestUtils.assertIsRefreshIndicatorHidden
 import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.checkDisabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.checkTextFieldAndInput
@@ -133,7 +134,7 @@ class ScreenComponentsTest {
 
         composeTestRule.setContentToScreen {
             AppPullToRefreshContainer(
-                isRefreshing = false,
+                isRefreshIndicatorDisplayed = false,
                 onRefresh = { isRefreshed = true }
             ) {
                 AppFullSizeScrollableContainer {
@@ -149,10 +150,50 @@ class ScreenComponentsTest {
     }
 
     @Test
+    fun appPullToRefreshContainer_pullToRefreshWithoutStartedRefreshing_hiddenRefreshIndicator() {
+        composeTestRule.setContentToScreen {
+            AppPullToRefreshContainer(
+                isRefreshIndicatorDisplayed = false,
+                onRefresh = {}
+            ) {
+                AppFullSizeScrollableContainer {
+                    AppLargeTitleText(text = LARGE_TITLE_TEXT)
+                }
+            }
+        }
+
+        composeTestRule.performPullToRefresh()
+
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsRefreshIndicatorHidden()
+    }
+
+    @Test
+    fun appPullToRefreshContainer_disallowedDataRefresh_notCalledRefreshAction() {
+        var isRefreshed = false
+
+        composeTestRule.setContentToScreen {
+            AppPullToRefreshContainer(
+                isRefreshIndicatorDisplayed = false,
+                onRefresh = { isRefreshed = true },
+                isAllowedDataRefresh = false
+            ) {
+                AppFullSizeScrollableContainer {
+                    AppLargeTitleText(text = LARGE_TITLE_TEXT)
+                }
+            }
+        }
+
+        composeTestRule.performPullToRefresh()
+
+        assertFalse(isRefreshed)
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsRefreshIndicatorHidden()
+    }
+
+    @Test
     fun appPullToRefreshContainer_refreshingState_displayedRefreshIndicator() {
         composeTestRule.setContentToScreen {
             AppPullToRefreshContainer(
-                isRefreshing = true,
+                isRefreshIndicatorDisplayed = true,
                 onRefresh = {}
             ) {
                 AppFullSizeScrollableContainer {

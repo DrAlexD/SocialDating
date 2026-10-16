@@ -21,6 +21,7 @@ import xelagurd.socialdating.client.data.PreferencesRepository
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.local.repository.LocalCategoriesRepository
 import xelagurd.socialdating.client.data.model.DataUtils.TIMEOUT_MILLIS
+import xelagurd.socialdating.client.data.model.details.SimilarUsersFilterDetails
 import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
 import xelagurd.socialdating.client.data.remote.ApiUtils.offlineModeStatus
 import xelagurd.socialdating.client.data.remote.ApiUtils.safeApiCall
@@ -48,6 +49,7 @@ class SimilarUsersViewModel @Inject constructor(
 
     // the similar users are calculated only on the user request
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.NOT_REQUESTED)
+    private val isDataRequestedByPullFlow = MutableStateFlow(false)
     private val nextPageRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val isLastPageFlow = MutableStateFlow(false)
     private val notificationFlow = MutableStateFlow<String?>(null)
@@ -60,19 +62,22 @@ class SimilarUsersViewModel @Inject constructor(
     // the paging session state, it is dropped on every screen entry and calculation
     private var nextCursor: String? = null
 
-    // the filter can be changed after the calculation, but the next pages have to be loaded with the calculated one
+    // the filter can be changed after the calculation, but the next pages have to be loaded with the calculated one,
+    // which is the filter of the displayed result, so it is kept by a failed calculation over the displayed users
     private val calculatedFilterDetailsFlow = MutableStateFlow(formDataFlow.value.toSimilarUsersFilterDetails())
 
     // the typed combine is limited by five flows, so the paging state is combined separately
     private val pagedSimilarUsersUiStateFlow = combine(
         similarUsersFlow,
         dataRequestStatusFlow,
+        isDataRequestedByPullFlow,
         nextPageRequestStatusFlow,
         isLastPageFlow
-    ) { similarUsers, dataRequestStatus, nextPageRequestStatus, isLastPage ->
+    ) { similarUsers, dataRequestStatus, isDataRequestedByPull, nextPageRequestStatus, isLastPage ->
         SimilarUsersUiState(
             entities = similarUsers.hideWhileLoading(dataRequestStatus),
             dataRequestStatus = dataRequestStatus,
+            isDataRequestedByPull = isDataRequestedByPull,
             nextPageRequestStatus = nextPageRequestStatus,
             isLastPage = isLastPage
         )
@@ -103,7 +108,11 @@ class SimilarUsersViewModel @Inject constructor(
                 // the calculated similar users contain the localized texts, so they are recalculated
                 // with the same filter, but the similar users are not calculated without the user request
                 if (dataRequestStatusFlow.value !is RequestStatus.NOT_REQUESTED) {
-                    loadSimilarUsers(isRequestedByUser = false)
+                    loadSimilarUsers(
+                        filterDetails = calculatedFilterDetailsFlow.value,
+                        isRequestedByUser = false,
+                        isRequestedByPull = false
+                    )
                 }
             }
         }
@@ -131,14 +140,32 @@ class SimilarUsersViewModel @Inject constructor(
         val similarUsersFilterFormData = formDataFlow.value
         if (!similarUsersFilterFormData.isValid) return
 
-        calculatedFilterDetailsFlow.update { similarUsersFilterFormData.toSimilarUsersFilterDetails() }
-
-        loadSimilarUsers(isRequestedByUser = true)
+        loadSimilarUsers(
+            filterDetails = similarUsersFilterFormData.toSimilarUsersFilterDetails(),
+            isRequestedByUser = true,
+            isRequestedByPull = false
+        )
     }
 
-    private fun loadSimilarUsers(isRequestedByUser: Boolean) {
+    fun refreshSimilarUsers() {
+        if (dataRequestStatusFlow.value is RequestStatus.LOADING) return
+
+        // the displayed similar users are refreshed, so the filter changed after their calculation is not applied
+        loadSimilarUsers(
+            filterDetails = calculatedFilterDetailsFlow.value,
+            isRequestedByUser = true,
+            isRequestedByPull = true
+        )
+    }
+
+    private fun loadSimilarUsers(
+        filterDetails: SimilarUsersFilterDetails,
+        isRequestedByUser: Boolean,
+        isRequestedByPull: Boolean
+    ) {
         if (isOfflineMode) { // FixMe: remove after adding server hosting
-            similarUsersFlow.update { FakeData.filterSimilarUsers(calculatedFilterDetailsFlow.value) }
+            similarUsersFlow.update { FakeData.filterSimilarUsers(filterDetails) }
+            calculatedFilterDetailsFlow.update { filterDetails }
             isLastPageFlow.update { true }
             dataRequestStatusFlow.update { offlineModeStatus(context) }
             if (isRequestedByUser) {
@@ -150,8 +177,9 @@ class SimilarUsersViewModel @Inject constructor(
         nextCursor = null
         isLastPageFlow.update { false }
         nextPageRequestStatusFlow.update { RequestStatus.UNDEFINED }
+        isDataRequestedByPullFlow.update { isRequestedByPull }
 
-        getSimilarUsersPage(isFirstPage = true, isRequestedByUser = isRequestedByUser)
+        getSimilarUsersPage(filterDetails = filterDetails, isFirstPage = true, isRequestedByUser = isRequestedByUser)
     }
 
     fun getNextSimilarUsers() {
@@ -160,15 +188,23 @@ class SimilarUsersViewModel @Inject constructor(
         if (dataRequestStatusFlow.value !is RequestStatus.SUCCESS) return
         if (nextPageRequestStatusFlow.value is RequestStatus.LOADING) return
 
-        getSimilarUsersPage(isFirstPage = false, isRequestedByUser = false)
+        getSimilarUsersPage(
+            filterDetails = calculatedFilterDetailsFlow.value,
+            isFirstPage = false,
+            isRequestedByUser = false
+        )
     }
 
-    private fun getSimilarUsersPage(isFirstPage: Boolean, isRequestedByUser: Boolean) {
+    private fun getSimilarUsersPage(
+        filterDetails: SimilarUsersFilterDetails,
+        isFirstPage: Boolean,
+        isRequestedByUser: Boolean
+    ) {
         viewModelScope.launch {
             updateRequestStatus(isFirstPage, RequestStatus.LOADING)
 
             val (similarUsersPage, status) = safeApiCall(context) {
-                remoteUserCategoriesRepository.getSimilarUsers(userId, calculatedFilterDetailsFlow.value, nextCursor)
+                remoteUserCategoriesRepository.getSimilarUsers(userId, filterDetails, nextCursor)
             }
 
             when {
@@ -192,12 +228,20 @@ class SimilarUsersViewModel @Inject constructor(
                 }
             }
 
+            val isDataExist = similarUsersFlow.value.isNotEmpty()
+
+            // the displayed similar users are replaced only by the successful first page, otherwise they stay
+            // found with the previous filter, while without them the result of this filter is the displayed error
+            if (isFirstPage && (status is RequestStatus.SUCCESS || !isDataExist)) {
+                calculatedFilterDetailsFlow.update { filterDetails }
+            }
+
             updateRequestStatus(isFirstPage, status)
             notificationFlow.updatePageLoadingNotification(
                 requestStatus = status,
                 isFirstPage = isFirstPage,
                 isRequestedByUser = isRequestedByUser,
-                isDataExist = { similarUsersFlow.value.isNotEmpty() }
+                isDataExist = { isDataExist }
             )
         }
     }

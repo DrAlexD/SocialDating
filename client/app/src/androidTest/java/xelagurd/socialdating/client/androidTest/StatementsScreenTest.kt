@@ -50,7 +50,7 @@ class StatementsScreenTest {
             StatementsScreenComponent()
         }
 
-        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
@@ -59,7 +59,7 @@ class StatementsScreenTest {
             StatementsScreenComponent(statementsUiState = StatementsUiState())
         }
 
-        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
