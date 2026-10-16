@@ -11,5 +11,6 @@ data class ProfileStatisticsUiState(
     val entityIdToData: Map<Int, List<UserDefiningThemeData>> = mapOf(),
     val entitiesMask: DetailedSimilarUserDto? = null,
     override val dataRequestStatus: RequestStatus = RequestStatus.UNDEFINED,
+    override val isDataRequestedByPull: Boolean = false,
     override val notification: String? = null
 ) : DataListUiState

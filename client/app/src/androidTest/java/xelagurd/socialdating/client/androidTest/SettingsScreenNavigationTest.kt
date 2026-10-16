@@ -1,10 +1,14 @@
 package xelagurd.socialdating.client.androidTest
 
+import kotlinx.coroutines.isActive
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.testing.TestNavHostController
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotSame
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -14,17 +18,21 @@ import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToCategor
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToProfileFromBottomNavBar
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToSettingsFromBottomNavBar
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToSimilarUsersFromBottomNavBar
+import xelagurd.socialdating.client.AndroidNavigationTestUtils.navigateToStatements
 import xelagurd.socialdating.client.AndroidNavigationTestUtils.setContentToAppNavHost
 import xelagurd.socialdating.client.AndroidTestUtils.assertBackStackDepth
 import xelagurd.socialdating.client.AndroidTestUtils.assertCurrentRouteName
 import xelagurd.socialdating.client.AndroidTestUtils.assertRouteNotInBackStack
 import xelagurd.socialdating.client.AndroidTestUtils.getCurrentRoute
+import xelagurd.socialdating.client.AndroidTestUtils.getCurrentViewModel
 import xelagurd.socialdating.client.HiltTestActivity
 import xelagurd.socialdating.client.ui.navigation.CategoriesDestination
 import xelagurd.socialdating.client.ui.navigation.LoginDestination
 import xelagurd.socialdating.client.ui.navigation.ProfileDestination
 import xelagurd.socialdating.client.ui.navigation.SettingsDestination
 import xelagurd.socialdating.client.ui.navigation.SimilarUsersDestination
+import xelagurd.socialdating.client.ui.navigation.StatementsDestination
+import xelagurd.socialdating.client.ui.viewmodel.ProfileViewModel
 
 @HiltAndroidTest
 class SettingsScreenNavigationTest {
@@ -51,6 +59,34 @@ class SettingsScreenNavigationTest {
 
         navController.assertCurrentRouteName(LoginDestination.route)
         navController.assertRouteNotInBackStack(SettingsDestination.route)
+        navController.assertBackStackDepth(2)
+    }
+
+    @Test
+    fun appNavHost_loginAfterLogout_createsNewProfileViewModel() {
+        composeTestRule.loginAndNavigateToCategories()
+        composeTestRule.navigateToProfileFromBottomNavBar()
+        val previousProfileViewModel = navController.getCurrentViewModel<ProfileViewModel>()
+        composeTestRule.navigateToSettingsFromBottomNavBar()
+        composeTestRule.logoutAndNavigateToLoginScreen()
+        composeTestRule.loginAndNavigateToCategories()
+        composeTestRule.navigateToProfileFromBottomNavBar()
+
+        assertNotSame(previousProfileViewModel, navController.getCurrentViewModel<ProfileViewModel>())
+        assertFalse(previousProfileViewModel.viewModelScope.isActive)
+    }
+
+    @Test
+    fun appNavHost_loginAfterLogout_navigatesToCategoriesScreenWithoutStatementsOfPreviousSession() {
+        composeTestRule.navigateToStatements()
+        composeTestRule.navigateToSettingsFromBottomNavBar()
+        composeTestRule.logoutAndNavigateToLoginScreen()
+        composeTestRule.loginAndNavigateToCategories()
+        composeTestRule.navigateToSettingsFromBottomNavBar()
+        composeTestRule.navigateToCategoriesFromBottomNavBar()
+
+        navController.assertCurrentRouteName(CategoriesDestination.route)
+        navController.assertRouteNotInBackStack(StatementsDestination.routeWithArgs)
         navController.assertBackStackDepth(2)
     }
 

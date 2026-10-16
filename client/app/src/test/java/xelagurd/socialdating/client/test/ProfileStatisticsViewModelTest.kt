@@ -23,6 +23,8 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -533,6 +535,39 @@ class ProfileStatisticsViewModelTest {
         coVerify(exactly = 2) { remoteUserDefiningThemesRepository.getUserDefiningThemes(any()) }
         coVerify(exactly = 1) { remoteCategoriesRepository.getCategories(any()) }
         coVerify(exactly = 1) { remoteDefiningThemesRepository.getDefiningThemes(any()) }
+    }
+
+    @Test
+    fun profileStatisticsViewModel_initialLoadingAndRefresh_dataRequestedByPullOnlyByRefresh() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertFalse(profileStatisticsUiState.isDataRequestedByPull)
+
+        viewModel.getProfileStatistics()
+        advanceUntilIdle()
+
+        assertTrue(profileStatisticsUiState.isDataRequestedByPull)
+    }
+
+    @Test
+    fun profileStatisticsViewModel_appLanguageChangeAfterRefresh_dataNotRequestedByPull() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.getProfileStatistics()
+        advanceUntilIdle()
+
+        languageChangesFlow.emit(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        assertFalse(profileStatisticsUiState.isDataRequestedByPull)
     }
 
     private fun mockGeneralMethods() {

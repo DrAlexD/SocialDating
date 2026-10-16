@@ -6,6 +6,7 @@ data class StatementsUiState(
     val categoryId: Int = -1,
     override val entities: List<Statement> = listOf(),
     override val dataRequestStatus: RequestStatus = RequestStatus.UNDEFINED,
+    override val isDataRequestedByPull: Boolean = false,
     override val nextPageRequestStatus: RequestStatus = RequestStatus.UNDEFINED,
     override val isLastPage: Boolean = false,
     override val actionRequestStatus: RequestStatus = RequestStatus.UNDEFINED,

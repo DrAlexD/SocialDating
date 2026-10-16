@@ -44,7 +44,7 @@ class CategoriesScreenTest {
             CategoriesScreenComponent()
         }
 
-        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
@@ -53,7 +53,7 @@ class CategoriesScreenTest {
             CategoriesScreenComponent(categoriesUiState = CategoriesUiState())
         }
 
-        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test

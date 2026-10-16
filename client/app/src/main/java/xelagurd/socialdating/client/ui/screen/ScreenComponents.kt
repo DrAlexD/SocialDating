@@ -66,8 +66,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.contentColorFor
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -75,7 +75,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -548,31 +550,44 @@ fun AppModalBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 inline fun AppPullToRefreshContainer(
-    isRefreshing: Boolean,
+    isRefreshIndicatorDisplayed: Boolean,
     noinline onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
+    isAllowedDataRefresh: Boolean = true,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     crossinline content: @Composable () -> Unit
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
+    val refreshRequestsCount = remember { mutableIntStateOf(0) }
 
-    PullToRefreshBox(
-        isRefreshing = isRefreshing,
-        onRefresh = onRefresh,
-        state = pullToRefreshState,
-        indicator = {
-            PullToRefreshDefaults.Indicator(
-                state = pullToRefreshState,
-                isRefreshing = isRefreshing,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = contentPadding.calculateTopPadding())
-                    .testTag(stringResource(R.string.refresh_indicator))
-            )
-        },
-        modifier = modifier,
-        content = { content() }
-    )
+    // the indicator stays at the threshold after the gesture until the refreshing ends, so it is hidden here
+    // when the refreshing has not started at all, for example when the refresh is ignored in the offline mode
+    LaunchedEffect(refreshRequestsCount.intValue) {
+        if (refreshRequestsCount.intValue > 0 && !isRefreshIndicatorDisplayed) pullToRefreshState.animateToHidden()
+    }
+
+    Box(
+        modifier = modifier.pullToRefresh(
+            isRefreshing = isRefreshIndicatorDisplayed,
+            state = pullToRefreshState,
+            enabled = isAllowedDataRefresh,
+            onRefresh = {
+                refreshRequestsCount.intValue++
+                // the gesture is not blocked once it has started, so the refresh can be disallowed by its end
+                if (isAllowedDataRefresh) onRefresh()
+            }
+        )
+    ) {
+        content()
+        PullToRefreshDefaults.Indicator(
+            state = pullToRefreshState,
+            isRefreshing = isRefreshIndicatorDisplayed,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = contentPadding.calculateTopPadding())
+                .testTag(stringResource(R.string.refresh_indicator))
+        )
+    }
 }
 
 @Composable

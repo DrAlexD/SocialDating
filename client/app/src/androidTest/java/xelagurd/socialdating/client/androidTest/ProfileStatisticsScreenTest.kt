@@ -56,7 +56,7 @@ class ProfileStatisticsScreenTest {
             ProfileStatisticsScreenComponent()
         }
 
-        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test
@@ -65,7 +65,7 @@ class ProfileStatisticsScreenTest {
             ProfileStatisticsScreenComponent(profileStatisticsUiState = ProfileStatisticsUiState())
         }
 
-        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
     }
 
     @Test

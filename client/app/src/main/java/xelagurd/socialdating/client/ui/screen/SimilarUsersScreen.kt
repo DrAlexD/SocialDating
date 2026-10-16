@@ -74,6 +74,7 @@ fun SimilarUsersScreen(
         onSimilarUserClick = { onSimilarUserClick(it, similarUsersUiState.calculatedFilterDetails.categoryIds) },
         onValueChange = similarUsersViewModel::updateUiState,
         onCalculate = similarUsersViewModel::calculateSimilarUsers,
+        onRefresh = similarUsersViewModel::refreshSimilarUsers,
         onLoadNextPage = similarUsersViewModel::getNextSimilarUsers,
         onNotificationShown = similarUsersViewModel::onNotificationShown
     )
@@ -86,6 +87,7 @@ fun SimilarUsersScreenComponent(
     onSimilarUserClick: (Int) -> Unit = {},
     onValueChange: (SimilarUsersFilterFormData) -> Unit = {},
     onCalculate: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     onLoadNextPage: () -> Unit = {},
     onNotificationShown: () -> Unit = {}
 ) {
@@ -139,7 +141,7 @@ fun SimilarUsersScreenComponent(
             PagedDataListComponent(
                 pagedDataListUiState = similarUsersUiState,
                 onLoadNextPage = onLoadNextPage,
-                onRefresh = onCalculate,
+                onRefresh = onRefresh,
                 contentPadding = innerPadding,
                 prefetchCount = SIMILAR_USERS_NEXT_PAGE_PREFETCH_COUNT
             ) {

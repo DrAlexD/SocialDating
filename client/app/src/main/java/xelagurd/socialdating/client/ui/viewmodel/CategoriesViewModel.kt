@@ -37,17 +37,20 @@ class CategoriesViewModel @Inject constructor(
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val isDataRequestedByPullFlow = MutableStateFlow(false)
     private val notificationFlow = MutableStateFlow<String?>(null)
     private val categoriesFlow = localCategoriesRepository.getCategories().distinctUntilChanged()
 
     val uiState = combine(
         categoriesFlow,
         dataRequestStatusFlow,
+        isDataRequestedByPullFlow,
         notificationFlow
-    ) { categories, dataRequestStatus, notification ->
+    ) { categories, dataRequestStatus, isDataRequestedByPull, notification ->
         CategoriesUiState(
             entities = categories.hideWhileLoading(dataRequestStatus),
             dataRequestStatus = dataRequestStatus,
+            isDataRequestedByPull = isDataRequestedByPull,
             notification = notification
         )
     }.stateIn(
@@ -81,6 +84,8 @@ class CategoriesViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            // the user requests the data only by the pull gesture
+            isDataRequestedByPullFlow.update { isRequestedByUser }
             dataRequestStatusFlow.update { RequestStatus.LOADING }
 
             val (remoteCategories, status) = safeApiCall(context) {
@@ -95,7 +100,7 @@ class CategoriesViewModel @Inject constructor(
             notificationFlow.updateLoadingNotification(
                 requestStatus = status,
                 isRequestedByUser = isRequestedByUser,
-                isDataExist = categoriesFlow.first().isNotEmpty()
+                isDataExist = { categoriesFlow.first().isNotEmpty() }
             )
         }
     }

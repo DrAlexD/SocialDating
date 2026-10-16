@@ -10,6 +10,10 @@ sealed interface RequestUiState {
 sealed interface DataRequestUiState : RequestUiState {
     val dataRequestStatus: RequestStatus
 
+    // the data of a not refreshable screen can't be requested by the pull gesture
+    val isDataRequestedByPull: Boolean
+        get() = false
+
     fun isDataExist(): Boolean
 }
 

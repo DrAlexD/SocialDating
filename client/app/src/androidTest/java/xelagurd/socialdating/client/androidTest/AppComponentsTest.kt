@@ -18,6 +18,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import xelagurd.socialdating.client.AndroidTestUtils.assertIsNotRefreshing
+import xelagurd.socialdating.client.AndroidTestUtils.assertIsRefreshIndicatorHidden
+import xelagurd.socialdating.client.AndroidTestUtils.assertIsRefreshing
 import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithRange
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
@@ -127,12 +130,37 @@ class AppComponentsTest {
     }
 
     @Test
-    fun dataListComponent_loadingStateAndRefreshAction_refreshIndicator() {
+    fun dataListComponent_loadingStateRequestedByPullAndRefreshAction_refreshIndicator() {
         setContentToRefreshableDataListComponent(
-            CategoriesUiState(dataRequestStatus = RequestStatus.LOADING)
+            CategoriesUiState(dataRequestStatus = RequestStatus.LOADING, isDataRequestedByPull = true)
         )
 
-        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsRefreshing()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun dataListComponent_loadingStateNotRequestedByPullAndRefreshAction_loadingIndicator() {
+        setContentToRefreshableDataListComponent(
+            CategoriesUiState(dataRequestStatus = RequestStatus.LOADING, isDataRequestedByPull = false)
+        )
+
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsNotRefreshing()
+    }
+
+    @Test
+    fun dataListComponent_loadingStateNotRequestedByPullWithDataAndRefreshAction_refreshIndicator() {
+        setContentToRefreshableDataListComponent(
+            CategoriesUiState(
+                entities = categories,
+                dataRequestStatus = RequestStatus.LOADING,
+                isDataRequestedByPull = false
+            )
+        )
+
+        composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsRefreshing()
         composeTestRule.onNodeWithTagId(R.string.loading).assertIsNotDisplayed()
     }
 
@@ -174,6 +202,21 @@ class AppComponentsTest {
         composeTestRule.performPullToRefresh()
 
         assertFalse(isRefreshed)
+    }
+
+    @Test
+    fun dataListComponent_pullToRefreshWhileLoadingNotRequestedByPull_notCalledRefreshAction() {
+        var isRefreshed = false
+
+        setContentToRefreshableDataListComponent(
+            CategoriesUiState(dataRequestStatus = RequestStatus.LOADING, isDataRequestedByPull = false)
+        ) { isRefreshed = true }
+
+        composeTestRule.performPullToRefresh()
+
+        assertFalse(isRefreshed)
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsRefreshIndicatorHidden()
     }
 
     @Test

@@ -12,6 +12,7 @@ data class SimilarUsersUiState(
     // the displayed similar users are found with this filter, the current one can be already changed
     val calculatedFilterDetails: SimilarUsersFilterDetails = SimilarUsersFilterDetails(),
     override val dataRequestStatus: RequestStatus = RequestStatus.NOT_REQUESTED,
+    override val isDataRequestedByPull: Boolean = false,
     override val nextPageRequestStatus: RequestStatus = RequestStatus.UNDEFINED,
     override val isLastPage: Boolean = false,
     override val notification: String? = null

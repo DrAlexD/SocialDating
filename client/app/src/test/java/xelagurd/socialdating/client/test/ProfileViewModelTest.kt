@@ -22,6 +22,8 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -237,6 +239,39 @@ class ProfileViewModelTest {
         assertEquals(RequestStatus.SUCCESS, profileUiState.dataRequestStatus)
 
         coVerify(exactly = 2) { remoteUsersRepository.getUser(any()) }
+    }
+
+    @Test
+    fun profileViewModel_initialLoadingAndRefresh_dataRequestedByPullOnlyByRefresh() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertFalse(profileUiState.isDataRequestedByPull)
+
+        viewModel.getUser()
+        advanceUntilIdle()
+
+        assertTrue(profileUiState.isDataRequestedByPull)
+    }
+
+    @Test
+    fun profileViewModel_appLanguageChangeAfterRefresh_dataNotRequestedByPull() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.getUser()
+        advanceUntilIdle()
+
+        languageChangesFlow.emit(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        assertFalse(profileUiState.isDataRequestedByPull)
     }
 
     private fun mockGeneralMethods() {

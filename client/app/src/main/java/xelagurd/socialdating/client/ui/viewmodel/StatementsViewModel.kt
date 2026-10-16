@@ -50,6 +50,7 @@ class StatementsViewModel @Inject constructor(
 
     private data class RequestStatuses(
         val data: RequestStatus,
+        val isDataRequestedByPull: Boolean,
         val nextPage: RequestStatus,
         val action: RequestStatus,
         val notification: String?
@@ -61,6 +62,7 @@ class StatementsViewModel @Inject constructor(
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val isDataRequestedByPullFlow = MutableStateFlow(false)
     private val nextPageRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val actionRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
     private val reactingStatementIdsFlow = MutableStateFlow<Set<Int>>(setOf())
@@ -77,11 +79,18 @@ class StatementsViewModel @Inject constructor(
     // the statuses are combined apart from the data, because a flow combination takes at most five flows
     private val requestStatusesFlow = combine(
         dataRequestStatusFlow,
+        isDataRequestedByPullFlow,
         nextPageRequestStatusFlow,
         actionRequestStatusFlow,
         notificationFlow
-    ) { dataRequestStatus, nextPageRequestStatus, actionRequestStatus, notification ->
-        RequestStatuses(dataRequestStatus, nextPageRequestStatus, actionRequestStatus, notification)
+    ) { dataRequestStatus, isDataRequestedByPull, nextPageRequestStatus, actionRequestStatus, notification ->
+        RequestStatuses(
+            dataRequestStatus,
+            isDataRequestedByPull,
+            nextPageRequestStatus,
+            actionRequestStatus,
+            notification
+        )
     }
 
     val uiState = combine(
@@ -94,6 +103,7 @@ class StatementsViewModel @Inject constructor(
             categoryId = categoryId,
             entities = statements.hideWhileLoading(requestStatuses.data),
             dataRequestStatus = requestStatuses.data,
+            isDataRequestedByPull = requestStatuses.isDataRequestedByPull,
             nextPageRequestStatus = requestStatuses.nextPage,
             isLastPage = isLastPage,
             actionRequestStatus = requestStatuses.action,
@@ -136,6 +146,8 @@ class StatementsViewModel @Inject constructor(
         nextOrderNumber = ID_MIN
         isLastPageFlow.update { false }
         nextPageRequestStatusFlow.update { RequestStatus.UNDEFINED }
+        // the user requests the data only by the pull gesture
+        isDataRequestedByPullFlow.update { isRequestedByUser }
 
         getStatementsPage(isFirstPage = true, isRequestedByUser = isRequestedByUser)
     }

@@ -42,27 +42,30 @@ fun <T : DataEntity> T?.hideWhileLoading(dataRequestStatus: RequestStatus) =
         else -> this
     }
 
-fun MutableStateFlow<String?>.updateLoadingNotification(
+inline fun isRequestedByUserOrDataExist(isRequestedByUser: Boolean, isDataExist: () -> Boolean) =
+    isRequestedByUser || isDataExist()
+
+inline fun MutableStateFlow<String?>.updateLoadingNotification(
     requestStatus: RequestStatus,
     isRequestedByUser: Boolean,
-    isDataExist: Boolean
+    isDataExist: () -> Boolean
 ) {
-    if (isRequestedByUser || isDataExist) {
+    if (isRequestedByUserOrDataExist(isRequestedByUser, isDataExist)) {
         update { requestStatus.notificationText() }
     }
 }
 
-suspend fun MutableStateFlow<String?>.updatePageLoadingNotification(
+inline fun MutableStateFlow<String?>.updatePageLoadingNotification(
     requestStatus: RequestStatus,
     isFirstPage: Boolean,
     isRequestedByUser: Boolean,
-    isDataExist: suspend () -> Boolean
+    isDataExist: () -> Boolean
 ) {
     if (!isFirstPage) return
 
     updateLoadingNotification(
         requestStatus = requestStatus,
         isRequestedByUser = isRequestedByUser,
-        isDataExist = isDataExist()
+        isDataExist = isDataExist
     )
 }

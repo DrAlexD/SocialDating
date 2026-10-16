@@ -5,10 +5,14 @@ import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.hasAnyDescendant
+import androidx.compose.ui.test.hasProgressBarRangeInfo
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -18,6 +22,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.junit.Assert.assertEquals
@@ -62,7 +68,27 @@ object AndroidTestUtils {
         waitForIdle()
     }
 
+    // the refresh indicator is only shifted out of the view while it is hidden, so it is always displayed
+    // for the tests, but it spins only while refreshing, otherwise it shows the progress of the pull
+    private val isRefreshingIndicator =
+        hasAnyDescendant(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
+    private val isHiddenIndicator =
+        hasAnyDescendant(hasProgressBarRangeInfo(ProgressBarRangeInfo(0f, 0f..1f)))
+
+    fun SemanticsNodeInteraction.assertIsRefreshing() =
+        assert(isRefreshingIndicator)
+
+    fun SemanticsNodeInteraction.assertIsNotRefreshing() =
+        assert(!isRefreshingIndicator)
+
+    fun SemanticsNodeInteraction.assertIsRefreshIndicatorHidden() =
+        assert(isHiddenIndicator)
+
     fun NavController.getCurrentRoute() = currentBackStackEntry?.destination?.route
+
+    // the view model is already created by the screen, so it is only taken from the back stack entry
+    inline fun <reified T : ViewModel> NavController.getCurrentViewModel(): T =
+        ViewModelProvider(requireNotNull(currentBackStackEntry))[T::class.java]
 
     fun NavController.assertCurrentRouteName(expectedRouteName: String) =
         assertEquals(expectedRouteName, getCurrentRoute())

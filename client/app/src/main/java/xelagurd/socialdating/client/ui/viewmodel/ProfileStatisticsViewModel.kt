@@ -59,6 +59,12 @@ class ProfileStatisticsViewModel @Inject constructor(
     private val commonLocalRepository: CommonLocalRepository
 ) : ViewModel() {
 
+    private data class RequestStatuses(
+        val data: RequestStatus,
+        val isDataRequestedByPull: Boolean,
+        val notification: String?
+    )
+
     private val userId: Int = checkNotNull(savedStateHandle[ProfileStatisticsDestination.userId])
     private val anotherUserId: Int = checkNotNull(savedStateHandle[ProfileStatisticsDestination.anotherUserId])
     private val categoryIds: Set<Int> =
@@ -66,6 +72,7 @@ class ProfileStatisticsViewModel @Inject constructor(
     private val isOfflineMode = runBlocking { preferencesRepository.isOfflineMode.first() }
 
     private val dataRequestStatusFlow = MutableStateFlow<RequestStatus>(RequestStatus.UNDEFINED)
+    private val isDataRequestedByPullFlow = MutableStateFlow(false)
     private val userCategoriesStateFlow = MutableStateFlow<List<UserCategoryData>>(listOf())
     private val userCategoriesFlow = when (anotherUserId) {
         userId -> localUserCategoriesRepository.getUserCategories(anotherUserId).distinctUntilChanged()
@@ -79,23 +86,32 @@ class ProfileStatisticsViewModel @Inject constructor(
     private val detailedSimilarUserFlow = MutableStateFlow<DetailedSimilarUserDto?>(null)
     private val notificationFlow = MutableStateFlow<String?>(null)
 
+    // the statuses are combined apart from the data, because a flow combination takes at most five flows
+    private val requestStatusesFlow = combine(
+        dataRequestStatusFlow,
+        isDataRequestedByPullFlow,
+        notificationFlow
+    ) { dataRequestStatus, isDataRequestedByPull, notification ->
+        RequestStatuses(dataRequestStatus, isDataRequestedByPull, notification)
+    }
+
     val uiState = combine(
         userCategoriesFlow,
         userDefiningThemesFlow,
         detailedSimilarUserFlow,
-        dataRequestStatusFlow,
-        notificationFlow
-    ) { userCategories, userDefiningThemes, detailedSimilarUser, dataRequestStatus, notification ->
+        requestStatusesFlow
+    ) { userCategories, userDefiningThemes, detailedSimilarUser, requestStatuses ->
         ProfileStatisticsUiState(
             userId = userId,
             anotherUserId = anotherUserId,
             entities = userCategories
                 .filter { categoryIds.isEmpty() || it.categoryId in categoryIds }
-                .hideWhileLoading(dataRequestStatus),
+                .hideWhileLoading(requestStatuses.data),
             entityIdToData = userDefiningThemes.groupBy { it.categoryId },
             entitiesMask = detailedSimilarUser,
-            dataRequestStatus = dataRequestStatus,
-            notification = notification
+            dataRequestStatus = requestStatuses.data,
+            isDataRequestedByPull = requestStatuses.isDataRequestedByPull,
+            notification = requestStatuses.notification
         )
     }.stateIn(
         scope = viewModelScope,
@@ -143,6 +159,8 @@ class ProfileStatisticsViewModel @Inject constructor(
         viewModelScope.launch {
             var globalStatus: RequestStatus = RequestStatus.LOADING
 
+            // the user requests the data only by the pull gesture
+            isDataRequestedByPullFlow.update { isRequestedByUser }
             dataRequestStatusFlow.update { globalStatus }
 
             val (remoteDetailedSimilarUser, statusDetailedSimilarUser) = when (anotherUserId) {
@@ -249,7 +267,7 @@ class ProfileStatisticsViewModel @Inject constructor(
             notificationFlow.updateLoadingNotification(
                 requestStatus = globalStatus,
                 isRequestedByUser = isRequestedByUser,
-                isDataExist = userCategoriesFlow.first().isNotEmpty()
+                isDataExist = { userCategoriesFlow.first().isNotEmpty() }
             )
         }
     }

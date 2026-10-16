@@ -87,7 +87,7 @@ class SimilarUsersScreenTest {
     fun similarUsersScreen_loadingState_loadingIndicators() {
         setContentToSimilarUsersBody(SimilarUsersUiState(dataRequestStatus = RequestStatus.LOADING))
 
-        composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsDisplayed()
+        composeTestRule.onNodeWithTagId(R.string.loading).assertIsDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.loading).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.calculate_similar_users_hint).assertDoesNotExist()
     }
@@ -181,6 +181,7 @@ class SimilarUsersScreenTest {
     fun similarUsersScreen_allActions_calledAllActions() {
         var clickedSimilarUserId = -1
         var calculationsCount = 0
+        var refreshesCount = 0
         val similarUsersUiState = SimilarUsersUiState(
             entities = similarUsers,
             dataRequestStatus = RequestStatus.SUCCESS
@@ -190,7 +191,8 @@ class SimilarUsersScreenTest {
             SimilarUsersScreenComponent(
                 similarUsersUiState = similarUsersUiState,
                 onSimilarUserClick = { clickedSimilarUserId = it },
-                onCalculate = { calculationsCount++ }
+                onCalculate = { calculationsCount++ },
+                onRefresh = { refreshesCount++ }
             )
         }
 
@@ -198,10 +200,12 @@ class SimilarUsersScreenTest {
         assertEquals(similarUser.id, clickedSimilarUserId)
 
         composeTestRule.performPullToRefresh()
-        assertEquals(1, calculationsCount)
+        assertEquals(1, refreshesCount)
+        assertEquals(0, calculationsCount)
 
         composeTestRule.onNodeWithTextId(R.string.calculate).checkButtonAndClick()
-        assertEquals(2, calculationsCount)
+        assertEquals(1, calculationsCount)
+        assertEquals(1, refreshesCount)
     }
 
     @Test

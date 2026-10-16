@@ -20,8 +20,10 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -216,6 +218,53 @@ class CategoriesViewModelTest {
         assertEquals(RequestStatus.SUCCESS, categoriesUiState.dataRequestStatus)
 
         coVerify(exactly = 2) { remoteCategoriesRepository.getCategories() }
+    }
+
+    @Test
+    fun categoriesViewModel_initialLoadingAndRefresh_dataRequestedByPullOnlyByRefresh() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        assertFalse(categoriesUiState.isDataRequestedByPull)
+
+        viewModel.getCategories()
+        advanceUntilIdle()
+
+        assertTrue(categoriesUiState.isDataRequestedByPull)
+    }
+
+    @Test
+    fun categoriesViewModel_appLanguageChangeAfterRefresh_dataNotRequestedByPull() = runTest {
+        mockDataWithInternet()
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.getCategories()
+        advanceUntilIdle()
+
+        languageChangesFlow.emit(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        assertFalse(categoriesUiState.isDataRequestedByPull)
+    }
+
+    @Test
+    fun categoriesViewModel_refreshInOfflineMode_dataNotRequestedByPull() = runTest {
+        every { preferencesRepository.isOfflineMode } returns flowOf(true)
+
+        initViewModel()
+        setupUiStateCollecting()
+        advanceUntilIdle()
+
+        viewModel.getCategories()
+        advanceUntilIdle()
+
+        assertFalse(categoriesUiState.isDataRequestedByPull)
     }
 
     @Test
