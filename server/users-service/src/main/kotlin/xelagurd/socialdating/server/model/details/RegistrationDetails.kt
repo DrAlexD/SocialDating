@@ -62,7 +62,7 @@ data class RegistrationDetails(
             nameRu = russianOrNull(name),
             gender = gender,
             username = username,
-            password = passwordEncoder.encode(password),
+            password = passwordEncoder.encode(password)!!,
             email = email,
             age = age,
             cityEn = englishOrNull(city),

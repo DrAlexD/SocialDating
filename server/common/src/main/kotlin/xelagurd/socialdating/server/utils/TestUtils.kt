@@ -1,9 +1,9 @@
 package xelagurd.socialdating.server.utils
 
 import kotlin.random.Random
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.mockk
+import tools.jackson.core.type.TypeReference
+import tools.jackson.module.kotlin.jacksonObjectMapper
 
 object TestUtils {
     private val objectMapper = jacksonObjectMapper()

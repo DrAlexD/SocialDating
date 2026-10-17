@@ -9,13 +9,13 @@ import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 import org.springframework.web.bind.MethodArgumentNotValidException
-import com.fasterxml.jackson.databind.JsonMappingException
-import com.fasterxml.jackson.databind.exc.InvalidFormatException
-import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import tools.jackson.core.JacksonException
+import tools.jackson.databind.exc.InvalidFormatException
+import tools.jackson.databind.exc.MismatchedInputException
 import xelagurd.socialdating.server.exception.BaseExceptionHandler
 
 class BaseExceptionHandlerUnitTest {
@@ -70,7 +70,7 @@ class BaseExceptionHandlerUnitTest {
     @Test
     fun handleHttpMessageNotReadableException_wrongEnumValue_returnsFieldMessage() {
         val cause = mockk<InvalidFormatException>(relaxed = true) {
-            every { path } returns listOf(JsonMappingException.Reference(null, "gender"))
+            every { path } returns listOf(JacksonException.Reference(null, "gender"))
         }
         val ex = mockk<HttpMessageNotReadableException>(relaxed = true) {
             every { this@mockk.cause } returns cause
@@ -82,7 +82,7 @@ class BaseExceptionHandlerUnitTest {
     @Test
     fun handleHttpMessageNotReadableException_nullValue_returnsNotNullMessage() {
         val cause = mockk<MismatchedInputException>(relaxed = true) {
-            every { path } returns listOf(JsonMappingException.Reference(null, "name"))
+            every { path } returns listOf(JacksonException.Reference(null, "name"))
         }
         val ex = mockk<HttpMessageNotReadableException>(relaxed = true) {
             every { this@mockk.cause } returns cause

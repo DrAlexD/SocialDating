@@ -33,6 +33,12 @@ SocialDating is a dating/social app consisting of:
 
 Reports are written to `tests-coverage/reports/`.
 
+#### Dependency updates
+
+- Show available release updates of dependencies, plugins and Gradle: `./gradlew dependencyUpdates`
+
+Report is written to `build/dependencyUpdates/report.txt`.
+
 ### Architecture
 
 Spring Boot microservices, entry point is `gateway-service/` (Spring Cloud Gateway):
@@ -64,7 +70,7 @@ localized too.
 
 **Testing:**
 
-- Unit and local integration tests: JUnit 5 + MockK + SpringMockK + TestContainers
+- Unit and local integration tests: JUnit 6 + MockK + SpringMockK + TestContainers
 - Global integration tests live only in `common/src/integrationTest/kotlin/`
 
 ---
@@ -92,6 +98,12 @@ localized too.
 - Run instrumented tests and build reports: `./gradlew createInstrumentedCoverageReport`
 
 Reports are written to `tests-coverage/reports/`.
+
+#### Dependency updates
+
+- Show available release updates of dependencies, plugins and Gradle: `./gradlew dependencyUpdates`
+
+Report is written to `build/dependencyUpdates/report.txt`.
 
 ### Architecture
 

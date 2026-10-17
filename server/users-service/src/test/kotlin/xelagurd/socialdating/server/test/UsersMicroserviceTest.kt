@@ -5,8 +5,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.resttestclient.TestRestTemplate
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
@@ -14,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeUsersData
 import xelagurd.socialdating.server.FakeUsersData.toUsersWithNullIds
 import xelagurd.socialdating.server.model.DefaultDataProperties.USER_ACTIVITY_INITIAL
@@ -41,6 +42,7 @@ import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
         "REFRESH_TOKEN_EXPIRATION=604800000"
     ]
 )
+@AutoConfigureTestRestTemplate
 @Import(NoSecurityConfig::class, AuthTestConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UsersMicroserviceTest(

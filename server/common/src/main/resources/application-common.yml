@@ -14,8 +14,9 @@ spring:
   web:
     locale: en
   jackson:
-    deserialization:
-      fail-on-numbers-for-enums: true
+    datatype:
+      enum:
+        fail-on-numbers-for-enums: true
   datasource:
     url: jdbc:postgresql://postgres:5432/social_dating_db
     username: ${POSTGRES_USER}

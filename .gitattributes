@@ -1,4 +1,20 @@
+# text files are stored in the repository with LF and checked out with CRLF
+* text=auto eol=crlf
+
+# executed in Linux, where CR breaks the shebang and the commands
 *.sh    text eol=lf
 gradlew text eol=lf
-*.bat   text eol=crlf
-*.cmd   text eol=crlf
+
+# read inside Linux containers
+Dockerfile         text eol=lf
+docker-compose.yml text eol=lf
+postgres-init.sql  text eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# never converted
+*.jar  binary
+*.png  binary
+*.webp binary
+*.ttf  binary

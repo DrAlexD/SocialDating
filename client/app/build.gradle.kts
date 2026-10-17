@@ -29,12 +29,12 @@ kotlin {
 
 android {
     namespace = "xelagurd.socialdating.client"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "xelagurd.socialdating.client"
-        minSdk = 34
-        targetSdk = 35
+        minSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -91,6 +91,11 @@ android {
         animationsDisabled = true
     }
 
+    installation {
+        // grants the runtime permissions declared in the manifest, so the debug build can reach the local server
+        installOptions += "-g"
+    }
+
     lint {
         baseline = file("lint-baseline.xml")
     }
@@ -137,27 +142,29 @@ tasks.register<JacocoReport>(instrumentedCoverageReportTaskName) {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core)
+
+    // the coroutines come only transitively, so the BOM aligns their versions in the app and in the tests
+    implementation(platform(libs.kotlinx.coroutines.bom))
 
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.androidx.compose)
 
     implementation(libs.androidx.activity.compose)
 
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+
+    implementation(libs.androidx.navigation.compose)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
 
-    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
     implementation(libs.retrofit)
     implementation(libs.okhttp)
 
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.datastore.preferences)
@@ -170,6 +177,8 @@ dependencies {
 
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    // the Compose test libraries bring an older Espresso, which reflects on InputManager.getInstance removed in API 37
+    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.runner)
     androidTestImplementation(libs.androidx.navigation.testing)

@@ -1,13 +1,12 @@
 package xelagurd.socialdating.server.test
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.Runs
 import io.mockk.confirmVerified
@@ -17,6 +16,7 @@ import io.mockk.just
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import xelagurd.socialdating.server.controller.UserStatementsController
 import xelagurd.socialdating.server.model.details.StatementReactionDetails
 import xelagurd.socialdating.server.model.enums.StatementReactionType

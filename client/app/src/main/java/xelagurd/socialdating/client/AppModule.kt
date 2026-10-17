@@ -10,7 +10,6 @@ import androidx.credentials.CredentialManager
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,6 +18,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import xelagurd.socialdating.client.data.local.AppDatabase
 import xelagurd.socialdating.client.data.remote.ApiService
 import xelagurd.socialdating.client.data.remote.AuthApiService

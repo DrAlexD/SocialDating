@@ -4,8 +4,9 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.resttestclient.TestRestTemplate
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpEntity
@@ -22,7 +23,7 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeCategoriesData
 import xelagurd.socialdating.server.FakeCategoriesData.filterByUserId
 import xelagurd.socialdating.server.FakeCategoriesData.toUserCategoriesWithNullIds
@@ -49,6 +50,7 @@ import xelagurd.socialdating.server.utils.TestUtils.toRequestParams
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestRestTemplate
 @Import(NoSecurityConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -364,7 +366,7 @@ class CategoriesMicroserviceTest(
         readObject("definingThemes")
             .mapValues { (_, definingTheme) -> (definingTheme as Map<*, *>)["similarityType"] }
 
-    private fun <T> TestRestTemplate.getWithAuth(
+    private fun <T : Any> TestRestTemplate.getWithAuth(
         userId: Int,
         url: String,
         responseType: Class<T>,

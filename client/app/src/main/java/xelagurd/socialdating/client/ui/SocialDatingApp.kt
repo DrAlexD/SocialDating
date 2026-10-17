@@ -58,7 +58,7 @@ fun AppTopBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
-    val colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+    val colors = TopAppBarDefaults.topAppBarColors()
 
     // the bar animates any change of its container color, so it is recreated on a theme change
     // to apply the new colors immediately and keep the animation only for the content scrolling

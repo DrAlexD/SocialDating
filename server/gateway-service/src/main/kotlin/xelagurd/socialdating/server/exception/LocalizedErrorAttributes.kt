@@ -1,7 +1,7 @@
 package xelagurd.socialdating.server.exception
 
 import org.springframework.boot.web.error.ErrorAttributeOptions
-import org.springframework.boot.web.reactive.error.DefaultErrorAttributes
+import org.springframework.boot.webflux.error.DefaultErrorAttributes
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import xelagurd.socialdating.server.utils.GatewayLocalizedMessages
@@ -15,7 +15,7 @@ class LocalizedErrorAttributes : DefaultErrorAttributes() {
     override fun getErrorAttributes(
         request: ServerRequest,
         options: ErrorAttributeOptions
-    ): MutableMap<String, Any> {
+    ): MutableMap<String, Any?> {
         val attributes = super.getErrorAttributes(request, options)
         val status = attributes[STATUS_ATTRIBUTE] as? Int ?: return attributes
 
