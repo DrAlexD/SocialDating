@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- the emulator host 10.0.2.2 is a local network address, which apps targeting API 37 reach only with this
+         runtime permission, it is granted on install by the "-g" install option and requested by MainActivity
+         when it is missing -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+
     <application>
         <activity
             android:name=".HiltTestActivity"

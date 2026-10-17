@@ -1,8 +1,8 @@
 package xelagurd.socialdating.server.model
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.hibernate.annotations.Check
 import org.springframework.security.core.userdetails.UserDetails
+import jakarta.persistence.CheckConstraint
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -41,10 +41,12 @@ import xelagurd.socialdating.server.utils.LocalizationUtils.localize
     uniqueConstraints = [
         UniqueConstraint(name = "uk_username", columnNames = ["username"]),
         UniqueConstraint(name = "uk_email", columnNames = ["email"])
+    ],
+    check = [
+        CheckConstraint(name = "ck_name", constraint = "name_en is not null or name_ru is not null"),
+        CheckConstraint(name = "ck_city", constraint = "city_en is not null or city_ru is not null")
     ]
 )
-@Check(name = "ck_name", constraints = "name_en is not null or name_ru is not null")
-@Check(name = "ck_city", constraints = "city_en is not null or city_ru is not null")
 class User(
     @field:Id
     @field:GeneratedValue(GenerationType.IDENTITY)

@@ -4,8 +4,6 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.kotlin.plugin.spring)
-    alias(libs.plugins.kotlin.plugin.jpa)
-    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 dependencies {
@@ -17,7 +15,7 @@ dependencies {
     implementation(libs.spring.cloud.gateway)
     implementation(platform(libs.spring.cloud.dependencies))
 
-    implementation(libs.spring.kafka)
+    implementation(libs.spring.boot.kafka)
 
     implementation(libs.springdoc.openapi.webflux)
 

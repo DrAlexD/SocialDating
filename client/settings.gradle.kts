@@ -1,3 +1,5 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+
 pluginManagement {
     repositories {
         google {
@@ -20,8 +22,8 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-    id("org.jetbrains.kotlinx.kover.aggregation") version "0.9.8"
+    id("org.jetbrains.kotlinx.kover.aggregation") version "0.9.11"
+    id("io.github.ben-manes.versions.settings") version "0.66.0"
 }
 
 kover {
@@ -50,6 +52,13 @@ gradle.rootProject {
     tasks.matching { it.name == "koverXmlReport" }.configureEach {
         (javaClass.getMethod("getReportFile\$kover_gradle_plugin").invoke(this) as RegularFileProperty)
             .set(testReportsDir.file("report.xml"))
+    }
+}
+
+gradle.rootProject {
+    tasks.withType<DependencyUpdatesTask>().configureEach {
+        revision = "release"
+        rejectPreReleases = true
     }
 }
 

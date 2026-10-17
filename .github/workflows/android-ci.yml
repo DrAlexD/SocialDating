@@ -44,8 +44,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        api-level: [ 34, 35 ]
+        api-level: [ '36', '37.0' ]
         profile: [ small_phone, medium_phone ]
+        # there is no ATD image for API 37 yet
+        include:
+          - api-level: '36'
+            target: aosp_atd
+          - api-level: '37.0'
+            target: google_apis
       fail-fast: false
 
     defaults:
@@ -76,7 +82,7 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           profile: ${{ matrix.profile }}
-          target: aosp_atd
+          target: ${{ matrix.target }}
           arch: x86_64
           emulator-options: -no-window -gpu swiftshader_indirect -accel on -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -no-metrics
           working-directory: client

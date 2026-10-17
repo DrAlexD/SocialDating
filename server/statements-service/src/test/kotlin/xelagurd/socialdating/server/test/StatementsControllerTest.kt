@@ -2,7 +2,7 @@ package xelagurd.socialdating.server.test
 
 import kotlin.random.Random
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
@@ -10,7 +10,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -18,6 +17,7 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import xelagurd.socialdating.server.FakeStatementsData
 import xelagurd.socialdating.server.controller.StatementsController
 import xelagurd.socialdating.server.model.DefaultDataProperties.PAGE_SIZE_DEFAULT

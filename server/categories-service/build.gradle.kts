@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.kotlin.plugin.spring)
     alias(libs.plugins.kotlin.plugin.jpa)
-    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 dependencies {
@@ -14,7 +13,7 @@ dependencies {
     implementation(libs.spring.cloud.openfeign)
     implementation(platform(libs.spring.cloud.dependencies))
 
-    implementation(libs.spring.kafka)
+    implementation(libs.spring.boot.kafka)
 
     developmentOnly(libs.spring.boot.devtools)
 

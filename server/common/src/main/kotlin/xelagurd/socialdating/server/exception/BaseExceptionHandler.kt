@@ -10,8 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import io.github.oshai.kotlinlogging.KotlinLogging
+import tools.jackson.databind.exc.MismatchedInputException
 import xelagurd.socialdating.server.utils.ExceptionUtils.createWrongDataMessage
 import xelagurd.socialdating.server.utils.ExceptionUtils.getErrorPositionFromStackTrace
 import xelagurd.socialdating.server.utils.ExceptionUtils.transformNotUniqueDataMessage

@@ -1,66 +1,56 @@
 [versions]
-kotlin = "2.3.20"
-kotlinxDatetime = "0.7.1-0.6.x-compat"
-kotlinxSerializationJson = "1.11.0"
-kotlinxCoroutines = "1.10.2"
-jacksonKotlin = "2.21.2"
-kotlinLogging = "8.0.01"
-springBoot = "3.5.13" # fixed due to Spring Boot 4.0.0
+kotlin = "2.4.21"
+kotlinLogging = "8.0.4"
+springBoot = "4.1.1"
 springDependencyManagement = "1.1.7"
-springKafka = "3.3.15" # fixed due to Spring Boot 4.0.0
-springCloudGateway = "4.3.4"
-springCloudOpenfeign = "4.3.2"
-springCloudDependencies = "2025.0.2" # fixed due to Spring Boot 4.0.0
-springdocOpenapi = "2.8.17" # fixed due to Spring Boot 4.0.0
+springCloudDependencies = "2025.1.3"
+springdocOpenapi = "3.1.1"
 jwt = "0.13.0"
-postgresql = "42.7.10"
-testcontainers = "1.21.4"
-mockk = "1.14.9"
+mockk = "1.14.11"
 springmockk = "5.0.1"
 
 [libraries]
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
-jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonKotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
+jackson-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
 kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlinLogging" }
-spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "springBoot" }
-spring-boot-devtools = { module = "org.springframework.boot:spring-boot-devtools", version.ref = "springBoot" }
-spring-boot-webmvc = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBoot" }
-spring-boot-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "springBoot" }
-spring-boot-validation = { module = "org.springframework.boot:spring-boot-starter-validation", version.ref = "springBoot" }
-spring-boot-security = { module = "org.springframework.boot:spring-boot-starter-security", version.ref = "springBoot" }
-spring-boot-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux", version.ref = "springBoot" }
-spring-kafka = { module = "org.springframework.kafka:spring-kafka", version.ref = "springKafka" }
-spring-cloud-gateway = { module = "org.springframework.cloud:spring-cloud-starter-gateway", version.ref = "springCloudGateway" }
-spring-cloud-openfeign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign", version.ref = "springCloudOpenfeign" }
+spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-devtools = { module = "org.springframework.boot:spring-boot-devtools" }
+spring-boot-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+spring-boot-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
+spring-boot-kafka = { module = "org.springframework.boot:spring-boot-starter-kafka" }
+spring-cloud-gateway = { module = "org.springframework.cloud:spring-cloud-starter-gateway-server-webflux" }
+spring-cloud-openfeign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign" }
 spring-cloud-dependencies = { module = "org.springframework.cloud:spring-cloud-dependencies", version.ref = "springCloudDependencies" }
 springdoc-openapi-webmvc = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdocOpenapi" }
 springdoc-openapi-webflux = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springdocOpenapi" }
 jwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jwt" }
 jwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jwt" }
 jwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jwt" }
-postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
-spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
-spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers", version.ref = "springBoot" }
-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+postgresql = { module = "org.postgresql:postgresql" }
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
+spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+spring-boot-data-jpa-test = { module = "org.springframework.boot:spring-boot-starter-data-jpa-test" }
+spring-boot-security-test = { module = "org.springframework.boot:spring-boot-starter-security-test" }
+spring-boot-restclient = { module = "org.springframework.boot:spring-boot-starter-restclient" }
+spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
+testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }
 
 [bundles]
-kotlin-ecosystem = ["kotlin-reflect", "kotlinx-datetime", "kotlinx-serialization-json", "kotlinx-coroutines",
-    "jackson-kotlin", "kotlin-logging"]
+kotlin-ecosystem = ["kotlin-reflect", "jackson-kotlin", "kotlin-logging"]
 spring-ecosystem = ["spring-boot-actuator", "spring-boot-webmvc", "spring-boot-data-jpa", "spring-boot-validation",
     "spring-boot-security", "springdoc-openapi-webmvc"]
-testing-ecosystem = ["kotlin-test-junit5", "spring-boot-test", "spring-boot-testcontainers", "testcontainers-postgresql",
-    "mockk", "springmockk"]
+testing-ecosystem = ["kotlin-test-junit5", "spring-boot-webmvc-test", "spring-boot-data-jpa-test", "spring-boot-security-test",
+    "spring-boot-restclient", "spring-boot-testcontainers", "testcontainers-postgresql", "mockk", "springmockk"]
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 kotlin-plugin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 kotlin-plugin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
-kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

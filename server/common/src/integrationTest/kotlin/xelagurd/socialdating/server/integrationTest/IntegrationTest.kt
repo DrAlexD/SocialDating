@@ -4,7 +4,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.boot.resttestclient.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -539,7 +539,7 @@ class IntegrationTest {
         }
     }
 
-    private fun <T> TestRestTemplate.getWithToken(
+    private fun <T : Any> TestRestTemplate.getWithToken(
         authorizedUser: AuthorizedUser,
         url: String,
         responseType: Class<T>,
@@ -551,7 +551,7 @@ class IntegrationTest {
         return exchange(url, HttpMethod.GET, HttpEntity<Void>(headers), responseType)
     }
 
-    private fun <T> TestRestTemplate.postWithToken(
+    private fun <T : Any> TestRestTemplate.postWithToken(
         authorizedUser: AuthorizedUser,
         url: String,
         body: Any,

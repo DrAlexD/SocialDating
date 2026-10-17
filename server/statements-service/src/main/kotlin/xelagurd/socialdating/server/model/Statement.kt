@@ -1,6 +1,6 @@
 package xelagurd.socialdating.server.model
 
-import org.hibernate.annotations.Check
+import jakarta.persistence.CheckConstraint
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -21,9 +21,9 @@ import xelagurd.socialdating.server.utils.LocalizationUtils.localize
     uniqueConstraints = [
         UniqueConstraint(name = "uk_text_en", columnNames = ["text_en"]),
         UniqueConstraint(name = "uk_text_ru", columnNames = ["text_ru"])
-    ]
+    ],
+    check = [CheckConstraint(name = "ck_text", constraint = "text_en is not null or text_ru is not null")]
 )
-@Check(name = "ck_text", constraints = "text_en is not null or text_ru is not null")
 class Statement(
     @field:Id
     @field:GeneratedValue(GenerationType.IDENTITY)

@@ -26,34 +26,36 @@ spring:
     bootstrap-servers: kafka:9092
   cloud:
     gateway:
-      routes:
-        - id: users-service
-          uri: http://${services.users.host}:${services.users.port}
-          predicates:
-            - Path=/api/v1/users/**
-          filters:
-            - StripPrefix=2
+      server:
+        webflux:
+          routes:
+            - id: users-service
+              uri: http://${services.users.host}:${services.users.port}
+              predicates:
+                - Path=/api/v1/users/**
+              filters:
+                - StripPrefix=2
 
-        - id: categories-service
-          uri: http://${services.categories.host}:${services.categories.port}
-          predicates:
-            - Path=/api/v1/categories/**
-          filters:
-            - StripPrefix=2
+            - id: categories-service
+              uri: http://${services.categories.host}:${services.categories.port}
+              predicates:
+                - Path=/api/v1/categories/**
+              filters:
+                - StripPrefix=2
 
-        - id: defining-themes-service
-          uri: http://${services.defining-themes.host}:${services.defining-themes.port}
-          predicates:
-            - Path=/api/v1/defining-themes/**
-          filters:
-            - StripPrefix=2
+            - id: defining-themes-service
+              uri: http://${services.defining-themes.host}:${services.defining-themes.port}
+              predicates:
+                - Path=/api/v1/defining-themes/**
+              filters:
+                - StripPrefix=2
 
-        - id: statements-service
-          uri: http://${services.statements.host}:${services.statements.port}
-          predicates:
-            - Path=/api/v1/statements/**
-          filters:
-            - StripPrefix=2
+            - id: statements-service
+              uri: http://${services.statements.host}:${services.statements.port}
+              predicates:
+                - Path=/api/v1/statements/**
+              filters:
+                - StripPrefix=2
 
 springdoc:
   swagger-ui:

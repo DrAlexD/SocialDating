@@ -6,6 +6,8 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
@@ -69,11 +71,12 @@ object AndroidTestUtils {
     }
 
     // the refresh indicator is only shifted out of the view while it is hidden, so it is always displayed
-    // for the tests, but it spins only while refreshing, otherwise it shows the progress of the pull
+    // for the tests, but it spins only while refreshing, otherwise it shows the progress of the pull,
+    // which is left out of the semantics while it is zero, so the hidden indicator has no progress at all
     private val isRefreshingIndicator =
         hasAnyDescendant(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
     private val isHiddenIndicator =
-        hasAnyDescendant(hasProgressBarRangeInfo(ProgressBarRangeInfo(0f, 0f..1f)))
+        !hasAnyDescendant(SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo))
 
     fun SemanticsNodeInteraction.assertIsRefreshing() =
         assert(isRefreshingIndicator)

@@ -6,7 +6,7 @@ Studio.
 
 ## 1. System image — `google_apis`
 
-Pick `google_apis` (x86_64, API 35) in the wizard. Do not use an ATD (Automated Test Device) image locally: ATD builds
+Pick `google_apis` (x86_64, API 37) in the wizard. Do not use an ATD (Automated Test Device) image locally: ATD builds
 are made for automated testing only — SystemUI, the launcher, the Settings app and the AOSP keyboard are stripped out
 and hardware rendering is disabled, so there is nothing to click and nothing to type with. CI uses `aosp_atd` because it
 runs headless and never touches any of that.
@@ -89,3 +89,8 @@ to PATH or call it by its full path:
   and the emulator compete for the same hypervisor and CPU.
 - Instrumented test coverage instrumentation is enabled only for `createInstrumentedCoverageReport`, so plain
   `connectedDebugAndroidTest` runs are not slowed down by it.
+- The server address `10.0.2.2` is a local network address, so on API 37 the debug build reaches it only with the
+  `ACCESS_LOCAL_NETWORK` runtime permission (otherwise requests silently time out). Gradle installs grant it through
+  the `-g` install option, and clearing the app data resets it, so then the app asks for it on the next launch. If it
+  was denied, grant it manually:
+  `~/AppData/Local/Android/Sdk/platform-tools/adb.exe shell pm grant xelagurd.socialdating.client android.permission.ACCESS_LOCAL_NETWORK`

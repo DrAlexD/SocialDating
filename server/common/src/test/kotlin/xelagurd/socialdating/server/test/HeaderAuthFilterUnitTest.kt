@@ -32,7 +32,7 @@ class HeaderAuthFilterUnitTest {
 
         headerAuthFilter.doFilter(request, MockHttpServletResponse(), filterChain)
 
-        val authentication = SecurityContextHolder.getContext().authentication
+        val authentication = SecurityContextHolder.getContext().authentication!!
         assertEquals(7, authentication.principal)
         assertEquals("ROLE_ADMIN", authentication.authorities.first().authority)
         assertEquals(request, filterChain.request)

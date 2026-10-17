@@ -13,7 +13,7 @@ object DataUtils {
         }
     }
 
-    fun <T> responseEntity(block: () -> T?): ResponseEntity<T> {
+    fun <T : Any> responseEntity(block: () -> T?): ResponseEntity<T> {
         val result = block()
         return when {
             result == null -> ResponseEntity.noContent().build()

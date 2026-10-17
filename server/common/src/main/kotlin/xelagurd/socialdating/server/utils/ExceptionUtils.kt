@@ -1,7 +1,7 @@
 package xelagurd.socialdating.server.utils
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException
-import com.fasterxml.jackson.databind.exc.MismatchedInputException
+import tools.jackson.databind.exc.InvalidFormatException
+import tools.jackson.databind.exc.MismatchedInputException
 
 object ExceptionUtils {
 
@@ -82,7 +82,7 @@ object ExceptionUtils {
     }
 
     fun MismatchedInputException.transformWrongInputMessage(messages: LocalizedMessages): String? {
-        val fieldName = path.lastOrNull { it.fieldName != null }?.fieldName ?: return null
+        val fieldName = path.lastOrNull { it.propertyName != null }?.propertyName ?: return null
         val message = if (this is InvalidFormatException) null else messages.get(MUST_NOT_BE_NULL_KEY)
 
         return createWrongDataMessage(listOf(fieldName to message), messages)
