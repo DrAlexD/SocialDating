@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -178,7 +175,9 @@ private fun UserCategoryCardContent(
                 modifier = Modifier.fillMaxSize()
             ) {
                 Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    painter = painterResource(
+                        if (isExpanded) R.drawable.keyboard_arrow_up else R.drawable.keyboard_arrow_down
+                    ),
                     contentDescription = stringResource(R.string.expand_list),
                     modifier = Modifier.padding(dimensionResource(R.dimen.padding_8dp))
                 )

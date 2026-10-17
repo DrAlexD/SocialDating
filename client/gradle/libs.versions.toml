@@ -30,7 +30,6 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-hilt-lifecycle-viewmodel-compose = { module = "androidx.hilt:hilt-lifecycle-viewmodel-compose", version.ref = "hiltLifecycleViewmodelCompose" }
 androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 androidx-material3 = { module = "androidx.compose.material3:material3" }
-androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
@@ -58,7 +57,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 [bundles]
-androidx-compose = ["androidx-material3", "androidx-material-icons-core", "androidx-ui-graphics", "androidx-ui", "androidx-ui-tooling-preview"]
+androidx-compose = ["androidx-material3", "androidx-ui-graphics", "androidx-ui", "androidx-ui-tooling-preview"]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

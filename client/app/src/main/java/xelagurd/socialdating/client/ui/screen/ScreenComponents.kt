@@ -34,9 +34,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -88,7 +85,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -347,7 +343,7 @@ fun AppRefreshTextCard(
                 overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp))
             )
             Icon(
-                imageVector = Icons.Default.Refresh,
+                painter = painterResource(R.drawable.refresh),
                 contentDescription = stringResource(R.string.refresh),
                 modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_4dp))
             )
@@ -481,7 +477,7 @@ fun AppBadgedIconButton(
 @Composable
 fun AppExtendedFloatingActionButton(
     text: String,
-    icon: ImageVector,
+    @DrawableRes iconRes: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = true
@@ -513,7 +509,7 @@ fun AppExtendedFloatingActionButton(
             modifier = modifier.semantics { if (!isEnabled) disabled() }
         ) {
             // the button is described by its text
-            Icon(imageVector = icon, contentDescription = null)
+            Icon(painter = painterResource(iconRes), contentDescription = null)
             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_12dp)))
             Text(text = text)
         }
@@ -829,7 +825,7 @@ fun AppFilterChip(
         },
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Done,
+                painter = painterResource(R.drawable.check),
                 contentDescription = null,
                 modifier = Modifier
                     .size(FilterChipDefaults.IconSize)

@@ -1,7 +1,7 @@
 package xelagurd.socialdating.client.ui.navigation
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.ui.graphics.vector.ImageVector
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.PreferencesRepository.Defaults.CURRENT_USER_ID_DEFAULT
 
@@ -16,8 +16,10 @@ abstract class NavigationDestination {
 data class TopLevelDestination(
     val navigationDestination: NavigationDestination,
     val navigateTo: () -> Unit,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
+    @param:DrawableRes
+    val selectedIconRes: Int,
+    @param:DrawableRes
+    val unselectedIconRes: Int,
     @param:StringRes
     val labelRes: Int,
     @param:StringRes
