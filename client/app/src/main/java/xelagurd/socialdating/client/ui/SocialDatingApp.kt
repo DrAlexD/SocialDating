@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,7 +68,7 @@ fun AppTopBar(
                 navigateUp?.let {
                     IconButton(onClick = it) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            painter = painterResource(R.drawable.arrow_back),
                             contentDescription = stringResource(R.string.back_button)
                         )
                     }
@@ -106,7 +105,9 @@ fun AppBottomNavigationBar(
             NavigationBarItem(
                 icon = {
                     Icon(
-                        imageVector = if (isSelectedRoute) item.selectedIcon else item.unselectedIcon,
+                        painter = painterResource(
+                            if (isSelectedRoute) item.selectedIconRes else item.unselectedIconRes
+                        ),
                         contentDescription = stringResource(item.contentDescription)
                     )
                 },

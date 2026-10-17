@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -103,7 +101,7 @@ fun StatementsScreenComponent(
             if (notificationHostState.currentSnackbarData == null) {
                 AppExtendedFloatingActionButton(
                     text = stringResource(R.string.add_statement),
-                    icon = Icons.Default.Add,
+                    iconRes = R.drawable.add,
                     onClick = { onStatementAddingClick(statementsUiState.categoryId) }
                 )
             }

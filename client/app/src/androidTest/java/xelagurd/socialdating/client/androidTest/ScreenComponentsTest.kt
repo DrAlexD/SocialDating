@@ -1,8 +1,6 @@
 package xelagurd.socialdating.client.androidTest
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -554,7 +552,7 @@ class ScreenComponentsTest {
         composeTestRule.setContentToScreen {
             AppExtendedFloatingActionButton(
                 text = BUTTON_TEXT,
-                icon = Icons.Default.Search,
+                iconRes = R.drawable.search,
                 onClick = { isClicked = true }
             )
         }
@@ -570,7 +568,7 @@ class ScreenComponentsTest {
         composeTestRule.setContentToScreen {
             AppExtendedFloatingActionButton(
                 text = BUTTON_TEXT,
-                icon = Icons.Default.Search,
+                iconRes = R.drawable.search,
                 onClick = { isClicked = true },
                 isEnabled = false
             )
@@ -590,7 +588,7 @@ class ScreenComponentsTest {
         composeTestRule.setContentToScreen {
             AppExtendedFloatingActionButton(
                 text = BUTTON_TEXT,
-                icon = Icons.Default.Search,
+                iconRes = R.drawable.search,
                 onClick = {},
                 isEnabled = isEnabled
             )

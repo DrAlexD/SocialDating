@@ -1,14 +1,5 @@
 package xelagurd.socialdating.client.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Face
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -262,32 +253,32 @@ fun initializeTopLevelDestinations(navController: NavHostController) {
         TopLevelDestination(
             navigationDestination = ProfileDestination,
             navigateTo = { navigateTo(ProfileDestination.topLevelRoute) },
-            selectedIcon = Icons.Default.AccountCircle,
-            unselectedIcon = Icons.Outlined.AccountCircle,
+            selectedIconRes = R.drawable.account_circle,
+            unselectedIconRes = R.drawable.outline_account_circle,
             labelRes = R.string.profile,
             contentDescription = R.string.nav_profile
         ),
         TopLevelDestination(
             navigationDestination = CategoriesDestination,
             navigateTo = { navigateTo(CategoriesDestination.topLevelRoute) },
-            selectedIcon = Icons.Default.Home,
-            unselectedIcon = Icons.Outlined.Home,
+            selectedIconRes = R.drawable.home,
+            unselectedIconRes = R.drawable.outline_home,
             labelRes = R.string.categories,
             contentDescription = R.string.nav_categories
         ),
         TopLevelDestination(
             navigationDestination = SimilarUsersDestination,
             navigateTo = { navigateTo(SimilarUsersDestination.topLevelRoute) },
-            selectedIcon = Icons.Default.Face,
-            unselectedIcon = Icons.Outlined.Face,
+            selectedIconRes = R.drawable.face,
+            unselectedIconRes = R.drawable.outline_face,
             labelRes = R.string.similar_users,
             contentDescription = R.string.nav_similar_users
         ),
         TopLevelDestination(
             navigationDestination = SettingsDestination,
             navigateTo = { navigateTo(SettingsDestination.topLevelRoute) },
-            selectedIcon = Icons.Default.Settings,
-            unselectedIcon = Icons.Outlined.Settings,
+            selectedIconRes = R.drawable.settings,
+            unselectedIconRes = R.drawable.outline_settings,
             labelRes = R.string.settings,
             contentDescription = R.string.nav_settings
         )

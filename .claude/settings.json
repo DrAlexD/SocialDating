@@ -19,6 +19,7 @@
       "Bash(./gradlew test koverHtmlReport koverXmlReport)",
       "Bash(./scripts/tests-coverage/create_integration_coverage_report.sh)",
       "Bash(./gradlew createInstrumentedCoverageReport)",
+      "Bash(./gradlew dependencyUpdates)",
       "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe devices)",
       "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe shell screencap *)",
       "Bash(~/AppData/Local/Android/Sdk/platform-tools/adb.exe shell uiautomator dump *)",
