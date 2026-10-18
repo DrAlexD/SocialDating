@@ -1,5 +1,7 @@
 package xelagurd.socialdating.client.test
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import android.text.TextUtils
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -33,6 +35,12 @@ class RegistrationFormDataTest {
 
     private val ageError = FormFieldError(R.string.error_age, listOf(AGE_MIN, AGE_MAX))
 
+    private val today = LocalDate.now()
+    private val youngestBirthDate = today.minusYears(AGE_MIN.toLong())
+    private val oldestBirthDate = today.minusYears(AGE_MAX + 1L).plusDays(1)
+
+    private fun LocalDate.toDigits() = format(DateTimeFormatter.ofPattern("ddMMuuuu"))
+
     private fun lengthError(minLength: Int, maxLength: Int) =
         FormFieldError(R.string.error_length, listOf(minLength, maxLength))
 
@@ -58,7 +66,7 @@ class RegistrationFormDataTest {
     fun registrationFormData_emptyData_isNotValid() {
         val emptyFormData = registrationFormData.copy(
             name = "", gender = null, username = "", password = "", repeatedPassword = "",
-            email = "", age = "", city = "", purpose = null
+            email = "", birthDate = "", city = "", purpose = null
         )
 
         assertFalse(emptyFormData.isValid)
@@ -100,13 +108,33 @@ class RegistrationFormDataTest {
     }
 
     @Test
-    fun registrationFormData_emptyAge_isNotValid() {
-        assertFalse(registrationFormData.copy(age = "").isValid)
+    fun registrationFormData_emptyBirthDate_isNotValid() {
+        assertFalse(registrationFormData.copy(birthDate = "").isValid)
     }
 
     @Test
-    fun registrationFormData_notNumberAge_isNotValid() {
-        assertFalse(registrationFormData.copy(age = "abcde").isValid)
+    fun registrationFormData_incompleteBirthDate_isNotValid() {
+        assertFalse(registrationFormData.copy(birthDate = "1503").isValid)
+    }
+
+    @Test
+    fun registrationFormData_youngestBirthDate_isValid() {
+        assertTrue(registrationFormData.copy(birthDate = youngestBirthDate.toDigits()).isValid)
+    }
+
+    @Test
+    fun registrationFormData_oldestBirthDate_isValid() {
+        assertTrue(registrationFormData.copy(birthDate = oldestBirthDate.toDigits()).isValid)
+    }
+
+    @Test
+    fun registrationFormData_tooYoungBirthDate_isNotValid() {
+        assertFalse(registrationFormData.copy(birthDate = youngestBirthDate.plusDays(1).toDigits()).isValid)
+    }
+
+    @Test
+    fun registrationFormData_tooOldBirthDate_isNotValid() {
+        assertFalse(registrationFormData.copy(birthDate = oldestBirthDate.minusDays(1).toDigits()).isValid)
     }
 
     @Test
@@ -126,7 +154,7 @@ class RegistrationFormDataTest {
         assertNull(registrationFormData.passwordError)
         assertNull(registrationFormData.repeatedPasswordError)
         assertNull(registrationFormData.emailError)
-        assertNull(registrationFormData.ageError)
+        assertNull(registrationFormData.birthDateError)
         assertNull(registrationFormData.cityError)
     }
 
@@ -134,7 +162,7 @@ class RegistrationFormDataTest {
     fun registrationFormData_emptyData_hasNoErrors() {
         val emptyFormData = registrationFormData.copy(
             name = "", username = "", password = "", repeatedPassword = "",
-            email = "", age = "", city = ""
+            email = "", birthDate = "", city = ""
         )
 
         assertNull(emptyFormData.nameError)
@@ -142,7 +170,7 @@ class RegistrationFormDataTest {
         assertNull(emptyFormData.passwordError)
         assertNull(emptyFormData.repeatedPasswordError)
         assertNull(emptyFormData.emailError)
-        assertNull(emptyFormData.ageError)
+        assertNull(emptyFormData.birthDateError)
         assertNull(emptyFormData.cityError)
     }
 
@@ -203,24 +231,45 @@ class RegistrationFormDataTest {
     }
 
     @Test
-    fun registrationFormData_notNumberAge_hasAgeError() {
-        val formData = registrationFormData.copy(age = "abcde")
+    fun registrationFormData_incompleteBirthDate_hasNoError() {
+        val formData = registrationFormData.copy(birthDate = "1503")
 
-        assertEquals(ageError, formData.ageError)
+        assertNull(formData.birthDateError)
     }
 
     @Test
-    fun registrationFormData_tooSmallAge_hasAgeError() {
-        val formData = registrationFormData.copy(age = (AGE_MIN - 1).toString())
+    fun registrationFormData_notExistingBirthDate_hasDateError() {
+        val formData = registrationFormData.copy(birthDate = "30022000")
 
-        assertEquals(ageError, formData.ageError)
+        assertEquals(FormFieldError(R.string.error_date), formData.birthDateError)
     }
 
     @Test
-    fun registrationFormData_tooBigAge_hasAgeError() {
-        val formData = registrationFormData.copy(age = (AGE_MAX + 1).toString())
+    fun registrationFormData_tooYoungBirthDate_hasAgeError() {
+        val formData = registrationFormData.copy(birthDate = youngestBirthDate.plusDays(1).toDigits())
 
-        assertEquals(ageError, formData.ageError)
+        assertEquals(ageError, formData.birthDateError)
+    }
+
+    @Test
+    fun registrationFormData_tooOldBirthDate_hasAgeError() {
+        val formData = registrationFormData.copy(birthDate = oldestBirthDate.minusDays(1).toDigits())
+
+        assertEquals(ageError, formData.birthDateError)
+    }
+
+    @Test
+    fun registrationFormData_futureBirthDate_hasAgeError() {
+        val formData = registrationFormData.copy(birthDate = today.plusDays(1).toDigits())
+
+        assertEquals(ageError, formData.birthDateError)
+    }
+
+    @Test
+    fun toRegistrationDetails_birthDateDigits_convertedToIsoDate() {
+        val registrationDetails = registrationFormData.copy(birthDate = "15032000").toRegistrationDetails()
+
+        assertEquals("2000-03-15", registrationDetails.birthDate)
     }
 
     @Test

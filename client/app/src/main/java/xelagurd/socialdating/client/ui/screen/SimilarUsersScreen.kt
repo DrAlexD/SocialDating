@@ -41,8 +41,8 @@ import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.Category
 import xelagurd.socialdating.client.data.model.DataUtils.SIMILAR_USERS_NEXT_PAGE_PREFETCH_COUNT
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.FILTER_AGE_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.DIFFERENCE_NUMBER_MIN
 import xelagurd.socialdating.client.data.model.dto.SimilarUserDto
 import xelagurd.socialdating.client.data.model.enums.DifferenceRangeType
@@ -253,7 +253,8 @@ private fun SimilarUsersFilterContent(
         RangeChoosingComponent(
             titleRes = R.string.age,
             value = similarUsersFilterFormData.ageRange,
-            valueRange = AGE_MIN..AGE_MAX,
+            valueRange = AGE_MIN..FILTER_AGE_MAX,
+            isMaxUnlimited = true,
             onValueChange = { onValueChange(similarUsersFilterFormData.copy(ageRange = it)) }
         )
         MultiChoosingComponent(

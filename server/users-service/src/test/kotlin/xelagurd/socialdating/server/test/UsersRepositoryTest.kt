@@ -1,5 +1,6 @@
 package xelagurd.socialdating.server.test
 
+import java.time.LocalDate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase
@@ -12,8 +13,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.testcontainers.postgresql.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeUsersData
-import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MAX
-import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Gender.FEMALE
@@ -24,6 +23,8 @@ import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.model.enums.Purpose.RELATIONSHIPS
 import xelagurd.socialdating.server.model.enums.Role
 import xelagurd.socialdating.server.repository.UsersRepository
+import xelagurd.socialdating.server.utils.DateUtils.toEarliestBirthDate
+import xelagurd.socialdating.server.utils.DateUtils.toLatestBirthDate
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -41,7 +42,7 @@ class UsersRepositoryTest(
         username: String,
         email: String? = null,
         gender: Gender = MALE,
-        age: Int = 25,
+        birthDate: LocalDate = LocalDate.of(2000, 1, 1),
         cityEn: String? = "city",
         cityRu: String? = null,
         purpose: Purpose = FRIENDS
@@ -52,7 +53,7 @@ class UsersRepositoryTest(
             username = username,
             password = FakeUsersData.users[0].password,
             email = email,
-            age = age,
+            birthDate = birthDate,
             cityEn = cityEn,
             cityRu = cityRu,
             purpose = purpose,
@@ -114,26 +115,70 @@ class UsersRepositoryTest(
 
     @Test
     fun findUserIds_withoutFilter_returnsAllUserIds() {
-        val result = usersRepository.findUserIds(null, AGE_MIN, AGE_MAX, null, null, null)
+        val result = usersRepository.findUserIds(null, null, null, null, null, null)
 
         assertEquals(setOf(user1.id, user2.id, user3.id), result.toSet())
     }
 
     @Test
+    fun findUserIds_byBirthDates_includesBorders() {
+        val (earliestUser, latestUser) = usersRepository.saveAllAndFlush(
+            listOf(
+                user(name = "Maria", username = "username4", birthDate = LocalDate.of(1990, 5, 10)),
+                user(name = "Anna", username = "username5", birthDate = LocalDate.of(1995, 5, 10)),
+                user(name = "Olga", username = "username6", birthDate = LocalDate.of(1990, 5, 9)),
+                user(name = "Irina", username = "username7", birthDate = LocalDate.of(1995, 5, 11))
+            )
+        )
+
+        val result = usersRepository.findUserIds(
+            null,
+            earliestUser.birthDate,
+            latestUser.birthDate,
+            null,
+            null,
+            null
+        )
+
+        assertEquals(setOf(earliestUser.id, latestUser.id), result.toSet())
+    }
+
+    @Test
     fun findUserIds_byGendersAgeAndPurposes_returnsOnlyMatching() {
+        val today = LocalDate.now()
+        val suitableBirthDate = today.minusYears(30)
+
         // only the first user has the suitable age and purpose
         val matchingUser = usersRepository.saveAllAndFlush(
             listOf(
-                user(name = "Maria", username = "username4", gender = FEMALE, age = 30, purpose = ALL_AT_ONCE),
-                user(name = "Anna", username = "username5", gender = FEMALE, age = 40, purpose = ALL_AT_ONCE),
-                user(name = "Olga", username = "username6", gender = FEMALE, age = 30, purpose = FRIENDS)
+                user(
+                    name = "Maria",
+                    username = "username4",
+                    gender = FEMALE,
+                    birthDate = suitableBirthDate,
+                    purpose = ALL_AT_ONCE
+                ),
+                user(
+                    name = "Anna",
+                    username = "username5",
+                    gender = FEMALE,
+                    birthDate = today.minusYears(40),
+                    purpose = ALL_AT_ONCE
+                ),
+                user(
+                    name = "Olga",
+                    username = "username6",
+                    gender = FEMALE,
+                    birthDate = suitableBirthDate,
+                    purpose = FRIENDS
+                )
             )
         ).first()
 
         val result = usersRepository.findUserIds(
             listOf(FEMALE.name),
-            30,
-            35,
+            35.toEarliestBirthDate(today),
+            30.toLatestBirthDate(today),
             listOf(RELATIONSHIPS.name, ALL_AT_ONCE.name),
             null,
             null
@@ -153,14 +198,14 @@ class UsersRepositoryTest(
         )
 
         // the translation of the city is unknown, so the users without the city in the same language are not found
-        val russianResult = usersRepository.findUserIds(null, AGE_MIN, AGE_MAX, null, null, " москва")
+        val russianResult = usersRepository.findUserIds(null, null, null, null, null, " москва")
         assertEquals(setOf(bothLanguagesUser.id, russianUser.id), russianResult.toSet())
 
-        val englishResult = usersRepository.findUserIds(null, AGE_MIN, AGE_MAX, null, "MOSCOW ", null)
+        val englishResult = usersRepository.findUserIds(null, null, null, null, "MOSCOW ", null)
         assertEquals(setOf(bothLanguagesUser.id, englishUser.id), englishResult.toSet())
 
         // the city in both languages is the same for the users with the city in any of them
-        val bothLanguagesResult = usersRepository.findUserIds(null, AGE_MIN, AGE_MAX, null, "Moscow", "Москва")
+        val bothLanguagesResult = usersRepository.findUserIds(null, null, null, null, "Moscow", "Москва")
         assertEquals(setOf(bothLanguagesUser.id, russianUser.id, englishUser.id), bothLanguagesResult.toSet())
     }
 

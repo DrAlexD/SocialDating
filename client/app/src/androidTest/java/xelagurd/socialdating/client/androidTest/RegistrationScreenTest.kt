@@ -1,5 +1,7 @@
 package xelagurd.socialdating.client.androidTest
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.performScrollTo
@@ -86,7 +88,7 @@ class RegistrationScreenTest {
             username = "user name",
             repeatedPassword = "otherPassword",
             email = "email1gmail.com",
-            age = (AGE_MIN - 1).toString()
+            birthDate = LocalDate.now().minusYears(AGE_MIN - 1L).format(DateTimeFormatter.ofPattern("ddMMuuuu"))
         )
 
         composeTestRule.setContentToScreen {
@@ -95,15 +97,13 @@ class RegistrationScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithTextId(R.string.error_username_format)
-            .performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.error_email_format)
-            .performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.error_age, AGE_MIN, AGE_MAX)
-            .performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.error_repeated_password)
-            .performScrollTo().assertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.register).performScrollTo().checkDisabledButton()
+        composeTestRule.onNodeWithTextId(R.string.error_username_format).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.error_email_format).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.error_age, AGE_MIN, AGE_MAX).assertIsDisplayed()
+
+        scrollToFormEnd()
+        composeTestRule.onNodeWithTextId(R.string.error_repeated_password).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.register).checkDisabledButton()
     }
 
     @Test
@@ -131,15 +131,13 @@ class RegistrationScreenTest {
         composeTestRule.onNodeWithTextId(R.string.email_optional).checkTextFieldAndInput(INPUT_TEXT)
         assertEquals(true, changedFormData?.email?.contains(INPUT_TEXT))
 
-        composeTestRule.onNodeWithTextId(R.string.age).checkTextFieldAndInput("1")
-        assertEquals(true, changedFormData?.age?.contains("1"))
-
         composeTestRule.onNodeWithTextId(R.string.city).checkTextFieldAndInput(INPUT_TEXT)
         assertEquals(true, changedFormData?.city?.contains(INPUT_TEXT))
 
         composeTestRule.onNodeWithTagId(R.string.female).checkButtonAndClick()
         assertEquals(Gender.FEMALE, changedFormData?.gender)
 
+        scrollToFormEnd()
         composeTestRule.onNodeWithTagId(R.string.friends).checkButtonAndClick()
         assertEquals(Purpose.FRIENDS, changedFormData?.purpose)
 
@@ -148,6 +146,21 @@ class RegistrationScreenTest {
 
         composeTestRule.onNodeWithContentDescriptionId(R.string.back_button).checkButtonAndClick()
         assertTrue(isNavigateUpClicked)
+    }
+
+    @Test
+    fun registrationScreen_birthDateInput_calledValueChangeActionWithDigitsOnly() {
+        var changedFormData: RegistrationFormData? = null
+
+        composeTestRule.setContentToScreen {
+            RegistrationScreenComponent(
+                registrationUiState = RegistrationUiState(formData = RegistrationFormData()),
+                onValueChange = { changedFormData = it }
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.birth_date).checkTextFieldAndInput("15.03")
+        assertEquals("1503", changedFormData?.birthDate)
     }
 
     @Test
@@ -161,6 +174,7 @@ class RegistrationScreenTest {
             )
         }
 
+        scrollToFormEnd()
         composeTestRule.onNodeWithTextId(R.string.password).checkTextFieldAndInput(INPUT_TEXT)
         assertEquals(true, changedFormData?.password?.contains(INPUT_TEXT))
 
@@ -168,6 +182,7 @@ class RegistrationScreenTest {
         assertEquals(true, changedFormData?.repeatedPassword?.contains(INPUT_TEXT))
     }
 
+    // the form stays scrolled to its end, so the register button is checked after it without the scroll
     private fun assertContentIsDisplayed() {
         composeTestRule.onNodeWithTextId(R.string.username).checkTextField()
         composeTestRule.onNodeWithTextId(R.string.name).checkTextField()
@@ -177,9 +192,10 @@ class RegistrationScreenTest {
         composeTestRule.onNodeWithTextId(R.string.female).assertIsDisplayed()
 
         composeTestRule.onNodeWithTextId(R.string.email_optional).checkTextField()
-        composeTestRule.onNodeWithTextId(R.string.age).checkTextField()
+        composeTestRule.onNodeWithTextId(R.string.birth_date).checkTextField()
         composeTestRule.onNodeWithTextId(R.string.city).checkTextField()
 
+        scrollToFormEnd()
         composeTestRule.onNodeWithTextIdWithColon(R.string.purpose).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.friends).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.relationships).assertIsDisplayed()
@@ -187,5 +203,11 @@ class RegistrationScreenTest {
 
         composeTestRule.onNodeWithTextId(R.string.password).checkTextField()
         composeTestRule.onNodeWithTextId(R.string.repeat_password).checkTextField()
+    }
+
+    // the form is longer than the small screens, but shorter than two of them, so its top is checked
+    // without the scroll, and the rest of it is checked after the scroll to its end
+    private fun scrollToFormEnd() {
+        composeTestRule.onNodeWithTextId(R.string.register).performScrollTo()
     }
 }

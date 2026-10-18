@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.CITY_LENGTH_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.CITY_LENGTH_MIN
@@ -14,7 +13,6 @@ import xelagurd.socialdating.client.data.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.PERCENT_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MIN
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidAge
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidPercent
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidText
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidUsername
@@ -49,7 +47,8 @@ data class User(
             "Username length must be between $USERNAME_LENGTH_MIN and $USERNAME_LENGTH_MAX " +
                     "and match username pattern"
         }
-        require(age.isValidAge()) { "Age must be between $AGE_MIN and $AGE_MAX" }
+        // the age grows after the registration, so it can become greater than the max age of the filters
+        require(age >= AGE_MIN) { "Age must not be less than $AGE_MIN" }
         require(city.isValidText(CITY_LENGTH_MIN, CITY_LENGTH_MAX)) {
             "City length must be between $CITY_LENGTH_MIN and $CITY_LENGTH_MAX"
         }

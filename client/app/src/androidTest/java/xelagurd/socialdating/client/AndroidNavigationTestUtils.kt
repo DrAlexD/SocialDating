@@ -80,8 +80,11 @@ object AndroidNavigationTestUtils {
         onNodeWithTextId(R.string.username).checkTextFieldAndInput(FakeData.mainUser.username)
         onNodeWithTextId(R.string.name).checkTextFieldAndInput(FakeData.mainUser.name)
         onNodeWithTagId(R.string.male).checkButtonAndClick()
-        onNodeWithTextId(R.string.age).checkTextFieldAndInput(FakeData.mainUser.age.toString())
+        onNodeWithTextId(R.string.birth_date).checkTextFieldAndInput(FakeData.registrationFormData.birthDate)
         onNodeWithTextId(R.string.city).checkTextFieldAndInput(FakeData.mainUser.city)
+
+        // the form is longer than the small screens, so the rest of it is filled after the scroll to its end
+        onNodeWithTextId(R.string.register).performScrollTo()
         onNodeWithTagId(R.string.all_at_once).checkButtonAndClick()
         onNodeWithTextId(R.string.password).checkTextFieldAndInput(FakeData.registrationFormData.password)
         onNodeWithTextId(R.string.repeat_password).checkTextFieldAndInput(FakeData.registrationFormData.repeatedPassword)

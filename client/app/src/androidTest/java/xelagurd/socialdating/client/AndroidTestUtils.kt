@@ -27,10 +27,12 @@ import androidx.compose.ui.test.swipeDown
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import xelagurd.socialdating.client.ui.navigation.initializeTopLevelDestinations
 import xelagurd.socialdating.client.ui.theme.AppTheme
 
 object AndroidTestUtils {
@@ -46,6 +48,13 @@ object AndroidTestUtils {
                     content()
                 }
             }
+        }
+    }
+
+    // the items of the bottom bar are filled by the navigation host, which is not a part of the screen tests
+    fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.initializeTestTopLevelDestinations() {
+        runOnUiThread {
+            initializeTopLevelDestinations(TestNavHostController(activity))
         }
     }
 
@@ -136,6 +145,9 @@ object AndroidTestUtils {
 
     fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithRange(range: IntRange) =
         onNodeWithText(activity.getString(R.string.range, range.first, range.last))
+
+    fun <A : ComponentActivity> AndroidComposeTestRule<ActivityScenarioRule<A>, A>.onNodeWithUnlimitedRange(min: Int) =
+        onNodeWithText(activity.getString(R.string.unlimited_range, min))
 
     fun SemanticsNodeInteraction.checkEnabledButton() {
         this.assertIsDisplayed()

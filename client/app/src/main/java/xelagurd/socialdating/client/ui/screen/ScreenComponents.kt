@@ -93,8 +93,11 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -102,6 +105,7 @@ import androidx.compose.ui.unit.dp
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.model.DataEntity
 import xelagurd.socialdating.client.data.model.DataUtils.NEXT_PAGE_PREFETCH_COUNT
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.DATE_DIGITS_NUMBER
 import xelagurd.socialdating.client.ui.form.FormFieldError
 import xelagurd.socialdating.client.ui.state.RequestStatus
 
@@ -381,6 +385,8 @@ fun AppTextField(
     textModifier: Modifier = Modifier,
     singleLine: Boolean = true,
     isPassword: Boolean = false,
+    // the value of the date contains only the digits, which are shown in the DD.MM.YYYY mask
+    isDate: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
     error: FormFieldError? = null,
     // the field can be marked by the error of the several fields, whose message is shown by another field
@@ -390,13 +396,25 @@ fun AppTextField(
 
     TextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = if (isDate) {
+            { onValueChange(it.filter(Char::isDigit).take(DATE_DIGITS_NUMBER)) }
+        } else {
+            onValueChange
+        },
         label = {
             AppMediumTitleText(
                 text = label,
                 overrideModifier = textModifier
             )
         },
+        placeholder = if (isDate) {
+            {
+                AppMediumBodyText(
+                    text = stringResource(R.string.date_placeholder),
+                    overrideModifier = Modifier
+                )
+            }
+        } else null,
         isError = isError,
         supportingText = error?.let {
             {
@@ -414,14 +432,52 @@ fun AppTextField(
             }
         } else null,
         singleLine = singleLine,
-        visualTransformation = if (isPassword && !isPasswordVisible) {
-            PasswordVisualTransformation()
-        } else {
-            VisualTransformation.None
+        visualTransformation = when {
+            isPassword && !isPasswordVisible -> PasswordVisualTransformation()
+            isDate -> DateVisualTransformation
+            else -> VisualTransformation.None
         },
-        keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else keyboardType),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = when {
+                isPassword -> KeyboardType.Password
+                isDate -> KeyboardType.Number
+                else -> keyboardType
+            }
+        ),
         modifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_8dp))
     )
+}
+
+private object DateVisualTransformation : VisualTransformation {
+    private const val SEPARATOR = '.'
+    private const val NOT_ENTERED_DIGIT = '_'
+
+    // the numbers of the digits before the separators, which follow the day and the month
+    private val separatorOffsets = listOf(2, 4)
+    private val transformedSeparatorOffsets = separatorOffsets.mapIndexed { index, offset -> offset + index }
+
+    override fun filter(text: AnnotatedString): TransformedText {
+        // the empty value is shown as is, so that the label and the placeholder are shown instead of the mask
+        if (text.isEmpty()) return TransformedText(text, OffsetMapping.Identity)
+
+        val maskedText = buildString {
+            text.text.padEnd(DATE_DIGITS_NUMBER, NOT_ENTERED_DIGIT).forEachIndexed { index, digit ->
+                if (index in separatorOffsets) append(SEPARATOR)
+                append(digit)
+            }
+        }
+
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int) =
+                offset + separatorOffsets.count { it <= offset }
+
+            // the cursor is never placed among the not entered digits
+            override fun transformedToOriginal(offset: Int) =
+                (offset - transformedSeparatorOffsets.count { it < offset }).coerceAtMost(text.length)
+        }
+
+        return TransformedText(AnnotatedString(maskedText), offsetMapping)
+    }
 }
 
 @Composable

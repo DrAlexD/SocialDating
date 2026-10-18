@@ -1,5 +1,6 @@
 package xelagurd.socialdating.server.test
 
+import java.time.LocalDate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
@@ -21,6 +22,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import tools.jackson.module.kotlin.jacksonObjectMapper
 import xelagurd.socialdating.server.FakeUsersData
 import xelagurd.socialdating.server.controller.AuthController
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.server.model.details.LoginDetails
 import xelagurd.socialdating.server.model.details.RefreshTokenDetails
 import xelagurd.socialdating.server.model.details.RegistrationDetails
@@ -49,7 +52,7 @@ class AuthControllerTest(@param:Autowired private val mockMvc: MockMvc) {
         username = "username1",
         password = "password",
         email = "email@gmail.com",
-        age = 25,
+        birthDate = LocalDate.of(2001, 4, 12),
         city = "city",
         purpose = Purpose.FRIENDS
     )
@@ -86,6 +89,40 @@ class AuthControllerTest(@param:Autowired private val mockMvc: MockMvc) {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
 
         verify(exactly = 1) { authService.registerUser(any()) }
+        confirmVerified(authService)
+    }
+
+    @Test
+    fun registerUser_tooYoungUser_badRequest() {
+        val tooYoungRegistrationDetails = registrationDetails.copy(
+            birthDate = LocalDate.now().minusYears(AGE_MIN.toLong()).plusDays(1)
+        )
+
+        mockMvc.perform(
+            post("/users/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(tooYoungRegistrationDetails))
+        )
+            .andExpect(status().isBadRequest)
+
+        verify(exactly = 0) { authService.registerUser(any()) }
+        confirmVerified(authService)
+    }
+
+    @Test
+    fun registerUser_tooOldUser_badRequest() {
+        val tooOldRegistrationDetails = registrationDetails.copy(
+            birthDate = LocalDate.now().minusYears(AGE_MAX + 1L)
+        )
+
+        mockMvc.perform(
+            post("/users/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(tooOldRegistrationDetails))
+        )
+            .andExpect(status().isBadRequest)
+
+        verify(exactly = 0) { authService.registerUser(any()) }
         confirmVerified(authService)
     }
 

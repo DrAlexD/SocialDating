@@ -107,7 +107,7 @@ class StatementAddingScreenTest {
                 STATEMENT_TEXT_LENGTH_MIN,
                 STATEMENT_TEXT_LENGTH_MAX
             )
-            .performScrollTo().assertIsDisplayed()
+            .assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.publish)
             .performScrollTo().checkDisabledButton()
     }

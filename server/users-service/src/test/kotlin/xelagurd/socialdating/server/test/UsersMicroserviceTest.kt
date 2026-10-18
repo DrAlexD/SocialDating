@@ -1,5 +1,6 @@
 package xelagurd.socialdating.server.test
 
+import java.time.LocalDate
 import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -10,7 +11,10 @@ import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRe
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ActiveProfiles
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -18,15 +22,20 @@ import org.junit.jupiter.api.TestInstance
 import org.testcontainers.postgresql.PostgreSQLContainer
 import xelagurd.socialdating.server.FakeUsersData
 import xelagurd.socialdating.server.FakeUsersData.toUsersWithNullIds
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USER_ACTIVITY_INITIAL
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.details.LoginDetails
 import xelagurd.socialdating.server.model.details.RefreshTokenDetails
 import xelagurd.socialdating.server.model.details.RegistrationDetails
+import xelagurd.socialdating.server.model.enums.AppLanguage.ENGLISH
+import xelagurd.socialdating.server.model.enums.AppLanguage.RUSSIAN
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
 import xelagurd.socialdating.server.model.enums.Role
 import xelagurd.socialdating.server.repository.UsersRepository
+import xelagurd.socialdating.server.utils.DateUtils.toAge
 import xelagurd.socialdating.server.utils.TestUtils.nextIntList
 import xelagurd.socialdating.server.utils.TestUtils.readArrayFromJsonString
 import xelagurd.socialdating.server.utils.TestUtils.readObject
@@ -64,7 +73,7 @@ class UsersMicroserviceTest(
         username = "username4",
         password = "password4",
         email = "email4@gmail.com",
-        age = 28,
+        birthDate = LocalDate.of(1998, 9, 3),
         city = "Saint Petersburg",
         purpose = Purpose.FRIENDS
     )
@@ -120,7 +129,7 @@ class UsersMicroserviceTest(
     fun getUserIds_withFilter_ok() {
         // user 1 is too young, user 2 and the registered user search for friends only
         val response = restTemplate.getForEntity(
-            "/users/ids?purposes=RELATIONSHIPS&ageMin=27&sameCityUserId=${users[0].id}",
+            "/users/ids?purposes=RELATIONSHIPS&ageMin=${users[2].birthDate.toAge()}&sameCityUserId=${users[0].id}",
             Array<Int>::class.java
         )
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -161,11 +170,51 @@ class UsersMicroserviceTest(
         assertEquals(registrationDetails.name, responseUser["name"])
         assertEquals(registrationDetails.gender.name, responseUser["gender"])
         assertEquals(registrationDetails.username, responseUser["username"])
-        assertEquals(registrationDetails.age, responseUser["age"])
+        assertEquals(registrationDetails.birthDate.toAge(), responseUser["age"])
         assertEquals(registrationDetails.city, responseUser["city"])
         assertEquals(registrationDetails.purpose.name, responseUser["purpose"])
         assertEquals(USER_ACTIVITY_INITIAL, responseUser["activity"])
         assertEquals(Role.USER.name, responseUser["role"])
+    }
+
+    @Test
+    fun registerUser_tooYoungUser_badRequestWithLocalizedMessage() {
+        val tooYoungRegistrationDetails = registrationDetails.copy(
+            username = "username5",
+            email = null,
+            birthDate = LocalDate.now().minusYears(AGE_MIN.toLong()).plusDays(1)
+        )
+
+        val englishResponse = registerUser(tooYoungRegistrationDetails, ENGLISH.languageTag)
+        assertEquals(HttpStatus.BAD_REQUEST, englishResponse.statusCode)
+        assertEquals(
+            "'BirthDate' must correspond to the age between $AGE_MIN and $AGE_MAX",
+            englishResponse.body
+        )
+
+        val russianResponse = registerUser(tooYoungRegistrationDetails, RUSSIAN.languageTag)
+        assertEquals(HttpStatus.BAD_REQUEST, russianResponse.statusCode)
+        assertEquals(
+            "'BirthDate' должно соответствовать возрасту от $AGE_MIN до $AGE_MAX",
+            russianResponse.body
+        )
+    }
+
+    @Test
+    fun registerUser_notExistingBirthDate_badRequestWithWrongValueMessage() {
+        val request = mapOf(
+            "name" to "Nikolay",
+            "gender" to "MALE",
+            "username" to "username5",
+            "password" to "password5",
+            "birthDate" to "2000-02-30",
+            "city" to "Saint Petersburg",
+            "purpose" to "FRIENDS"
+        )
+
+        val response = registerUser(request, ENGLISH.languageTag)
+        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+        assertEquals("'BirthDate' has wrong value", response.body)
     }
 
     @Test
@@ -202,12 +251,18 @@ class UsersMicroserviceTest(
         return responseAuth
     }
 
+    private fun registerUser(request: Any, language: String): ResponseEntity<String> {
+        val headers = HttpHeaders()
+        headers.set(HttpHeaders.ACCEPT_LANGUAGE, language)
+        return restTemplate.postForEntity("/users/auth/register", HttpEntity(request, headers), String::class.java)
+    }
+
     private fun assertUser(expected: User, responseUser: Map<String, Any>) {
         assertEquals(expected.id, responseUser["id"])
         assertEquals(expected.nameEn, responseUser["name"])
         assertEquals(expected.gender.name, responseUser["gender"])
         assertEquals(expected.username, responseUser["username"])
-        assertEquals(expected.age, responseUser["age"])
+        assertEquals(expected.birthDate.toAge(), responseUser["age"])
         assertEquals(expected.cityEn, responseUser["city"])
         assertEquals(expected.purpose.name, responseUser["purpose"])
         assertEquals(expected.activity, responseUser["activity"])

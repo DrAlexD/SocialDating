@@ -1,5 +1,6 @@
 package xelagurd.socialdating.server.test
 
+import java.time.LocalDate
 import java.util.Optional
 import kotlin.random.Random
 import io.mockk.confirmVerified
@@ -14,14 +15,14 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import xelagurd.socialdating.server.FakeUsersData
-import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MAX
-import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.server.model.details.UsersFilterDetails
 import xelagurd.socialdating.server.model.enums.Gender.FEMALE
 import xelagurd.socialdating.server.model.enums.Purpose.ALL_AT_ONCE
 import xelagurd.socialdating.server.model.enums.Purpose.FRIENDS
 import xelagurd.socialdating.server.repository.UsersRepository
 import xelagurd.socialdating.server.service.UsersService
+import xelagurd.socialdating.server.utils.DateUtils.toEarliestBirthDate
+import xelagurd.socialdating.server.utils.DateUtils.toLatestBirthDate
 import xelagurd.socialdating.server.utils.TestUtils.nextIntList
 
 @ExtendWith(MockKExtension::class)
@@ -84,7 +85,7 @@ class UsersServiceUnitTest {
 
         assertEquals(userIds, result)
 
-        verify(exactly = 1) { usersRepository.findUserIds(null, AGE_MIN, AGE_MAX, null, null, null) }
+        verify(exactly = 1) { usersRepository.findUserIds(null, null, null, null, null, null) }
         confirmVerified(usersRepository)
     }
 
@@ -105,12 +106,14 @@ class UsersServiceUnitTest {
 
         assertEquals(userIds, result)
 
+        val today = LocalDate.now()
+
         verify(exactly = 1) { usersRepository.findById(userId) }
         verify(exactly = 1) {
             usersRepository.findUserIds(
                 listOf(FEMALE.name),
-                20,
-                30,
+                30.toEarliestBirthDate(today),
+                20.toLatestBirthDate(today),
                 listOf(FRIENDS.name, ALL_AT_ONCE.name),
                 user.cityEn,
                 user.cityRu

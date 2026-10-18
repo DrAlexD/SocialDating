@@ -1,5 +1,6 @@
 package xelagurd.socialdating.server.model
 
+import java.time.LocalDate
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import jakarta.persistence.CheckConstraint
@@ -12,8 +13,6 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
-import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MAX
-import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.CITY_LENGTH_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.CITY_LENGTH_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.EMAIL_LENGTH_MAX
@@ -33,6 +32,7 @@ import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.model.enums.Gender
 import xelagurd.socialdating.server.model.enums.Purpose
 import xelagurd.socialdating.server.model.enums.Role
+import xelagurd.socialdating.server.utils.DateUtils.toAge
 import xelagurd.socialdating.server.utils.LocalizationUtils.localize
 
 @Entity(name = "users")
@@ -92,8 +92,8 @@ class User(
     )
     var email: String?,
 
-    @field:Column(nullable = false, columnDefinition = "integer check (age between $AGE_MIN and $AGE_MAX)")
-    var age: Int,
+    @field:Column(nullable = false)
+    var birthDate: LocalDate,
 
     @field:Column(
         columnDefinition = "varchar($CITY_LENGTH_MAX) " +
@@ -128,7 +128,7 @@ class User(
             name = localize(nameEn, nameRu, language),
             gender = gender,
             username = username,
-            age = age,
+            age = birthDate.toAge(),
             city = localize(cityEn, cityRu, language),
             purpose = purpose,
             activity = activity,
@@ -162,7 +162,6 @@ class User(
         other as User
 
         if (id != other.id) return false
-        if (age != other.age) return false
         if (activity != other.activity) return false
         if (nameEn != other.nameEn) return false
         if (nameRu != other.nameRu) return false
@@ -170,6 +169,7 @@ class User(
         if (username != other.username) return false
         if (password != other.password) return false
         if (email != other.email) return false
+        if (birthDate != other.birthDate) return false
         if (cityEn != other.cityEn) return false
         if (cityRu != other.cityRu) return false
         if (purpose != other.purpose) return false
@@ -180,7 +180,6 @@ class User(
 
     override fun hashCode(): Int {
         var result = id ?: 0
-        result = 31 * result + age
         result = 31 * result + activity
         result = 31 * result + nameEn.hashCode()
         result = 31 * result + nameRu.hashCode()
@@ -188,6 +187,7 @@ class User(
         result = 31 * result + username.hashCode()
         result = 31 * result + password.hashCode()
         result = 31 * result + email.hashCode()
+        result = 31 * result + birthDate.hashCode()
         result = 31 * result + cityEn.hashCode()
         result = 31 * result + cityRu.hashCode()
         result = 31 * result + purpose.hashCode()
