@@ -14,6 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.checkEnabledButton
+import xelagurd.socialdating.client.AndroidTestUtils.initializeTestTopLevelDestinations
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextIdWithColon
@@ -38,6 +39,7 @@ class ProfileScreenTest {
     @Before
     fun setup() {
         hiltRule.inject()
+        composeTestRule.initializeTestTopLevelDestinations()
     }
 
     private val user = FakeData.users[0]

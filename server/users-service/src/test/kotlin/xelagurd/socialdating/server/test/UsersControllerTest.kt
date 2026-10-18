@@ -131,6 +131,7 @@ class UsersControllerTest(@param:Autowired private val mockMvc: MockMvc) {
     fun getUserIds_wrongFilter_badRequest() {
         val wrongFilterQueries = listOf(
             "ageMin=${AGE_MIN - 1}",
+            "ageMin=${AGE_MAX + 1}",
             "ageMax=${AGE_MAX + 1}",
             "ageMin=30&ageMax=20",
             "sameCityUserId=0"

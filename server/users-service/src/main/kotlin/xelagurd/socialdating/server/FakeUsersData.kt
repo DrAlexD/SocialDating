@@ -1,5 +1,6 @@
 package xelagurd.socialdating.server
 
+import java.time.LocalDate
 import xelagurd.socialdating.server.model.User
 import xelagurd.socialdating.server.model.enums.AppLanguage.ENGLISH
 import xelagurd.socialdating.server.model.enums.Gender.MALE
@@ -19,7 +20,7 @@ object FakeUsersData {
             username = "username1",
             password = $$"$2a$10$VlL1TDtoHSflx3dUMswP1eJ24xh5IgRVll5JHp9a24mpsArAZQjnm",
             email = "email1@gmail.com",
-            age = 26,
+            birthDate = LocalDate.of(2000, 3, 15),
             cityEn = "Moscow",
             cityRu = "Москва",
             purpose = ALL_AT_ONCE,
@@ -34,7 +35,7 @@ object FakeUsersData {
             username = "username2",
             password = $$"$2a$10$pNja5Q6J680N2HYc2VC7wOza5WoFO6O8e65D9Qwom7OjZkNE3uLe6",
             email = "email2@gmail.com",
-            age = 27,
+            birthDate = LocalDate.of(1999, 6, 20),
             cityEn = "Moscow",
             cityRu = "Москва",
             purpose = FRIENDS,
@@ -49,7 +50,7 @@ object FakeUsersData {
             username = "username3",
             password = $$"$2a$10$wfn84flRD.QlmGV4.EGVeO9fXm8sDl9u8.0Cq0MwIq67lgTswjL.e",
             email = "email3@gmail.com",
-            age = 27,
+            birthDate = LocalDate.of(1999, 1, 25),
             cityEn = "Moscow",
             cityRu = "Москва",
             purpose = RELATIONSHIPS,
@@ -69,7 +70,7 @@ object FakeUsersData {
                 username = it.username,
                 password = it.password,
                 email = it.email,
-                age = it.age,
+                birthDate = it.birthDate,
                 cityEn = it.cityEn,
                 cityRu = it.cityRu,
                 purpose = it.purpose,

@@ -1,7 +1,7 @@
 package xelagurd.socialdating.client.ui.form
 
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.FILTER_AGE_MAX
 import xelagurd.socialdating.client.data.model.details.SimilarUsersFilterDetails
 import xelagurd.socialdating.client.data.model.enums.DifferenceRangeType
 import xelagurd.socialdating.client.data.model.enums.DifferenceRangeType.CUSTOM
@@ -17,7 +17,7 @@ data class SimilarUsersFilterFormData(
     val minDifferenceNumber: String = "",
     val maxDifferenceNumber: String = "",
     val genders: Set<Gender> = setOf(),
-    val ageRange: IntRange = AGE_MIN..AGE_MAX,
+    val ageRange: IntRange = AGE_MIN..FILTER_AGE_MAX,
     val purposes: Set<Purpose> = setOf(),
     val isSameCity: Boolean = false
 ) : FormData {
@@ -47,7 +47,7 @@ data class SimilarUsersFilterFormData(
             categoryIds.isNotEmpty(),
             differenceRangeType == CUSTOM,
             genders.isNotEmpty(),
-            ageRange != AGE_MIN..AGE_MAX,
+            ageRange != AGE_MIN..FILTER_AGE_MAX,
             purposes.isNotEmpty(),
             isSameCity
         ).count { it }
@@ -61,7 +61,8 @@ data class SimilarUsersFilterFormData(
     fun togglePurpose(purpose: Purpose) =
         copy(purposes = purposes.toggle(purpose))
 
-    // the default range and the whole age range don't need to be sent, so their borders are absent
+    // the default range and the whole age range don't need to be sent, so their borders are absent,
+    // the max border of the age range doesn't limit the age, so it is absent too
     fun toSimilarUsersFilterDetails() =
         SimilarUsersFilterDetails(
             categoryIds = categoryIds,
@@ -69,7 +70,7 @@ data class SimilarUsersFilterFormData(
             maxDifferenceNumber = maxDifferenceNumber.takeIf { differenceRangeType == CUSTOM }?.toIntOrNull(),
             genders = genders,
             ageMin = ageRange.first.takeIf { it > AGE_MIN },
-            ageMax = ageRange.last.takeIf { it < AGE_MAX },
+            ageMax = ageRange.last.takeIf { it < FILTER_AGE_MAX },
             purposes = purposes,
             isSameCity = isSameCity
         )
@@ -85,7 +86,7 @@ fun SimilarUsersFilterDetails.toSimilarUsersFilterFormData() =
         minDifferenceNumber = minDifferenceNumber?.toString().orEmpty(),
         maxDifferenceNumber = maxDifferenceNumber?.toString().orEmpty(),
         genders = genders,
-        ageRange = (ageMin ?: AGE_MIN)..(ageMax ?: AGE_MAX),
+        ageRange = (ageMin ?: AGE_MIN)..(ageMax ?: FILTER_AGE_MAX),
         purposes = purposes,
         isSameCity = isSameCity
     )

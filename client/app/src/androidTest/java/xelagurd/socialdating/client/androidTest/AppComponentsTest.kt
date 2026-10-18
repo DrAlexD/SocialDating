@@ -26,6 +26,7 @@ import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithRange
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextIdWithColon
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithUnlimitedRange
 import xelagurd.socialdating.client.AndroidTestUtils.performPullToRefresh
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
 import xelagurd.socialdating.client.HiltTestActivity
@@ -525,6 +526,37 @@ class AppComponentsTest {
     }
 
     @Test
+    fun rangeChoosingComponent_unlimitedMaxValue_displayedRangeWithoutMax() {
+        setContentToRangeChoosingComponent(RANGE_START..AGE_MAX, isMaxUnlimited = true) { }
+
+        composeTestRule.onNodeWithUnlimitedRange(RANGE_START).assertIsDisplayed()
+    }
+
+    @Test
+    fun rangeChoosingComponent_unlimitedRangeWithLimitedValue_displayedRange() {
+        setContentToRangeChoosingComponent(RANGE_START..RANGE_END, isMaxUnlimited = true) { }
+
+        composeTestRule.onNodeWithRange(RANGE_START..RANGE_END).assertIsDisplayed()
+    }
+
+    @Test
+    fun rangeChoosingComponent_unlimitedMaxAndStartThumbDraggedToMax_calledValueChangeActionWithMinBelowMax() {
+        var changedValue: IntRange? = null
+
+        setContentToRangeChoosingComponent(AGE_MIN..AGE_MAX, isMaxUnlimited = true) { changedValue = it }
+
+        composeTestRule.onNodeWithTagId(R.string.range_slider).performTouchInput {
+            // the slider skips the first move of the swipe, which passes the touch slop,
+            // so the swipe goes beyond the slider for the thumb to reach its end
+            swipeRight(startX = left, endX = right + width)
+        }
+        composeTestRule.waitForIdle()
+
+        assertEquals((AGE_MAX - 1)..AGE_MAX, changedValue)
+        composeTestRule.onNodeWithUnlimitedRange(AGE_MAX - 1).assertIsDisplayed()
+    }
+
+    @Test
     fun rangeChoosingComponent_dragStartThumb_calledValueChangeActionWithNarrowedRange() {
         var changedValue: IntRange? = null
 
@@ -554,13 +586,18 @@ class AppComponentsTest {
         }
     }
 
-    private fun setContentToRangeChoosingComponent(value: IntRange, onValueChange: (IntRange) -> Unit) {
+    private fun setContentToRangeChoosingComponent(
+        value: IntRange,
+        isMaxUnlimited: Boolean = false,
+        onValueChange: (IntRange) -> Unit
+    ) {
         composeTestRule.setContentToScreen {
             RangeChoosingComponent(
                 titleRes = R.string.age,
                 value = value,
                 valueRange = AGE_MIN..AGE_MAX,
-                onValueChange = onValueChange
+                onValueChange = onValueChange,
+                isMaxUnlimited = isMaxUnlimited
             )
         }
     }

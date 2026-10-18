@@ -1,5 +1,6 @@
 package xelagurd.socialdating.server.test
 
+import java.time.LocalDate
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.CredentialsExpiredException
@@ -64,7 +65,7 @@ class AuthServiceUnitTest {
             username = "username",
             password = "password",
             email = email,
-            age = 25,
+            birthDate = LocalDate.of(2001, 4, 12),
             city = "city",
             purpose = Purpose.FRIENDS
         )

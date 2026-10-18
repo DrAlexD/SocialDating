@@ -391,17 +391,27 @@ fun RangeChoosingComponent(
     @StringRes titleRes: Int,
     value: IntRange,
     valueRange: IntRange,
-    onValueChange: (IntRange) -> Unit
+    onValueChange: (IntRange) -> Unit,
+    // the max value of the range means the values without the upper limit, so the min value is less than it
+    isMaxUnlimited: Boolean = false
 ) {
     // the value is changed continuously while dragging, so it is passed on only when the dragging is finished
     var currentValue by remember(value) { mutableStateOf(value) }
 
     TitledComponent(titleRes = titleRes) {
-        AppLargeBodyText(text = stringResource(R.string.range, currentValue.first, currentValue.last))
+        AppLargeBodyText(
+            text = if (isMaxUnlimited && currentValue.last == valueRange.last) {
+                stringResource(R.string.unlimited_range, currentValue.first)
+            } else {
+                stringResource(R.string.range, currentValue.first, currentValue.last)
+            }
+        )
         AppRangeSlider(
             value = currentValue,
             valueRange = valueRange,
-            onValueChange = { currentValue = it },
+            onValueChange = {
+                currentValue = if (isMaxUnlimited) it.first.coerceAtMost(valueRange.last - 1)..it.last else it
+            },
             onValueChangeFinished = { onValueChange(currentValue) }
         )
     }

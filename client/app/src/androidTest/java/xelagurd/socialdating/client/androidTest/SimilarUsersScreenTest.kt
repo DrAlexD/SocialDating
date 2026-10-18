@@ -24,17 +24,16 @@ import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
 import xelagurd.socialdating.client.AndroidTestUtils.checkDisabledButton
 import xelagurd.socialdating.client.AndroidTestUtils.checkTextFieldAndInput
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
-import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithRange
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextIdWithColon
+import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithUnlimitedRange
 import xelagurd.socialdating.client.AndroidTestUtils.performPullToRefresh
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreen
 import xelagurd.socialdating.client.AndroidTestUtils.setContentToScreenAndRecompose
 import xelagurd.socialdating.client.HiltTestActivity
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.DIFFERENCE_NUMBER_MIN
 import xelagurd.socialdating.client.data.model.enums.DifferenceRangeType.CUSTOM
@@ -249,32 +248,35 @@ class SimilarUsersScreenTest {
         openFilterSheet()
 
         composeTestRule.onNodeWithTextId(R.string.filters).assertIsDisplayed()
-        composeTestRule.onNodeWithTextIdWithColon(R.string.categories).scrollToAndAssertIsDisplayed()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.categories).assertIsDisplayed()
         categories.forEach {
-            composeTestRule.onNodeWithText(it.name).scrollToAndAssertIsDisplayed()
+            composeTestRule.onNodeWithText(it.name).assertIsDisplayed()
         }
-        composeTestRule.onNodeWithTextIdWithColon(R.string.similarity).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.default_similarity).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.custom_similarity).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.default_similarity_hint, DIFFERENCE_NUMBER_MIN)
-            .scrollToAndAssertIsDisplayed()
+
+        scrollToFiltersMiddle()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.similarity).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.default_similarity).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.custom_similarity).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.default_similarity_hint, DIFFERENCE_NUMBER_MIN).assertIsDisplayed()
         // the borders are typed only for the custom range
         composeTestRule.onNodeWithTextId(R.string.min_similarity).assertDoesNotExist()
         composeTestRule.onNodeWithTextId(R.string.max_similarity).assertDoesNotExist()
-        composeTestRule.onNodeWithTextIdWithColon(R.string.gender).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.male).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.female).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextIdWithColon(R.string.age).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithRange(AGE_MIN..AGE_MAX).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextIdWithColon(R.string.purpose).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.friends).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.relationships).scrollToAndAssertIsDisplayed()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.gender).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.male).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.female).assertIsDisplayed()
+
+        scrollToFiltersEnd()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.age).assertIsDisplayed()
+        composeTestRule.onNodeWithUnlimitedRange(AGE_MIN).assertIsDisplayed()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.purpose).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.friends).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.relationships).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.all_at_once).assertDoesNotExist()
-        composeTestRule.onNodeWithTextId(R.string.all_at_once_always_displayed).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextIdWithColon(R.string.city).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.only_my_city).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.reset).scrollToAndAssertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.done).scrollToAndAssertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.all_at_once_always_displayed).assertIsDisplayed()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.city).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.only_my_city).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.reset).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.done).assertIsDisplayed()
     }
 
     @Test
@@ -293,10 +295,11 @@ class SimilarUsersScreenTest {
 
         openFilterSheet()
 
-        composeTestRule.onNodeWithText(categories[0].name).scrollToAndClick()
-        composeTestRule.onNodeWithTextId(R.string.female).scrollToAndClick()
-        composeTestRule.onNodeWithTextId(R.string.relationships).scrollToAndClick()
-        composeTestRule.onNodeWithTextId(R.string.only_my_city).scrollToAndClick()
+        composeTestRule.onNodeWithText(categories[0].name).checkButtonAndClick()
+        scrollToFiltersEnd()
+        composeTestRule.onNodeWithTextId(R.string.female).checkButtonAndClick()
+        composeTestRule.onNodeWithTextId(R.string.relationships).checkButtonAndClick()
+        composeTestRule.onNodeWithTextId(R.string.only_my_city).checkButtonAndClick()
         composeTestRule.onNodeWithTextId(R.string.custom_similarity).scrollToAndClick()
         // the keyboard shifts the sheet content while it is appearing, so the text is typed after all the clicks
         composeTestRule.onNodeWithTextId(R.string.min_similarity).apply {
@@ -372,6 +375,16 @@ class SimilarUsersScreenTest {
         composeTestRule.onNodeWithContentDescriptionId(R.string.not_requested).assertIsDisplayed()
         composeTestRule.onNodeWithTagId(R.string.refresh_indicator).assertIsNotDisplayed()
         composeTestRule.onNodeWithContentDescriptionId(R.string.loading).assertIsNotDisplayed()
+    }
+
+    // the filters are longer than two small screens, so they are checked at the top without the scroll,
+    // and then after the scrolls to their middle and to their end
+    private fun scrollToFiltersMiddle() {
+        composeTestRule.onNodeWithTextId(R.string.female).performScrollTo()
+    }
+
+    private fun scrollToFiltersEnd() {
+        composeTestRule.onNodeWithTextId(R.string.done).performScrollTo()
     }
 
     private fun SemanticsNodeInteraction.scrollToAndAssertIsDisplayed() {

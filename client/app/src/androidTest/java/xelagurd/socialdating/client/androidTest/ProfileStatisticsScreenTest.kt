@@ -13,6 +13,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import xelagurd.socialdating.client.AndroidTestUtils.checkButtonAndClick
+import xelagurd.socialdating.client.AndroidTestUtils.initializeTestTopLevelDestinations
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithContentDescriptionId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTagId
 import xelagurd.socialdating.client.AndroidTestUtils.onNodeWithTextId
@@ -39,6 +40,7 @@ class ProfileStatisticsScreenTest {
     @Before
     fun setup() {
         hiltRule.inject()
+        composeTestRule.initializeTestTopLevelDestinations()
     }
 
     private val userCategoriesData = FakeData.userCategories.toUserCategoriesData(FakeData.categories)

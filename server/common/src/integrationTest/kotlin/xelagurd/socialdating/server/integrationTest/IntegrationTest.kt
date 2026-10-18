@@ -1,5 +1,6 @@
 package xelagurd.socialdating.server.integrationTest
 
+import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -27,6 +28,7 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.GATEWAY_URL
 import xelagurd.socialdating.server.model.enums.StatementReactionType
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_MAINTAIN
 import xelagurd.socialdating.server.model.enums.StatementReactionType.FULL_NO_MAINTAIN
+import xelagurd.socialdating.server.utils.DateUtils.toAge
 import xelagurd.socialdating.server.utils.TestUtils.readArray
 import xelagurd.socialdating.server.utils.TestUtils.readArrayFromJsonString
 import xelagurd.socialdating.server.utils.TestUtils.readObject
@@ -322,7 +324,7 @@ class IntegrationTest {
             "username" to "user$uniqueNumber",
             "password" to "pass$uniqueNumber",
             "email" to "email$uniqueNumber@gmail.com",
-            "age" to 26,
+            "birthDate" to "2000-03-15",
             "city" to "Moscow",
             "purpose" to "ALL_AT_ONCE"
         )
@@ -337,7 +339,7 @@ class IntegrationTest {
         val responseUser = responseAuth.readObject("user")
         assertEquals(request["name"], responseUser["name"])
         assertEquals(request["username"], responseUser["username"])
-        assertEquals(request["age"], responseUser["age"])
+        assertEquals(LocalDate.parse(request.getValue("birthDate")).toAge(), responseUser["age"])
         assertEquals(request["city"], responseUser["city"])
 
         return responseAuth.toAuthorizedUser()

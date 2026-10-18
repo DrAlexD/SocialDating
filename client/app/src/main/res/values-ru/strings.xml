@@ -49,6 +49,8 @@
     <string name="female">Женщина</string>
     <string name="email_optional">Email (опционально)</string>
     <string name="age">Возраст</string>
+    <string name="birth_date">Дата рождения</string>
+    <string name="date_placeholder">ДД.ММ.ГГГГ</string>
     <string name="city">Город</string>
     <string name="purpose">Цель</string>
     <string name="password">Пароль</string>
@@ -67,6 +69,7 @@
     <string name="error_length">От %1$d до %2$d символов</string>
     <string name="error_username_format">Только латинские буквы, цифры и _</string>
     <string name="error_email_format">Некорректный формат email</string>
+    <string name="error_date">Некорректная дата</string>
     <string name="error_repeated_password">Пароли не совпадают</string>
     <string name="error_age">От %1$d до %2$d лет</string>
     <string name="error_integer">Нужно целое число</string>

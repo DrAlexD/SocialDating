@@ -463,7 +463,7 @@ object FakeData {
             password = "password1",
             repeatedPassword = "password1",
             email = "email1@gmail.com",
-            age = mainUser.age.toString(),
+            birthDate = "15032000",
             city = mainUser.city,
             purpose = mainUser.purpose
         )

@@ -1,14 +1,15 @@
 package xelagurd.socialdating.server.service
 
+import java.time.LocalDate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MAX
-import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.server.model.details.UsersFilterDetails
 import xelagurd.socialdating.server.model.dto.UserDto
 import xelagurd.socialdating.server.model.enums.AppLanguage
 import xelagurd.socialdating.server.model.enums.Purpose.ALL_AT_ONCE
 import xelagurd.socialdating.server.repository.UsersRepository
+import xelagurd.socialdating.server.utils.DateUtils.toEarliestBirthDate
+import xelagurd.socialdating.server.utils.DateUtils.toLatestBirthDate
 
 @Service
 class UsersService(
@@ -29,10 +30,13 @@ class UsersService(
             usersRepository.findByIdOrNull(it) ?: return listOf()
         }
 
+        val today = LocalDate.now()
+
         return usersRepository.findUserIds(
             genders = usersFilterDetails.genders?.map { it.name },
-            ageMin = usersFilterDetails.ageMin ?: AGE_MIN,
-            ageMax = usersFilterDetails.ageMax ?: AGE_MAX,
+            // the older users have the earlier birth dates, the absent borders don't limit the users at all
+            birthDateMin = usersFilterDetails.ageMax?.toEarliestBirthDate(today),
+            birthDateMax = usersFilterDetails.ageMin?.toLatestBirthDate(today),
             // the users who search for everything at once are suitable for any purpose
             purposes = usersFilterDetails.purposes?.plus(ALL_AT_ONCE)?.distinct()?.map { it.name },
             cityEn = sameCityUser?.cityEn,

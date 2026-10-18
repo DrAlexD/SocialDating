@@ -1,8 +1,7 @@
 package xelagurd.socialdating.server.model.details
 
+import java.time.LocalDate
 import org.springframework.security.crypto.password.PasswordEncoder
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
@@ -26,6 +25,7 @@ import xelagurd.socialdating.server.model.enums.Purpose
 import xelagurd.socialdating.server.model.enums.Role
 import xelagurd.socialdating.server.utils.LocalizationUtils.englishOrNull
 import xelagurd.socialdating.server.utils.LocalizationUtils.russianOrNull
+import xelagurd.socialdating.server.validation.AgeRange
 import xelagurd.socialdating.server.validation.TrimmedSize
 
 data class RegistrationDetails(
@@ -47,9 +47,8 @@ data class RegistrationDetails(
     @field:Pattern(regexp = EMAIL_PATTERN, message = "{socialdating.validation.email}")
     val email: String?,
 
-    @field:Min(AGE_MIN.toLong())
-    @field:Max(AGE_MAX.toLong())
-    val age: Int,
+    @field:AgeRange(min = AGE_MIN, max = AGE_MAX)
+    val birthDate: LocalDate,
 
     @field:TrimmedSize(min = CITY_LENGTH_MIN, max = CITY_LENGTH_MAX)
     val city: String,
@@ -64,7 +63,7 @@ data class RegistrationDetails(
             username = username,
             password = passwordEncoder.encode(password)!!,
             email = email,
-            age = age,
+            birthDate = birthDate,
             cityEn = englishOrNull(city),
             cityRu = russianOrNull(city),
             purpose = purpose,
@@ -72,5 +71,5 @@ data class RegistrationDetails(
         )
 
     override fun toString() = "RegistrationDetails(name=$name, gender=$gender, username=$username, email=$email, " +
-            "age=$age, city=$city, purpose=$purpose)"
+            "birthDate=$birthDate, city=$city, purpose=$purpose)"
 }

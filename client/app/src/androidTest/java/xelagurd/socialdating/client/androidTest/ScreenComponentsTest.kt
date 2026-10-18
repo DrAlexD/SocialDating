@@ -343,6 +343,79 @@ class ScreenComponentsTest {
     }
 
     @Test
+    fun appTextField_dateInput_calledValueChangeActionWithDigitsOnly() {
+        var changedValue: String? = null
+
+        composeTestRule.setContentToScreen {
+            AppTextField(
+                value = "",
+                onValueChange = { changedValue = it },
+                label = composeTestRule.activity.getString(R.string.birth_date),
+                isDate = true
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.birth_date).checkTextFieldAndInput("1a5.03-2")
+
+        assertEquals("15032", changedValue)
+    }
+
+    @Test
+    fun appTextField_dateInputWithExtraDigits_calledValueChangeActionWithDateDigits() {
+        var changedValue: String? = null
+
+        composeTestRule.setContentToScreen {
+            AppTextField(
+                value = "",
+                onValueChange = { changedValue = it },
+                label = composeTestRule.activity.getString(R.string.birth_date),
+                isDate = true
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.birth_date).checkTextFieldAndInput("150320001234")
+
+        assertEquals("15032000", changedValue)
+    }
+
+    @Test
+    fun appTextField_dateTyping_displayedEnteredDigitsInMask() {
+        composeTestRule.setContentToScreen {
+            var value by remember { mutableStateOf("") }
+
+            AppTextField(
+                value = value,
+                onValueChange = { value = it },
+                label = composeTestRule.activity.getString(R.string.birth_date),
+                isDate = true
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.birth_date).checkTextFieldAndInput("150")
+        composeTestRule.onNodeWithText("15.0_.____").assertIsDisplayed()
+
+        // the next digits are added after the cursor, which is placed after the separators
+        composeTestRule.onNodeWithTextId(R.string.birth_date).checkTextFieldAndInput("32000")
+        composeTestRule.onNodeWithText("15.03.2000").assertIsDisplayed()
+    }
+
+    @Test
+    fun appTextField_emptyDateWithFocus_displayedPlaceholder() {
+        composeTestRule.setContentToScreen {
+            AppTextField(
+                value = "",
+                onValueChange = {},
+                label = composeTestRule.activity.getString(R.string.birth_date),
+                isDate = true
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.birth_date).performClick()
+
+        composeTestRule.onNodeWithTextId(R.string.date_placeholder).assertIsDisplayed()
+    }
+
+    @Test
     fun appTextField_error_displayedErrorMessage() {
         composeTestRule.setContentToScreen {
             AppTextField(

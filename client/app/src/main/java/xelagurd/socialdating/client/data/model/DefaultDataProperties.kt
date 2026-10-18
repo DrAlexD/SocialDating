@@ -1,5 +1,10 @@
 package xelagurd.socialdating.client.data.model
 
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
+import java.time.format.ResolverStyle
+
 object DefaultDataProperties {
 
     const val ID_MIN = 1
@@ -29,6 +34,13 @@ object DefaultDataProperties {
     const val AGE_MIN = 18
     const val AGE_MAX = 99
 
+    // the max border of the age filter means the age without the upper limit,
+    // because the users become older than the max age of the registration
+    const val FILTER_AGE_MAX = AGE_MAX + 1
+
+    // the date is entered without the separators, as DDMMYYYY
+    const val DATE_DIGITS_NUMBER = 8
+
     const val DIFFERENCE_NUMBER_MIN = 1
 
     private const val EMAIL_LOCAL_PART = "[A-Za-z0-9_%+-]+(\\.[A-Za-z0-9_%+-]+)*"
@@ -36,6 +48,8 @@ object DefaultDataProperties {
 
     private val usernameRegex = Regex("^[a-zA-Z0-9_]+\$")
     private val emailRegex = Regex("^$EMAIL_LOCAL_PART@$EMAIL_DOMAIN_LABEL(\\.$EMAIL_DOMAIN_LABEL)+\$")
+
+    private val dateDigitsFormatter = DateTimeFormatter.ofPattern("ddMMuuuu").withResolverStyle(ResolverStyle.STRICT)
 
 
     fun String.isValidText(minLength: Int, maxLength: Int) = trim().length in minLength..maxLength
@@ -51,7 +65,17 @@ object DefaultDataProperties {
 
     fun String.isValidEmail() = isValidText(EMAIL_LENGTH_MIN, EMAIL_LENGTH_MAX) && isValidEmailFormat()
 
-    fun String.isValidAge() = toIntOrNull()?.isValidAge() == true
+    fun String.toDateOrNull(): LocalDate? =
+        if (length == DATE_DIGITS_NUMBER) runCatching { LocalDate.parse(this, dateDigitsFormatter) }.getOrNull()
+        else null
+
+    fun LocalDate.toAge() = Period.between(this, LocalDate.now()).years
+
+    fun String.isValidDate() = toDateOrNull() != null
+
+    fun String.isValidBirthDate() = toDateOrNull()?.isValidBirthDate() == true
+
+    fun LocalDate.isValidBirthDate() = toAge().isValidAge()
 
     fun Int.isValidAge() = this in AGE_MIN..AGE_MAX
 

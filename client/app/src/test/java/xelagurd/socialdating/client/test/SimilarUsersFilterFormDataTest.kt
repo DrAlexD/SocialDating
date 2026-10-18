@@ -9,6 +9,7 @@ import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.FILTER_AGE_MAX
 import xelagurd.socialdating.client.data.model.details.SimilarUsersFilterDetails
 import xelagurd.socialdating.client.data.model.enums.DifferenceRangeType.CUSTOM
 import xelagurd.socialdating.client.data.model.enums.DifferenceRangeType.DEFAULT
@@ -111,7 +112,8 @@ class SimilarUsersFilterFormDataTest {
     @Test
     fun similarUsersFilterFormData_narrowedAgeRange_countedAsActiveFilter() {
         assertEquals(1, emptyFormData.copy(ageRange = AGE_MIN..30).activeFiltersNumber)
-        assertEquals(1, emptyFormData.copy(ageRange = 20..AGE_MAX).activeFiltersNumber)
+        assertEquals(1, emptyFormData.copy(ageRange = 20..FILTER_AGE_MAX).activeFiltersNumber)
+        assertEquals(1, emptyFormData.copy(ageRange = AGE_MIN..AGE_MAX).activeFiltersNumber)
     }
 
     @Test
@@ -163,8 +165,18 @@ class SimilarUsersFilterFormDataTest {
     fun toSimilarUsersFilterDetails_ageRange_mapsOnlyNarrowedBorders() {
         assertEquals(20 to 30, formData.copy(ageRange = 20..30).mappedAgeBorders())
         assertEquals(null to 30, formData.copy(ageRange = AGE_MIN..30).mappedAgeBorders())
-        assertEquals(20 to null, formData.copy(ageRange = 20..AGE_MAX).mappedAgeBorders())
-        assertEquals(null to null, formData.copy(ageRange = AGE_MIN..AGE_MAX).mappedAgeBorders())
+        assertEquals(20 to null, formData.copy(ageRange = 20..FILTER_AGE_MAX).mappedAgeBorders())
+        assertEquals(null to null, formData.copy(ageRange = AGE_MIN..FILTER_AGE_MAX).mappedAgeBorders())
+    }
+
+    @Test
+    fun toSimilarUsersFilterDetails_ageRangeBelowFilterMax_mapsMaxBorder() {
+        assertEquals(null to AGE_MAX, formData.copy(ageRange = AGE_MIN..AGE_MAX).mappedAgeBorders())
+    }
+
+    @Test
+    fun toSimilarUsersFilterDetails_narrowestUnlimitedAgeRange_mapsMinBorderWithoutMax() {
+        assertEquals(AGE_MAX to null, formData.copy(ageRange = AGE_MAX..FILTER_AGE_MAX).mappedAgeBorders())
     }
 
     @Test
@@ -175,6 +187,14 @@ class SimilarUsersFilterFormDataTest {
     @Test
     fun toSimilarUsersFilterFormData_emptyData_mapsEmptyFilter() {
         assertEquals(emptyFormData, SimilarUsersFilterDetails().toSimilarUsersFilterFormData())
+    }
+
+    @Test
+    fun toSimilarUsersFilterFormData_absentAgeMax_mapsFilterMaxAge() {
+        assertEquals(
+            25..FILTER_AGE_MAX,
+            SimilarUsersFilterDetails(ageMin = 25).toSimilarUsersFilterFormData().ageRange
+        )
     }
 
     @Test

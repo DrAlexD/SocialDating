@@ -158,30 +158,21 @@ private inline fun RegistrationDetailsBody(
             keyboardType = KeyboardType.Email,
             error = registrationFormData.emailError
         )
-        Row(
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            AppTextField(
-                value = registrationFormData.age,
-                onValueChange = { onValueChange(registrationFormData.copy(age = it)) },
-                label = stringResource(R.string.age),
-                overrideModifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_4dp))
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp)),
-                keyboardType = KeyboardType.Number,
-                error = registrationFormData.ageError
-            )
-            AppTextField(
-                value = registrationFormData.city,
-                onValueChange = { onValueChange(registrationFormData.copy(city = it)) },
-                label = stringResource(R.string.city),
-                overrideModifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_4dp))
-                    .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp)),
-                error = registrationFormData.cityError
-            )
-        }
+        AppTextField(
+            value = registrationFormData.birthDate,
+            onValueChange = { onValueChange(registrationFormData.copy(birthDate = it)) },
+            label = stringResource(R.string.birth_date),
+            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp)),
+            isDate = true,
+            error = registrationFormData.birthDateError
+        )
+        AppTextField(
+            value = registrationFormData.city,
+            onValueChange = { onValueChange(registrationFormData.copy(city = it)) },
+            label = stringResource(R.string.city),
+            overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp)),
+            error = registrationFormData.cityError
+        )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -265,7 +256,7 @@ private fun RegistrationComponentInvalidFormPreview() {
                     username = "user name",
                     repeatedPassword = "otherPassword",
                     email = "email1gmail.com",
-                    age = "5"
+                    birthDate = "05052020"
                 )
             )
         )
