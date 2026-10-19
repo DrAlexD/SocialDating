@@ -79,7 +79,7 @@ class UserCategoriesServiceUnitTest {
         name: String = "User$id",
         age: Int = 20 + id,
         city: String = "City$id"
-    ) = UserDto(id, name, MALE, "username$id", age, city, FRIENDS, USER_ACTIVITY_INITIAL, USER)
+    ) = UserDto(id, name, MALE, "username$id", "@telegram$id", age, city, FRIENDS, USER_ACTIVITY_INITIAL, USER)
 
     private fun userCategory(
         userId: Int,

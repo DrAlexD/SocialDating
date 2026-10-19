@@ -9,6 +9,7 @@ data class UserDto(
     val name: String,
     val gender: Gender,
     val username: String,
+    val telegram: String,
     val age: Int,
     val city: String,
     val purpose: Purpose,

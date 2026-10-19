@@ -80,6 +80,7 @@ object AndroidNavigationTestUtils {
         onNodeWithTextId(R.string.username).checkTextFieldAndInput(FakeData.mainUser.username)
         onNodeWithTextId(R.string.name).checkTextFieldAndInput(FakeData.mainUser.name)
         onNodeWithTagId(R.string.male).checkButtonAndClick()
+        onNodeWithTextId(R.string.telegram).checkTextFieldAndInput(FakeData.mainUser.telegram)
         onNodeWithTextId(R.string.birth_date).checkTextFieldAndInput(FakeData.registrationFormData.birthDate)
         onNodeWithTextId(R.string.city).checkTextFieldAndInput(FakeData.mainUser.city)
 

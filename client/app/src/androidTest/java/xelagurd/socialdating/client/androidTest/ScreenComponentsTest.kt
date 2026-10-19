@@ -2,11 +2,14 @@ package xelagurd.socialdating.client.androidTest
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
@@ -245,6 +248,26 @@ class ScreenComponentsTest {
     }
 
     @Test
+    fun appLargeBodyText_url_openedUrlByClick() {
+        var openedUrl: String? = null
+        val uriHandler = object : UriHandler {
+            override fun openUri(uri: String) {
+                openedUrl = uri
+            }
+        }
+
+        composeTestRule.setContentToScreen {
+            CompositionLocalProvider(LocalUriHandler provides uriHandler) {
+                AppLargeBodyText(text = LARGE_BODY_TEXT, url = URL)
+            }
+        }
+
+        composeTestRule.onNodeWithText(LARGE_BODY_TEXT).performClick()
+
+        assertEquals(URL, openedUrl)
+    }
+
+    @Test
     fun appMediumTextCard_enabled_calledClickAction() {
         var isClicked = false
 
@@ -413,6 +436,22 @@ class ScreenComponentsTest {
         composeTestRule.onNodeWithTextId(R.string.birth_date).performClick()
 
         composeTestRule.onNodeWithTextId(R.string.date_placeholder).assertIsDisplayed()
+    }
+
+    @Test
+    fun appTextField_emptyWithPlaceholderAndFocus_displayedPlaceholder() {
+        composeTestRule.setContentToScreen {
+            AppTextField(
+                value = "",
+                onValueChange = {},
+                label = composeTestRule.activity.getString(R.string.telegram),
+                placeholder = composeTestRule.activity.getString(R.string.telegram_placeholder)
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.telegram).performClick()
+
+        composeTestRule.onNodeWithTextId(R.string.telegram_placeholder).assertIsDisplayed()
     }
 
     @Test
@@ -909,5 +948,6 @@ class ScreenComponentsTest {
         const val SMALL_TITLE_TEXT = "Small title"
         const val MEDIUM_TITLE_TEXT = "Medium title"
         const val LARGE_TITLE_TEXT = "Large title"
+        const val URL = "https://example.com/"
     }
 }

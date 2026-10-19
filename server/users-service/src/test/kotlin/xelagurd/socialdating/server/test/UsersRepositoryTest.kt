@@ -40,7 +40,7 @@ class UsersRepositoryTest(
     private fun user(
         name: String,
         username: String,
-        email: String? = null,
+        telegram: String = "@$username",
         gender: Gender = MALE,
         birthDate: LocalDate = LocalDate.of(2000, 1, 1),
         cityEn: String? = "city",
@@ -52,7 +52,7 @@ class UsersRepositoryTest(
             gender = gender,
             username = username,
             password = FakeUsersData.users[0].password,
-            email = email,
+            telegram = telegram,
             birthDate = birthDate,
             cityEn = cityEn,
             cityRu = cityRu,
@@ -64,9 +64,9 @@ class UsersRepositoryTest(
     fun seedData() {
         val saved = usersRepository.saveAllAndFlush(
             listOf(
-                user(name = "Alexander", username = "username1", email = "email1@gmail.com"),
-                user(name = "Denis", username = "username2", email = "email2@gmail.com"),
-                user(name = "Andrey", username = "username3", email = null)
+                user(name = "Alexander", username = "username1", telegram = "@telegram1"),
+                user(name = "Denis", username = "username2", telegram = "@Telegram2"),
+                user(name = "Andrey", username = "username3", telegram = "@telegram3")
             )
         )
         user1 = saved[0]
@@ -88,16 +88,21 @@ class UsersRepositoryTest(
     }
 
     @Test
-    fun findByEmail_existing_returnsUser() {
-        val result = usersRepository.findByEmail("email2@gmail.com")
+    fun findByTelegram_existing_returnsUser() {
+        val result = usersRepository.findByTelegram("@Telegram2")
 
         assertEquals(user2.id, result?.id)
-        assertEquals("email2@gmail.com", result?.email)
+        assertEquals("@Telegram2", result?.telegram)
     }
 
     @Test
-    fun findByEmail_notExisting_returnsNull() {
-        assertNull(usersRepository.findByEmail("missing@gmail.com"))
+    fun findByTelegram_existingInOtherCase_returnsNull() {
+        assertNull(usersRepository.findByTelegram("@telegram2"))
+    }
+
+    @Test
+    fun findByTelegram_notExisting_returnsNull() {
+        assertNull(usersRepository.findByTelegram("@missing"))
     }
 
     @Test

@@ -19,12 +19,12 @@ import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.CITY_LENGTH_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.CITY_LENGTH_MIN
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.EMAIL_LENGTH_MAX
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.EMAIL_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.NAME_LENGTH_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.NAME_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.PASSWORD_LENGTH_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.PASSWORD_LENGTH_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.TELEGRAM_LENGTH_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.TELEGRAM_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MIN
 import xelagurd.socialdating.client.ui.form.FormFieldError
@@ -66,15 +66,35 @@ class RegistrationFormDataTest {
     fun registrationFormData_emptyData_isNotValid() {
         val emptyFormData = registrationFormData.copy(
             name = "", gender = null, username = "", password = "", repeatedPassword = "",
-            email = "", birthDate = "", city = "", purpose = null
+            telegram = "", birthDate = "", city = "", purpose = null
         )
 
         assertFalse(emptyFormData.isValid)
     }
 
     @Test
-    fun registrationFormData_emptyEmail_isValid() {
-        assertTrue(registrationFormData.copy(email = "").isValid)
+    fun registrationFormData_emptyTelegram_isNotValid() {
+        assertFalse(registrationFormData.copy(telegram = "").isValid)
+    }
+
+    @Test
+    fun registrationFormData_telegramWithoutPrefix_isNotValid() {
+        assertFalse(registrationFormData.copy(telegram = "telegram1").isValid)
+    }
+
+    @Test
+    fun registrationFormData_shortestTelegram_isValid() {
+        assertTrue(registrationFormData.copy(telegram = "@" + "a".repeat(TELEGRAM_LENGTH_MIN - 1)).isValid)
+    }
+
+    @Test
+    fun registrationFormData_longestTelegram_isValid() {
+        assertTrue(registrationFormData.copy(telegram = "@" + "a".repeat(TELEGRAM_LENGTH_MAX - 1)).isValid)
+    }
+
+    @Test
+    fun registrationFormData_telegramWithDigitsAndUnderscores_isValid() {
+        assertTrue(registrationFormData.copy(telegram = "@Tele_gram_1").isValid)
     }
 
     @Test
@@ -153,7 +173,7 @@ class RegistrationFormDataTest {
         assertNull(registrationFormData.usernameError)
         assertNull(registrationFormData.passwordError)
         assertNull(registrationFormData.repeatedPasswordError)
-        assertNull(registrationFormData.emailError)
+        assertNull(registrationFormData.telegramError)
         assertNull(registrationFormData.birthDateError)
         assertNull(registrationFormData.cityError)
     }
@@ -162,14 +182,14 @@ class RegistrationFormDataTest {
     fun registrationFormData_emptyData_hasNoErrors() {
         val emptyFormData = registrationFormData.copy(
             name = "", username = "", password = "", repeatedPassword = "",
-            email = "", birthDate = "", city = ""
+            telegram = "", birthDate = "", city = ""
         )
 
         assertNull(emptyFormData.nameError)
         assertNull(emptyFormData.usernameError)
         assertNull(emptyFormData.passwordError)
         assertNull(emptyFormData.repeatedPasswordError)
-        assertNull(emptyFormData.emailError)
+        assertNull(emptyFormData.telegramError)
         assertNull(emptyFormData.birthDateError)
         assertNull(emptyFormData.cityError)
     }
@@ -217,17 +237,52 @@ class RegistrationFormDataTest {
     }
 
     @Test
-    fun registrationFormData_incorrectEmail_hasFormatError() {
-        val formData = registrationFormData.copy(email = "email1gmail.com")
+    fun registrationFormData_telegramWithoutPrefix_hasPrefixError() {
+        val formData = registrationFormData.copy(telegram = "telegram1")
 
-        assertEquals(FormFieldError(R.string.error_email_format), formData.emailError)
+        assertEquals(FormFieldError(R.string.error_telegram_prefix), formData.telegramError)
     }
 
     @Test
-    fun registrationFormData_longEmail_hasLengthError() {
-        val formData = registrationFormData.copy(email = "a".repeat(EMAIL_LENGTH_MAX) + "@gmail.com")
+    fun registrationFormData_shortTelegram_hasLengthError() {
+        val formData = registrationFormData.copy(telegram = "@" + "a".repeat(TELEGRAM_LENGTH_MIN - 2))
 
-        assertEquals(lengthError(EMAIL_LENGTH_MIN, EMAIL_LENGTH_MAX), formData.emailError)
+        assertEquals(lengthError(TELEGRAM_LENGTH_MIN, TELEGRAM_LENGTH_MAX), formData.telegramError)
+    }
+
+    @Test
+    fun registrationFormData_longTelegram_hasLengthError() {
+        val formData = registrationFormData.copy(telegram = "@" + "a".repeat(TELEGRAM_LENGTH_MAX))
+
+        assertEquals(lengthError(TELEGRAM_LENGTH_MIN, TELEGRAM_LENGTH_MAX), formData.telegramError)
+    }
+
+    @Test
+    fun registrationFormData_telegramStartingWithDigit_hasFormatError() {
+        val formData = registrationFormData.copy(telegram = "@1telegram")
+
+        assertEquals(FormFieldError(R.string.error_telegram_format), formData.telegramError)
+    }
+
+    @Test
+    fun registrationFormData_telegramEndingWithUnderscore_hasFormatError() {
+        val formData = registrationFormData.copy(telegram = "@telegram_")
+
+        assertEquals(FormFieldError(R.string.error_telegram_format), formData.telegramError)
+    }
+
+    @Test
+    fun registrationFormData_telegramWithForbiddenSymbols_hasFormatError() {
+        val formData = registrationFormData.copy(telegram = "@tele-gram")
+
+        assertEquals(FormFieldError(R.string.error_telegram_format), formData.telegramError)
+    }
+
+    @Test
+    fun toRegistrationDetails_telegram_keptWithPrefix() {
+        val registrationDetails = registrationFormData.copy(telegram = "@telegram1").toRegistrationDetails()
+
+        assertEquals("@telegram1", registrationDetails.telegram)
     }
 
     @Test
