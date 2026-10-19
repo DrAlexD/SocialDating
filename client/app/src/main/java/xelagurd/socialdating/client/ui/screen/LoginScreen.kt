@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
@@ -110,6 +111,7 @@ private inline fun LoginDetailsBody(
             value = loginFormData.username,
             onValueChange = { onValueChange(loginFormData.copy(username = it)) },
             label = stringResource(R.string.username),
+            keyboardType = KeyboardType.Ascii,
             error = loginFormData.usernameError
         )
         AppTextField(

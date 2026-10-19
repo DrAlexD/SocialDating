@@ -94,12 +94,18 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import xelagurd.socialdating.client.R
@@ -233,14 +239,41 @@ fun AppMediumBodyText(
 fun AppLargeBodyText(
     text: String,
     modifier: Modifier = Modifier,
-    overrideModifier: Modifier? = null
+    overrideModifier: Modifier? = null,
+    // the text with the url is shown as the link, which is opened by the click
+    url: String? = null
 ) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodyLarge,
-        modifier = overrideModifier
-            ?: modifier.padding(dimensionResource(R.dimen.padding_4dp))
+    val textModifier = overrideModifier ?: modifier.padding(dimensionResource(R.dimen.padding_4dp))
+
+    if (url == null) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = textModifier
+        )
+    } else {
+        Text(
+            text = linkText(text, url),
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = textModifier
+        )
+    }
+}
+
+@Composable
+private fun linkText(text: String, url: String): AnnotatedString {
+    val linkStyles = TextLinkStyles(
+        style = SpanStyle(
+            color = MaterialTheme.colorScheme.primary,
+            textDecoration = TextDecoration.Underline
+        )
     )
+
+    return buildAnnotatedString {
+        withLink(LinkAnnotation.Url(url = url, styles = linkStyles)) {
+            append(text)
+        }
+    }
 }
 
 @Composable
@@ -387,6 +420,9 @@ fun AppTextField(
     isPassword: Boolean = false,
     // the value of the date contains only the digits, which are shown in the DD.MM.YYYY mask
     isDate: Boolean = false,
+    // the placeholder is shown in the focused empty field, it is ignored for the date,
+    // which always has the placeholder of its mask
+    placeholder: String? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
     error: FormFieldError? = null,
     // the field can be marked by the error of the several fields, whose message is shown by another field
@@ -414,7 +450,14 @@ fun AppTextField(
                     overrideModifier = Modifier
                 )
             }
-        } else null,
+        } else placeholder?.let {
+            {
+                AppMediumBodyText(
+                    text = it,
+                    overrideModifier = Modifier
+                )
+            }
+        },
         isError = isError,
         supportingText = error?.let {
             {

@@ -323,7 +323,7 @@ class IntegrationTest {
             "gender" to "MALE",
             "username" to "user$uniqueNumber",
             "password" to "pass$uniqueNumber",
-            "email" to "email$uniqueNumber@gmail.com",
+            "telegram" to "@telegram$uniqueNumber",
             "birthDate" to "2000-03-15",
             "city" to "Moscow",
             "purpose" to "ALL_AT_ONCE"

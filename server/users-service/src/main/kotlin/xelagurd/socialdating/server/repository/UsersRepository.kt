@@ -11,7 +11,9 @@ interface UsersRepository : JpaRepository<User, Int> {
 
     fun findByUsername(username: String): User?
 
-    fun findByEmail(email: String): User?
+    // the nicknames are compared with their case, unlike Telegram, where they are case-insensitive,
+    // so the nicknames which differ only in the case are considered as the different ones
+    fun findByTelegram(telegram: String): User?
 
     fun findAllByIdIn(userIds: List<Int>): List<User>
 

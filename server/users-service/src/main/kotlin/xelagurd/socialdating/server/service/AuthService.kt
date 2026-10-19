@@ -45,8 +45,8 @@ class AuthService(
             throw InvalidDataException("error.user.usernameAlreadyExists")
         }
 
-        if (registrationDetails.email != null && usersRepository.findByEmail(registrationDetails.email) != null) {
-            throw InvalidDataException("error.user.emailAlreadyExists")
+        if (usersRepository.findByTelegram(registrationDetails.telegram) != null) {
+            throw InvalidDataException("error.user.telegramAlreadyExists")
         }
 
         val user = usersRepository.save(registrationDetails.toUser(passwordEncoder))

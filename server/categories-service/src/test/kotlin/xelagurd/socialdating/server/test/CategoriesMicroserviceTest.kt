@@ -71,6 +71,7 @@ class CategoriesMicroserviceTest(
         name = "RemoteUser2",
         gender = MALE,
         username = "remoteUser2",
+        telegram = "@remoteTelegram2",
         age = 27,
         city = "RemoteCity",
         purpose = FRIENDS,

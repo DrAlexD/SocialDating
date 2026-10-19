@@ -72,7 +72,7 @@ class UsersMicroserviceTest(
         gender = Gender.MALE,
         username = "username4",
         password = "password4",
-        email = "email4@gmail.com",
+        telegram = "@telegram4",
         birthDate = LocalDate.of(1998, 9, 3),
         city = "Saint Petersburg",
         purpose = Purpose.FRIENDS
@@ -170,6 +170,7 @@ class UsersMicroserviceTest(
         assertEquals(registrationDetails.name, responseUser["name"])
         assertEquals(registrationDetails.gender.name, responseUser["gender"])
         assertEquals(registrationDetails.username, responseUser["username"])
+        assertEquals(registrationDetails.telegram, responseUser["telegram"])
         assertEquals(registrationDetails.birthDate.toAge(), responseUser["age"])
         assertEquals(registrationDetails.city, responseUser["city"])
         assertEquals(registrationDetails.purpose.name, responseUser["purpose"])
@@ -181,7 +182,7 @@ class UsersMicroserviceTest(
     fun registerUser_tooYoungUser_badRequestWithLocalizedMessage() {
         val tooYoungRegistrationDetails = registrationDetails.copy(
             username = "username5",
-            email = null,
+            telegram = "@telegram5",
             birthDate = LocalDate.now().minusYears(AGE_MIN.toLong()).plusDays(1)
         )
 
@@ -201,12 +202,53 @@ class UsersMicroserviceTest(
     }
 
     @Test
+    fun registerUser_existingTelegram_badRequestWithLocalizedMessage() {
+        val existingTelegramRegistrationDetails = registrationDetails.copy(
+            username = "username5",
+            telegram = users[0].telegram
+        )
+
+        val englishResponse = registerUser(existingTelegramRegistrationDetails, ENGLISH.languageTag)
+        assertEquals(HttpStatus.BAD_REQUEST, englishResponse.statusCode)
+        assertEquals("User with this Telegram already exists", englishResponse.body)
+
+        val russianResponse = registerUser(existingTelegramRegistrationDetails, RUSSIAN.languageTag)
+        assertEquals(HttpStatus.BAD_REQUEST, russianResponse.statusCode)
+        assertEquals("Пользователь с таким Telegram уже существует", russianResponse.body)
+    }
+
+    @Test
+    fun registerUser_telegramWithoutAt_badRequestWithLocalizedMessage() {
+        val withoutAtRegistrationDetails = registrationDetails.copy(
+            username = "username5",
+            telegram = "telegram5"
+        )
+
+        val englishResponse = registerUser(withoutAtRegistrationDetails, ENGLISH.languageTag)
+        assertEquals(HttpStatus.BAD_REQUEST, englishResponse.statusCode)
+        assertEquals(
+            "'Telegram' must start with @ and contain only latin letters, numbers and underscores, " +
+                    "starting with a letter and not ending with an underscore",
+            englishResponse.body
+        )
+
+        val russianResponse = registerUser(withoutAtRegistrationDetails, RUSSIAN.languageTag)
+        assertEquals(HttpStatus.BAD_REQUEST, russianResponse.statusCode)
+        assertEquals(
+            "'Telegram' должно начинаться с @ и содержать только латинские буквы, цифры и подчёркивания, " +
+                    "начинаясь с буквы и не заканчиваясь подчёркиванием",
+            russianResponse.body
+        )
+    }
+
+    @Test
     fun registerUser_notExistingBirthDate_badRequestWithWrongValueMessage() {
         val request = mapOf(
             "name" to "Nikolay",
             "gender" to "MALE",
             "username" to "username5",
             "password" to "password5",
+            "telegram" to "@telegram5",
             "birthDate" to "2000-02-30",
             "city" to "Saint Petersburg",
             "purpose" to "FRIENDS"
@@ -262,6 +304,7 @@ class UsersMicroserviceTest(
         assertEquals(expected.nameEn, responseUser["name"])
         assertEquals(expected.gender.name, responseUser["gender"])
         assertEquals(expected.username, responseUser["username"])
+        assertEquals(expected.telegram, responseUser["telegram"])
         assertEquals(expected.birthDate.toAge(), responseUser["age"])
         assertEquals(expected.cityEn, responseUser["city"])
         assertEquals(expected.purpose.name, responseUser["purpose"])

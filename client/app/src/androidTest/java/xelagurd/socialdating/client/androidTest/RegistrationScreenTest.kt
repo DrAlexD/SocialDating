@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -87,7 +88,7 @@ class RegistrationScreenTest {
         val invalidFormData = registrationFormData.copy(
             username = "user name",
             repeatedPassword = "otherPassword",
-            email = "email1gmail.com",
+            telegram = "telegram1",
             birthDate = LocalDate.now().minusYears(AGE_MIN - 1L).format(DateTimeFormatter.ofPattern("ddMMuuuu"))
         )
 
@@ -98,7 +99,7 @@ class RegistrationScreenTest {
         }
 
         composeTestRule.onNodeWithTextId(R.string.error_username_format).assertIsDisplayed()
-        composeTestRule.onNodeWithTextId(R.string.error_email_format).assertIsDisplayed()
+        composeTestRule.onNodeWithTextId(R.string.error_telegram_prefix).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.error_age, AGE_MIN, AGE_MAX).assertIsDisplayed()
 
         scrollToFormEnd()
@@ -128,8 +129,8 @@ class RegistrationScreenTest {
         composeTestRule.onNodeWithTextId(R.string.name).checkTextFieldAndInput(INPUT_TEXT)
         assertEquals(true, changedFormData?.name?.contains(INPUT_TEXT))
 
-        composeTestRule.onNodeWithTextId(R.string.email_optional).checkTextFieldAndInput(INPUT_TEXT)
-        assertEquals(true, changedFormData?.email?.contains(INPUT_TEXT))
+        composeTestRule.onNodeWithTextId(R.string.telegram).checkTextFieldAndInput(INPUT_TEXT)
+        assertEquals(true, changedFormData?.telegram?.contains(INPUT_TEXT))
 
         composeTestRule.onNodeWithTextId(R.string.city).checkTextFieldAndInput(INPUT_TEXT)
         assertEquals(true, changedFormData?.city?.contains(INPUT_TEXT))
@@ -164,6 +165,19 @@ class RegistrationScreenTest {
     }
 
     @Test
+    fun registrationScreen_emptyTelegramWithFocus_displayedPlaceholder() {
+        composeTestRule.setContentToScreen {
+            RegistrationScreenComponent(
+                registrationUiState = RegistrationUiState(formData = RegistrationFormData())
+            )
+        }
+
+        composeTestRule.onNodeWithTextId(R.string.telegram).performClick()
+
+        composeTestRule.onNodeWithTextId(R.string.telegram_placeholder).assertIsDisplayed()
+    }
+
+    @Test
     fun registrationScreen_passwordsInput_calledValueChangeAction() {
         var changedFormData: RegistrationFormData? = null
 
@@ -191,7 +205,7 @@ class RegistrationScreenTest {
         composeTestRule.onNodeWithTextId(R.string.male).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.female).assertIsDisplayed()
 
-        composeTestRule.onNodeWithTextId(R.string.email_optional).checkTextField()
+        composeTestRule.onNodeWithTextId(R.string.telegram).checkTextField()
         composeTestRule.onNodeWithTextId(R.string.birth_date).checkTextField()
         composeTestRule.onNodeWithTextId(R.string.city).checkTextField()
 

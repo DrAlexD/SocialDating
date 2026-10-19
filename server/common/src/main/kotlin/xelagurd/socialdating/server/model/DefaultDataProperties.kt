@@ -16,8 +16,8 @@ object DefaultDataProperties {
     const val PASSWORD_LENGTH_MIN = 8
     const val PASSWORD_LENGTH_MAX = 20
     const val PASSWORD_HASH_LENGTH = 60
-    const val EMAIL_LENGTH_MIN = 5 // a@b.c
-    const val EMAIL_LENGTH_MAX = 50
+    const val TELEGRAM_LENGTH_MIN = 6 // @ and 5 characters of the nickname
+    const val TELEGRAM_LENGTH_MAX = 33 // @ and 32 characters of the nickname
     const val CITY_LENGTH_MIN = 2
     const val CITY_LENGTH_MAX = 50
     const val CATEGORY_NAME_LENGTH_MIN = 2
@@ -30,9 +30,8 @@ object DefaultDataProperties {
     const val STATEMENT_TEXT_LENGTH_MAX = 200
 
     const val USERNAME_PATTERN = "^[a-zA-Z0-9_]+\$"
-    private const val EMAIL_LOCAL_PART = "[A-Za-z0-9_%+-]+(\\.[A-Za-z0-9_%+-]+)*"
-    private const val EMAIL_DOMAIN_LABEL = "[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?"
-    const val EMAIL_PATTERN = "^$EMAIL_LOCAL_PART@$EMAIL_DOMAIN_LABEL(\\.$EMAIL_DOMAIN_LABEL)+\$"
+    // the nickname starts with a letter and doesn't end with an underscore
+    const val TELEGRAM_PATTERN = "^@[a-zA-Z]([a-zA-Z0-9_]*[a-zA-Z0-9])?\$"
 
     const val PERCENT_MIN = 0
     const val PERCENT_MAX = 100

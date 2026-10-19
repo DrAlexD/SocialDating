@@ -11,9 +11,12 @@ import xelagurd.socialdating.client.data.model.DefaultDataProperties.NAME_LENGTH
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.NAME_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.PERCENT_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.TELEGRAM_LENGTH_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.TELEGRAM_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidPercent
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidTelegram
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidText
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidUsername
 import xelagurd.socialdating.client.data.model.enums.Gender
@@ -33,6 +36,7 @@ data class User(
     val name: String,
     val gender: Gender,
     val username: String,
+    val telegram: String,
     val age: Int,
     val city: String,
     val purpose: Purpose,
@@ -46,6 +50,10 @@ data class User(
         require(username.isValidUsername()) {
             "Username length must be between $USERNAME_LENGTH_MIN and $USERNAME_LENGTH_MAX " +
                     "and match username pattern"
+        }
+        require(telegram.isValidTelegram()) {
+            "Telegram length must be between $TELEGRAM_LENGTH_MIN and $TELEGRAM_LENGTH_MAX " +
+                    "and match telegram pattern"
         }
         // the age grows after the registration, so it can become greater than the max age of the filters
         require(age >= AGE_MIN) { "Age must not be less than $AGE_MIN" }

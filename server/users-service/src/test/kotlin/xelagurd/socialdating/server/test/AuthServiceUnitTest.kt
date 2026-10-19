@@ -58,13 +58,13 @@ class AuthServiceUnitTest {
     private val accessToken = "accessToken"
     private val refreshToken = "refreshToken"
 
-    private fun registrationDetails(email: String? = "email@gmail.com") =
+    private fun registrationDetails() =
         RegistrationDetails(
             name = "name",
             gender = Gender.MALE,
             username = "username",
             password = "password",
-            email = email,
+            telegram = "@telegram",
             birthDate = LocalDate.of(2001, 4, 12),
             city = "city",
             purpose = Purpose.FRIENDS
@@ -99,7 +99,7 @@ class AuthServiceUnitTest {
         val registrationDetails = registrationDetails()
         val savedUserSlot = slot<User>()
         every { usersRepository.findByUsername(registrationDetails.username) } returns null
-        every { usersRepository.findByEmail(registrationDetails.email!!) } returns null
+        every { usersRepository.findByTelegram(registrationDetails.telegram) } returns null
         every { passwordEncoder.encode(registrationDetails.password) } returns "encodedPassword"
         every { usersRepository.save(capture(savedUserSlot)) } returns user
         mockTokenGeneration()
@@ -110,28 +110,11 @@ class AuthServiceUnitTest {
         assertEquals(accessToken, result.accessToken)
         assertEquals(refreshToken, result.refreshToken)
         assertEquals("encodedPassword", savedUserSlot.captured.password)
+        assertEquals(registrationDetails.telegram, savedUserSlot.captured.telegram)
         assertEquals(Role.USER, savedUserSlot.captured.role)
 
         verify(exactly = 1) { usersRepository.findByUsername(registrationDetails.username) }
-        verify(exactly = 1) { usersRepository.findByEmail(registrationDetails.email!!) }
-        verify(exactly = 1) { usersRepository.save(any()) }
-        confirmVerified(usersRepository)
-    }
-
-    @Test
-    fun registerUser_nullEmail_skipsEmailCheckAndSaves() {
-        val registrationDetails = registrationDetails(email = null)
-        every { usersRepository.findByUsername(registrationDetails.username) } returns null
-        every { passwordEncoder.encode(any()) } returns "encodedPassword"
-        every { usersRepository.save(any()) } returns user
-        mockTokenGeneration()
-
-        val result = authService.registerUser(registrationDetails)
-
-        assertEquals(userDto, result.user)
-
-        verify(exactly = 1) { usersRepository.findByUsername(registrationDetails.username) }
-        verify(exactly = 0) { usersRepository.findByEmail(any()) }
+        verify(exactly = 1) { usersRepository.findByTelegram(registrationDetails.telegram) }
         verify(exactly = 1) { usersRepository.save(any()) }
         confirmVerified(usersRepository)
     }
@@ -150,17 +133,17 @@ class AuthServiceUnitTest {
     }
 
     @Test
-    fun registerUser_existingEmail_throwsIllegalArgument() {
+    fun registerUser_existingTelegram_throwsIllegalArgument() {
         val registrationDetails = registrationDetails()
         every { usersRepository.findByUsername(registrationDetails.username) } returns null
-        every { usersRepository.findByEmail(registrationDetails.email!!) } returns user
+        every { usersRepository.findByTelegram(registrationDetails.telegram) } returns user
 
         assertThrows(IllegalArgumentException::class.java) {
             authService.registerUser(registrationDetails)
         }
 
         verify(exactly = 1) { usersRepository.findByUsername(registrationDetails.username) }
-        verify(exactly = 1) { usersRepository.findByEmail(registrationDetails.email!!) }
+        verify(exactly = 1) { usersRepository.findByTelegram(registrationDetails.telegram) }
         confirmVerified(usersRepository)
     }
 

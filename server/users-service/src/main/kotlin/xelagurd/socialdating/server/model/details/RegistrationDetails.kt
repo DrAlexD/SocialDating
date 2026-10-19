@@ -9,13 +9,13 @@ import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.CITY_LENGTH_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.CITY_LENGTH_MIN
-import xelagurd.socialdating.server.model.DefaultDataProperties.EMAIL_LENGTH_MAX
-import xelagurd.socialdating.server.model.DefaultDataProperties.EMAIL_LENGTH_MIN
-import xelagurd.socialdating.server.model.DefaultDataProperties.EMAIL_PATTERN
 import xelagurd.socialdating.server.model.DefaultDataProperties.NAME_LENGTH_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.NAME_LENGTH_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.PASSWORD_LENGTH_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PASSWORD_LENGTH_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.TELEGRAM_LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.TELEGRAM_LENGTH_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.TELEGRAM_PATTERN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_LENGTH_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_LENGTH_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_PATTERN
@@ -43,9 +43,10 @@ data class RegistrationDetails(
     @field:Size(min = PASSWORD_LENGTH_MIN, max = PASSWORD_LENGTH_MAX)
     val password: String,
 
-    @field:TrimmedSize(min = EMAIL_LENGTH_MIN, max = EMAIL_LENGTH_MAX)
-    @field:Pattern(regexp = EMAIL_PATTERN, message = "{socialdating.validation.email}")
-    val email: String?,
+    @field:NotBlank
+    @field:Size(min = TELEGRAM_LENGTH_MIN, max = TELEGRAM_LENGTH_MAX)
+    @field:Pattern(regexp = TELEGRAM_PATTERN, message = "{socialdating.validation.telegram}")
+    val telegram: String,
 
     @field:AgeRange(min = AGE_MIN, max = AGE_MAX)
     val birthDate: LocalDate,
@@ -62,7 +63,7 @@ data class RegistrationDetails(
             gender = gender,
             username = username,
             password = passwordEncoder.encode(password)!!,
-            email = email,
+            telegram = telegram,
             birthDate = birthDate,
             cityEn = englishOrNull(city),
             cityRu = russianOrNull(city),
@@ -70,6 +71,6 @@ data class RegistrationDetails(
             role = Role.USER
         )
 
-    override fun toString() = "RegistrationDetails(name=$name, gender=$gender, username=$username, email=$email, " +
+    override fun toString() = "RegistrationDetails(name=$name, gender=$gender, username=$username, telegram=$telegram, " +
             "birthDate=$birthDate, city=$city, purpose=$purpose)"
 }

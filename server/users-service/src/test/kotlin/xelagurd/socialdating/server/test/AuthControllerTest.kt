@@ -51,7 +51,7 @@ class AuthControllerTest(@param:Autowired private val mockMvc: MockMvc) {
         gender = Gender.MALE,
         username = "username1",
         password = "password",
-        email = "email@gmail.com",
+        telegram = "@telegram",
         birthDate = LocalDate.of(2001, 4, 12),
         city = "city",
         purpose = Purpose.FRIENDS
@@ -127,6 +127,26 @@ class AuthControllerTest(@param:Autowired private val mockMvc: MockMvc) {
     }
 
     @Test
+    fun registerUser_telegramWithoutAt_badRequest() {
+        assertRegistrationBadRequest(registrationDetails.copy(telegram = "telegram"))
+    }
+
+    @Test
+    fun registerUser_telegramStartingWithDigit_badRequest() {
+        assertRegistrationBadRequest(registrationDetails.copy(telegram = "@1telegram"))
+    }
+
+    @Test
+    fun registerUser_telegramEndingWithUnderscore_badRequest() {
+        assertRegistrationBadRequest(registrationDetails.copy(telegram = "@telegram_"))
+    }
+
+    @Test
+    fun registerUser_shortTelegram_badRequest() {
+        assertRegistrationBadRequest(registrationDetails.copy(telegram = "@tele"))
+    }
+
+    @Test
     fun registerUser_existingUsername_badRequest() {
         every { authService.registerUser(any()) } throws
                 IllegalArgumentException("User with this username already exists")
@@ -186,6 +206,18 @@ class AuthControllerTest(@param:Autowired private val mockMvc: MockMvc) {
             .andExpect(status().isUnauthorized)
 
         verify(exactly = 1) { authService.refreshToken(any()) }
+        confirmVerified(authService)
+    }
+
+    private fun assertRegistrationBadRequest(invalidRegistrationDetails: RegistrationDetails) {
+        mockMvc.perform(
+            post("/users/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRegistrationDetails))
+        )
+            .andExpect(status().isBadRequest)
+
+        verify(exactly = 0) { authService.registerUser(any()) }
         confirmVerified(authService)
     }
 }

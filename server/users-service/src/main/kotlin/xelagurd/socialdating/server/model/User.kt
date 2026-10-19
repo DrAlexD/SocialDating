@@ -15,14 +15,14 @@ import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
 import xelagurd.socialdating.server.model.DefaultDataProperties.CITY_LENGTH_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.CITY_LENGTH_MIN
-import xelagurd.socialdating.server.model.DefaultDataProperties.EMAIL_LENGTH_MAX
-import xelagurd.socialdating.server.model.DefaultDataProperties.EMAIL_LENGTH_MIN
-import xelagurd.socialdating.server.model.DefaultDataProperties.EMAIL_PATTERN
 import xelagurd.socialdating.server.model.DefaultDataProperties.NAME_LENGTH_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.NAME_LENGTH_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.PASSWORD_HASH_LENGTH
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.PERCENT_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.TELEGRAM_LENGTH_MAX
+import xelagurd.socialdating.server.model.DefaultDataProperties.TELEGRAM_LENGTH_MIN
+import xelagurd.socialdating.server.model.DefaultDataProperties.TELEGRAM_PATTERN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_LENGTH_MAX
 import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_LENGTH_MIN
 import xelagurd.socialdating.server.model.DefaultDataProperties.USERNAME_PATTERN
@@ -40,7 +40,7 @@ import xelagurd.socialdating.server.utils.LocalizationUtils.localize
     name = "users",
     uniqueConstraints = [
         UniqueConstraint(name = "uk_username", columnNames = ["username"]),
-        UniqueConstraint(name = "uk_email", columnNames = ["email"])
+        UniqueConstraint(name = "uk_telegram", columnNames = ["telegram"])
     ],
     check = [
         CheckConstraint(name = "ck_name", constraint = "name_en is not null or name_ru is not null"),
@@ -86,11 +86,12 @@ class User(
     final var password: String,
 
     @field:Column(
-        columnDefinition = "varchar($EMAIL_LENGTH_MAX) " +
-                "check (email is null or (length(trim(email)) between $EMAIL_LENGTH_MIN and $EMAIL_LENGTH_MAX " +
-                "and email ~ '$EMAIL_PATTERN'))"
+        nullable = false,
+        columnDefinition = "varchar($TELEGRAM_LENGTH_MAX) " +
+                "check (length(telegram) between $TELEGRAM_LENGTH_MIN and $TELEGRAM_LENGTH_MAX " +
+                "and telegram ~ '$TELEGRAM_PATTERN')"
     )
-    var email: String?,
+    var telegram: String,
 
     @field:Column(nullable = false)
     var birthDate: LocalDate,
@@ -128,6 +129,7 @@ class User(
             name = localize(nameEn, nameRu, language),
             gender = gender,
             username = username,
+            telegram = telegram,
             age = birthDate.toAge(),
             city = localize(cityEn, cityRu, language),
             purpose = purpose,
@@ -168,7 +170,7 @@ class User(
         if (gender != other.gender) return false
         if (username != other.username) return false
         if (password != other.password) return false
-        if (email != other.email) return false
+        if (telegram != other.telegram) return false
         if (birthDate != other.birthDate) return false
         if (cityEn != other.cityEn) return false
         if (cityRu != other.cityRu) return false
@@ -186,7 +188,7 @@ class User(
         result = 31 * result + gender.hashCode()
         result = 31 * result + username.hashCode()
         result = 31 * result + password.hashCode()
-        result = 31 * result + email.hashCode()
+        result = 31 * result + telegram.hashCode()
         result = 31 * result + birthDate.hashCode()
         result = 31 * result + cityEn.hashCode()
         result = 31 * result + cityRu.hashCode()

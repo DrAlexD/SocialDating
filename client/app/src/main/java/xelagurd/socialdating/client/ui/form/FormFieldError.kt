@@ -5,16 +5,17 @@ import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.AGE_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.DATE_DIGITS_NUMBER
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.EMAIL_LENGTH_MAX
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.EMAIL_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.PASSWORD_LENGTH_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.PASSWORD_LENGTH_MIN
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.TELEGRAM_LENGTH_MAX
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.TELEGRAM_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MAX
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.USERNAME_LENGTH_MIN
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidBirthDate
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidDate
-import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidEmailFormat
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidPassword
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidTelegramFormat
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidTelegramPrefix
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidText
 import xelagurd.socialdating.client.data.model.DefaultDataProperties.isValidUsernameFormat
 
@@ -52,12 +53,13 @@ object FormFieldErrors {
         else -> null
     }
 
-    fun String.emailError() = when {
+    fun String.telegramError() = when {
         isEmpty() -> null
-        !isValidEmailFormat() -> FormFieldError(R.string.error_email_format)
-        !isValidText(EMAIL_LENGTH_MIN, EMAIL_LENGTH_MAX) ->
-            lengthError(EMAIL_LENGTH_MIN, EMAIL_LENGTH_MAX)
+        !isValidTelegramPrefix() -> FormFieldError(R.string.error_telegram_prefix)
+        !isValidText(TELEGRAM_LENGTH_MIN, TELEGRAM_LENGTH_MAX) ->
+            lengthError(TELEGRAM_LENGTH_MIN, TELEGRAM_LENGTH_MAX)
 
+        !isValidTelegramFormat() -> FormFieldError(R.string.error_telegram_format)
         else -> null
     }
 

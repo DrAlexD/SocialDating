@@ -10,12 +10,12 @@ data class RegistrationDetails(
     val gender: Gender,
     val username: String,
     val password: String,
-    val email: String?,
+    val telegram: String,
     // ISO 8601 date, as YYYY-MM-DD
     val birthDate: String,
     val city: String,
     val purpose: Purpose
 ) {
-    override fun toString() = "RegistrationDetails(name=$name, gender=$gender, username=$username, email=$email, " +
+    override fun toString() = "RegistrationDetails(name=$name, gender=$gender, username=$username, telegram=$telegram, " +
             "birthDate=$birthDate, city=$city, purpose=$purpose)"
 }

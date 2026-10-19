@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import xelagurd.socialdating.client.R
 import xelagurd.socialdating.client.data.fake.FakeData
+import xelagurd.socialdating.client.data.model.DefaultDataProperties.toTelegramUrl
 import xelagurd.socialdating.client.data.model.User
 import xelagurd.socialdating.client.data.model.enums.Gender
 import xelagurd.socialdating.client.ui.AppBottomNavigationBar
@@ -135,6 +136,7 @@ private fun UserDetailsBody(user: User) {
 private fun UserInfoHints() {
     Column {
         AppLargeBodyText(text = stringResourceWithColon(R.string.username))
+        AppLargeBodyText(text = stringResourceWithColon(R.string.telegram))
         AppLargeBodyText(text = stringResourceWithColon(R.string.name))
         AppLargeBodyText(text = stringResourceWithColon(R.string.age))
         AppLargeBodyText(text = stringResourceWithColon(R.string.city))
@@ -146,6 +148,7 @@ private fun UserInfoHints() {
 private fun UserData(user: User) {
     Column {
         AppLargeBodyText(text = user.username)
+        AppLargeBodyText(text = user.telegram, url = user.telegram.toTelegramUrl())
         NameWithAvatar(name = user.name, gender = user.gender)
         AppLargeBodyText(text = "${user.age}")
         AppLargeBodyText(text = user.city)

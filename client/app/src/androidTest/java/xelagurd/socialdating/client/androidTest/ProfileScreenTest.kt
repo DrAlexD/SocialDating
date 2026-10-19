@@ -1,10 +1,14 @@
 package xelagurd.socialdating.client.androidTest
 
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertEquals
@@ -72,18 +76,44 @@ class ProfileScreenTest {
         setContentToProfileBody(profileUiState)
 
         composeTestRule.onNodeWithTextIdWithColon(R.string.username).assertIsDisplayed()
+        composeTestRule.onNodeWithTextIdWithColon(R.string.telegram).assertIsDisplayed()
         composeTestRule.onNodeWithTextIdWithColon(R.string.name).assertIsDisplayed()
         composeTestRule.onNodeWithTextIdWithColon(R.string.age).assertIsDisplayed()
         composeTestRule.onNodeWithTextIdWithColon(R.string.city).assertIsDisplayed()
         composeTestRule.onNodeWithTextIdWithColon(R.string.purpose).assertIsDisplayed()
 
         composeTestRule.onNodeWithText(user.username).assertIsDisplayed()
+        composeTestRule.onNodeWithText(user.telegram).assertIsDisplayed()
         composeTestRule.onNodeWithText(user.name).assertIsDisplayed()
         composeTestRule.onNodeWithText(user.age.toString()).assertIsDisplayed()
         composeTestRule.onNodeWithText(user.city).assertIsDisplayed()
         composeTestRule.onNodeWithTextId(R.string.all_at_once).assertIsDisplayed()
 
         composeTestRule.onNodeWithTextId(R.string.open_profile_statistics).checkEnabledButton()
+    }
+
+    @Test
+    fun profileScreen_telegramClick_openedTelegramUrl() {
+        var openedUrl: String? = null
+        val uriHandler = object : UriHandler {
+            override fun openUri(uri: String) {
+                openedUrl = uri
+            }
+        }
+        val profileUiState = ProfileUiState(
+            entity = user,
+            dataRequestStatus = RequestStatus.SUCCESS
+        )
+
+        composeTestRule.setContentToScreen {
+            CompositionLocalProvider(LocalUriHandler provides uriHandler) {
+                ProfileScreenComponent(profileUiState = profileUiState)
+            }
+        }
+
+        composeTestRule.onNodeWithText(user.telegram).performClick()
+
+        assertEquals("https://t.me/telegram1", openedUrl)
     }
 
     @Test

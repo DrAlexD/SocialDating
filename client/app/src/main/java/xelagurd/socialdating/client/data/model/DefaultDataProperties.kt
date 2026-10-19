@@ -15,8 +15,8 @@ object DefaultDataProperties {
     const val USERNAME_LENGTH_MAX = 20
     const val PASSWORD_LENGTH_MIN = 8
     const val PASSWORD_LENGTH_MAX = 20
-    const val EMAIL_LENGTH_MIN = 5 // a@b.c
-    const val EMAIL_LENGTH_MAX = 50
+    const val TELEGRAM_LENGTH_MIN = 6 // @ and 5 characters of the nickname
+    const val TELEGRAM_LENGTH_MAX = 33 // @ and 32 characters of the nickname
     const val CITY_LENGTH_MIN = 2
     const val CITY_LENGTH_MAX = 50
     const val CATEGORY_NAME_LENGTH_MIN = 2
@@ -43,11 +43,12 @@ object DefaultDataProperties {
 
     const val DIFFERENCE_NUMBER_MIN = 1
 
-    private const val EMAIL_LOCAL_PART = "[A-Za-z0-9_%+-]+(\\.[A-Za-z0-9_%+-]+)*"
-    private const val EMAIL_DOMAIN_LABEL = "[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?"
+    private const val TELEGRAM_PREFIX = "@"
+    private const val TELEGRAM_URL = "https://t.me/"
 
     private val usernameRegex = Regex("^[a-zA-Z0-9_]+\$")
-    private val emailRegex = Regex("^$EMAIL_LOCAL_PART@$EMAIL_DOMAIN_LABEL(\\.$EMAIL_DOMAIN_LABEL)+\$")
+    // the nickname starts with a letter and doesn't end with an underscore
+    private val telegramRegex = Regex("^$TELEGRAM_PREFIX[a-zA-Z]([a-zA-Z0-9_]*[a-zA-Z0-9])?\$")
 
     private val dateDigitsFormatter = DateTimeFormatter.ofPattern("ddMMuuuu").withResolverStyle(ResolverStyle.STRICT)
 
@@ -61,9 +62,14 @@ object DefaultDataProperties {
     fun String.isValidUsername() =
         isValidText(USERNAME_LENGTH_MIN, USERNAME_LENGTH_MAX) && isValidUsernameFormat()
 
-    fun String.isValidEmailFormat() = emailRegex.matches(this)
+    fun String.isValidTelegramPrefix() = startsWith(TELEGRAM_PREFIX)
 
-    fun String.isValidEmail() = isValidText(EMAIL_LENGTH_MIN, EMAIL_LENGTH_MAX) && isValidEmailFormat()
+    fun String.isValidTelegramFormat() = telegramRegex.matches(this)
+
+    fun String.isValidTelegram() =
+        isValidText(TELEGRAM_LENGTH_MIN, TELEGRAM_LENGTH_MAX) && isValidTelegramFormat()
+
+    fun String.toTelegramUrl() = TELEGRAM_URL + removePrefix(TELEGRAM_PREFIX)
 
     fun String.toDateOrNull(): LocalDate? =
         if (length == DATE_DIGITS_NUMBER) runCatching { LocalDate.parse(this, dateDigitsFormatter) }.getOrNull()

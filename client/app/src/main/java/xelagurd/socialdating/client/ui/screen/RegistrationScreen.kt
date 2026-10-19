@@ -122,6 +122,7 @@ private inline fun RegistrationDetailsBody(
                 overrideModifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_4dp))
                     .width(TextFieldDefaults.MinWidth / 2 - dimensionResource(R.dimen.padding_4dp)),
+                keyboardType = KeyboardType.Ascii,
                 error = registrationFormData.usernameError
             )
             AppTextField(
@@ -151,12 +152,13 @@ private inline fun RegistrationDetailsBody(
             }
         }
         AppTextField(
-            value = registrationFormData.email,
-            onValueChange = { onValueChange(registrationFormData.copy(email = it)) },
-            label = stringResource(R.string.email_optional),
+            value = registrationFormData.telegram,
+            onValueChange = { onValueChange(registrationFormData.copy(telegram = it)) },
+            label = stringResource(R.string.telegram),
             overrideModifier = Modifier.padding(dimensionResource(R.dimen.padding_4dp)),
-            keyboardType = KeyboardType.Email,
-            error = registrationFormData.emailError
+            placeholder = stringResource(R.string.telegram_placeholder),
+            keyboardType = KeyboardType.Ascii,
+            error = registrationFormData.telegramError
         )
         AppTextField(
             value = registrationFormData.birthDate,
@@ -255,7 +257,7 @@ private fun RegistrationComponentInvalidFormPreview() {
                 formData = FakeData.registrationFormData.copy(
                     username = "user name",
                     repeatedPassword = "otherPassword",
-                    email = "email1gmail.com",
+                    telegram = "telegram1",
                     birthDate = "05052020"
                 )
             )
