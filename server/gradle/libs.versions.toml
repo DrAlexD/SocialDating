@@ -1,10 +1,10 @@
 [versions]
 kotlin = "2.4.21"
 kotlinLogging = "8.0.4"
-springBoot = "4.1.1"
+springBoot = "4.1.2"
 springDependencyManagement = "1.1.7"
-springCloudDependencies = "2025.1.3"
-springdocOpenapi = "3.1.1"
+springCloudDependencies = "2025.1.4"
+springdocOpenapi = "3.2.0"
 jwt = "0.13.0"
 mockk = "1.14.11"
 springmockk = "5.0.1"
